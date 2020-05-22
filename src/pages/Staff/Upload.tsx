@@ -46,26 +46,27 @@ export default () => {
           </Dragger>
           <div style={{maxHeight: 500,marginTop:50 }}>
             {fileList.map((item,i) => {
-              return <div key={i}>
-                <Row>
-                  <Col span={7}><span>{item.name}</span></Col>
-                  <Col span={12}>
-                    <Progress
-                      status={item.statusColor}
-                      percent={item.percent}
-                      format={
-                        () => <a>{item.uploadStatus}{item.result.length > 0
-                        ?
-                        <Popover content={<div>{item.result.map(item => {return <p>{item}-员工编号已存在</p>})}</div>}>
-                          <span>详情</span>
-                        </Popover>
-                        :
-                        ''}</a>} />
-                      </Col>
-                </Row>
+              return (
+                <div key={i}>
+                  <Row>
+                    <Col span={7}><span>{item.name}</span></Col>
+                    <Col span={12}>
+                      <Progress
+                        status={item.statusColor}
+                        percent={item.percent}
+                        format={
+                          () => <a>{item.uploadStatus}{item.result.length > 0
+                          ?
+                          <Popover content={<div>{item.result.map(item => {return <p>{item}-员工编号已存在</p>})}</div>}>
+                            <span>详情</span>
+                          </Popover>
+                          :
+                          ''}</a>} />
+                        </Col>
+                  </Row>
                 <Divider />
               </div>
-            })}
+            )})}
           </div>
         </Col>
       </Row>

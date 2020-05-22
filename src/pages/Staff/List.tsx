@@ -122,7 +122,7 @@ export default () => {
               label="业务线"
               name="businessId"
             >
-              <Select allowClear placeholder="请选择所属业务线">
+              <Select showSearch optionFilterProp="children">
                 {
                   businessList?.map(item => {
                     return <Option key={item.businessId} value={item.businessId}>{item.businessLineName}</Option>

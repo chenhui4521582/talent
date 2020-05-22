@@ -105,6 +105,9 @@ export default defineConfig({
         path: '/talent/staff/config',
         component: '@/pages/Staff/Config'
       }, {
+        path: '/talent/staff/relation',
+        component: '@/pages/Staff/Relation'
+      }, {
         path: '/talent/report/demand',
         component: '@/pages/Report/Demand'
       }, {

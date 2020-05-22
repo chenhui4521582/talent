@@ -37,3 +37,17 @@ export async function saveConfigureRoster(params) { // 花名册配置
     data: params
   })
 }
+
+export async function listFamily(params) { // 员工家庭信息列表
+  return request(`/api/talent/employeeRoster/listFamily`, {
+    method: 'POST',
+    data: params
+  })
+}
+
+export async function exportFamily(params) { // 导出员工家庭信息列表
+  return request(`/api/talent/employeeRoster/exportFamily`, {
+    method: 'get',
+    params
+  })
+}

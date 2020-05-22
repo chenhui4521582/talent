@@ -56,6 +56,7 @@ export const useTable = ({
 
   return {
     TableContent,
-    refresh
+    refresh,
+    searchForm
   };
 }
