@@ -141,6 +141,14 @@ export default defineConfig({
           component: '@/pages/Staff/Relation',
         },
         {
+          path: '/talent/staff/detail',
+          component: '@/pages/Staff/Detail',
+        },
+        {
+          path: '/talent/staff/edit',
+          component: '@/pages/Staff/Edit',
+        },
+        {
           path: '/talent/report/demand',
           component: '@/pages/Report/Demand',
         },

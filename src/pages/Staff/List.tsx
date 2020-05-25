@@ -5,6 +5,7 @@ import { ColumnProps } from 'antd/es/table';
 import { listByConditionsRoster } from './services/staff';
 import { Card, Form, Input, Select, Row, Col, Button, Divider } from 'antd';
 import { useBusiness } from '@/models/global';
+import { serialize } from '@/utils/serialize';
 
 const { Option } = Select;
 export default () => {
@@ -46,14 +47,14 @@ export default () => {
       key: 'employmentType',
       align: 'center',
       render: text => {
-        const data = ['正式', '实习', '外聘', '兼职'];
+        const data = { 1: '正式', 2: '实习', 3: '外聘', 4: '兼职' };
         return <span>{data[text]}</span>;
       },
     },
     {
       title: '身份证号',
-      dataIndex: 'bankCardNo',
-      key: 'bankCardNo',
+      dataIndex: 'idCard',
+      key: 'idCard',
       align: 'center',
     },
     {
@@ -87,7 +88,7 @@ export default () => {
       },
     },
   ];
-  const { TableContent } = useTable({
+  const { TableContent, searchForm } = useTable({
     queryMethod: listByConditionsRoster,
     columns,
     rowKeyName: 'employeeId',
@@ -96,9 +97,21 @@ export default () => {
     <Card
       title="员工花名册"
       extra={
-        <Button type="primary">
-          <Link to={`edit`}>新增员工</Link>
-        </Button>
+        <div>
+          <Button type="primary">
+            <Link to={`edit`}>新增员工</Link>
+          </Button>
+          <Button
+            download
+            href={serialize(
+              '/api/talent/employeeRoster/export',
+              searchForm.getFieldsValue(),
+            )}
+            style={{ marginLeft: 10 }}
+          >
+            导出
+          </Button>
+        </div>
       }
     >
       <TableContent>

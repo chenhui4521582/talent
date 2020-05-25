@@ -2,7 +2,7 @@ export interface GlobalResParams<T> {
   msg: string;
   obj: T;
   status: number;
-};
+}
 
 export interface PaginationTableParams {
   pageNum: number;
@@ -31,7 +31,7 @@ export const newPageFormItemLayout = {
     sm: { span: 12 },
     md: { span: 10 },
   },
-}
+};
 
 export const submitFormLayout = {
   wrapperCol: {
@@ -46,5 +46,17 @@ export const ResumeStatus = {
   3: '已面试待入职',
   4: '未入职',
   5: '在职',
-  6: '离职'
+  6: '离职',
+};
+
+export const eduHash = {
+  0: '高中以下',
+  1: '高中',
+  2: '中专',
+  3: '大专',
+  4: '大学本科',
+  5: '研究生',
+  6: '博士生',
+  7: '博士后',
+  8: '院士',
 };
