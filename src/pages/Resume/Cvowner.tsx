@@ -73,7 +73,7 @@ export default (props) => {
           {
             curKey === '2' ? <span>
               <Divider type="vertical" />
-              <a onClick= { e => handleshow(record,'change')}>变更</a>
+              <a onClick= { e => handleshow(record,'change')}>面试安排</a>
               <Divider type="vertical" />
               <a onClick= { e => handleshow(record,'record')}>记录</a>
             </span>: null

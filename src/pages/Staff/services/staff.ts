@@ -51,3 +51,10 @@ export async function exportFamily(params) { // 导出员工家庭信息列表
     params
   })
 }
+
+export async function commonDetail(employeeId: string) { // 详情
+  return request('/api/talent/employeeRoster/getByEmployeeId', {
+    method: 'POST',
+    data: { employeeId }
+  });
+}

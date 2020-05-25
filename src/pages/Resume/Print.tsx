@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import PDFObject from 'pdfobject'
+import PDFObject from 'pdfobject';
 import { history } from 'umi';
 import { Row, Col, Button } from 'antd';
 import { getResumePDFUrl } from './services/print';

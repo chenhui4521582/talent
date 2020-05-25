@@ -14,8 +14,14 @@ export default (props) => {
       search: 'lorem ipsum'
     }
   };
-  const resumeId = props.location.query.resumeId;
-  const type = props.location.query.type;
+  let resumeId, type;
+  if (props.isComponent) {
+    resumeId = props.resumeId;
+    type = props.type;
+  } else {
+    resumeId = props.location.query.resumeId;
+    type = props.location.query.type;
+  }
   const [isEmpty, setIsEmpty] = useState<boolean>(false);
   useEffect(() => {
     let pdfMethod, values;
