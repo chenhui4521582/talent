@@ -109,14 +109,6 @@ export default defineConfig({
           component: '@/pages/System/Hrmanage',
         },
         {
-          path: '/talent/company/costmanage',
-          component: '@/pages/Company/Costmanage',
-        },
-        {
-          path: '/talent/company/labourmanage',
-          component: '@/pages/Company/Labourmanage',
-        },
-        {
           path: '/talent/system/tagmanage',
           component: '@/pages/System/Tagmanage',
         },
@@ -143,6 +135,10 @@ export default defineConfig({
         {
           path: '/talent/staff/config',
           component: '@/pages/Staff/Config',
+        },
+        {
+          path: '/talent/staff/relation',
+          component: '@/pages/Staff/Relation',
         },
         {
           path: '/talent/report/demand',
@@ -183,6 +179,14 @@ export default defineConfig({
         {
           path: '/talent/myview/resumeFilter',
           component: '@/pages/Myview/ResumeFilter',
+        },
+        {
+          path: '/talent/company/costmanage',
+          component: '@/pages/Company/Costmanage',
+        },
+        {
+          path: '/talent/company/labourmanage',
+          component: '@/pages/Company/Labourmanage',
         },
       ],
     },

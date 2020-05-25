@@ -9,36 +9,45 @@ interface useTablesParams {
   columns: ColumnProps<any>[];
   rowKeyName: any;
   paramName?: string;
-  paramValue? :string | number;
-};
+  paramValue?: string | number;
+}
 
 export const useTable = ({
-  queryMethod, columns, rowKeyName, paramName, paramValue
+  queryMethod,
+  columns,
+  rowKeyName,
+  paramName,
+  paramValue,
 }: useTablesParams) => {
   const [searchForm] = Form.useForm();
-  const { tableProps, refresh, search } = useFormTable(async ({ current, pageSize }: PaginationTableParams) => {
-    const data = searchForm.getFieldsValue();
-    if (paramName) data[paramName] = paramValue;
-    let response = await queryMethod({pageNum: current, pageSize, ...data});
-    return {
-      total: response.obj?.total,
-      list: response.obj?.list
-    };
-  }, {
-    defaultPageSize: 10,
-    form: searchForm
-  });
+  const { tableProps, refresh, search } = useFormTable(
+    async ({ current, pageSize }: PaginationTableParams) => {
+      const data = searchForm.getFieldsValue();
+      if (paramName) data[paramName] = paramValue;
+      let response = await queryMethod({ pageNum: current, pageSize, ...data });
+      return {
+        total: response.obj?.total,
+        list: response.obj?.list,
+      };
+    },
+    {
+      defaultPageSize: 10,
+      form: searchForm,
+    },
+  );
 
   const { reset, submit } = search;
 
   const TableContent = ({ children }) => {
-    return(
+    return (
       <div>
         <div>
           <Form form={searchForm}>
             {children}
             <Row>
-              <Form.Item style={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <Form.Item
+                style={{ display: 'flex', justifyContent: 'flex-end' }}
+              >
                 <Button type="primary" onClick={submit}>
                   查询
                 </Button>
@@ -49,13 +58,19 @@ export const useTable = ({
             </Row>
           </Form>
         </div>
-        <Table size="small" columns={columns} rowKey={rowKeyName} {...tableProps} />
+        <Table
+          size="small"
+          columns={columns}
+          rowKey={rowKeyName}
+          {...tableProps}
+        />
       </div>
-    )
+    );
   };
 
   return {
     TableContent,
-    refresh
+    refresh,
+    searchForm,
   };
-}
+};
