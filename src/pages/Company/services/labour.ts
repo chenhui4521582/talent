@@ -1,11 +1,7 @@
 import request from '@/utils/request';
+import { PaginationTableParams } from '@/types/ITypes';
 
-interface lsitParam {
-  pageNum: number;
-  pageSize: number;
-}
-
-export async function listPage(params: lsitParam) {
+export async function listPage(params: PaginationTableParams) {
   // 成本中心列表
   return request(`/api/talent/laborRelation/list`, {
     method: 'POST',

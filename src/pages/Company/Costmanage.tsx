@@ -2,18 +2,32 @@ import React, { useState, useRef } from 'react';
 import { Card, notification, Modal, Button, Divider } from 'antd';
 import { useReq } from '@/components/GlobalTable/useReq';
 import { listPage, saveCost, updateCost, removeCost } from './services/cost';
+import { tsRefs } from './services/company';
 import { ColumnProps } from 'antd/es/table';
 import { GlobalResParams } from '@/types/ITypes';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import Company from './components/Company';
 
+interface tsCostColItem {
+  costCenterName: string;
+  createTime: string;
+  updateTime: string;
+  id: number;
+  action: string;
+}
+
+interface tsCostSave {
+  costId?: number;
+  companyId: number;
+}
+
 export default () => {
   const [costId, setCostId] = useState<number>();
   const [action, setAction] = useState<string>('');
-  const [optionName, setOptionName] = useState<number>();
-  const companyRef = useRef<any>();
+  const [optionName, setOptionName] = useState<string>();
+  const companyRef = useRef<tsRefs>();
 
-  const columns: ColumnProps<any>[] = [
+  const columns: ColumnProps<tsCostColItem>[] = [
     {
       title: '成本中心名称',
       key: 'costCenterName',
@@ -36,7 +50,7 @@ export default () => {
       title: '操作',
       key: 'action',
       align: 'center',
-      render: (_, record) => (
+      render: (_, record: tsCostColItem) => (
         <span>
           <a onClick={e => showModal('edit', record)}>修改</a>
           <Divider type="vertical" />
@@ -52,20 +66,20 @@ export default () => {
     rowKeyName: 'id',
   });
 
-  const showModal = (type, record) => {
+  const showModal = (type: string, record: tsCostColItem | undefined): void => {
     setOptionName(record?.costCenterName);
     setCostId(record?.id);
     setAction(type);
     companyRef.current?.reset();
   };
 
-  const cancelModal = () => {
+  const cancelModal = (): void => {
     setCostId(undefined);
     setAction('');
-    companyRef.current.reset();
+    companyRef.current?.reset();
   };
 
-  const handleDelete = record => {
+  const handleDelete = (record: tsCostColItem): void => {
     Modal.confirm({
       title: '确定删除?',
       okText: '确定',
@@ -90,7 +104,7 @@ export default () => {
     });
   };
 
-  const handleAdd = async values => {
+  const handleAdd = async (values: tsCostSave) => {
     let actionMethod;
     if (action === 'add') {
       actionMethod = saveCost;
@@ -113,9 +127,10 @@ export default () => {
       });
     }
   };
+
   return (
     <Card
-      title="成本中心"
+      title="成本中心列表"
       extra={
         <Button type="primary" onClick={e => showModal('add', undefined)}>
           新增成本中心
@@ -129,11 +144,10 @@ export default () => {
         okText="确定"
         cancelText="取消"
         onCancel={cancelModal}
-        onOk={e => companyRef.current.ok()}
+        onOk={e => companyRef.current?.ok()}
       >
         <Company
           ref={companyRef}
-          formRef={companyRef}
           handleAdd={handleAdd}
           optionName={optionName}
         />

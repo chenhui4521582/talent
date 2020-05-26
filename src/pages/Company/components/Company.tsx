@@ -5,10 +5,11 @@ import React, {
   forwardRef,
 } from 'react';
 import { Select, Form } from 'antd';
-import { listCompany, IResumeCompany } from '../services/company';
+import { listCompany, IResumeCompany, tsCompany } from '../services/company';
 
 const { Option } = Select;
-function Company(props, formRef) {
+
+function Company(props: tsCompany, formRef) {
   const [optionList, setOptionList] = useState<Array<IResumeCompany>>([]);
   const [form] = Form.useForm();
 
