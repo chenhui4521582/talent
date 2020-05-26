@@ -1,25 +1,19 @@
 import React, { useState, useRef } from 'react';
 import { Card, notification, Modal, Button, Divider } from 'antd';
 import { useReq } from '@/components/GlobalTable/useReq';
-import { listPage, saveCost, updateCost, removeCost } from './services/cost';
+import {
+  listPage,
+  saveCost,
+  updateCost,
+  removeCost,
+  tsCostColItem,
+  tsCostSave,
+} from './services/cost';
 import { tsRefs } from './services/company';
 import { ColumnProps } from 'antd/es/table';
 import { GlobalResParams } from '@/types/ITypes';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import Company from './components/Company';
-
-interface tsCostColItem {
-  costCenterName: string;
-  createTime: string;
-  updateTime: string;
-  id: number;
-  action: string;
-}
-
-interface tsCostSave {
-  costId?: number;
-  companyId: number;
-}
 
 export default () => {
   const [costId, setCostId] = useState<number>();

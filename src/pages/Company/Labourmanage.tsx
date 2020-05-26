@@ -7,24 +7,13 @@ import {
   saveLabour,
   updateLabour,
   removeLabour,
+  tsLabourColItem,
+  tsLabourSave,
 } from './services/labour';
 import { tsRefs } from './services/company';
 import { GlobalResParams } from '@/types/ITypes';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import Company from './components/Company';
-
-interface tsLabourColItem {
-  companyName: string;
-  createTime: string;
-  updateTime: string;
-  id: number;
-  action: string;
-}
-
-interface tsLabourSave {
-  labourId?: number;
-  companyId: number;
-}
 
 export default () => {
   const [labourId, setLabourId] = useState<number>();
