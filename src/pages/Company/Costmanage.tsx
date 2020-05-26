@@ -53,7 +53,6 @@ export default () => {
   });
 
   const showModal = (type, record) => {
-    console.log(record);
     setOptionName(record?.costCenterName);
     setCostId(record?.id);
     setAction(type);
@@ -92,7 +91,6 @@ export default () => {
   };
 
   const handleAdd = async values => {
-    console.log(values);
     let actionMethod;
     if (action === 'add') {
       actionMethod = saveCost;

@@ -96,7 +96,6 @@ export default () => {
   };
 
   const handleAdd = async values => {
-    console.log(values);
     let actionMethod;
     if (action === 'add') {
       actionMethod = saveLabour;
