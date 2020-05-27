@@ -5,10 +5,11 @@ import React, {
   forwardRef,
 } from 'react';
 import { Select, Form } from 'antd';
-import { listCompany, IResumeCompany } from '../services/company';
+import { listCompany, IResumeCompany, tsCompany } from '../services/company';
 
 const { Option } = Select;
-function Company(props, formRef) {
+
+function Company(props: tsCompany, formRef) {
   const [optionList, setOptionList] = useState<Array<IResumeCompany>>([]);
   const [form] = Form.useForm();
 
@@ -25,8 +26,6 @@ function Company(props, formRef) {
   useEffect(() => {
     for (let i = 0; i < optionList.length; i++) {
       if (optionList[i].companyName === props.optionName) {
-        // setOptionName(optionList[i].companyId)
-        console.log(props.optionName, optionList[i].companyId);
         form.setFieldsValue({ companyId: optionList[i].companyId });
       }
     }
@@ -50,7 +49,7 @@ function Company(props, formRef) {
         name="companyId"
         rules={[{ required: true, message: '请选择公司名称' }]}
       >
-        <Select defaultValue="请选择名称">
+        <Select placeholder="请选择名称">
           {optionList.map(item => {
             return (
               <Option key={item.companyId} value={item.companyId}>

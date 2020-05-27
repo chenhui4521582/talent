@@ -1,11 +1,20 @@
 import request from '@/utils/request';
+import { PaginationTableParams } from '@/types/ITypes';
 
-interface lsitParam {
-  pageNum: number;
-  pageSize: number;
+export interface tsCostColItem {
+  costCenterName: string;
+  createTime: string;
+  updateTime: string;
+  id: number;
+  action: string;
 }
 
-export async function listPage(params: lsitParam) {
+export interface tsCostSave {
+  costId?: number;
+  companyId: number;
+}
+
+export async function listPage(params: PaginationTableParams) {
   // 成本中心列表
   return request(`/api/talent/costCenter/list`, {
     method: 'POST',
@@ -13,7 +22,7 @@ export async function listPage(params: lsitParam) {
   });
 }
 
-export async function saveCost(params) {
+export async function saveCost(params: tsCostSave) {
   // 新增成本
   return request(`/api/talent/costCenter/save`, {
     method: 'POST',
@@ -21,7 +30,7 @@ export async function saveCost(params) {
   });
 }
 
-export async function updateCost(params) {
+export async function updateCost(params: tsCostSave) {
   // 编辑成本
   return request(`/api/talent/costCenter/update`, {
     method: 'POST',

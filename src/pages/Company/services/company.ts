@@ -7,6 +7,16 @@ export interface IResumeCompany {
   updateTime: string | null;
 }
 
+export interface tsRefs {
+  reset: () => void;
+  ok: () => void;
+}
+
+export interface tsCompany {
+  handleAdd: (values) => Promise<void>;
+  optionName: string | undefined;
+}
+
 export async function listCompany() {
   // 成本中心列表
   return request(`/api/talent/company/listCompanyOption`, {

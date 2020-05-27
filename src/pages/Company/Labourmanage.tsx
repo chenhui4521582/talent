@@ -7,7 +7,10 @@ import {
   saveLabour,
   updateLabour,
   removeLabour,
+  tsLabourColItem,
+  tsLabourSave,
 } from './services/labour';
+import { tsRefs } from './services/company';
 import { GlobalResParams } from '@/types/ITypes';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import Company from './components/Company';
@@ -15,10 +18,9 @@ import Company from './components/Company';
 export default () => {
   const [labourId, setLabourId] = useState<number>();
   const [action, setAction] = useState<string>('');
-  const [optionName, setOptionName] = useState<number>();
-  const companyRef = useRef<any>();
-
-  const columns: ColumnProps<any>[] = [
+  const [optionName, setOptionName] = useState<string>();
+  const companyRef = useRef<tsRefs>();
+  const columns: ColumnProps<tsLabourColItem>[] = [
     {
       title: '公司名称',
       key: 'companyName',
@@ -41,7 +43,7 @@ export default () => {
       title: '操作',
       key: 'action',
       align: 'center',
-      render: (_, record) => (
+      render: (_, record: tsLabourColItem) => (
         <span>
           <a onClick={e => showModal('edit', record)}>修改</a>
           <Divider type="vertical" />
@@ -57,20 +59,23 @@ export default () => {
     rowKeyName: 'id',
   });
 
-  const showModal = async (type, record) => {
+  const showModal = (
+    type: string,
+    record: tsLabourColItem | undefined,
+  ): void => {
     setOptionName(record?.companyName);
     setAction(type);
     setLabourId(record?.id);
     companyRef.current?.reset();
   };
 
-  const cancelModal = () => {
+  const cancelModal = (): void => {
     setLabourId(undefined);
     setAction('');
     companyRef.current?.reset();
   };
 
-  const handleDelete = record => {
+  const handleDelete = (record: tsLabourColItem): void => {
     Modal.confirm({
       title: '确定删除?',
       okText: '确定',
@@ -95,8 +100,7 @@ export default () => {
     });
   };
 
-  const handleAdd = async values => {
-    console.log(values);
+  const handleAdd = async (values: tsLabourSave) => {
     let actionMethod;
     if (action === 'add') {
       actionMethod = saveLabour;
@@ -119,27 +123,27 @@ export default () => {
       });
     }
   };
+
   return (
     <Card
-      title="成本中心"
+      title="劳动关系列表"
       extra={
         <Button type="primary" onClick={e => showModal('add', undefined)}>
-          新增成本中心
+          新增劳动关系
         </Button>
       }
     >
       <TableContent />
       <Modal
         visible={!!action}
-        title={action === 'add' ? '新增成本中心' : '编辑成本中心'}
+        title={action === 'add' ? '新增劳动关系' : '编辑劳动关系'}
         okText="确定"
         cancelText="取消"
         onCancel={cancelModal}
-        onOk={e => companyRef.current.ok()}
+        onOk={e => companyRef.current?.ok()}
       >
         <Company
           ref={companyRef}
-          formRef={companyRef}
           handleAdd={handleAdd}
           optionName={optionName}
         />

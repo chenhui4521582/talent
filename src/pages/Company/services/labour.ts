@@ -1,11 +1,20 @@
 import request from '@/utils/request';
+import { PaginationTableParams } from '@/types/ITypes';
 
-interface lsitParam {
-  pageNum: number;
-  pageSize: number;
+export interface tsLabourColItem {
+  companyName: string;
+  createTime: string;
+  updateTime: string;
+  id: number;
+  action: string;
 }
 
-export async function listPage(params: lsitParam) {
+export interface tsLabourSave {
+  labourId?: number;
+  companyId: number;
+}
+
+export async function listPage(params: PaginationTableParams) {
   // 成本中心列表
   return request(`/api/talent/laborRelation/list`, {
     method: 'POST',
@@ -13,7 +22,7 @@ export async function listPage(params: lsitParam) {
   });
 }
 
-export async function saveLabour(params) {
+export async function saveLabour(params: tsLabourSave) {
   // 新增成本
   return request(`/api/talent/laborRelation/save`, {
     method: 'POST',
@@ -21,7 +30,7 @@ export async function saveLabour(params) {
   });
 }
 
-export async function updateLabour(params) {
+export async function updateLabour(params: tsLabourSave) {
   // 编辑成本
   return request(`/api/talent/laborRelation/update`, {
     method: 'POST',
