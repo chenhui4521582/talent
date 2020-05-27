@@ -6,10 +6,12 @@ import { listByConditionsRoster } from './services/staff';
 import { Card, Form, Input, Select, Row, Col, Button, Divider } from 'antd';
 import { useBusiness } from '@/models/global';
 import { serialize } from '@/utils/serialize';
+import { useJob } from '@/models/global';
 
 const { Option } = Select;
 export default () => {
   const { businessList } = useBusiness();
+  const { jobList } = useJob();
   const columns: ColumnProps<any>[] = [
     {
       title: '员工编号',
@@ -117,8 +119,16 @@ export default () => {
       <TableContent>
         <Row>
           <Col span={6}>
-            <Form.Item label="岗位" name="post">
-              <Input />
+            <Form.Item label="岗位" name="postId">
+              <Select showSearch optionFilterProp="children">
+                {jobList?.map(item => {
+                  return (
+                    <Option key={item.jobId} value={item.jobId}>
+                      {item.jobName}
+                    </Option>
+                  );
+                })}
+              </Select>
             </Form.Item>
           </Col>
           <Col span={6} offset={2}>
@@ -134,16 +144,11 @@ export default () => {
         </Row>
         <Row>
           <Col span={6}>
-            <Form.Item label="联系电话" name="mobile">
-              <Input />
-            </Form.Item>
-          </Col>
-          <Col span={6} offset={2}>
-            <Form.Item label="业务线" name="businessId">
+            <Form.Item label="业务线" name="businessCode">
               <Select showSearch optionFilterProp="children">
                 {businessList?.map(item => {
                   return (
-                    <Option key={item.businessId} value={item.businessId}>
+                    <Option key={item.businessCode} value={item.businessCode}>
                       {item.businessLineName}
                     </Option>
                   );

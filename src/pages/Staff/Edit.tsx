@@ -310,6 +310,18 @@ export default props => {
           </Col>
           <Col span={6} offset={2}>
             <Form.Item
+              label="是否在职"
+              name="currentPosition"
+              rules={[{ required: true, message: '请选择是否在职' }]}
+            >
+              <Select>
+                <Option value={0}>离职</Option>
+                <Option value={1}>在职</Option>
+              </Select>
+            </Form.Item>
+          </Col>
+          <Col span={6} offset={2}>
+            <Form.Item
               label="工作地"
               name="workPlace"
               rules={[{ required: true, message: '请输入工作地' }]}
@@ -410,6 +422,17 @@ export default props => {
               rules={[{ required: true, message: '请选择上份合同开始时间' }]}
             >
               <DatePicker />
+            </Form.Item>
+          </Col>
+        </Row>
+        <Row>
+          <Col span={16}>
+            <Form.Item
+              label="合同变更记录"
+              name="contractChangeRecord"
+              rules={[{ required: true, message: '请输入合同变更记录' }]}
+            >
+              <Input />
             </Form.Item>
           </Col>
         </Row>

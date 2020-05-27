@@ -23,8 +23,8 @@ export default () => {
   const columns: ColumnProps<tsLabourColItem>[] = [
     {
       title: '公司名称',
-      key: 'companyName',
-      dataIndex: 'companyName',
+      key: 'laborRelationName',
+      dataIndex: 'laborRelationName',
       align: 'center',
     },
     {

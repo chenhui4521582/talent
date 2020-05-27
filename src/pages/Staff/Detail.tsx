@@ -29,6 +29,7 @@ export default props => {
   const marrigeHash = { 1: '未婚', 2: '已婚' };
   const bearHash = { 1: '已育', 0: '未育' };
   const computeHash = { 0: '否', 1: '是' };
+  const positionHash = { 0: '离职', 1: '在职' };
   const options = {
     height: '900px',
     page: '1',
@@ -87,6 +88,9 @@ export default props => {
               </Descriptions.Item>
               <Descriptions.Item label="角色">
                 {detail?.roles}
+              </Descriptions.Item>
+              <Descriptions.Item label="是否在职">
+                {positionHash[detail?.currentPosition]}
               </Descriptions.Item>
               <Descriptions.Item label="工作地">
                 {detail?.workPlace}
