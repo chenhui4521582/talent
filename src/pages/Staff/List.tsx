@@ -37,8 +37,8 @@ export default () => {
     },
     {
       title: '岗位',
-      dataIndex: 'post',
-      key: 'post',
+      dataIndex: 'postName',
+      key: 'postName',
       align: 'center',
     },
     {

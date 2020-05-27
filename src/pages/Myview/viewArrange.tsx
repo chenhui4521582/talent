@@ -6,7 +6,7 @@ import { Link } from 'umi';
 import { useTable } from '@/components/GlobalTable/useTable';
 import { listInterviewByInterviewer, updateInterviewByInterviewer } from './services/myview';
 import { ColumnProps } from 'antd/es/table';
-import { getLevel } from '@/utils/level';
+import { useRank } from '@/models/global';
 import { GlobalResParams, formItemLayout } from '@/types/ITypes';
 
 const { Option } = Select;
@@ -15,7 +15,7 @@ export default () => {
   const [curRecord, setCurRecord] = useState<any>();
   const [form] = Form.useForm();
   const [view, setView] = useState<number>(-1);
-  const level = getLevel();
+  const { rankList } = useRank();
   const columns: ColumnProps<any>[] = [
     {
       title: '编号',
@@ -203,13 +203,13 @@ export default () => {
               </Form.Item>
               <Form.Item
                 label='职级'
-                name="level"
+                name="rankId"
                 rules={[{ required: true, message: '请选择实际职级' }]}
               >
                 <Select showSearch placeholder="请选择实际职级">
                   {
-                    level.map((item, i) => {
-                      return <Option key={i} value={item}>{item}</Option>
+                    rankList?.map(item => {
+                      return <Option key={item.rankId} value={item.rankId}>{item.rankName}</Option>
                     })
                   }
                 </Select>

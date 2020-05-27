@@ -1,6 +1,15 @@
 import { GlobalResParams } from '@/types/ITypes';
 import { useEffect, useState } from 'react';
-import { queryBusiness, IBusiness, queryJob, IJob, queryRole } from '@/services/global';
+import {
+  queryBusiness, IBusiness,
+  queryJob, IJob,
+  queryRole,
+  listDepartment, IDepartment,
+  listRank, IRank,
+  listTitle, ITitle,
+  listCostCenter, ICost,
+  listLabor, ILabor
+} from '@/services/global';
 
 export const useBusiness = () => {
   const [businessList, setBusinessList] = useState<IBusiness[]>(); 
@@ -37,4 +46,65 @@ export const useRole = (type: number) => {
   }, []);
   return { roleList };
 }
+
+export const useDepartment = (level: number) => {
+  const [departmentList, setDepartmentList] = useState<IDepartment[]>();
+  useEffect(() => {
+    async function fetchDepartment() {
+      let res: GlobalResParams<IDepartment[]> = await listDepartment(level);
+      setDepartmentList(res.obj);
+    }
+    fetchDepartment();
+  }, [])
+  return { departmentList };
+}
+
+export const useRank = () => {
+  const [rankList, setRankList] = useState<IRank[]>();
+  useEffect(() => {
+    async function fetchRank() {
+      let res: GlobalResParams<IRank[]> = await listRank();
+      setRankList(res.obj);
+    }
+    fetchRank();
+  }, [])
+  return { rankList };
+}
+
+export const useTitle = () => {
+  const [titleList, setTitleList] = useState<ITitle[]>();
+  useEffect(() => {
+    async function fetchTitle() {
+      let res: GlobalResParams<ITitle[]> = await listTitle();
+      setTitleList(res.obj);
+    }
+    fetchTitle();
+  }, [])
+  return { titleList };
+}
+
+export const useCost = () => {
+  const [costList, setCostList] = useState<ICost[]>();
+  useEffect(() => {
+    async function fetchCost() {
+      let res: GlobalResParams<ICost[]> = await listCostCenter();
+      setCostList(res.obj);
+    }
+    fetchCost();
+  }, [])
+  return { costList };
+}
+
+export const useLabor = () => {
+  const [laborList, setLaborList] = useState<ILabor[]>();
+  useEffect(() => {
+    async function fetchLabor() {
+      let res: GlobalResParams<ILabor[]> = await listLabor();
+      setLaborList(res.obj);
+    }
+    fetchLabor();
+  }, [])
+  return { laborList };
+}
+
 

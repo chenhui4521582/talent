@@ -14,7 +14,7 @@ export default props => {
     async function getDetail() {
       let res: GlobalResParams<any> = await commonDetail(employeeId);
       setDetail(res?.obj);
-      if (res.obj.resumeUrl) {
+      if (res.obj?.resumeUrl) {
         let url = res.obj.resumeUrl.split(':')[1];
         PDFObject.embed(url, '#pdf', options);
       } else {
@@ -25,7 +25,7 @@ export default props => {
   }, []);
   const sexHash = { 1: '男', 2: '女' };
   const emHash = { 1: '正式', 2: '实习', 3: '外聘', 4: '兼职' };
-  const deadlineHash = { 0: '已到期', 1: '未到期' };
+  const deadlineHash = { 0: '未提醒', 1: '已提醒' };
   const marrigeHash = { 1: '未婚', 2: '已婚' };
   const bearHash = { 1: '已育', 0: '未育' };
   const computeHash = { 0: '否', 1: '是' };
@@ -58,7 +58,7 @@ export default props => {
                 {detail?.businessName}
               </Descriptions.Item>
               <Descriptions.Item label="部门">
-                {detail?.departmentId}
+                {detail?.departmentName}
               </Descriptions.Item>
               <Descriptions.Item label="成本中心">
                 {detail?.businessCostCenter}
@@ -80,10 +80,10 @@ export default props => {
                 {detail?.superiorsName}
               </Descriptions.Item>
               <Descriptions.Item label="职级">
-                {detail?.rankId}
+                {detail?.rankName}
               </Descriptions.Item>
               <Descriptions.Item label="职位">
-                {detail?.titleId}
+                {detail?.titleName}
               </Descriptions.Item>
               <Descriptions.Item label="角色">
                 {detail?.roles}
@@ -126,13 +126,13 @@ export default props => {
             <div style={{ marginTop: 20 }}>
               <Descriptions bordered>
                 <Descriptions.Item label="岗位">
-                  {detail?.post}
+                  {detail?.postName}
                 </Descriptions.Item>
                 <Descriptions.Item label="类别">
                   {detail?.category}
                 </Descriptions.Item>
                 <Descriptions.Item label="组别">
-                  {detail?.group}
+                  {detail?.groupName}
                 </Descriptions.Item>
                 <Descriptions.Item label="其他">
                   {detail?.other}

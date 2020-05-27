@@ -14,7 +14,7 @@ export function isUrl(path: string) {
 }
 
 function formatter(data, parentPath: string) {
-  return data.map(item => {
+  return data?.map(item => {
     let { path, icon } = item;
     if (!isUrl(path)) {
       path = parentPath + item.path;

@@ -63,3 +63,18 @@ export async function commonDetail(employeeId: string) {
     data: { employeeId },
   });
 }
+
+// 新增员工
+export async function saveEmployeeInfo(params) {
+  return request('/api/talent/employeeRoster/saveEmployeeInfo', {
+    method: 'POST',
+    data: params
+  });
+}
+// 编辑员工
+export async function updateEmployeeInfo(params) {
+  return request('/api/talent/employeeRoster/updateEmployeeInfo', {
+    method: 'POST',
+    data: params
+  });
+}

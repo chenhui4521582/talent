@@ -4,7 +4,7 @@ import { history } from 'umi';
 import { Card, Form, Input, InputNumber, Select, Button, notification, DatePicker } from 'antd';
 import { newPageFormItemLayout, submitFormLayout, GlobalResParams } from '@/types/ITypes';
 import { useBusiness, useJob, useRole } from '@/models/global';
-import { getLevel } from '@/utils/level';
+import { useRank } from '@/models/global';
 import { createDemand, INewDemandParams, demandDetail } from './services/list';
 
 const { Option } = Select;
@@ -15,7 +15,7 @@ export default (props) => {
   const { businessList } = useBusiness();
   const { jobList } = useJob();
   const { roleList } = useRole(2);
-  const level = getLevel();
+  const { rankList } = useRank();
   useEffect(() => {
     if (demandId) {
       async function fetchDemand() {
@@ -90,8 +90,8 @@ export default (props) => {
         >
           <Select showSearch placeholder="请选择职级">
             {
-              level.map((item, i) => {
-                return <Option key={i} value={item}>{item}</Option>
+              rankList?.map(item => {
+                return <Option key={item.rankId} value={item.rankId}>{item.rankName}</Option>
               })
             }
           </Select>

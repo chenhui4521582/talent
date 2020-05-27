@@ -46,6 +46,31 @@ export interface IBusinessPerson {
   userName: string;
 }
 
+export interface IDepartment {
+  code: string;
+  name: string;
+}
+
+export interface IRank {
+  rankId: number;
+  rankName: string;
+}
+
+export interface ITitle {
+  titleId: number;
+  titleName: string;
+}
+
+export interface ICost {
+  id: number;
+  costCenterName: string;
+}
+
+export interface ILabor {
+  id: number;
+  laborRelationName: string;
+}
+
 export async function queryMenus(data: MenusReqParams) {
   return request('/api/odsApi/resource/listMenuByRoleCode', {
     method: 'post',
@@ -98,4 +123,44 @@ export async function listUserByBusinessCode(businessId: number) { // 根据业�
     method: 'POST',
     data: { businessId }
   })
-}
+};
+
+// 部门下拉 1: 业务线  2: 部门  3:小组
+export async function listDepartment(level: number) {
+  return request(`/api/talent/employeeRoster/listDepartment`, {
+    method: 'POST',
+    data: { level }
+  })
+};
+
+// 职级下拉
+export async function listRank() {
+  return request(`/api/talent/employeeRoster/listRank`, {
+    method: 'POST',
+    data: {}
+  })
+};
+
+// 职位下拉
+export async function listTitle() {
+  return request(`/api/talent/employeeRoster/listTitle`, {
+    method: 'POST',
+    data: {}
+  })
+};
+
+// 成本中心下拉
+export async function listCostCenter() {
+  return request(`/api/talent/costCenter/listOption`, {
+    method: 'POST',
+    data: {}
+  })
+};
+
+// 劳动关系下拉
+export async function listLabor() {
+  return request(`/api/talent/laborRelation/listOption`, {
+    method: 'POST',
+    data: {}
+  })
+};
