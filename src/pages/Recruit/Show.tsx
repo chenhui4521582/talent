@@ -133,7 +133,7 @@ export default (props) => {
             <Select showSearch optionFilterProp='children' placeholder="请选择HR">
               {
                 roleList?.map((item, i) => {
-                  return <Select.Option key={i} value={item.userCode}>{item.name}</Select.Option>
+                  return <Select.Option key={i} value={item.userCode}>{item.userName}</Select.Option>
                 })
               }
           </Select>

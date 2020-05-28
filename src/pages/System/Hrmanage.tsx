@@ -17,23 +17,14 @@ export default () => {
   const [form] = Form.useForm();
   const columns: ColumnProps<any>[] = [
     {
-      title: '编号',
-      key: 'userNo',
-      dataIndex: 'userNo'
-    },
-    {
       title: '姓名',
-      dataIndex: 'name',
-      key: 'name',
+      dataIndex: 'userName',
+      key: 'userName',
     },
     {
       title: '角色',
-      dataIndex: 'type',
-      key: 'type',
-      render: (text) => {
-        const data = { 1: '人事专员', 2: '面试官' };
-        return <span>{data[text]}</span>
-      }
+      dataIndex: 'roleName',
+      key: 'roleName',
     },
     {
       title: '业务线',
@@ -78,7 +69,7 @@ export default () => {
   const { TableContent, refresh } = useTable({
     queryMethod: getRoleList,
     columns,
-    rowKeyName: 'userNo'
+    rowKeyName: 'userName'
   });
 
   const showModal = () => {
