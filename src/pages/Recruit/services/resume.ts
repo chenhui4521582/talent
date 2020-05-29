@@ -44,6 +44,6 @@ export async function refuseEva(nId) {
 export async function setInterview(params) {
   return request('/api/talent/evaluation/insertInterview', {
     method: 'POST',
-    body: params
+    data: params
   });
 }

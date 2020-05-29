@@ -106,7 +106,7 @@ export default () => {
           <Button
             download
             href={serialize(
-              '/api/talent/employeeRoster/export',
+              '/api/talent/employeeRoster/export?includ=name,businessName,businessCostCenter,post,employmentType,idCard,birthDate,contractStart,contractEnd',
               searchForm.getFieldsValue(),
             )}
             style={{ marginLeft: 10 }}

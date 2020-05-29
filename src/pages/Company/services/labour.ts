@@ -2,7 +2,7 @@ import request from '@/utils/request';
 import { PaginationTableParams } from '@/types/ITypes';
 
 export interface tsLabourColItem {
-  companyName: string;
+  laborRelationName: string;
   createTime: string;
   updateTime: string;
   id: number;
@@ -10,7 +10,7 @@ export interface tsLabourColItem {
 }
 
 export interface tsLabourSave {
-  labourId?: number;
+  laborId?: number;
   companyId: number;
 }
 
@@ -38,10 +38,10 @@ export async function updateLabour(params: tsLabourSave) {
   });
 }
 
-export async function removeLabour(labourId: number) {
+export async function removeLabour(laborId: number) {
   // 删除成本
   return request(`/api/talent/laborRelation/delete`, {
     method: 'POST',
-    data: { labourId },
+    data: { laborId },
   });
 }

@@ -48,6 +48,58 @@ export default (props) => {
       dataIndex: 'heir'
     }
   ];
+
+  const work_columns = [
+    {
+      title: '公司名',
+      key: 'companyName',
+      dataIndex: 'companyName'
+    },
+    {
+      title: '时间',
+      dataIndex: 'beginDate',
+      key: 'beginDate',
+      render: (text, record) => {
+        return <span>{text}-{record.endDate}</span>
+      }
+    },
+    {
+      title: '职位',
+      key: 'position',
+      dataIndex: 'position'
+    },
+    {
+      title: '工作内容',
+      key: 'achievement',
+      dataIndex: 'achievement'
+    }
+  ];
+
+  const edu_columns = [
+    {
+      title: '学校名',
+      key: 'schoolName',
+      dataIndex: 'schoolName'
+    },
+    {
+      title: '时间',
+      dataIndex: 'beginDate',
+      key: 'beginDate',
+      render: (text, record) => {
+        return <span>{text}-{record.endDate}</span>
+      }
+    },
+    {
+      title: '专业',
+      key: 'major',
+      dataIndex: 'major'
+    },
+    {
+      title: '学历',
+      key: 'degree',
+      dataIndex: 'degree'
+    }
+  ];
   return(
     <Card title="简历详情">
       <Row>
@@ -64,68 +116,53 @@ export default (props) => {
       </Row>
       <Divider />
       <Row>
-        <Col span={2}>
+        <Col span={12}>
           <span>在职状态：{detail?.currentStatus}</span>
-          <Divider type="vertical" />
         </Col>
-        <Col span={6}>
+        <Col span={12}>
           <span>求职意向：{detail?.jobIntention ? detail.jobIntention : '***' }</span>
         </Col>
-        <Divider type="vertical" />
-        <Col span={3}>
+      </Row>
+      <Row style={{marginTop: 20}}>
+        <Col span={12}>
           <span>手机：{detail?.phone ? detail.phone : '***'}</span>
-          <Divider type="vertical" />
         </Col>
-        <Col span={3}>
+        <Col span={12}>
           <span>邮箱：{detail?.email ? detail.email : '***'}</span>
         </Col>
       </Row>
       <Divider />
-      <Row style={{marginBottom:40}}>
-        <Col style={{fontWeight:'bold'}}>工作经历</Col>
+      <h3 style={{marginTop: 40}}>工作经历</h3>
+      <Divider />
+      <Table
+        rowKey='id'
+        columns={work_columns}
+        dataSource={detail?.workExp}
+        pagination={false}
+      />
+      <h3 style={{marginTop: 40}}>教育经历</h3>
+      <Divider />
+      <Table
+        rowKey='id'
+        columns={edu_columns}
+        dataSource={detail?.eduExp}
+        pagination={false}
+      />
+      <div style={{display:(detail?.feedbackList && detail.feedbackList.length > 0) ? 'block' : 'none'}}>
+        <h3 style={{marginTop: 40}}>面试情况</h3>
         <Divider />
-        <Row>
-          {
-            detail?.workExp ? detail.workExp.map((item,i) => {
-              return <div key={i} style={{marginBottom: 20}}>
-                <Row><Col span={5} style={{fontWeight: 'bold'}}>{item.companyName}</Col><Col span={4} offset={11}>{item.beginDate}-{item.endDate}</Col></Row>
-                <Row><Col span={3}><p>{item.position}</p></Col></Row>
-                <Row><Col>{item.achievement}</Col></Row>
-              </div>
-            }) : ''
-          }
-        </Row>
-      </Row>
-      <Row style={{marginBottom:40}}>
-        <Col style={{fontWeight:'bold'}}>教育经历</Col>
-        <Divider />
-        {
-          detail?.eduExp ? detail.eduExp.map((item,i) => {
-            return <div key={i}>
-              <Row><Col span={3}>{item.schoolName}</Col><Col span={3}>{item.major}</Col><Col span={3}>{item.degree}</Col><Col span={3} offset={6}>{item.beginDate}-{item.endDate}</Col></Row>
-            </div>
-          }) : ''
-        }
-      </Row>
-      <Row style={{display:(detail?.feedbackList && detail.feedbackList.length > 0) ? 'block' : 'none'}}>
-        <Col style={{fontWeight:'bold'}}>
-          面试情况
-        </Col>
-        <Divider />
-        <Col>
-          <Table
-            onRow={(record) => {    //行点击事件
-              return{
-                onClick: handleClick
-              }
-            }}
-            rowKey={ row => row.resumeId }
-            columns={columns}
-            dataSource={detail?.feedbackList}
-            pagination={false}
-          />
-        </Col>
-      </Row>
+        <Table
+          onRow={() => {    //行点击事件
+            return{
+              onClick: handleClick
+            }
+          }}
+          rowKey={ row => row.resumeId }
+          columns={columns}
+          dataSource={detail?.feedbackList}
+          pagination={false}
+        />
+      </div>
     </Card>
   )
 }

@@ -63,7 +63,7 @@ export default () => {
     type: string,
     record: tsLabourColItem | undefined,
   ): void => {
-    setOptionName(record?.companyName);
+    setOptionName(record?.laborRelationName);
     setAction(type);
     setLabourId(record?.id);
     companyRef.current?.reset();
@@ -106,7 +106,7 @@ export default () => {
       actionMethod = saveLabour;
     } else {
       actionMethod = updateLabour;
-      values.labourId = labourId;
+      values.laborId = labourId;
     }
     let res: GlobalResParams<string> = await actionMethod(values);
     if (res.status === 200) {

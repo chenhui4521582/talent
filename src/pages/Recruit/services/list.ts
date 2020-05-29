@@ -32,7 +32,7 @@ export interface IDemandDetail {
 
 export interface INewDemandParams {
   amount: number
-  businessId: number
+  businessCode: string;
   description: string
   emergencyDegree: number
   entryDate: string

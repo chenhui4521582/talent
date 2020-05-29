@@ -496,10 +496,10 @@ export default props => {
               rules={[{ required: true, message: '请选择婚姻状况' }]}
             >
               <Select>
-                <Option value={1} key={1}>
+                <Option value={2} key={2}>
                   已婚
                 </Option>
-                <Option value={2} key={2}>
+                <Option value={1} key={1}>
                   未婚
                 </Option>
               </Select>

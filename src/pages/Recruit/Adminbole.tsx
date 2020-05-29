@@ -175,7 +175,7 @@ export default (props) => {
           <Col span={6}>
             <Form.Item
               label="业务线"
-              name="businessId"
+              name="businessCode"
             >
               <Select
                 showSearch
@@ -183,7 +183,7 @@ export default (props) => {
                 optionFilterProp="children"
               >
                 {businessList?.map((item) => {
-                  return <Option key={item.businessId} value={item.businessId}>{item.businessLineName}</Option>
+                  return <Option key={item.businessCode} value={item.businessCode}>{item.businessLineName}</Option>
                 })}
               </Select>
             </Form.Item>

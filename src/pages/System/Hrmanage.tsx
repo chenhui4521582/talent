@@ -81,18 +81,18 @@ export default () => {
   }
   const changeBusiness = async (value) => {
     let data = JSON.parse(value);
-    let res: GlobalResParams<IBusinessPerson[]> = await listUserByBusinessCode(data.businessId);
+    let res: GlobalResParams<IBusinessPerson[]> = await listUserByBusinessCode(data.businessCode);
     setPersons(res.obj);
   }
 
   const handleAdd = async (values) => {
-    let businessData = JSON.parse(values.businessId);
+    let businessData = JSON.parse(values.businessCode);
     let userData = JSON.parse(values.userCode);
     values.userCode = userData.userCode;
     values.email = userData.email;
     values.name = userData.userName;
     values.businessLineName = businessData.businessLineName;
-    values.businessId = businessData.businessId;
+    values.businessCode = businessData.businessCode;
     let res: GlobalResParams<string> = await addRole(values);
     if(res.status === 200) {
       cancelModal();
@@ -139,13 +139,13 @@ export default () => {
         >
           <Form.Item
             label="选择业务线"
-            name="businessId"
+            name="businessCode"
             rules={[{ required: true, message: '请选择业务线' }]}
           >
             <Select placeholder="请选择业务线" allowClear onChange={changeBusiness}>
               {
                 businessList?.map(item => {
-                  return <Option key={item.businessId} value={JSON.stringify(item)}>{item.businessLineName}</Option>
+                  return <Option key={item.businessCode} value={JSON.stringify(item)}>{item.businessLineName}</Option>
                 })
               }
             </Select>

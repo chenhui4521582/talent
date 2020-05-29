@@ -90,11 +90,11 @@ export default () => {
       <TableContent>
         <Row>
           <Col span={6}>
-            <Form.Item label="业务线" name="businessId">
+            <Form.Item label="业务线" name="businessCode">
               <Select showSearch optionFilterProp="children">
                 {businessList?.map(item => {
                   return (
-                    <Option key={item.businessId} value={item.businessId}>
+                    <Option key={item.businessCode} value={item.businessCode}>
                       {item.businessLineName}
                     </Option>
                   );

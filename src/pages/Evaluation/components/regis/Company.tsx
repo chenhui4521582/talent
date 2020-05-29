@@ -19,14 +19,14 @@ export default () => {
       </Form.Item>
       <Form.Item
         label="部门"
-        name={["companyModel","businessId"]}
+        name={["companyModel","businessCode"]}
         rules={[{ required: true, message: '请选择部门' }]}
         {...newPageFormItemLayout}
       >
         <Select>
           {
             businessList?.map(item => {
-              return <Option key={item.businessId} value={item.businessId}>{item.businessLineName}</Option>
+              return <Option key={item.businessCode} value={item.businessCode}>{item.businessLineName}</Option>
             })
           }
         </Select>

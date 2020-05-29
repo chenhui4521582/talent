@@ -5,5 +5,6 @@ export const serialize = (url: string, values: object) => {
       urlParam.searchParams.append(item, values[item]);
     }
   });
+  console.log(urlParam.href)
   return urlParam.href;
 };

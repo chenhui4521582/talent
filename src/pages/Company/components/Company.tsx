@@ -25,6 +25,8 @@ function Company(props: tsCompany, formRef) {
 
   useEffect(() => {
     for (let i = 0; i < optionList.length; i++) {
+      // console.log(optionList)
+      // debugger
       if (optionList[i].companyName === props.optionName) {
         form.setFieldsValue({ companyId: optionList[i].companyId });
       }

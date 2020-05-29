@@ -29,6 +29,12 @@ export default (props) => {
   }, [])
   const handleSubmit = async (values) => {
     values.entryDate = values.entryDate.format('YYYY-MM-DD');
+    const businessArray: any = businessList?.filter(item => item.businessCode === values.businessCode);
+    values.businessLineName = businessArray[0]['businessLineName'];
+    const jobArray: any = jobList?.filter(item => item.jobId === values.positionId);
+    values.jobName = jobArray[0]['jobName'];
+    const interviewArray:any = roleList?.filter(item => item.userCode === values.interviewCode);
+    values.interview = interviewArray[0]['userName'];
     let actionMethod;
     if (demandId) {
       values.demandId = demandId;
@@ -59,13 +65,13 @@ export default (props) => {
       >
         <Form.Item
           label='业务线'
-          name="businessId"
+          name="businessCode"
           rules={[{ required: true, message: '请选择业务线' }]}
         >
           <Select showSearch placeholder="请选择业务线" optionFilterProp='children'>
             {
               businessList?.map((item) => {
-                return <Option key={item.businessId} value={item.businessId}>{item.businessLineName}</Option>
+                return <Option key={item.businessCode} value={item.businessCode}>{item.businessLineName}</Option>
               })
             }
           </Select>
@@ -85,7 +91,7 @@ export default (props) => {
         </Form.Item>
         <Form.Item
           label='职级'
-          name="rank"
+          name="rankId"
           rules={[{ required: true, message: '请选择职级' }]}
         >
           <Select showSearch placeholder="请选择职级">

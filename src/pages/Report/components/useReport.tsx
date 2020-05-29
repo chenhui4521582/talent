@@ -45,12 +45,12 @@ export const useReport = ({
               <Col span={6}>
                 <Form.Item
                   label="业务线"
-                  name="businessId"
+                  name="businessCode"
                 >
                   <Select placeholder="请选择业务线">
                     {
                       businessList?.map(item => {
-                        return <Select.Option value={item.businessId} key={item.businessId}>{item.businessLineName}</Select.Option>
+                        return <Select.Option value={item.businessCode} key={item.businessCode}>{item.businessLineName}</Select.Option>
                       })
                     }
                   </Select>

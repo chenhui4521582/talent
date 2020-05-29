@@ -42,14 +42,14 @@ export default (props: IRouteComponentProps) => {
     if (getToken('ods_token_front')) {
       fetchCurrent();
     } else {
-      window.location.href = document.location.protocol + '//mp.jdd-hub.com/account/login';
+      window.location.href = document.location.protocol + '//console.jdd-hub.com/login';
     }
   }, []);
 
   const handleMenuClick = ({ key }: KeyParams) => {
     if (key === 'logout') {
       removeToken('ods_token_front');
-      window.location.href = document.location.protocol + '//mp.jdd-hub.com/account/login';
+      window.location.href = document.location.protocol + '//console.jdd-hub.com/login';
     } else {
       setModalName(key);
     }
