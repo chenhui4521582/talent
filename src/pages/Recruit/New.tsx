@@ -97,7 +97,7 @@ export default (props) => {
           <Select showSearch placeholder="请选择职级">
             {
               rankList?.map(item => {
-                return <Option key={item.rankId} value={item.rankId}>{item.rank}</Option>
+                return <Option key={item.rankId} value={item.rankId}>{item.rankName}</Option>
               })
             }
           </Select>

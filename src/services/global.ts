@@ -54,7 +54,6 @@ export interface IDepartment {
 export interface IRank {
   rankId: number;
   rankName: string;
-  rank: string;
 }
 
 export interface ITitle {
