@@ -12,8 +12,20 @@ import {
 } from 'antd';
 import { history } from 'umi';
 import moment from 'moment';
-import { useBusiness, useJob, useDepartment, useRank, useTitle, useCost, useLabor } from '@/models/global';
-import { commonDetail, saveEmployeeInfo, updateEmployeeInfo } from './services/staff';
+import {
+  useBusiness,
+  useJob,
+  useDepartment,
+  useRank,
+  useTitle,
+  useCost,
+  useLabor,
+} from '@/models/global';
+import {
+  commonDetail,
+  saveEmployeeInfo,
+  updateEmployeeInfo,
+} from './services/staff';
 import { GlobalResParams } from '@/types/ITypes';
 
 const { Option } = Select;
@@ -34,19 +46,31 @@ export default props => {
       let res: GlobalResParams<any> = await commonDetail(employeeId);
       let values = res?.obj;
       if (res?.obj) {
-        values.contractStart = moment(values.contractStart);
-        values.contractEnd = moment(values.contractEnd);
-        values.onboardingDate = moment(values.onboardingDate);
-        values.probationEnd = moment(values.probationEnd);
-        values.workStart = moment(values.workStart);
-        values.exWorkStart = moment(values.exWorkStart);
-        values.graduationDate = moment(values.graduationDate);
+        values.contractStart
+          ? (values.contractStart = moment(values.contractStart))
+          : '';
+        values.contractEnd
+          ? (values.contractEnd = moment(values.contractEnd))
+          : '';
+        values.onboardingDate
+          ? (values.onboardingDate = moment(values.onboardingDate))
+          : '';
+        values.probationEnd
+          ? (values.probationEnd = moment(values.probationEnd))
+          : '';
+        values.workStart ? (values.workStart = moment(values.workStart)) : '';
+        values.exWorkStart
+          ? (values.exWorkStart = moment(values.exWorkStart))
+          : '';
+        values.graduationDate
+          ? (values.graduationDate = moment(values.graduationDate))
+          : '';
       }
       form.setFieldsValue(res?.obj);
     }
     if (employeeId) getDetail();
   }, []);
-  const handleSubmit = async (values) => {
+  const handleSubmit = async values => {
     let actionMethod;
     values.contractStart = moment(values.contractStart).format('YYYY/MM/DD');
     values.contractEnd = moment(values.contractEnd).format('YYYY/MM/DD');
@@ -58,7 +82,7 @@ export default props => {
     if (employeeId) {
       actionMethod = updateEmployeeInfo;
     } else {
-      actionMethod = saveEmployeeInfo
+      actionMethod = saveEmployeeInfo;
     }
     let res: GlobalResParams<string> = await actionMethod(values);
     if (res.status === 200) {
@@ -331,7 +355,7 @@ export default props => {
           </Col>
         </Row>
 
-        <Row style={{marginTop: 20}}>
+        <Row style={{ marginTop: 20 }}>
           <Col span={6}>
             <Form.Item
               label="合同起始日期"
@@ -471,13 +495,13 @@ export default props => {
               rules={[{ required: true, message: '请选择组别' }]}
             >
               <Select showSearch optionFilterProp="children">
-                {
-                  groupList?.map(item => {
-                    return (
-                      <Option value={item.code} key={item.code}>{item.name}</Option>
-                    )
-                  })
-                }
+                {groupList?.map(item => {
+                  return (
+                    <Option value={item.code} key={item.code}>
+                      {item.name}
+                    </Option>
+                  );
+                })}
               </Select>
             </Form.Item>
           </Col>
