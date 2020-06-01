@@ -196,6 +196,50 @@ export default defineConfig({
           path: '/talent/company/labourmanage',
           component: '@/pages/Company/Labourmanage',
         },
+        {
+          path: '/talent/workflow/initiate',
+          component: '@/pages/Workflow/Initiate',
+        },
+        {
+          path: '/talent/workflow/approval',
+          component: '@/pages/Workflow/Approval',
+        },
+        {
+          path: '/talent/workflow/dismissal',
+          component: '@/pages/Workflow/Dismissal',
+        },
+        {
+          path: '/talent/workflow/promotion',
+          component: '@/pages/Workflow/Promotion',
+        },
+        {
+          path: '/talent/workflow/recruit',
+          component: '@/pages/Workflow/Recruit',
+        },
+        {
+          path: '/talent/workflow/resignation',
+          component: '@/pages/Workflow/Resignation',
+        },
+        {
+          path: '/talent/workflow/transfer',
+          component: '@/pages/Workflow/Transfer',
+        },
+        {
+          path: '/talent/workflow/list',
+          component: '@/pages/Workflow/List',
+        },
+        {
+          path: '/talent/workflow/complete',
+          component: '@/pages/Workflow/Complete',
+        },
+        {
+          path: '/talent/workflow/todo',
+          component: '@/pages/Workflow/ToDo',
+        },
+        {
+          path: '/talent/workflow/detail',
+          component: '@/pages/Workflow/Detail',
+        },
       ],
     },
   ],
