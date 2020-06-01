@@ -2,15 +2,6 @@ import React, { useState } from 'react';
 import { Button, Card } from 'antd';
 import './style/initiate.less';
 
-const routerJson = {
-  approval: '/talent/workflow/approval',
-  dismissal: '/talent/workflow/dismissal',
-  promotion: '/talent/workflow/promotion',
-  recruit: '/talent/workflow/recruit',
-  resignation: '/talent/workflow/resignation',
-  transfer: '/talent/workflow/transfer',
-};
-
 export default () => {
   return (
     <Card title="发起流程">
@@ -19,7 +10,7 @@ export default () => {
         <div>
           <Button
             onClick={() => {
-              window.location.href = routerJson['recruit'];
+              window.location.href = '/talent/workflow/homedetail';
             }}
             className="button-right"
           >
@@ -27,7 +18,7 @@ export default () => {
           </Button>
           <Button
             onClick={() => {
-              window.location.href = routerJson['approval'];
+              window.location.href = '/talent/workflow/homedetail';
             }}
             className="button-right"
           >
@@ -36,7 +27,7 @@ export default () => {
           <Button
             className="button-right"
             onClick={() => {
-              window.location.href = routerJson['transfer'];
+              window.location.href = '/talent/workflow/homedetail';
             }}
           >
             转岗
@@ -44,7 +35,7 @@ export default () => {
           <Button
             className="button-right"
             onClick={() => {
-              window.location.href = routerJson['promotion'];
+              window.location.href = '/talent/workflow/homedetail';
             }}
           >
             晋升

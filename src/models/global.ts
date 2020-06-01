@@ -1,18 +1,25 @@
 import { GlobalResParams } from '@/types/ITypes';
 import { useEffect, useState } from 'react';
 import {
-  queryBusiness, IBusiness,
-  queryJob, IJob,
+  queryBusiness,
+  IBusiness,
+  queryJob,
+  IJob,
   queryRole,
-  listDepartment, IDepartment,
-  listRank, IRank,
-  listTitle, ITitle,
-  listCostCenter, ICost,
-  listLabor, ILabor
+  listDepartment,
+  IDepartment,
+  listRank,
+  IRank,
+  listTitle,
+  ITitle,
+  listCostCenter,
+  ICost,
+  listLabor,
+  ILabor,
 } from '@/services/global';
 
 export const useBusiness = () => {
-  const [businessList, setBusinessList] = useState<IBusiness[]>(); 
+  const [businessList, setBusinessList] = useState<IBusiness[]>();
   useEffect(() => {
     async function fetchBusiness() {
       let res: GlobalResParams<IBusiness[]> = await queryBusiness();
@@ -21,10 +28,10 @@ export const useBusiness = () => {
     fetchBusiness();
   }, []);
   return { businessList };
-} 
+};
 
 export const useJob = () => {
-  const [jobList, setJobList] = useState<IJob[]>(); 
+  const [jobList, setJobList] = useState<IJob[]>();
   useEffect(() => {
     async function fetchJob() {
       let res: GlobalResParams<IJob[]> = await queryJob();
@@ -33,10 +40,10 @@ export const useJob = () => {
     fetchJob();
   }, []);
   return { jobList };
-}
+};
 
 export const useRole = (type: number) => {
-  const [roleList, setRoleList] = useState<any[]>(); 
+  const [roleList, setRoleList] = useState<any[]>();
   useEffect(() => {
     async function fetchRole() {
       let res: GlobalResParams<any[]> = await queryRole(type);
@@ -45,7 +52,7 @@ export const useRole = (type: number) => {
     fetchRole();
   }, []);
   return { roleList };
-}
+};
 
 export const useDepartment = (level: number) => {
   const [departmentList, setDepartmentList] = useState<IDepartment[]>();
@@ -55,9 +62,9 @@ export const useDepartment = (level: number) => {
       setDepartmentList(res.obj);
     }
     fetchDepartment();
-  }, [])
+  }, []);
   return { departmentList };
-}
+};
 
 export const useRank = () => {
   const [rankList, setRankList] = useState<IRank[]>();
@@ -67,9 +74,9 @@ export const useRank = () => {
       setRankList(res.obj);
     }
     fetchRank();
-  }, [])
+  }, []);
   return { rankList };
-}
+};
 
 export const useTitle = () => {
   const [titleList, setTitleList] = useState<ITitle[]>();
@@ -79,9 +86,9 @@ export const useTitle = () => {
       setTitleList(res.obj);
     }
     fetchTitle();
-  }, [])
+  }, []);
   return { titleList };
-}
+};
 
 export const useCost = () => {
   const [costList, setCostList] = useState<ICost[]>();
@@ -91,9 +98,9 @@ export const useCost = () => {
       setCostList(res.obj);
     }
     fetchCost();
-  }, [])
+  }, []);
   return { costList };
-}
+};
 
 export const useLabor = () => {
   const [laborList, setLaborList] = useState<ILabor[]>();
@@ -103,8 +110,6 @@ export const useLabor = () => {
       setLaborList(res.obj);
     }
     fetchLabor();
-  }, [])
+  }, []);
   return { laborList };
-}
-
-
+};

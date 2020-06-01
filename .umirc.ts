@@ -197,36 +197,16 @@ export default defineConfig({
           component: '@/pages/Company/Labourmanage',
         },
         {
-          path: '/talent/workflow/initiate',
-          component: '@/pages/Workflow/Initiate',
+          path: '/talent/workflow/home',
+          component: '@/pages/Workflow/Home',
         },
         {
-          path: '/talent/workflow/approval',
-          component: '@/pages/Workflow/Approval',
+          path: '/talent/workflow/homedetail',
+          component: '@/pages/Workflow/HomeDetail',
         },
         {
-          path: '/talent/workflow/dismissal',
-          component: '@/pages/Workflow/Dismissal',
-        },
-        {
-          path: '/talent/workflow/promotion',
-          component: '@/pages/Workflow/Promotion',
-        },
-        {
-          path: '/talent/workflow/recruit',
-          component: '@/pages/Workflow/Recruit',
-        },
-        {
-          path: '/talent/workflow/resignation',
-          component: '@/pages/Workflow/Resignation',
-        },
-        {
-          path: '/talent/workflow/transfer',
-          component: '@/pages/Workflow/Transfer',
-        },
-        {
-          path: '/talent/workflow/list',
-          component: '@/pages/Workflow/List',
+          path: '/talent/workflow/mylist',
+          component: '@/pages/Workflow/MyList',
         },
         {
           path: '/talent/workflow/complete',
@@ -239,6 +219,30 @@ export default defineConfig({
         {
           path: '/talent/workflow/detail',
           component: '@/pages/Workflow/Detail',
+        },
+        {
+          path: '/talent/framework/organization',
+          component: '@/pages/Framework/Organization',
+        },
+        {
+          path: '/talent/framework/rolelabel',
+          component: '@/pages/Framework/RoleLabel',
+        },
+        {
+          path: '/talent/framework/systemLabel',
+          component: '@/pages/Framework/systemlabel',
+        },
+        {
+          path: '/talent/wfmanage/list',
+          component: '@/pages/WFmanage/List',
+        },
+        {
+          path: '/talent/wfmanage/category',
+          component: '@/pages/WFmanage/Category',
+        },
+        {
+          path: '/talent/wftemplate/List',
+          component: '@/pages/WFtemplate/list',
         },
       ],
     },
