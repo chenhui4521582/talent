@@ -7,6 +7,9 @@ export default defineConfig({
   dynamicImport: {
     loading: '@/components/PageLoading/index',
   },
+  targets: {
+    ie: 10,
+  },
   routes: [
     {
       path: '/',

@@ -27,7 +27,12 @@ import {
 } from './services/cvowner';
 import { selectJob, IJobParams } from './services/cvupload';
 import { ColumnProps } from 'antd/es/table';
-import { GlobalResParams, formItemLayout, ResumeStatus } from '@/types/ITypes';
+import {
+  GlobalResParams,
+  formItemLayout,
+  ResumeStatus,
+  eduHash,
+} from '@/types/ITypes';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 
 const { Option } = Select;
@@ -247,10 +252,10 @@ export default props => {
                   optionFilterProp="children"
                   placeholder="请选择学历"
                 >
-                  {Object.keys(ResumeStatus).map(item => {
+                  {Object.keys(eduHash).map(item => {
                     return (
                       <Option value={item} key={item}>
-                        {ResumeStatus[item]}
+                        {eduHash[item]}
                       </Option>
                     );
                   })}
