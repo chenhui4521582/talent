@@ -8,6 +8,7 @@ export default defineConfig({
     loading: '@/components/PageLoading/index',
   },
   targets: {
+    edge: 13,
     ie: 10,
   },
   routes: [
