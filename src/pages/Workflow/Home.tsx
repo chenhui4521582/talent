@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Button, Card } from 'antd';
+import { Link } from 'umi';
 import './style/initiate.less';
 
 export default () => {
@@ -8,13 +9,8 @@ export default () => {
       <div className="type">
         <h3>培训类</h3>
         <div>
-          <Button
-            onClick={() => {
-              window.location.href = '/talent/workflow/homedetail';
-            }}
-            className="button-right"
-          >
-            招聘
+          <Button className="button-right">
+            <Link to={`homedetail?name=${'招聘'}`}>招聘</Link>
           </Button>
           <Button
             onClick={() => {

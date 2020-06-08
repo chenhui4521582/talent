@@ -241,7 +241,7 @@ export default defineConfig({
           component: '@/pages/WFmanage/Category',
         },
         {
-          path: '/talent/wftemplate/List',
+          path: '/talent/wftemplate/list',
           component: '@/pages/WFtemplate/list',
         },
       ],

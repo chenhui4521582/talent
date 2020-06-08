@@ -16,6 +16,8 @@ import {
   ICost,
   listLabor,
   ILabor,
+  listCompany,
+  IResumeCompany,
 } from '@/services/global';
 
 export const useBusiness = () => {
@@ -112,4 +114,17 @@ export const useLabor = () => {
     fetchLabor();
   }, []);
   return { laborList };
+};
+
+// 公司列表
+export const useCompany = () => {
+  const [companyList, setCompanyList] = useState<IResumeCompany[]>([]);
+  useEffect(() => {
+    async function fetchLabor() {
+      let res: GlobalResParams<IResumeCompany[]> = await listCompany();
+      setCompanyList(res.obj);
+    }
+    fetchLabor();
+  }, []);
+  return { companyList };
 };

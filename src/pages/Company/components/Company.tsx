@@ -5,30 +5,19 @@ import React, {
   forwardRef,
 } from 'react';
 import { Select, Form } from 'antd';
-import { listCompany, IResumeCompany, tsCompany } from '../services/company';
+import { tsCompany } from '../services/company';
+import { useCompany } from '@/models/global';
 
 const { Option } = Select;
 
 function Company(props: tsCompany, formRef) {
-  const [optionList, setOptionList] = useState<Array<IResumeCompany>>([]);
+  const { companyList } = useCompany();
   const [form] = Form.useForm();
 
   useEffect(() => {
-    async function getcompanyList() {
-      let companyObj = await listCompany();
-      if (companyObj.status === 200) {
-        setOptionList(companyObj.obj);
-      }
-    }
-    getcompanyList();
-  }, []);
-
-  useEffect(() => {
-    for (let i = 0; i < optionList.length; i++) {
-      // console.log(optionList)
-      // debugger
-      if (optionList[i].companyName === props.optionName) {
-        form.setFieldsValue({ companyId: optionList[i].companyId });
+    for (let i = 0; i < companyList.length; i++) {
+      if (companyList[i].companyName === props.optionName) {
+        form.setFieldsValue({ companyId: companyList[i].companyId });
       }
     }
   });
@@ -52,7 +41,7 @@ function Company(props: tsCompany, formRef) {
         rules={[{ required: true, message: '请选择公司名称' }]}
       >
         <Select placeholder="请选择名称">
-          {optionList.map(item => {
+          {companyList.map(item => {
             return (
               <Option key={item.companyId} value={item.companyId}>
                 {item.companyName}
