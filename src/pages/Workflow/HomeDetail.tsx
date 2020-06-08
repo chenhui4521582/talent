@@ -11,7 +11,7 @@ import Temp from './Component';
 // import jsons from './services/json.js'
 
 export default () => {
-  const [formList, setFormList] = useState<any[]>([]);
+  const [formList, setFormList] = useState<tsFormChildlist[]>([]);
   const [title, setTitle] = useState<string | null>('');
 
   useEffect(() => {
@@ -22,40 +22,38 @@ export default () => {
         let formChildlist = obj.formChildlist || [];
         let groupList = obj.groupList || [];
         let data: any = [];
-        let group: any = [];
         for (let k = 0; k < formChildlist.length; k++) {
           let fromItem = formChildlist[k];
           let controlList = fromItem.controlList || [];
           data[k] = fromItem;
           data[k].list = [];
+          data[k].arr = [];
+          data[k].groupColArr = [];
           for (let i = 0; i < groupList.length; i++) {
             let groupItem = groupList[i];
             let list: any = [];
             for (let g = 0; g < controlList.length; g++) {
               if (groupItem.id === controlList[g].resGroupId) {
-                formChildlist[k].controlList[g].isGroups = 1;
+                data[k].groupColArr.push(formChildlist[k].controlList[g].id);
                 list.push(controlList[g]);
                 groupItem.list = list;
                 data[k].list.push(groupItem);
-              } else {
-                if (controlList[g].isGroups !== 1) {
-                  console.log(controlList[g].isGroups);
-                  data[k].list.push(controlList[g]);
-                }
+              }
+              if (
+                data[k].arr.indexOf(formChildlist[k].controlList[g].id) ===
+                  -1 &&
+                data[k].groupColArr.indexOf(
+                  formChildlist[k].controlList[g].id,
+                ) === -1 &&
+                i === groupList.length - 1
+              ) {
+                data[k].arr.push(formChildlist[k].controlList[g].id);
+                data[k].list.push(controlList[g]);
               }
             }
             data[k].list = [...new Set(data[k].list)];
           }
         }
-
-        // for(let h=0; h<data.length; h++){
-        //   for(let u=0; u<data[h].list.length; u++){
-        //     console.log(data[h].list[u])
-        //   }
-        // }
-
-        console.log(data);
-        console.log('data');
         setTitle(obj.name);
         setFormList(data);
       }
@@ -65,29 +63,67 @@ export default () => {
 
   const fromContent = useMemo(() => {
     return formList.map(fromItem => {
-      // return(
-      //   <Descriptions title={fromItem.name} key={fromItem.id} bordered column={1}>
-      //     {
-      //       fromItem.map((groupItem,index)=>{
+      let list: any[] = fromItem.list;
+      return (
+        <Descriptions
+          title={fromItem.name}
+          key={fromItem.id}
+          bordered
+          column={1}
+          style={{ marginBottom: 40 }}
+        >
+          {list.map(groupItem => {
+            if (groupItem.list && groupItem.list.length) {
+              return (
+                <Descriptions.Item
+                  key={groupItem.id}
+                  label={groupItem.name}
+                  span={1}
+                >
+                  {groupItem.list.map(listItem => {
+                    return (
+                      <div
+                        key={listItem.id}
+                        style={{
+                          display: 'flex',
+                          flex: 1,
+                          flexDirection: 'row',
+                        }}
+                      >
+                        <p style={{ display: 'flex', flex: 1 }}>
+                          {listItem.name}
+                        </p>
 
-      //           return(
-      //             <Descriptions.Item
-      //               key={index}
-      //               label={groupItem.name}
-      //               span={groupItem.colspan}>
-      //               <Temp
-      //                 s_type={groupItem.baseControlType}
-      //                 readOnly={groupItem.isLocked}
-      //                 list={groupItem.itemList || []}
-      //               />
-      //             </Descriptions.Item>
-      //           )
-
-      //       })
-      //     }
-      //   </Descriptions>
-      // )
-      return null;
+                        <p style={{ display: 'flex', flex: 1 }}>
+                          <Temp
+                            s_type={listItem.baseControlType}
+                            readOnly={listItem.isLocked}
+                            list={listItem.itemList || []}
+                          />
+                        </p>
+                      </div>
+                    );
+                  })}
+                </Descriptions.Item>
+              );
+            } else {
+              return (
+                <Descriptions.Item
+                  key={groupItem.id}
+                  label={groupItem.name}
+                  span={groupItem.colspan}
+                >
+                  <Temp
+                    s_type={groupItem.baseControlType}
+                    readOnly={groupItem.isLocked}
+                    list={groupItem.itemList || []}
+                  />
+                </Descriptions.Item>
+              );
+            }
+          })}
+        </Descriptions>
+      );
     });
   }, [formList]);
 

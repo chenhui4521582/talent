@@ -23,6 +23,7 @@ export interface tsFormChildlist {
   updateTime: string | null;
   updatedBy: string | null;
   controlList: tsControlList[];
+  list: tsGroupList[] | tsControlList[];
 }
 
 export interface tsGroupList {
@@ -36,7 +37,7 @@ export interface tsGroupList {
   status: number | null;
   updateTime: string | null;
   updatedBy: string | null;
-  list?: any;
+  list?: tsControlList[];
 }
 
 export interface tsControlList {
