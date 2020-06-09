@@ -3,15 +3,18 @@ import {
   wfFormDetail,
   tsWfFormDetail,
   tsFormChildlist,
+  tsControlList,
   saveTaskForm,
 } from './services/home';
 import { GlobalResParams } from '@/types/ITypes';
 import { Card, Descriptions, Button, Form } from 'antd';
 import Temp from './Component';
+import './style/home.less';
 
 export default () => {
   const [formList, setFormList] = useState<tsFormChildlist[]>([]);
   const [title, setTitle] = useState<string | null>('');
+
   const [form] = Form.useForm();
   useEffect(() => {
     async function getFrom() {
@@ -23,7 +26,7 @@ export default () => {
         let data: any = [];
         for (let k = 0; k < formChildlist.length; k++) {
           let fromItem = formChildlist[k];
-          let controlList = fromItem.controlList || [];
+          let controlList = fromItem.controlList;
           data[k] = fromItem;
           data[k].list = [];
           data[k].arr = [];
@@ -59,17 +62,22 @@ export default () => {
     }
     getFrom();
   }, []);
+  const changSubData = (id: string, value: string): void => {
+    let obj = {};
+    obj[id] = value;
+    form.setFieldsValue(obj);
+  };
 
   const fromContent = useMemo(() => {
     return formList.map(fromItem => {
       let list: any[] = fromItem.list;
       return (
         <Descriptions
-          title={fromItem.name}
+          title={<div style={{ textAlign: 'center' }}>{fromItem.name}</div>}
           key={fromItem.id}
           bordered
           column={1}
-          style={{ marginBottom: 40 }}
+          style={{ marginBottom: 40, width: '80%', marginLeft: '10%' }}
         >
           {list.map(groupItem => {
             if (groupItem.list && groupItem.list.length) {
@@ -90,7 +98,12 @@ export default () => {
                           margin: '10px',
                         }}
                       >
-                        <div style={{ display: 'flex', flex: 1 }}>
+                        <div
+                          className={
+                            listItem.isRequired ? 'label-required' : ''
+                          }
+                          style={{ display: 'flex', flex: 1 }}
+                        >
                           {listItem.name}
                         </div>
 
@@ -104,11 +117,14 @@ export default () => {
                               },
                             ]}
                             name={listItem.id}
+                            initialValue={listItem.defaultValue}
                           >
                             <Temp
                               s_type={listItem.baseControlType}
                               readOnly={listItem.isLocked}
                               list={listItem.itemList || []}
+                              changSubData={changSubData}
+                              id={listItem.id}
                             />
                           </Form.Item>
                         </div>
@@ -121,12 +137,19 @@ export default () => {
               return (
                 <Descriptions.Item
                   key={groupItem.id}
-                  label={groupItem.name}
+                  label={
+                    <span
+                      className={groupItem.isRequired ? 'label-required' : ''}
+                    >
+                      {groupItem.name}
+                    </span>
+                  }
                   span={groupItem.colspan}
                 >
                   <Form.Item
                     style={{ width: '100%' }}
                     name={groupItem.id}
+                    initialValue={groupItem.defaultValue}
                     rules={[
                       {
                         required: groupItem.isRequired,
@@ -138,6 +161,7 @@ export default () => {
                       s_type={groupItem.baseControlType}
                       readOnly={groupItem.isLocked}
                       list={groupItem.itemList || []}
+                      id={groupItem.id}
                     />
                   </Form.Item>
                 </Descriptions.Item>
@@ -150,15 +174,15 @@ export default () => {
   }, [formList]);
 
   return (
-    <Card title={`发起流程  /  ${title}-创建`}>
-      <Form form={form} onFinish={values => console.log(values)}>
+    <Card title={`发起流程  /  ${title}-创建`} className="home-detail">
+      <Form form={form}>
         {fromContent}
         <div style={{ textAlign: 'center' }}>
           <Button
             type="primary"
             style={{ marginRight: 20 }}
             onClick={() => {
-              // console.log(form.getFieldsValue())
+              console.log(form.getFieldsValue());
               form.submit();
             }}
           >

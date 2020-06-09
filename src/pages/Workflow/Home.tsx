@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button, Card } from 'antd';
 import { Link } from 'umi';
-import './style/initiate.less';
+import './style/home.less';
 
 export default () => {
   return (

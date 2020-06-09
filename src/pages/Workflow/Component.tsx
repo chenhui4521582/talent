@@ -103,20 +103,25 @@ export default props => {
       return <Input {...props} placeholder="关联流程" readOnly />;
 
     default:
-      return null;
+      return <></>;
   }
 };
 
 // 单选框
 const SelectTemplate = props => {
-  const { list } = props;
-  console.log(list);
+  const { list, changSubData, id } = props;
   let data = [];
   if (Object.prototype.toString.call(list) === '[object String]') {
     data = list.split('|');
   }
   return (
-    <Select placeholder="请选择" style={{ width: '100%' }}>
+    <Select
+      placeholder="请选择"
+      style={{ width: '100%' }}
+      onSelect={e => {
+        changSubData(id, e);
+      }}
+    >
       {data.map((item, index) => {
         return (
           <Option key={index} value={item}>
