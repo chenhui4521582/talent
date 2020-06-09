@@ -3,20 +3,19 @@ import {
   wfFormDetail,
   tsWfFormDetail,
   tsFormChildlist,
-  tsGroupList,
+  saveTaskForm,
 } from './services/home';
 import { GlobalResParams } from '@/types/ITypes';
-import { Card, Descriptions } from 'antd';
+import { Card, Descriptions, Button, Form } from 'antd';
 import Temp from './Component';
-// import jsons from './services/json.js'
 
 export default () => {
   const [formList, setFormList] = useState<tsFormChildlist[]>([]);
   const [title, setTitle] = useState<string | null>('');
-
+  const [form] = Form.useForm();
   useEffect(() => {
     async function getFrom() {
-      let json: GlobalResParams<tsWfFormDetail> = await wfFormDetail(2, 5);
+      let json: GlobalResParams<tsWfFormDetail> = await wfFormDetail(0, 6);
       if (json.status === 200) {
         let obj = json.obj || {};
         let formChildlist = obj.formChildlist || [];
@@ -88,19 +87,31 @@ export default () => {
                           display: 'flex',
                           flex: 1,
                           flexDirection: 'row',
+                          margin: '10px',
                         }}
                       >
-                        <p style={{ display: 'flex', flex: 1 }}>
+                        <div style={{ display: 'flex', flex: 1 }}>
                           {listItem.name}
-                        </p>
+                        </div>
 
-                        <p style={{ display: 'flex', flex: 1 }}>
-                          <Temp
-                            s_type={listItem.baseControlType}
-                            readOnly={listItem.isLocked}
-                            list={listItem.itemList || []}
-                          />
-                        </p>
+                        <div style={{ display: 'flex', flex: 1 }}>
+                          <Form.Item
+                            style={{ width: '100%' }}
+                            rules={[
+                              {
+                                required: listItem.isRequired,
+                                message: `${listItem.name}'必填!`,
+                              },
+                            ]}
+                            name={listItem.id}
+                          >
+                            <Temp
+                              s_type={listItem.baseControlType}
+                              readOnly={listItem.isLocked}
+                              list={listItem.itemList || []}
+                            />
+                          </Form.Item>
+                        </div>
                       </div>
                     );
                   })}
@@ -113,11 +124,22 @@ export default () => {
                   label={groupItem.name}
                   span={groupItem.colspan}
                 >
-                  <Temp
-                    s_type={groupItem.baseControlType}
-                    readOnly={groupItem.isLocked}
-                    list={groupItem.itemList || []}
-                  />
+                  <Form.Item
+                    style={{ width: '100%' }}
+                    name={groupItem.id}
+                    rules={[
+                      {
+                        required: groupItem.isRequired,
+                        message: `${groupItem.name}'必填!`,
+                      },
+                    ]}
+                  >
+                    <Temp
+                      s_type={groupItem.baseControlType}
+                      readOnly={groupItem.isLocked}
+                      list={groupItem.itemList || []}
+                    />
+                  </Form.Item>
                 </Descriptions.Item>
               );
             }
@@ -127,5 +149,30 @@ export default () => {
     });
   }, [formList]);
 
-  return <Card title={`发起流程  /  ${title}-创建`}>{fromContent}</Card>;
+  return (
+    <Card title={`发起流程  /  ${title}-创建`}>
+      <Form form={form} onFinish={values => console.log(values)}>
+        {fromContent}
+        <div style={{ textAlign: 'center' }}>
+          <Button
+            type="primary"
+            style={{ marginRight: 20 }}
+            onClick={() => {
+              // console.log(form.getFieldsValue())
+              form.submit();
+            }}
+          >
+            提交
+          </Button>
+          <Button
+            onClick={() => {
+              alert(1);
+            }}
+          >
+            返回
+          </Button>
+        </div>
+      </Form>
+    </Card>
+  );
 };

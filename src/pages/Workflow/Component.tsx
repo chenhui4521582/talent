@@ -116,7 +116,7 @@ const SelectTemplate = props => {
     data = list.split('|');
   }
   return (
-    <Select defaultValue="请选择" style={{ width: '100%' }}>
+    <Select placeholder="请选择" style={{ width: '100%' }}>
       {data.map((item, index) => {
         return (
           <Option key={index} value={item}>

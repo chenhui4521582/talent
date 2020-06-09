@@ -70,6 +70,34 @@ export interface tsControlList {
   isGroups?: number;
 }
 
+export interface PaginationTableParams {
+  pageNum: number;
+  pageSize: number;
+  [propName: string]: any;
+}
+
+export interface tsSaveTaskForm {
+  resFormId: number;
+  wfResFormSaveItem: tsFormSaveItem[];
+  wfTaskFormFilesCrudParamList: tsFormFiledSaveItem[];
+}
+
+export interface tsFormSaveItem {
+  id: number;
+  multipleNumber?: number;
+  value: string;
+}
+
+export interface tsFormFiledSaveItem {
+  fileExtname: string;
+  fileName: string;
+  fileSize: string;
+  fileUrl: string;
+  id: number;
+  resFormControlId: number;
+  taskFormId: number;
+}
+
 //工作流动态表单详情
 export async function wfFormDetail(accountType: number, id: number) {
   return request(`/api/talent/wfresform/getDetail`, {
@@ -81,14 +109,16 @@ export async function wfFormDetail(accountType: number, id: number) {
   });
 }
 
-export interface PaginationTableParams {
-  pageNum: number;
-  pageSize: number;
-  [propName: string]: any;
+//提交流程表单
+export async function saveTaskForm(params: tsSaveTaskForm) {
+  return request(`/api/talent/wftaskform/saveTaskForm`, {
+    method: 'POST',
+    data: params,
+  });
 }
 
+// 成本中心列表
 export async function listPage(params: PaginationTableParams) {
-  // 成本中心列表
   return request(`/api/talent/laborRelation/list`, {
     method: 'POST',
     data: params,
