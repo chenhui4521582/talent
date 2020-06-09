@@ -4,32 +4,18 @@ import React, {
   useImperativeHandle,
   forwardRef,
 } from 'react';
-import { Select, Form } from 'antd';
-import { listCompany, IResumeCompany, tsCompany } from '../services/company';
-
-const { Option } = Select;
+import { Input, Form } from 'antd';
+import { IResumeCompany, tsCompany } from '../services/company';
 
 function Company(props: tsCompany, formRef) {
-  const [optionList, setOptionList] = useState<Array<IResumeCompany>>([]);
   const [form] = Form.useForm();
+  const { name, paramName, defaultValue } = props;
 
   useEffect(() => {
-    async function getcompanyList() {
-      let companyObj = await listCompany();
-      if (companyObj.status === 200) {
-        setOptionList(companyObj.obj);
-      }
-    }
-    getcompanyList();
-  }, []);
-
-  useEffect(() => {
-    for (let i = 0; i < optionList.length; i++) {
-      // console.log(optionList)
-      // debugger
-      if (optionList[i].companyName === props.optionName) {
-        form.setFieldsValue({ companyId: optionList[i].companyId });
-      }
+    if (defaultValue) {
+      let obj = {};
+      obj[name] = defaultValue;
+      form.setFieldsValue(obj);
     }
   });
 
@@ -47,19 +33,11 @@ function Company(props: tsCompany, formRef) {
   return (
     <Form form={form} onFinish={props.handleAdd}>
       <Form.Item
-        label="公司名称"
-        name="companyId"
-        rules={[{ required: true, message: '请选择公司名称' }]}
+        label={name}
+        name={paramName}
+        rules={[{ required: true, message: `请输入${name}` }]}
       >
-        <Select placeholder="请选择名称">
-          {optionList.map(item => {
-            return (
-              <Option key={item.companyId} value={item.companyId}>
-                {item.companyName}
-              </Option>
-            );
-          })}
-        </Select>
+        <Input type="text" placeholder={`请输入${name}`} />
       </Form.Item>
     </Form>
   );

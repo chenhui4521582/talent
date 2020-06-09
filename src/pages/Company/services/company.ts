@@ -14,7 +14,9 @@ export interface tsRefs {
 
 export interface tsCompany {
   handleAdd: (values) => Promise<void>;
-  optionName: string | undefined;
+  defaultValue: string | undefined;
+  name: string;
+  paramName: string;
 }
 
 export async function listCompany() {

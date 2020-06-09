@@ -18,7 +18,7 @@ import Company from './components/Company';
 export default () => {
   const [labourId, setLabourId] = useState<number>();
   const [action, setAction] = useState<string>('');
-  const [optionName, setOptionName] = useState<string>();
+  const [defaultValue, setDefaultValue] = useState<string>();
   const companyRef = useRef<tsRefs>();
   const columns: ColumnProps<tsLabourColItem>[] = [
     {
@@ -63,7 +63,7 @@ export default () => {
     type: string,
     record: tsLabourColItem | undefined,
   ): void => {
-    setOptionName(record?.laborRelationName);
+    setDefaultValue(record?.laborRelationName);
     setAction(type);
     setLabourId(record?.id);
     companyRef.current?.reset();
@@ -103,6 +103,7 @@ export default () => {
   const handleAdd = async (values: tsLabourSave) => {
     let actionMethod;
     if (action === 'add') {
+      console.log(values);
       actionMethod = saveLabour;
     } else {
       actionMethod = updateLabour;
@@ -145,7 +146,9 @@ export default () => {
         <Company
           ref={companyRef}
           handleAdd={handleAdd}
-          optionName={optionName}
+          defaultValue={defaultValue}
+          name="劳动关系名称"
+          paramName="laborRelationName"
         />
       </Modal>
     </Card>

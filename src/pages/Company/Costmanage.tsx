@@ -18,7 +18,7 @@ import Company from './components/Company';
 export default () => {
   const [costId, setCostId] = useState<number>();
   const [action, setAction] = useState<string>('');
-  const [optionName, setOptionName] = useState<string>();
+  const [defaultValue, setDefaultValue] = useState<string>();
   const companyRef = useRef<tsRefs>();
 
   const columns: ColumnProps<tsCostColItem>[] = [
@@ -61,7 +61,7 @@ export default () => {
   });
 
   const showModal = (type: string, record: tsCostColItem | undefined): void => {
-    setOptionName(record?.costCenterName);
+    setDefaultValue(record?.costCenterName);
     setCostId(record?.id);
     setAction(type);
     companyRef.current?.reset();
@@ -143,7 +143,9 @@ export default () => {
         <Company
           ref={companyRef}
           handleAdd={handleAdd}
-          optionName={optionName}
+          defaultValue={defaultValue}
+          name="成本中心名称"
+          paramName="costCenterName"
         />
       </Modal>
     </Card>

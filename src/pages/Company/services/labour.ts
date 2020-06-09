@@ -11,7 +11,7 @@ export interface tsLabourColItem {
 
 export interface tsLabourSave {
   laborId?: number;
-  companyId: number;
+  laborRelationName: string;
 }
 
 export async function listPage(params: PaginationTableParams) {

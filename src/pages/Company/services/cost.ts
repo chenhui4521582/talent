@@ -11,7 +11,7 @@ export interface tsCostColItem {
 
 export interface tsCostSave {
   costId?: number;
-  companyId: number;
+  costCenterName: string;
 }
 
 export async function listPage(params: PaginationTableParams) {
