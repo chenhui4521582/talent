@@ -56,7 +56,7 @@ export default props => {
     //成员 user多选框
     case 'user':
       return <UserTemplate {...props} />;
-    //department 部门
+    //department 部门 走组织架构
     case 'department':
       return <DepartmentTemplate {...props} />;
     //业务线 business
@@ -298,4 +298,4 @@ const DepartmentTemplate = props => {
   );
 };
 
-//
+// 人员， 组织架构  关联流程 （部门 走组织架构）
