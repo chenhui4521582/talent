@@ -56,6 +56,7 @@ export default () => {
   const [currentUserList, setCurrentUserList] = useState<any[]>([]);
 
   const [hoverItemCode, setHoverItemCode] = useState<string>('');
+  const [flag, setFlag] = useState<Boolean>(true);
   const [popconfirm, setPopconfirm] = useState<Boolean>(true);
 
   // 因为新建子部门跟，修改部门名称是同一个modal
@@ -174,6 +175,7 @@ export default () => {
               <p>设置上级</p>
               <p
                 onClick={() => {
+                  setFlag(true);
                   setRemoveVisible(true), setHoverItemCode('');
                 }}
               >
@@ -197,6 +199,9 @@ export default () => {
               display: 'flex',
               width: '2em',
               justifyContent: 'flex-end',
+            }}
+            onClick={() => {
+              setFlag(false);
             }}
           >
             ⋮
@@ -285,7 +290,14 @@ export default () => {
           } else {
             if (list[i].code === hoverItemCode) {
               list[i].title = (
-                <div style={{ width: '8em', display: 'flex', flex: '1' }}>
+                <div
+                  style={{ width: '8em', display: 'flex', flex: '1' }}
+                  onMouseLeave={e => {
+                    if (flag) {
+                      setHoverItemCode('');
+                    }
+                  }}
+                >
                   <span>{list[i].name}</span>
                   {more}
                 </div>
@@ -294,7 +306,7 @@ export default () => {
               list[i].title = (
                 <div
                   style={{ width: '8em', display: 'flex', flex: '1' }}
-                  onMouseOver={e => {
+                  onMouseEnter={e => {
                     e.preventDefault();
                     setHoverItemCode(list[i].code);
                   }}
