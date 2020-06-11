@@ -1,8 +1,47 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Tree, Input, Button, Modal, Table, Divider, Form } from 'antd';
+import {
+  Card,
+  Tree,
+  Input,
+  Button,
+  Modal,
+  Table,
+  Divider,
+  Tooltip,
+} from 'antd';
 import json from './services/json';
 
 const { Search } = Input;
+const columns: any = [
+  {
+    title: '姓名',
+    dataIndex: 'name',
+    key: 'name',
+  },
+  {
+    title: '年龄',
+    dataIndex: 'groupCode',
+    key: 'groupCode',
+  },
+  {
+    title: '住址',
+    dataIndex: 'code',
+    key: 'code',
+  },
+  {
+    title: '操作',
+    key: 'action',
+    align: 'center',
+    render: (_, record) => (
+      <span>
+        <a onClick={e => alert(1)}>修改</a>
+        <Divider type="vertical" />
+        <a onClick={e => alert(2)}>删除</a>
+      </span>
+    ),
+  },
+];
+
 export default () => {
   const [dataList, setDataList] = useState<any>([]);
   const [searchValue, setSearchValue] = useState<string>('');
@@ -12,11 +51,17 @@ export default () => {
   const [userListObj, setUserList] = useState<any>({});
   const [currentUserList, setCurrentUserList] = useState<any[]>([]);
   const [orVisible, setOrVisible] = useState<boolean>(false);
+  const [hoverItemCode, setHoverItemCode] = useState<string>('');
   useEffect(() => {
     if (json.status === 200) {
       let list = json.obj;
-      console.log(json);
-      handleList(list);
+      let newObj: any = {};
+      newObj.key = '奖多多集团';
+      newObj.title = '奖多多集团';
+      newObj.code = '奖多多集团';
+      newObj.name = '奖多多集团';
+      newObj.children = list;
+      handleList([newObj]);
     }
   }, []);
 
@@ -39,6 +84,7 @@ export default () => {
         }
       }
     };
+
     handleItem(data);
     setDataList(data);
     setKeyTitleList(keyTitle);
@@ -61,7 +107,6 @@ export default () => {
   };
 
   const searchChange = (e): void => {
-    console.log(keyTitleList);
     const {
       target: { value },
     } = e;
@@ -74,8 +119,6 @@ export default () => {
       })
       .filter((item, i, self) => item && self.indexOf(item) === i);
 
-    console.log('expandedKeys1');
-    console.log(expandedKey);
     setExpandedKeys(expandedKey);
     setSearchValue(value);
     setAutoExpandParent(true);
@@ -87,8 +130,6 @@ export default () => {
   };
 
   const onTreeSelect = e => {
-    console.log(userListObj);
-    console.log(userListObj[e]);
     if (userListObj[e]) {
       setCurrentUserList(userListObj[e]);
     } else {
@@ -105,15 +146,140 @@ export default () => {
           const index = list[i].title.indexOf(searchValue);
           const beforeStr = list[i].title.substr(0, index);
           const afterStr = list[i].title.substr(index + searchValue.length);
-          list[i].title = (
-            <div>
-              {' '}
-              {beforeStr} <span style={{ color: 'red' }}>{searchValue}</span>{' '}
-              {afterStr}{' '}
-            </div>
-          );
+          if (list[i].title === '奖多多集团') {
+            list[i].title = (
+              <div style={{ width: '8em', display: 'flex' }}>
+                {beforeStr}{' '}
+                <span style={{ color: 'red' }}> {searchValue} </span>
+                {afterStr}
+                <span
+                  style={{
+                    display: 'flex',
+                    alignContent: 'center',
+                    flex: 1,
+                    justifyContent: 'flex-end',
+                    fontSize: 20,
+                  }}
+                  onClick={e => {
+                    e.stopPropagation();
+                    setOrVisible(true);
+                  }}
+                >
+                  +
+                </span>
+              </div>
+            );
+          } else {
+            if (list[i].code === hoverItemCode) {
+              list[i].title = (
+                <div
+                  style={{ width: '8em' }}
+                  onMouseOut={e => {
+                    e.preventDefault();
+                    setHoverItemCode('');
+                  }}
+                  onMouseOver={e => {
+                    e.preventDefault();
+                    setHoverItemCode(list[i].code);
+                  }}
+                >
+                  {' '}
+                  {beforeStr}{' '}
+                  <span style={{ color: 'red' }}>{searchValue}</span> {afterStr}{' '}
+                  <span style={{ float: 'right', fontSize: 20, width: '2em' }}>
+                    ⋮
+                  </span>
+                </div>
+              );
+            } else {
+              list[i].title = (
+                <div
+                  style={{ width: '8em' }}
+                  onMouseOut={e => {
+                    e.preventDefault();
+                    setHoverItemCode('');
+                  }}
+                  onMouseOver={e => {
+                    e.preventDefault();
+                    setHoverItemCode(list[i].code);
+                  }}
+                >
+                  {' '}
+                  {beforeStr}{' '}
+                  <span style={{ color: 'red' }}>{searchValue}</span> {afterStr}{' '}
+                </div>
+              );
+            }
+          }
         } else {
-          list[i].title = list[i].name;
+          if (list[i].title === '奖多多集团') {
+            list[i].title = (
+              <div style={{ width: '8em', display: 'flex' }}>
+                {list[i].name}
+                <span
+                  style={{
+                    display: 'flex',
+                    flex: 1,
+                    justifyContent: 'flex-end',
+                    fontSize: 20,
+                  }}
+                  onClick={e => {
+                    e.stopPropagation();
+                    setOrVisible(true);
+                  }}
+                >
+                  +
+                </span>
+              </div>
+            );
+          } else {
+            if (list[i].code === hoverItemCode) {
+              list[i].title = (
+                <div
+                  style={{ width: '8em', display: 'flex', flex: '1' }}
+                  onMouseOut={e => {
+                    e.preventDefault();
+                    setHoverItemCode('');
+                  }}
+                  onMouseOver={e => {
+                    e.preventDefault();
+                    setHoverItemCode(list[i].code);
+                  }}
+                >
+                  <span>{list[i].name}</span>
+                  <span
+                    style={{
+                      display: 'flex',
+                      flex: '1',
+                      justifyContent: 'flex-end',
+                    }}
+                    onClick={e => {
+                      e.stopPropagation();
+                      setOrVisible(true);
+                    }}
+                  >
+                    ⋮
+                  </span>
+                </div>
+              );
+            } else {
+              list[i].title = (
+                <div
+                  style={{ width: '8em', display: 'flex', flex: '1' }}
+                  onMouseOut={e => {
+                    e.preventDefault();
+                    setHoverItemCode('');
+                  }}
+                  onMouseOver={e => {
+                    e.preventDefault();
+                    setHoverItemCode(list[i].code);
+                  }}
+                >
+                  <span>{list[i].name}</span>
+                </div>
+              );
+            }
+          }
         }
         if (list[i].children) {
           handleItem(list[i].children);
@@ -124,35 +290,21 @@ export default () => {
     return loopdata;
   };
 
-  const columns: any = [
-    {
-      title: '姓名',
-      dataIndex: 'name',
-      key: 'name',
+  const rowSelection = {
+    onChange: (selectedRowKeys, selectedRows) => {
+      console.log(
+        `selectedRowKeys: ${selectedRowKeys}`,
+        'selectedRows: ',
+        selectedRows,
+      );
     },
-    {
-      title: '年龄',
-      dataIndex: 'groupCode',
-      key: 'groupCode',
+    onSelect: (record, selected, selectedRows) => {
+      console.log(record, selected, selectedRows);
     },
-    {
-      title: '住址',
-      dataIndex: 'code',
-      key: 'code',
+    onSelectAll: (selected, selectedRows, changeRows) => {
+      console.log(selected, selectedRows, changeRows);
     },
-    {
-      title: '操作',
-      key: 'action',
-      align: 'center',
-      render: (_, record) => (
-        <span>
-          <a onClick={e => alert(1)}>修改</a>
-          <Divider type="vertical" />
-          <a onClick={e => alert(2)}>删除</a>
-        </span>
-      ),
-    },
-  ];
+  };
 
   return (
     <Card title="组织架构">
@@ -163,17 +315,13 @@ export default () => {
           onChange={searchChange}
           style={{ marginBottom: 30 }}
         />
-        <Button
-          onClick={() => {
-            setOrVisible(true);
-          }}
-        >
-          操作
-        </Button>
         <Tree
           key={searchValue}
           onExpand={onExpand}
           showLine={true}
+          onRightClick={e => {
+            console.log(e);
+          }}
           treeData={Loop(dataList)}
           expandedKeys={expandedKeys}
           autoExpandParent={autoExpandParent}
@@ -192,6 +340,7 @@ export default () => {
           style={{ width: '100%' }}
           columns={columns}
           dataSource={currentUserList}
+          rowSelection={rowSelection}
         />
       </div>
       <Modal
