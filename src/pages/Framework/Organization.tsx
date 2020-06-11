@@ -7,10 +7,12 @@ import {
   Modal,
   Table,
   Divider,
-  Tooltip,
+  Popconfirm,
+  Select,
+  Form,
 } from 'antd';
 import json from './services/json';
-
+const { Option } = Select;
 const { Search } = Input;
 const columns: any = [
   {
@@ -43,6 +45,8 @@ const columns: any = [
 ];
 
 export default () => {
+  const [newGropForm] = Form.useForm();
+  const [changeForm] = Form.useForm();
   const [dataList, setDataList] = useState<any>([]);
   const [searchValue, setSearchValue] = useState<string>('');
   const [expandedKeys, setExpandedKeys] = useState<any[]>([]);
@@ -50,8 +54,17 @@ export default () => {
   const [keyTitleList, setKeyTitleList] = useState<any[]>([]);
   const [userListObj, setUserList] = useState<any>({});
   const [currentUserList, setCurrentUserList] = useState<any[]>([]);
-  const [orVisible, setOrVisible] = useState<boolean>(false);
+
   const [hoverItemCode, setHoverItemCode] = useState<string>('');
+  const [popconfirm, setPopconfirm] = useState<Boolean>(true);
+
+  // 因为新建子部门跟，修改部门名称是同一个modal
+  const [newChildGropVisible, setNewChildGropVisible] = useState<boolean>(
+    false,
+  );
+  const [newGropVisible, setNewGropVisible] = useState<boolean>(false);
+  const [removeVisible, setRemoveVisible] = useState<boolean>(false);
+  const [confirmVisible, setConfirmVisible] = useState<boolean>(false);
   useEffect(() => {
     if (json.status === 200) {
       let list = json.obj;
@@ -139,6 +152,59 @@ export default () => {
 
   const Loop = data => {
     let loopdata = JSON.parse(JSON.stringify(data));
+    const more = (
+      <span
+        style={{
+          display: 'flex',
+          flex: '1',
+          justifyContent: 'flex-end',
+        }}
+      >
+        <Popconfirm
+          title={
+            <div>
+              <p>添加子部门</p>
+              <p
+                onClick={() => {
+                  setNewChildGropVisible(true);
+                }}
+              >
+                修改名称
+              </p>
+              <p>设置上级</p>
+              <p
+                onClick={() => {
+                  setRemoveVisible(true), setHoverItemCode('');
+                }}
+              >
+                删除
+              </p>
+              <p>上移</p>
+              <p>下移</p>
+            </div>
+          }
+          icon={<></>}
+          onConfirm={() => {}}
+          onCancel={() => {}}
+          placement="bottomLeft"
+          cancelButtonProps={{ style: { display: 'none' } }}
+          okButtonProps={{ style: { display: 'none' } }}
+          okText=""
+          cancelText=""
+        >
+          <span
+            style={{
+              display: 'flex',
+              width: '2em',
+              justifyContent: 'flex-end',
+            }}
+          >
+            ⋮
+          </span>
+        </Popconfirm>
+      </span>
+    );
+
     const handleItem = list => {
       for (let i = 0; i < list.length; i++) {
         list[i].key = list[i].code;
@@ -161,8 +227,8 @@ export default () => {
                     fontSize: 20,
                   }}
                   onClick={e => {
-                    e.stopPropagation();
-                    setOrVisible(true);
+                    e.preventDefault();
+                    setNewGropVisible(true);
                   }}
                 >
                   +
@@ -172,33 +238,17 @@ export default () => {
           } else {
             if (list[i].code === hoverItemCode) {
               list[i].title = (
-                <div
-                  style={{ width: '8em' }}
-                  onMouseOut={e => {
-                    e.preventDefault();
-                    setHoverItemCode('');
-                  }}
-                  onMouseOver={e => {
-                    e.preventDefault();
-                    setHoverItemCode(list[i].code);
-                  }}
-                >
+                <div style={{ width: '8em', display: 'flex' }}>
                   {' '}
                   {beforeStr}{' '}
-                  <span style={{ color: 'red' }}>{searchValue}</span> {afterStr}{' '}
-                  <span style={{ float: 'right', fontSize: 20, width: '2em' }}>
-                    ⋮
-                  </span>
+                  <span style={{ color: 'red' }}>{searchValue}</span> {afterStr}
+                  {more}
                 </div>
               );
             } else {
               list[i].title = (
                 <div
                   style={{ width: '8em' }}
-                  onMouseOut={e => {
-                    e.preventDefault();
-                    setHoverItemCode('');
-                  }}
                   onMouseOver={e => {
                     e.preventDefault();
                     setHoverItemCode(list[i].code);
@@ -225,7 +275,7 @@ export default () => {
                   }}
                   onClick={e => {
                     e.stopPropagation();
-                    setOrVisible(true);
+                    setNewGropVisible(true);
                   }}
                 >
                   +
@@ -235,41 +285,15 @@ export default () => {
           } else {
             if (list[i].code === hoverItemCode) {
               list[i].title = (
-                <div
-                  style={{ width: '8em', display: 'flex', flex: '1' }}
-                  onMouseOut={e => {
-                    e.preventDefault();
-                    setHoverItemCode('');
-                  }}
-                  onMouseOver={e => {
-                    e.preventDefault();
-                    setHoverItemCode(list[i].code);
-                  }}
-                >
+                <div style={{ width: '8em', display: 'flex', flex: '1' }}>
                   <span>{list[i].name}</span>
-                  <span
-                    style={{
-                      display: 'flex',
-                      flex: '1',
-                      justifyContent: 'flex-end',
-                    }}
-                    onClick={e => {
-                      e.stopPropagation();
-                      setOrVisible(true);
-                    }}
-                  >
-                    ⋮
-                  </span>
+                  {more}
                 </div>
               );
             } else {
               list[i].title = (
                 <div
                   style={{ width: '8em', display: 'flex', flex: '1' }}
-                  onMouseOut={e => {
-                    e.preventDefault();
-                    setHoverItemCode('');
-                  }}
                   onMouseOver={e => {
                     e.preventDefault();
                     setHoverItemCode(list[i].code);
@@ -305,7 +329,7 @@ export default () => {
       console.log(selected, selectedRows, changeRows);
     },
   };
-
+  console.log(hoverItemCode);
   return (
     <Card title="组织架构">
       <div style={{ width: '20%', float: 'left' }}>
@@ -343,32 +367,78 @@ export default () => {
           rowSelection={rowSelection}
         />
       </div>
+      {/* 根目录下新建（+） */}
       <Modal
-        title="操作"
-        visible={orVisible}
+        zIndex={9999999}
+        title="新建部门"
+        visible={newGropVisible}
         onCancel={() => {
-          setOrVisible(false);
+          setNewGropVisible(false);
         }}
-        footer={null}
+        onOk={() => {
+          newGropForm.submit();
+        }}
+        okText="保存"
+        cancelText="取消"
       >
-        <Button style={{ display: 'block', width: 140, margin: '20px auto' }}>
-          添加子部门
-        </Button>
-        <Button style={{ display: 'block', width: 140, margin: '20px auto' }}>
-          修改名称
-        </Button>
-        <Button style={{ display: 'block', width: 140, margin: '20px auto' }}>
-          设置上级
-        </Button>
-        <Button style={{ display: 'block', width: 140, margin: '20px auto' }}>
-          删除
-        </Button>
-        <Button style={{ display: 'block', width: 140, margin: '20px auto' }}>
-          上移
-        </Button>
-        <Button style={{ display: 'block', width: 140, margin: '20px auto' }}>
-          下移
-        </Button>
+        <Form form={newGropForm}>
+          <Form.Item
+            label="部门名称"
+            name="userName"
+            rules={[{ required: true, message: '请输入部门名称!' }]}
+          >
+            <Input placeholder="请输入部门名称" />
+          </Form.Item>
+          <Form.Item
+            label="所属部门"
+            name="gropName"
+            rules={[{ required: true, message: '请选择所属部门!' }]}
+          >
+            <Select placeholder="请选择所属部门">
+              <Option value="1">1</Option>
+            </Select>
+          </Form.Item>
+        </Form>
+      </Modal>
+      {/* 修改部门名称，新建子部门 */}
+      <Modal
+        zIndex={9999999}
+        title="修改部门名称"
+        visible={newChildGropVisible}
+        onCancel={() => {
+          setNewChildGropVisible(false);
+        }}
+        onOk={() => {
+          changeForm.submit();
+        }}
+        okText="保存"
+        cancelText="取消"
+      >
+        <Form form={changeForm}>
+          <Form.Item
+            label="部门名称"
+            name="userName"
+            rules={[{ required: true, message: '请输入部门名称!' }]}
+          >
+            <Input placeholder="请输入部门名称" />
+          </Form.Item>
+        </Form>
+      </Modal>
+      {/* 删除 */}
+      <Modal
+        zIndex={9999999}
+        title="删除成员"
+        visible={removeVisible}
+        onCancel={() => {
+          setNewChildGropVisible(false);
+        }}
+        onOk={() => {
+          //  changeForm.submit()
+        }}
+        okText="保存"
+        cancelText="取消"
+      >
+        <p>删除后，成员的上级属性将完全被清除</p>
       </Modal>
     </Card>
   );
