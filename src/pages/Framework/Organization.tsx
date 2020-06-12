@@ -12,6 +12,7 @@ import {
   Form,
 } from 'antd';
 import json from './services/json';
+import Organization from './components/Organization';
 const { Option } = Select;
 const { Search } = Input;
 const columns: any = [
@@ -451,6 +452,23 @@ export default () => {
         cancelText="取消"
       >
         <p>删除后，成员的上级属性将完全被清除</p>
+      </Modal>
+
+      <Modal
+        zIndex={9999999}
+        width="50vw"
+        title="设置所在部门"
+        visible={true}
+        onCancel={() => {
+          // setNewChildGropVisible(false);
+        }}
+        onOk={() => {
+          //  changeForm.submit()
+        }}
+        okText="保存"
+        cancelText="取消"
+      >
+        <Organization />
       </Modal>
     </Card>
   );
