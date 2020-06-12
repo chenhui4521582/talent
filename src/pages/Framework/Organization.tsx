@@ -468,7 +468,7 @@ export default () => {
         okText="保存"
         cancelText="取消"
       >
-        <Organization />
+        <Organization renderUser={true} onlySelectUser={true} />
       </Modal>
     </Card>
   );

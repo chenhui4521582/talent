@@ -3,13 +3,20 @@ import { Tree, Input, Divider } from 'antd';
 import json from '../services/json';
 
 const { Search } = Input;
-export default () => {
+interface tsProps {
+  renderUser?: boolean;
+  onlySelectUser?: boolean;
+}
+
+export default (props: tsProps) => {
+  const { renderUser, onlySelectUser } = props;
   const [dataList, setDataList] = useState<any>([]);
   const [searchValue, setSearchValue] = useState<string>('');
   const [expandedKeys, setExpandedKeys] = useState<any[]>([]);
   const [autoExpandParent, setAutoExpandParent] = useState<boolean>(true);
   const [keyTitleList, setKeyTitleList] = useState<any[]>([]);
   const [userListObj, setUserList] = useState<any>({});
+  const [userKeyList, setUserKeyList] = useState<any[]>([]);
   const [checkedKeys, setCheckedKeys] = useState<any[]>([]);
 
   useEffect(() => {
@@ -28,6 +35,7 @@ export default () => {
   const handleList = data => {
     let keyTitle = keyTitleList;
     let userList = userListObj;
+    let userKeyArr = userKeyList;
     const handleItem = list => {
       for (let i = 0; i < list.length; i++) {
         list[i].key = list[i].code;
@@ -38,6 +46,12 @@ export default () => {
         });
         if (list[i].memberList && list[i].memberList.length) {
           userList[list[i].code] = list[i].memberList;
+          if (renderUser) {
+            list[i].children = list[i].memberList;
+          }
+          list[i].memberList.map(item => {
+            userKeyArr.push(item.code);
+          });
         }
         if (list[i].children) {
           handleItem(list[i].children);
@@ -47,6 +61,8 @@ export default () => {
         }
       }
     };
+    console.log(data);
+    setUserKeyList(userKeyArr);
     handleItem(data);
     setDataList(data);
     setKeyTitleList(keyTitle);
@@ -136,14 +152,10 @@ export default () => {
         }
       }
     };
+
     let newData = JSON.parse(JSON.stringify(dataList));
     handleItem(newData);
     let newList = fatherArr.concat(childrenArr);
-    console.log('-----------');
-    console.log(childrenArr);
-    console.log(fatherArr);
-    console.log(newList);
-    console.log('-----------');
     let keyArr = JSON.parse(JSON.stringify(keys));
     console.log('keyArr');
     console.log(keyArr);
@@ -163,10 +175,17 @@ export default () => {
       checked,
       node: { key },
     } = e;
-    if (checked) {
-      handleCheckKey(keys.checked, key);
+    console.log(e);
+    if (onlySelectUser && checked) {
+      if (userKeyList.indexOf(key) > -1) {
+        setCheckedKeys(keys.checked);
+      }
     } else {
-      setCheckedKeys(keys.checked);
+      if (checked) {
+        handleCheckKey(keys.checked, key);
+      } else {
+        setCheckedKeys(keys.checked);
+      }
     }
   };
 
