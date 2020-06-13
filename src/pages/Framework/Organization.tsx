@@ -13,6 +13,7 @@ import {
 } from 'antd';
 import json from './services/json';
 import Organization from './components/Organization';
+import OzTreeSlect from './components/OzTreeSlect';
 const { Option } = Select;
 const { Search } = Input;
 const columns: any = [
@@ -455,7 +456,7 @@ export default () => {
       </Modal>
 
       <Modal
-        zIndex={9999999}
+        // zIndex={9999999}
         width="50vw"
         title="设置所在部门"
         visible={true}
@@ -468,7 +469,8 @@ export default () => {
         okText="保存"
         cancelText="取消"
       >
-        <Organization renderUser={true} onlySelectUser={true} />
+        {/* <Organization renderUser={true} onlySelectUser={true} /> */}
+        <OzTreeSlect />
       </Modal>
     </Card>
   );

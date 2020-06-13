@@ -98,6 +98,15 @@ export interface tsFormFiledSaveItem {
   taskFormId: number;
 }
 
+export interface tsList {
+  id: number;
+  title: string;
+  name: string;
+  createTime: string;
+  status: string;
+  currStepName: string;
+}
+
 //工作流动态表单详情
 export async function wfFormDetail(accountType: number, id: number) {
   return request(`/api/talent/wfresform/getDetail`, {
@@ -117,9 +126,25 @@ export async function saveTaskForm(params: tsSaveTaskForm) {
   });
 }
 
-// 成本中心列表
-export async function listPage(params: PaginationTableParams) {
-  return request(`/api/talent/laborRelation/list`, {
+// 我的列表
+export async function myListPage(params: PaginationTableParams) {
+  return request(`/api/talent/wftaskform/listMyFormPage`, {
+    method: 'POST',
+    data: params,
+  });
+}
+
+// 已待列表
+export async function myToDoListPage(params: PaginationTableParams) {
+  return request(`/api/talent/wftaskform/listDoneFormPage`, {
+    method: 'POST',
+    data: params,
+  });
+}
+
+// 我的待办
+export async function myDoneListPage(params: PaginationTableParams) {
+  return request(`/api/talent/wftaskform/listTodoFormPage`, {
     method: 'POST',
     data: params,
   });
