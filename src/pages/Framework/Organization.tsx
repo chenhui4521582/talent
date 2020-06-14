@@ -381,9 +381,6 @@ export default () => {
                     fontSize: 20,
                   }}
                   onClick={e => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    setSelectedKeys([hoverItemCode]);
                     setNewVisible(true);
                   }}
                 >
@@ -419,7 +416,6 @@ export default () => {
                   }}
                   onClick={e => {
                     e.preventDefault();
-                    // e.stopPropagation();
                   }}
                 >
                   <span>{list[i].name}</span>
