@@ -39,18 +39,6 @@ const columns: any = [
     dataIndex: 'code',
     key: 'code',
   },
-  {
-    title: '操作',
-    key: 'action',
-    align: 'center',
-    render: (_, record) => (
-      <span>
-        <a onClick={e => alert(1)}>修改</a>
-        <Divider type="vertical" />
-        <a onClick={e => alert(2)}>删除</a>
-      </span>
-    ),
-  },
 ];
 
 export default () => {
@@ -60,22 +48,43 @@ export default () => {
   const [searchValue, setSearchValue] = useState<string>('');
   const [expandedKeys, setExpandedKeys] = useState<any[]>([]);
   const [autoExpandParent, setAutoExpandParent] = useState<boolean>(true);
+  const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
+  //所有的列表item
   const [keyTitleList, setKeyTitleList] = useState<any[]>([]);
+  // 选择组下面人的对象
   const [userListObj, setUserList] = useState<any>({});
+  // 当前的选准的组对象下面的人
   const [currentUserList, setCurrentUserList] = useState<any[]>([]);
-
+  // 鼠标划入treeItem的选项
   const [hoverItemCode, setHoverItemCode] = useState<string>('');
+  // 点击选准的treeitem
+  const [selectGroup, setSelectGroup] = useState<tsSlectGroup>({
+    title: '',
+    key: '',
+  });
+  // 接了解决点击弹窗的一个bug
   const [flag, setFlag] = useState<Boolean>(true);
-  const [popconfirm, setPopconfirm] = useState<Boolean>(true);
-  const [selectGroup, setSelectGroup] = useState<tsSlectGroup>({});
-
-  // 因为新建子部门跟，修改部门名称是同一个modal
+  // 因为新建子部门跟，修改部门名称是同一个   modal
   const [newChildGropVisible, setNewChildGropVisible] = useState<boolean>(
     false,
   );
-  const [newGropVisible, setNewGropVisible] = useState<boolean>(false);
-  const [removeVisible, setRemoveVisible] = useState<boolean>(false);
-  const [confirmVisible, setConfirmVisible] = useState<boolean>(false);
+  // 判断是新增还是修改选准的部门新增子部门
+  const [changeOrNewType, setChangeOrNewType] = useState<
+    '添加子部门' | '修改名称'
+  >('添加子部门');
+  // 点击根旁边+的modal
+  const [newVisible, setNewVisible] = useState<boolean>(false);
+  // 删除人员的第一层modal
+  const [removeUserVisible, setRemoveUserVisible] = useState<boolean>(false);
+  // 从其他部门移入 modal
+  const [moveInVisible, setMoveInVisible] = useState<boolean>(false);
+  // 设置所在部门 modal
+  const [departmentVisible, setDepartmentVisible] = useState<boolean>(false);
+  // 设置上级 modal
+  const [superiorVisible, setSuperiorVisible] = useState<boolean>(false);
+  // 删除分组
+  const [removeGroupVisible, setRemoveGroupVisible] = useState<boolean>(false);
+
   useEffect(() => {
     if (json.status === 200) {
       let list = json.obj;
@@ -154,6 +163,7 @@ export default () => {
   };
 
   const onTreeSelect = e => {
+    setSelectedKeys(e);
     keyTitleList.map(item => {
       if (item.key === e[0]) {
         setSelectGroup(item);
@@ -176,29 +186,61 @@ export default () => {
           flex: '1',
           justifyContent: 'flex-end',
         }}
+        onClick={e => {
+          e.preventDefault();
+          e.stopPropagation();
+          setSelectedKeys([hoverItemCode]);
+        }}
       >
         <Popconfirm
           title={
             <div className="hover">
-              <p>添加子部门</p>
               <p
-                onClick={() => {
+                onClick={e => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setFlag(true);
+                  setChangeOrNewType('添加子部门');
                   setNewChildGropVisible(true);
+                  setHoverItemCode('');
+                }}
+              >
+                添加子部门
+              </p>
+              <p
+                onClick={e => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setFlag(true);
+                  setChangeOrNewType('修改名称');
+                  setNewChildGropVisible(true);
+                  setHoverItemCode('');
                 }}
               >
                 修改名称
               </p>
-              <p>设置上级</p>
               <p
-                onClick={() => {
+                onClick={e => {
+                  e.preventDefault();
+                  e.stopPropagation();
                   setFlag(true);
-                  setRemoveVisible(true), setHoverItemCode('');
+                  setSuperiorVisible(true);
+                  setHoverItemCode('');
+                }}
+              >
+                设置上级
+              </p>
+              <p
+                onClick={e => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setFlag(true);
+                  setRemoveGroupVisible(true);
+                  setHoverItemCode('');
                 }}
               >
                 删除
               </p>
-              <p>上移</p>
-              <p>下移</p>
             </div>
           }
           icon={<></>}
@@ -217,7 +259,9 @@ export default () => {
               justifyContent: 'flex-end',
             }}
             onClick={e => {
+              e.preventDefault();
               e.stopPropagation();
+              setSelectedKeys([hoverItemCode]);
               setFlag(false);
             }}
           >
@@ -236,7 +280,13 @@ export default () => {
           const afterStr = list[i].title.substr(index + searchValue.length);
           if (list[i].title === '奖多多集团') {
             list[i].title = (
-              <div style={{ width: '8em', display: 'flex' }}>
+              <div
+                style={{ width: '8em', display: 'flex' }}
+                onClick={e => {
+                  e.preventDefault();
+                  // e.stopPropagation();
+                }}
+              >
                 {beforeStr}{' '}
                 <span style={{ color: 'red' }}> {searchValue} </span>
                 {afterStr}
@@ -250,7 +300,7 @@ export default () => {
                   }}
                   onClick={e => {
                     e.preventDefault();
-                    setNewGropVisible(true);
+                    setNewVisible(true);
                   }}
                 >
                   +
@@ -260,7 +310,13 @@ export default () => {
           } else {
             if (list[i].code === hoverItemCode) {
               list[i].title = (
-                <div style={{ width: '8em', display: 'flex' }}>
+                <div
+                  style={{ width: '8em', display: 'flex' }}
+                  onClick={e => {
+                    e.preventDefault();
+                    // e.stopPropagation();
+                  }}
+                >
                   {' '}
                   {beforeStr}{' '}
                   <span style={{ color: 'red' }}>{searchValue}</span> {afterStr}
@@ -275,6 +331,10 @@ export default () => {
                     e.preventDefault();
                     setHoverItemCode(list[i].code);
                   }}
+                  onClick={e => {
+                    e.preventDefault();
+                    // e.stopPropagation();
+                  }}
                 >
                   {' '}
                   {beforeStr}{' '}
@@ -286,7 +346,13 @@ export default () => {
         } else {
           if (list[i].title === '奖多多集团') {
             list[i].title = (
-              <div style={{ width: '8em', display: 'flex' }}>
+              <div
+                style={{ width: '8em', display: 'flex' }}
+                onClick={e => {
+                  e.preventDefault();
+                  // e.stopPropagation();
+                }}
+              >
                 {list[i].name}
                 <span
                   style={{
@@ -296,8 +362,9 @@ export default () => {
                     fontSize: 20,
                   }}
                   onClick={e => {
-                    e.stopPropagation();
-                    setNewGropVisible(true);
+                    e.preventDefault();
+                    // e.stopPropagation();
+                    setNewVisible(true);
                   }}
                 >
                   +
@@ -314,6 +381,10 @@ export default () => {
                       setHoverItemCode('');
                     }
                   }}
+                  onClick={e => {
+                    e.preventDefault();
+                    // e.stopPropagation();
+                  }}
                 >
                   <span>{list[i].name}</span>
                   {more}
@@ -326,6 +397,10 @@ export default () => {
                   onMouseEnter={e => {
                     e.preventDefault();
                     setHoverItemCode(list[i].code);
+                  }}
+                  onClick={e => {
+                    e.preventDefault();
+                    // e.stopPropagation();
                   }}
                 >
                   <span>{list[i].name}</span>
@@ -362,33 +437,75 @@ export default () => {
   const renderRight = useMemo(() => {
     const tableTitle = (
       <div className="table-title">
-        <span>从其他部门移入</span>
+        <span
+          onClick={() => {
+            setMoveInVisible(true);
+          }}
+        >
+          从其他部门移入
+        </span>
         <Divider type="vertical" />
-        <span>设置所在部门</span>
+        <span
+          onClick={() => {
+            setDepartmentVisible(true);
+          }}
+        >
+          设置所在部门
+        </span>
         {currentUserList.length ? (
           <>
             <Divider type="vertical" />
-            <span>删除</span>
+            <span
+              onClick={() => {
+                setRemoveUserVisible(true);
+              }}
+            >
+              删除
+            </span>
           </>
         ) : null}
       </div>
     );
+    const groupTitle = (
+      <div className="group-title">
+        <h1>{selectGroup.title}</h1>
+        <div>
+          <span
+            onClick={() => {
+              setFlag(true);
+              setChangeOrNewType('修改名称');
+              setNewChildGropVisible(true);
+            }}
+          >
+            修改名称
+          </span>
+          <Divider type="vertical" />
+          <span
+            onClick={() => {
+              setFlag(true);
+              setChangeOrNewType('添加子部门');
+              setNewChildGropVisible(true);
+            }}
+          >
+            添加子部门
+          </span>
+          <Divider type="vertical" />
+          <span
+            onClick={() => {
+              setFlag(true);
+              setSuperiorVisible(true);
+            }}
+          >
+            设置上级
+          </span>
+        </div>
+      </div>
+    );
+
     if (currentUserList.length) {
       return (
         <div className="right-box">
-          {selectGroup.title ? (
-            <div className="group-title">
-              <h1>{selectGroup.title}</h1>
-              <div>
-                <span>修改名称</span>
-                <Divider type="vertical" />
-                <span>添加子部门</span>
-                <Divider type="vertical" />
-                <span>设置上级</span>
-              </div>
-            </div>
-          ) : null}
-
+          {selectGroup.title ? groupTitle : null}
           <Table
             title={() => {
               return tableTitle;
@@ -402,20 +519,7 @@ export default () => {
       );
     } else {
       return (
-        <div className="right-box">
-          {selectGroup.title ? (
-            <div className="group-title">
-              <h1>{selectGroup.title}</h1>
-              <div>
-                <span>修改名称</span>
-                <Divider type="vertical" />
-                <span>添加子部门</span>
-                <Divider type="vertical" />
-                <span>设置上级</span>
-              </div>
-            </div>
-          ) : null}
-        </div>
+        <div className="right-box">{selectGroup.title ? groupTitle : null}</div>
       );
     }
   }, [currentUserList]);
@@ -439,16 +543,16 @@ export default () => {
           expandedKeys={expandedKeys}
           autoExpandParent={autoExpandParent}
           onSelect={onTreeSelect}
+          selectedKeys={selectedKeys}
         />
       </div>
       {renderRight}
       {/* 根目录下新建（+） */}
       <Modal
-        zIndex={9999999}
         title="新建部门"
-        visible={newGropVisible}
+        visible={newVisible}
         onCancel={() => {
-          setNewGropVisible(false);
+          setNewVisible(false);
         }}
         onOk={() => {
           newGropForm.submit();
@@ -478,7 +582,7 @@ export default () => {
       {/* 修改部门名称，新建子部门 */}
       <Modal
         zIndex={9999999}
-        title="修改部门名称"
+        title={changeOrNewType}
         visible={newChildGropVisible}
         onCancel={() => {
           setNewChildGropVisible(false);
@@ -499,30 +603,29 @@ export default () => {
           </Form.Item>
         </Form>
       </Modal>
-      {/* 删除 */}
+      {/* 删除成员 */}
       <Modal
         zIndex={9999999}
         title="删除成员"
-        visible={removeVisible}
+        visible={removeUserVisible}
         onCancel={() => {
-          setNewChildGropVisible(false);
+          setRemoveUserVisible(false);
         }}
         onOk={() => {
-          //  changeForm.submit()
+          setRemoveUserVisible(false);
         }}
         okText="保存"
         cancelText="取消"
       >
         <p>删除后，成员的上级属性将完全被清除</p>
       </Modal>
-
+      {/* 从其他部门移入 */}
       <Modal
-        // zIndex={9999999}
         width="50vw"
-        title="设置所在部门"
-        visible={false}
+        title="从其他部门移入"
+        visible={moveInVisible}
         onCancel={() => {
-          // setNewChildGropVisible(false);
+          setMoveInVisible(false);
         }}
         onOk={() => {
           //  changeForm.submit()
@@ -530,8 +633,55 @@ export default () => {
         okText="保存"
         cancelText="取消"
       >
-        {/* <Organization renderUser={true} onlySelectUser={true} /> */}
-        <OzTreeSlect />
+        <Organization renderUser={true} />
+      </Modal>
+      {/* 设置所在部门 */}
+      <Modal
+        width="50vw"
+        title="从其他部门移入"
+        visible={departmentVisible}
+        onCancel={() => {
+          setDepartmentVisible(false);
+        }}
+        onOk={() => {
+          //  changeForm.submit()
+        }}
+        okText="保存"
+        cancelText="取消"
+      >
+        <Organization renderUser={true} />
+      </Modal>
+      {/* 设置上级 */}
+      <Modal
+        width="50vw"
+        title="设置上级"
+        visible={superiorVisible}
+        onCancel={() => {
+          setSuperiorVisible(false);
+        }}
+        onOk={() => {
+          //  changeForm.submit()
+        }}
+        okText="保存"
+        cancelText="取消"
+      >
+        <Organization renderUser={true} onlySelectUser={true} />
+      </Modal>
+      {/* 删除分组 */}
+      <Modal
+        width="50vw"
+        title="删除分组"
+        visible={removeGroupVisible}
+        onCancel={() => {
+          setRemoveGroupVisible(false);
+        }}
+        onOk={() => {
+          //  changeForm.submit()
+        }}
+        okText="保存"
+        cancelText="取消"
+      >
+        删除分组
       </Modal>
     </Card>
   );
