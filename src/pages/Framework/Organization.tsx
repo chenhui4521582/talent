@@ -12,6 +12,11 @@ import {
   Form,
 } from 'antd';
 import json from './services/json';
+import {
+  getOrganization,
+  getDeleteGroup,
+  getDefaultGroup,
+} from './services/organization';
 import Organization from './components/Organization';
 import OzTreeSlect from './components/OzTreeSlect';
 import './style/organization.less';
@@ -86,6 +91,20 @@ export default () => {
   const [removeGroupVisible, setRemoveGroupVisible] = useState<boolean>(false);
 
   useEffect(() => {
+    async function getJson() {
+      // getOrganization, getDeleteGroup ,geDefaultGroup
+      let organizationJson = await getOrganization();
+      let deleteGroupJson = await getDeleteGroup();
+      let DefaultGroupJson = await getDefaultGroup();
+      console.log('organizationJson');
+      console.log(organizationJson);
+      console.log('deleteGroupJson');
+      console.log(deleteGroupJson);
+      console.log('DefaultGroupJson');
+      console.log(DefaultGroupJson);
+    }
+    getJson();
+
     if (json.status === 200) {
       let list = json.obj;
       let newObj: any = {};
@@ -573,15 +592,12 @@ export default () => {
             name="gropName"
             rules={[{ required: true, message: '请选择所属部门!' }]}
           >
-            <Select placeholder="请选择所属部门">
-              <Option value="1">1</Option>
-            </Select>
+            <OzTreeSlect />
           </Form.Item>
         </Form>
       </Modal>
       {/* 修改部门名称，新建子部门 */}
       <Modal
-        zIndex={9999999}
         title={changeOrNewType}
         visible={newChildGropVisible}
         onCancel={() => {
