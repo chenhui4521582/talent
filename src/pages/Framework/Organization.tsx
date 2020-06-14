@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   Card,
   Tree,
@@ -14,8 +14,15 @@ import {
 import json from './services/json';
 import Organization from './components/Organization';
 import OzTreeSlect from './components/OzTreeSlect';
+import './style/organization.less';
 const { Option } = Select;
 const { Search } = Input;
+
+interface tsSlectGroup {
+  key: string;
+  title: string;
+}
+
 const columns: any = [
   {
     title: '姓名',
@@ -60,6 +67,7 @@ export default () => {
   const [hoverItemCode, setHoverItemCode] = useState<string>('');
   const [flag, setFlag] = useState<Boolean>(true);
   const [popconfirm, setPopconfirm] = useState<Boolean>(true);
+  const [selectGroup, setSelectGroup] = useState<tsSlectGroup>({});
 
   // 因为新建子部门跟，修改部门名称是同一个modal
   const [newChildGropVisible, setNewChildGropVisible] = useState<boolean>(
@@ -146,6 +154,12 @@ export default () => {
   };
 
   const onTreeSelect = e => {
+    keyTitleList.map(item => {
+      if (item.key === e[0]) {
+        setSelectGroup(item);
+      }
+    });
+
     if (userListObj[e]) {
       setCurrentUserList(userListObj[e]);
     } else {
@@ -165,7 +179,7 @@ export default () => {
       >
         <Popconfirm
           title={
-            <div>
+            <div className="hover">
               <p>添加子部门</p>
               <p
                 onClick={() => {
@@ -202,7 +216,8 @@ export default () => {
               width: '2em',
               justifyContent: 'flex-end',
             }}
-            onClick={() => {
+            onClick={e => {
+              e.stopPropagation();
               setFlag(false);
             }}
           >
@@ -343,7 +358,67 @@ export default () => {
       console.log(selected, selectedRows, changeRows);
     },
   };
-  console.log(hoverItemCode);
+
+  const renderRight = useMemo(() => {
+    const tableTitle = (
+      <div className="table-title">
+        <span>从其他部门移入</span>
+        <Divider type="vertical" />
+        <span>设置所在部门</span>
+        {currentUserList.length ? (
+          <>
+            <Divider type="vertical" />
+            <span>删除</span>
+          </>
+        ) : null}
+      </div>
+    );
+    if (currentUserList.length) {
+      return (
+        <div className="right-box">
+          {selectGroup.title ? (
+            <div className="group-title">
+              <h1>{selectGroup.title}</h1>
+              <div>
+                <span>修改名称</span>
+                <Divider type="vertical" />
+                <span>添加子部门</span>
+                <Divider type="vertical" />
+                <span>设置上级</span>
+              </div>
+            </div>
+          ) : null}
+
+          <Table
+            title={() => {
+              return tableTitle;
+            }}
+            style={{ width: '100%' }}
+            columns={columns}
+            dataSource={currentUserList}
+            rowSelection={rowSelection}
+          />
+        </div>
+      );
+    } else {
+      return (
+        <div className="right-box">
+          {selectGroup.title ? (
+            <div className="group-title">
+              <h1>{selectGroup.title}</h1>
+              <div>
+                <span>修改名称</span>
+                <Divider type="vertical" />
+                <span>添加子部门</span>
+                <Divider type="vertical" />
+                <span>设置上级</span>
+              </div>
+            </div>
+          ) : null}
+        </div>
+      );
+    }
+  }, [currentUserList]);
   return (
     <Card title="组织架构">
       <div style={{ width: '20%', float: 'left' }}>
@@ -366,21 +441,7 @@ export default () => {
           onSelect={onTreeSelect}
         />
       </div>
-      <div
-        style={{
-          margin: '5%',
-          float: 'left',
-          width: '70%',
-          height: '100%',
-        }}
-      >
-        <Table
-          style={{ width: '100%' }}
-          columns={columns}
-          dataSource={currentUserList}
-          rowSelection={rowSelection}
-        />
-      </div>
+      {renderRight}
       {/* 根目录下新建（+） */}
       <Modal
         zIndex={9999999}
@@ -459,7 +520,7 @@ export default () => {
         // zIndex={9999999}
         width="50vw"
         title="设置所在部门"
-        visible={true}
+        visible={false}
         onCancel={() => {
           // setNewChildGropVisible(false);
         }}
