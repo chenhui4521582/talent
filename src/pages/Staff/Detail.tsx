@@ -55,8 +55,11 @@ export default props => {
               <Descriptions.Item label="性别">
                 {sexHash[detail?.sex]}
               </Descriptions.Item>
-              <Descriptions.Item label="所属业务线">
+              <Descriptions.Item label="一级业务线">
                 {detail?.businessName}
+              </Descriptions.Item>
+              <Descriptions.Item label="二级业务线">
+                {detail?.secondBusinessName}
               </Descriptions.Item>
               <Descriptions.Item label="部门">
                 {detail?.departmentName}

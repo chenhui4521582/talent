@@ -146,7 +146,7 @@ export default props => {
           </Col>
           <Col span={6} offset={2}>
             <Form.Item
-              label="所属业务线"
+              label="一级业务线"
               name="businessCode"
               rules={[{ required: true, message: '请选择所属业务线' }]}
             >
@@ -163,19 +163,11 @@ export default props => {
           </Col>
           <Col span={6} offset={2}>
             <Form.Item
-              label="成本中心"
-              name="costId"
-              rules={[{ required: true, message: '请输入英文名' }]}
+              label="二级业务线"
+              name="secondBusinessName"
+              rules={[{ required: true, message: '请输入二级业务线' }]}
             >
-              <Select showSearch optionFilterProp="children">
-                {costList?.map(item => {
-                  return (
-                    <Option value={item.id} key={item.id}>
-                      {item.costCenterName}
-                    </Option>
-                  );
-                })}
-              </Select>
+              <Input placeholder="请输入二级业务线" />
             </Form.Item>
           </Col>
         </Row>
@@ -354,7 +346,25 @@ export default props => {
             </Form.Item>
           </Col>
         </Row>
-
+        <Row>
+          <Col span={6}>
+            <Form.Item
+              label="成本中心"
+              name="costId"
+              rules={[{ required: true, message: '请输入英文名' }]}
+            >
+              <Select showSearch optionFilterProp="children">
+                {costList?.map(item => {
+                  return (
+                    <Option value={item.id} key={item.id}>
+                      {item.costCenterName}
+                    </Option>
+                  );
+                })}
+              </Select>
+            </Form.Item>
+          </Col>
+        </Row>
         <Row style={{ marginTop: 20 }}>
           <Col span={6}>
             <Form.Item
