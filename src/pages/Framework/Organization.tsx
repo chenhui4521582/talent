@@ -303,7 +303,6 @@ export default () => {
                 style={{ width: '8em', display: 'flex' }}
                 onClick={e => {
                   e.preventDefault();
-                  // e.stopPropagation();
                 }}
               >
                 {beforeStr}{' '}
@@ -319,6 +318,8 @@ export default () => {
                   }}
                   onClick={e => {
                     e.preventDefault();
+                    e.stopPropagation();
+                    setSelectedKeys([hoverItemCode]);
                     setNewVisible(true);
                   }}
                 >
@@ -369,7 +370,6 @@ export default () => {
                 style={{ width: '8em', display: 'flex' }}
                 onClick={e => {
                   e.preventDefault();
-                  // e.stopPropagation();
                 }}
               >
                 {list[i].name}
@@ -382,7 +382,8 @@ export default () => {
                   }}
                   onClick={e => {
                     e.preventDefault();
-                    // e.stopPropagation();
+                    e.stopPropagation();
+                    setSelectedKeys([hoverItemCode]);
                     setNewVisible(true);
                   }}
                 >
@@ -402,7 +403,6 @@ export default () => {
                   }}
                   onClick={e => {
                     e.preventDefault();
-                    // e.stopPropagation();
                   }}
                 >
                   <span>{list[i].name}</span>
@@ -621,7 +621,6 @@ export default () => {
       </Modal>
       {/* 删除成员 */}
       <Modal
-        zIndex={9999999}
         title="删除成员"
         visible={removeUserVisible}
         onCancel={() => {

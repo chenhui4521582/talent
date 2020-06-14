@@ -157,15 +157,12 @@ export default (props: tsProps) => {
     handleItem(newData);
     let newList = fatherArr.concat(childrenArr);
     let keyArr = JSON.parse(JSON.stringify(keys));
-    console.log('keyArr');
-    console.log(keyArr);
 
     newList.map(k => {
       if (keyArr.indexOf(k) > -1) {
         keyArr.splice(keyArr.indexOf(k), 1);
       }
     });
-    console.log(keyArr);
     setCheckedKeys(keyArr);
   };
 
@@ -175,7 +172,6 @@ export default (props: tsProps) => {
       checked,
       node: { key },
     } = e;
-    console.log(e);
     if (onlySelectUser && checked) {
       if (userKeyList.indexOf(key) > -1) {
         setCheckedKeys(keys.checked);

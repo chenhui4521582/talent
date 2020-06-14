@@ -16,6 +16,8 @@ export default (props: tsProps) => {
   const [userListObj, setUserList] = useState<any>({});
   const [userKeyList, setUserKeyList] = useState<any[]>([]);
   const [searchValue, setSearchValue] = useState<string>('');
+  const [values, setValues] = useState<string[]>([]);
+  const [selectKeys, setSelectKeys] = useState<string[]>([]);
 
   useEffect(() => {
     if (json.status === 200) {
@@ -102,8 +104,72 @@ export default (props: tsProps) => {
     handleItem(loopdata);
     return loopdata;
   };
-  const onChange = e => {
-    console.log(e);
+
+  // 查找选择后取消祖父节点跟曾子节点的选准状态
+  const handleCheckKey = (keys, key) => {
+    let fatherArr: string[] = [];
+    let childrenArr: string[] = [];
+
+    const handleFater = code => {
+      fatherArr.push(code);
+      newData.map(item => {
+        if (item.parentCode) {
+          handleFater(item.parentCode);
+        } else {
+          return;
+        }
+      });
+    };
+
+    const handleChildren = list => {
+      list.map(item => {
+        childrenArr.push(item.code);
+        if (item.children) {
+          handleChildren(item.children);
+        } else {
+          return;
+        }
+      });
+    };
+
+    const handleItem = list => {
+      for (let i = 0; i < list.length; i++) {
+        let item = list[i];
+
+        if (key === item.code) {
+          if (item.parentCode) {
+            handleFater(item.parentCode);
+          }
+          if (item.children) {
+            handleChildren(item.children);
+          }
+          break;
+        }
+        if (item.children) {
+          handleItem(item.children);
+        }
+      }
+    };
+
+    let newData = JSON.parse(JSON.stringify(dataList));
+    handleItem(newData);
+    let newList = fatherArr.concat(childrenArr);
+    let keyArr = JSON.parse(JSON.stringify(keys));
+    console.log(keyArr);
+    newList.map(k => {
+      if (keyArr.indexOf(k) > -1) {
+        keyArr.splice(keyArr.indexOf(k), 1);
+      }
+    });
+    console.log(keyArr);
+    setValues(keyArr);
+  };
+
+  const onChange = value => {
+    console.log(value);
+    console.log(value[value.length - 1]);
+    // setValues(value);
+    handleCheckKey(value, value[value.length - 1]);
   };
 
   return (
@@ -116,9 +182,7 @@ export default (props: tsProps) => {
       style={{ minWidth: '200px', width: '100%' }}
       onSearch={onSearch}
       onChange={onChange}
+      value={values}
     />
   );
 };
-
-// searchValue
-// filterTreeNode
