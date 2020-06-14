@@ -1,63 +1,54 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Button, Card } from 'antd';
 import { Link } from 'umi';
+import { homeList } from './services/home';
+import { GlobalResParams } from '@/types/ITypes';
 import './style/home.less';
 
+interface tsList {
+  id: number;
+  name: string;
+  sort: number;
+  listForm: tsListItem[];
+}
+
+interface tsListItem {
+  id: number;
+  icon: string | null;
+  name: string;
+}
+
 export default () => {
-  return (
-    <Card title="发起流程">
-      <div className="type">
-        <h3>培训类</h3>
-        <div>
-          <Button className="button-right">
-            <Link to={`homedetail?name=${'招聘'}`}>招聘</Link>
-          </Button>
-          <Button
-            onClick={() => {
-              window.location.href = '/talent/workflow/homedetail';
-            }}
-            className="button-right"
-          >
-            审批
-          </Button>
-          <Button
-            className="button-right"
-            onClick={() => {
-              window.location.href = '/talent/workflow/homedetail';
-            }}
-          >
-            转岗
-          </Button>
-          <Button
-            className="button-right"
-            onClick={() => {
-              window.location.href = '/talent/workflow/homedetail';
-            }}
-          >
-            晋升
-          </Button>
-          <Button className="button-right">辞职</Button>
-          <Button className="button-right">辞退</Button>
+  const [list, setList] = useState<tsList[]>([]);
+  useEffect(() => {
+    async function getList() {
+      let json: GlobalResParams<tsList[]> = await homeList();
+      if (json.status === 200) {
+        setList(json.obj);
+      }
+    }
+    getList();
+  }, []);
+
+  const renderList = useMemo(() => {
+    return list.map(item => {
+      const listForm = item.listForm;
+      const id = item.id;
+      const name = item.name;
+      return (
+        <div className="type" key={id}>
+          <h3>{name}</h3>
+          {listForm.map(u => {
+            return (
+              <Button className="button-right" key={u.id}>
+                <Link to={`homedetail?id=${u.id}`}>{u.name}</Link>
+              </Button>
+            );
+          })}
         </div>
-      </div>
-      <div className="type">
-        <h3>公共类</h3>
-        <div>
-          <Button className="button-right">招聘</Button>
-          <Button className="button-right">审批</Button>
-          <Button className="button-right">转岗</Button>
-          <Button className="button-right">晋升</Button>
-        </div>
-      </div>
-      <div className="type">
-        <h3>财务类</h3>
-        <div>
-          <Button className="button-right">招聘</Button>
-          <Button className="button-right">审批</Button>
-          <Button className="button-right">转岗</Button>
-          <Button className="button-right">晋升</Button>
-        </div>
-      </div>
-    </Card>
-  );
+      );
+    });
+  }, [list]);
+
+  return <Card title="发起流程">{renderList}</Card>;
 };

@@ -108,11 +108,10 @@ export interface tsList {
 }
 
 //工作流动态表单详情
-export async function wfFormDetail(accountType: number, id: number) {
+export async function wfFormDetail(id: number) {
   return request(`/api/talent/wfresform/getDetail`, {
     method: 'POST',
     data: {
-      accountType,
       id,
     },
   });
@@ -134,9 +133,9 @@ export async function myListPage(params: PaginationTableParams) {
   });
 }
 
-// 已待列表
+// 已办列表
 export async function myToDoListPage(params: PaginationTableParams) {
-  return request(`/api/talent/wftaskform/listDoneFormPage`, {
+  return request(`/api/talent/wftaskform/listTodoFormPage`, {
     method: 'POST',
     data: params,
   });
@@ -144,8 +143,16 @@ export async function myToDoListPage(params: PaginationTableParams) {
 
 // 我的待办
 export async function myDoneListPage(params: PaginationTableParams) {
-  return request(`/api/talent/wftaskform/listTodoFormPage`, {
+  return request(`/api/talent/wftaskform/listDoneFormPage`, {
     method: 'POST',
     data: params,
+  });
+}
+
+// 发起流程列表 /wfresform/list
+
+export async function homeList() {
+  return request(`/api/talent/wfresform/list`, {
+    method: 'POST',
   });
 }

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import {
   Input,
   Select,
@@ -15,6 +15,8 @@ import {
   useCompany,
   useDepartment,
 } from '@/models/global';
+
+import OzTreeSlect from '@/pages/Framework/components/OzTreeSlect';
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -55,7 +57,7 @@ export default props => {
       return <TextArea {...props} />;
     //成员 user多选框
     case 'user':
-      return <UserTemplate {...props} />;
+      return <OzTreeSlect onlyUser={true} singleChoice={true} {...props} />;
     //department 部门 走组织架构
     case 'department':
       return <DepartmentTemplate {...props} />;

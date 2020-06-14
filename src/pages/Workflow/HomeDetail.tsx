@@ -14,12 +14,14 @@ import './style/home.less';
 export default () => {
   const [formList, setFormList] = useState<tsFormChildlist[]>([]);
   const [title, setTitle] = useState<string | null>('');
+  const [mount, setMount] = useState<Boolean>(false);
 
   const [form] = Form.useForm();
   useEffect(() => {
     async function getFrom() {
-      let json: GlobalResParams<tsWfFormDetail> = await wfFormDetail(0, 6);
+      let json: GlobalResParams<tsWfFormDetail> = await wfFormDetail(1);
       if (json.status === 200) {
+        setMount(true);
         let obj = json.obj || {};
         let formChildlist = obj.formChildlist || [];
         let groupList = obj.groupList || [];
@@ -31,29 +33,33 @@ export default () => {
           data[k].list = [];
           data[k].arr = [];
           data[k].groupColArr = [];
-          for (let i = 0; i < groupList.length; i++) {
-            let groupItem = groupList[i];
-            let list: any = [];
-            for (let g = 0; g < controlList.length; g++) {
-              if (groupItem.id === controlList[g].resGroupId) {
-                data[k].groupColArr.push(formChildlist[k].controlList[g].id);
-                list.push(controlList[g]);
-                groupItem.list = list;
-                data[k].list.push(groupItem);
+          if (groupList.length) {
+            for (let i = 0; i < groupList.length; i++) {
+              let groupItem = groupList[i];
+              let list: any = [];
+              for (let g = 0; g < controlList.length; g++) {
+                if (groupItem.id === controlList[g].resGroupId) {
+                  data[k].groupColArr.push(formChildlist[k].controlList[g].id);
+                  list.push(controlList[g]);
+                  groupItem.list = list;
+                  data[k].list.push(groupItem);
+                }
+                if (
+                  data[k].arr.indexOf(formChildlist[k].controlList[g].id) ===
+                    -1 &&
+                  data[k].groupColArr.indexOf(
+                    formChildlist[k].controlList[g].id,
+                  ) === -1 &&
+                  i === groupList.length - 1
+                ) {
+                  data[k].arr.push(formChildlist[k].controlList[g].id);
+                  data[k].list.push(controlList[g]);
+                }
               }
-              if (
-                data[k].arr.indexOf(formChildlist[k].controlList[g].id) ===
-                  -1 &&
-                data[k].groupColArr.indexOf(
-                  formChildlist[k].controlList[g].id,
-                ) === -1 &&
-                i === groupList.length - 1
-              ) {
-                data[k].arr.push(formChildlist[k].controlList[g].id);
-                data[k].list.push(controlList[g]);
-              }
+              data[k].list = [...new Set(data[k].list)];
             }
-            data[k].list = [...new Set(data[k].list)];
+          } else {
+            data[k].list = controlList;
           }
         }
         setTitle(obj.name);
@@ -69,6 +75,7 @@ export default () => {
   };
 
   const fromContent = useMemo(() => {
+    console.log(formList);
     return formList.map(fromItem => {
       let list: any[] = fromItem.list;
       return (
@@ -117,7 +124,11 @@ export default () => {
                               },
                             ]}
                             name={listItem.id}
-                            initialValue={listItem.defaultValue}
+                            initialValue={
+                              listItem.defaulShowValue
+                                ? listItem.defaulShowValue
+                                : listItem.defaultValue
+                            }
                           >
                             <Temp
                               s_type={listItem.baseControlType}
@@ -149,7 +160,11 @@ export default () => {
                   <Form.Item
                     style={{ width: '100%' }}
                     name={groupItem.id}
-                    initialValue={groupItem.defaultValue}
+                    initialValue={
+                      groupItem.defaulShowValue
+                        ? groupItem.defaulShowValue
+                        : groupItem.defaultValue
+                    }
                     rules={[
                       {
                         required: groupItem.isRequired,
@@ -177,25 +192,27 @@ export default () => {
     <Card title={`发起流程  /  ${title}-创建`} className="home-detail">
       <Form form={form}>
         {fromContent}
-        <div style={{ textAlign: 'center' }}>
-          <Button
-            type="primary"
-            style={{ marginRight: 20 }}
-            onClick={() => {
-              console.log(form.getFieldsValue());
-              form.submit();
-            }}
-          >
-            提交
-          </Button>
-          <Button
-            onClick={() => {
-              alert(1);
-            }}
-          >
-            返回
-          </Button>
-        </div>
+        {mount ? (
+          <div style={{ textAlign: 'center' }}>
+            <Button
+              type="primary"
+              style={{ marginRight: 20 }}
+              onClick={() => {
+                console.log(form.getFieldsValue());
+                form.submit();
+              }}
+            >
+              提交
+            </Button>
+            <Button
+              onClick={() => {
+                history.go(-1);
+              }}
+            >
+              返回
+            </Button>
+          </div>
+        ) : null}
       </Form>
     </Card>
   );

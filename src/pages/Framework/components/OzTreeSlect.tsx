@@ -113,7 +113,7 @@ export default (props: tsProps) => {
       multiple={true}
       showSearch={true}
       treeData={loop(dataList)}
-      style={{ width: '200px' }}
+      style={{ minWidth: '200px', width: '100%' }}
       onSearch={onSearch}
       onChange={onChange}
     />
