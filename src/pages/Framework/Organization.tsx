@@ -19,6 +19,7 @@ import {
 } from './services/organization';
 import Organization from './components/Organization';
 import OzTreeSlect from './components/OzTreeSlect';
+import { GlobalResParams } from '@/types/ITypes';
 import './style/organization.less';
 const { Option } = Select;
 const { Search } = Input;
@@ -26,6 +27,25 @@ const { Search } = Input;
 interface tsSlectGroup {
   key: string;
   title: string;
+}
+
+interface tsListItem {
+  code: string;
+  key?: string;
+  title?: string;
+  id: number | null;
+  level: number;
+  memberList?: tsUserItem[];
+  name: '彩票事业部';
+  parentCode: string | null;
+}
+
+interface tsUserItem {
+  code: string;
+  groupCode: string;
+  name: string;
+  key?: string;
+  title?: string;
 }
 
 const columns: any = [
@@ -93,9 +113,9 @@ export default () => {
   useEffect(() => {
     async function getJson() {
       // getOrganization, getDeleteGroup ,geDefaultGroup
-      let organizationJson = await getOrganization();
-      let deleteGroupJson = await getDeleteGroup();
-      let DefaultGroupJson = await getDefaultGroup();
+      let organizationJson: GlobalResParams<tsListItem[]> = await getOrganization();
+      let deleteGroupJson: GlobalResParams<tsListItem[]> = await getDeleteGroup();
+      let DefaultGroupJson: GlobalResParams<tsListItem[]> = await getDefaultGroup();
       console.log('organizationJson');
       console.log(organizationJson);
       console.log('deleteGroupJson');
@@ -107,6 +127,7 @@ export default () => {
 
     if (json.status === 200) {
       let list = json.obj;
+      console.log(list);
       let newObj: any = {};
       newObj.key = '奖多多集团';
       newObj.title = '奖多多集团';
