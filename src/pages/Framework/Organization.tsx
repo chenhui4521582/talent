@@ -3,50 +3,27 @@ import {
   Card,
   Tree,
   Input,
-  Button,
   Modal,
   Table,
   Divider,
   Popconfirm,
-  Select,
   Form,
 } from 'antd';
-import json from './services/json';
 import {
   getOrganization,
   getDeleteGroup,
   getDefaultGroup,
+  tsListItem,
+  tsDeleteItem,
+  tsDefaultItem,
+  tsSlectGroup,
+  tsUserItem,
 } from './services/organization';
 import Organization from './components/Organization';
 import OzTreeSlect from './components/OzTreeSlect';
 import { GlobalResParams } from '@/types/ITypes';
 import './style/organization.less';
-const { Option } = Select;
 const { Search } = Input;
-
-interface tsSlectGroup {
-  key: string;
-  title: string;
-}
-
-interface tsListItem {
-  code: string;
-  key?: string;
-  title?: string;
-  id: number | null;
-  level: number;
-  memberList?: tsUserItem[];
-  name: '彩票事业部';
-  parentCode: string | null;
-}
-
-interface tsUserItem {
-  code: string;
-  groupCode: string;
-  name: string;
-  key?: string;
-  title?: string;
-}
 
 const columns: any = [
   {
@@ -112,30 +89,71 @@ export default () => {
 
   useEffect(() => {
     async function getJson() {
-      // getOrganization, getDeleteGroup ,geDefaultGroup
       let organizationJson: GlobalResParams<tsListItem[]> = await getOrganization();
-      let deleteGroupJson: GlobalResParams<tsListItem[]> = await getDeleteGroup();
-      let DefaultGroupJson: GlobalResParams<tsListItem[]> = await getDefaultGroup();
-      console.log('organizationJson');
-      console.log(organizationJson);
-      console.log('deleteGroupJson');
-      console.log(deleteGroupJson);
-      console.log('DefaultGroupJson');
-      console.log(DefaultGroupJson);
+      let deleteGroupJson: GlobalResParams<tsDeleteItem[]> = await getDeleteGroup();
+      let defaultGroupJson: GlobalResParams<tsDefaultItem[]> = await getDefaultGroup();
+      if (
+        organizationJson.status === 200 &&
+        deleteGroupJson.status === 200 &&
+        defaultGroupJson.status === 200
+      ) {
+        let list = organizationJson.obj;
+        let deleteGroupList: tsListItem[] = [];
+        for (let i = 0; i < deleteGroupJson.obj.length; i++) {
+          deleteGroupList.push({
+            key: deleteGroupJson.obj[i].userCode,
+            title: deleteGroupJson.obj[i].trueName,
+            code: deleteGroupJson.obj[i].userCode,
+            parentCode: '已删除组',
+            name: deleteGroupJson.obj[i].trueName,
+          });
+        }
+        let deleteGroupObj: tsListItem = {
+          code: '已删除组',
+          name: '已删除组',
+          parentCode: '奖多多集团',
+          key: '已删除组',
+          title: '已删除组',
+          children: deleteGroupList,
+        };
+
+        list.push(deleteGroupObj);
+
+        let defaulGroupList: tsUserItem[] = [];
+        for (let i = 0; i < defaultGroupJson.obj.length; i++) {
+          defaulGroupList.push({
+            key: defaultGroupJson.obj[i].userCode,
+            title: defaultGroupJson.obj[i].trueName,
+            code: defaultGroupJson.obj[i].userCode,
+            groupCode: '已删除组',
+            name: defaultGroupJson.obj[i].trueName,
+          });
+        }
+
+        let defaultGroupObj: tsListItem = {
+          code: '默认分组',
+          name: '默认分组',
+          parentCode: '奖多多集团',
+          key: '默认分组',
+          title: '默认分组',
+          memberList: defaulGroupList,
+        };
+
+        list.push(defaultGroupObj);
+
+        console.log(list);
+
+        let newObj: tsListItem = {
+          key: '奖多多集团',
+          title: '奖多多集团',
+          code: '奖多多集团',
+          name: '奖多多集团',
+          children: list,
+        };
+        handleList([newObj]);
+      }
     }
     getJson();
-
-    if (json.status === 200) {
-      let list = json.obj;
-      console.log(list);
-      let newObj: any = {};
-      newObj.key = '奖多多集团';
-      newObj.title = '奖多多集团';
-      newObj.code = '奖多多集团';
-      newObj.name = '奖多多集团';
-      newObj.children = list;
-      handleList([newObj]);
-    }
   }, []);
 
   const handleList = data => {

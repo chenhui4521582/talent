@@ -1,5 +1,40 @@
 import request from '@/utils/request';
 
+export interface tsSlectGroup {
+  key: string;
+  title: string;
+}
+
+export interface tsListItem {
+  code: string;
+  key?: string;
+  title?: string;
+  id?: number | null;
+  level?: number;
+  memberList?: tsUserItem[];
+  name: string;
+  parentCode?: string | null;
+  children?: tsListItem[];
+}
+
+export interface tsUserItem {
+  code: string;
+  groupCode: string;
+  name: string;
+  key?: string;
+  title?: string;
+}
+
+export interface tsDeleteItem {
+  trueName: string;
+  userCode: string;
+}
+
+export interface tsDefaultItem {
+  trueName: string;
+  userCode: string;
+}
+
 // 获取组织架构主体
 export async function getOrganization() {
   return request(`/api/talent/department/listDefaultGroupMember`, {

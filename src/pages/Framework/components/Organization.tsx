@@ -1,6 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Tree, Input, Divider } from 'antd';
-import json from '../services/json';
+import {
+  getOrganization,
+  getDeleteGroup,
+  getDefaultGroup,
+  tsListItem,
+  tsDeleteItem,
+  tsDefaultItem,
+} from '../services/organization';
+import { GlobalResParams } from '@/types/ITypes';
 
 const { Search } = Input;
 interface tsProps {
@@ -20,16 +28,72 @@ export default (props: tsProps) => {
   const [checkedKeys, setCheckedKeys] = useState<any[]>([]);
 
   useEffect(() => {
-    if (json.status === 200) {
-      let list = json.obj;
-      let newObj: any = {};
-      newObj.key = '奖多多集团';
-      newObj.title = '奖多多集团';
-      newObj.code = '奖多多集团';
-      newObj.name = '奖多多集团';
-      newObj.children = list;
-      handleList([newObj]);
+    async function getJson() {
+      let organizationJson: GlobalResParams<tsListItem[]> = await getOrganization();
+      let deleteGroupJson: GlobalResParams<tsDeleteItem[]> = await getDeleteGroup();
+      let defaultGroupJson: GlobalResParams<tsDefaultItem[]> = await getDefaultGroup();
+      if (
+        organizationJson.status === 200 &&
+        deleteGroupJson.status === 200 &&
+        defaultGroupJson.status === 200
+      ) {
+        let list = organizationJson.obj;
+        let deleteGroupList: tsListItem[] = [];
+        for (let i = 0; i < deleteGroupJson.obj.length; i++) {
+          deleteGroupList.push({
+            key: deleteGroupJson.obj[i].userCode,
+            title: deleteGroupJson.obj[i].trueName,
+            code: deleteGroupJson.obj[i].userCode,
+            parentCode: '已删除组',
+            name: deleteGroupJson.obj[i].trueName,
+          });
+        }
+        let deleteGroupObj: tsListItem = {
+          code: '已删除组',
+          name: '已删除组',
+          parentCode: '奖多多集团',
+          key: '已删除组',
+          title: '已删除组',
+          children: deleteGroupList,
+        };
+
+        list.push(deleteGroupObj);
+
+        let defaulGroupList: tsUserItem[] = [];
+        for (let i = 0; i < defaultGroupJson.obj.length; i++) {
+          defaulGroupList.push({
+            key: defaultGroupJson.obj[i].userCode,
+            title: defaultGroupJson.obj[i].trueName,
+            code: defaultGroupJson.obj[i].userCode,
+            groupCode: '已删除组',
+            name: defaultGroupJson.obj[i].trueName,
+          });
+        }
+
+        let defaultGroupObj: tsListItem = {
+          code: '默认分组',
+          name: '默认分组',
+          parentCode: '奖多多集团',
+          key: '默认分组',
+          title: '默认分组',
+          memberList: defaulGroupList,
+        };
+
+        list.push(defaultGroupObj);
+
+        console.log(list);
+
+        let newObj: tsListItem = {
+          key: '奖多多集团',
+          title: '奖多多集团',
+          code: '奖多多集团',
+          name: '奖多多集团',
+          children: list,
+        };
+        handleList([newObj]);
+      }
     }
+    getJson();
   }, []);
 
   const handleList = data => {
