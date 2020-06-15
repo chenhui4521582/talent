@@ -8,11 +8,13 @@ import {
   Divider,
   Popconfirm,
   Form,
+  Button,
 } from 'antd';
 import {
   getOrganization,
   getDeleteGroup,
   getDefaultGroup,
+  deleteGroup,
   tsListItem,
   tsDeleteItem,
   tsDefaultItem,
@@ -64,6 +66,8 @@ export default () => {
     title: '',
     key: '',
   });
+  // 存储 换气菜单的item；
+  const [hoverSelect, setHoverSelect] = useState<tsListItem | undefined>();
   // 接了解决点击弹窗的一个bug
   const [flag, setFlag] = useState<Boolean>(true);
   // 因为新建子部门跟，修改部门名称是同一个   modal
@@ -88,73 +92,74 @@ export default () => {
   const [removeGroupVisible, setRemoveGroupVisible] = useState<boolean>(false);
 
   useEffect(() => {
-    async function getJson() {
-      let organizationJson: GlobalResParams<tsListItem[]> = await getOrganization();
-      let deleteGroupJson: GlobalResParams<tsDeleteItem[]> = await getDeleteGroup();
-      let defaultGroupJson: GlobalResParams<tsDefaultItem[]> = await getDefaultGroup();
-      if (
-        organizationJson.status === 200 &&
-        deleteGroupJson.status === 200 &&
-        defaultGroupJson.status === 200
-      ) {
-        let list = organizationJson.obj;
-        let deleteGroupList: tsListItem[] = [];
-        for (let i = 0; i < deleteGroupJson.obj.length; i++) {
-          deleteGroupList.push({
-            key: deleteGroupJson.obj[i].userCode,
-            title: deleteGroupJson.obj[i].trueName,
-            code: deleteGroupJson.obj[i].userCode,
-            parentCode: '已删除组',
-            name: deleteGroupJson.obj[i].trueName,
-          });
-        }
-        let deleteGroupObj: tsListItem = {
-          code: '已删除组',
-          name: '已删除组',
-          parentCode: '奖多多集团',
-          key: '已删除组',
-          title: '已删除组',
-          children: deleteGroupList,
-        };
-
-        list.push(deleteGroupObj);
-
-        let defaulGroupList: tsUserItem[] = [];
-        for (let i = 0; i < defaultGroupJson.obj.length; i++) {
-          defaulGroupList.push({
-            key: defaultGroupJson.obj[i].userCode,
-            title: defaultGroupJson.obj[i].trueName,
-            code: defaultGroupJson.obj[i].userCode,
-            groupCode: '已删除组',
-            name: defaultGroupJson.obj[i].trueName,
-          });
-        }
-
-        let defaultGroupObj: tsListItem = {
-          code: '默认分组',
-          name: '默认分组',
-          parentCode: '奖多多集团',
-          key: '默认分组',
-          title: '默认分组',
-          memberList: defaulGroupList,
-        };
-
-        list.push(defaultGroupObj);
-
-        console.log(list);
-
-        let newObj: tsListItem = {
-          key: '奖多多集团',
-          title: '奖多多集团',
-          code: '奖多多集团',
-          name: '奖多多集团',
-          children: list,
-        };
-        handleList([newObj]);
-      }
-    }
     getJson();
   }, []);
+
+  async function getJson() {
+    let organizationJson: GlobalResParams<tsListItem[]> = await getOrganization();
+    let deleteGroupJson: GlobalResParams<tsDeleteItem[]> = await getDeleteGroup();
+    let defaultGroupJson: GlobalResParams<tsDefaultItem[]> = await getDefaultGroup();
+    if (
+      organizationJson.status === 200 &&
+      deleteGroupJson.status === 200 &&
+      defaultGroupJson.status === 200
+    ) {
+      let list = organizationJson.obj;
+      let deleteGroupList: tsListItem[] = [];
+      for (let i = 0; i < deleteGroupJson.obj.length; i++) {
+        deleteGroupList.push({
+          key: deleteGroupJson.obj[i].userCode,
+          title: deleteGroupJson.obj[i].trueName,
+          code: deleteGroupJson.obj[i].userCode,
+          parentCode: '已删除组',
+          name: deleteGroupJson.obj[i].trueName,
+        });
+      }
+      let deleteGroupObj: tsListItem = {
+        code: '已删除组',
+        name: '已删除组',
+        parentCode: '奖多多集团',
+        key: '已删除组',
+        title: '已删除组',
+        children: deleteGroupList,
+      };
+
+      list.push(deleteGroupObj);
+
+      let defaulGroupList: tsUserItem[] = [];
+      for (let i = 0; i < defaultGroupJson.obj.length; i++) {
+        defaulGroupList.push({
+          key: defaultGroupJson.obj[i].userCode,
+          title: defaultGroupJson.obj[i].trueName,
+          code: defaultGroupJson.obj[i].userCode,
+          groupCode: '已删除组',
+          name: defaultGroupJson.obj[i].trueName,
+        });
+      }
+
+      let defaultGroupObj: tsListItem = {
+        code: '默认分组',
+        name: '默认分组',
+        parentCode: '奖多多集团',
+        key: '默认分组',
+        title: '默认分组',
+        memberList: defaulGroupList,
+      };
+
+      list.push(defaultGroupObj);
+
+      console.log(list);
+
+      let newObj: tsListItem = {
+        key: '奖多多集团',
+        title: '奖多多集团',
+        code: '奖多多集团',
+        name: '奖多多集团',
+        children: list,
+      };
+      handleList([newObj]);
+    }
+  }
 
   const handleList = data => {
     let keyTitle = keyTitleList;
@@ -338,12 +343,7 @@ export default () => {
           const afterStr = list[i].title.substr(index + searchValue.length);
           if (list[i].title === '奖多多集团') {
             list[i].title = (
-              <div
-                style={{ width: '8em', display: 'flex' }}
-                onClick={e => {
-                  e.preventDefault();
-                }}
-              >
+              <div style={{ width: '8em', display: 'flex' }}>
                 {beforeStr}{' '}
                 <span style={{ color: 'red' }}> {searchValue} </span>
                 {afterStr}
@@ -356,8 +356,6 @@ export default () => {
                     fontSize: 20,
                   }}
                   onClick={e => {
-                    e.preventDefault();
-                    e.stopPropagation();
                     setSelectedKeys([hoverItemCode]);
                     setNewVisible(true);
                   }}
@@ -389,6 +387,7 @@ export default () => {
                   onMouseOver={e => {
                     e.preventDefault();
                     setHoverItemCode(list[i].code);
+                    setHoverSelect(list[i]);
                   }}
                   onClick={e => {
                     e.preventDefault();
@@ -405,12 +404,7 @@ export default () => {
         } else {
           if (list[i].title === '奖多多集团') {
             list[i].title = (
-              <div
-                style={{ width: '8em', display: 'flex' }}
-                onClick={e => {
-                  e.preventDefault();
-                }}
-              >
+              <div style={{ width: '8em', display: 'flex' }}>
                 {list[i].name}
                 <span
                   style={{
@@ -452,6 +446,7 @@ export default () => {
                   onMouseEnter={e => {
                     e.preventDefault();
                     setHoverItemCode(list[i].code);
+                    setHoverSelect(list[i]);
                   }}
                   onClick={e => {
                     e.preventDefault();
@@ -577,6 +572,15 @@ export default () => {
       );
     }
   }, [currentUserList]);
+
+  //删除功能
+  const handleDeleteGroup = async () => {
+    let json: GlobalResParams<string> = await deleteGroup(hoverSelect?.code);
+    if (json.status === 200) {
+      getJson();
+    }
+  };
+
   return (
     <Card title="组织架构">
       <div style={{ width: '20%', float: 'left' }}>
@@ -724,14 +728,40 @@ export default () => {
         visible={removeGroupVisible}
         onCancel={() => {
           setRemoveGroupVisible(false);
+          setHoverSelect(undefined);
         }}
-        onOk={() => {
-          //  changeForm.submit()
-        }}
-        okText="保存"
-        cancelText="取消"
+        footer={[
+          <Button
+            onClick={() => {
+              setRemoveGroupVisible(false);
+              setHoverSelect(undefined);
+            }}
+          >
+            返回
+          </Button>,
+          hoverSelect?.code === '已删除组' ||
+          hoverSelect?.code === '默认分组' ||
+          hoverSelect?.children?.length ||
+          hoverSelect?.memberList?.length ? null : (
+            <Button
+              type="primary"
+              onClick={() => {
+                handleDeleteGroup();
+              }}
+            >
+              确认
+            </Button>
+          ),
+        ]}
       >
-        删除分组
+        {hoverSelect?.code === '已删除组' ||
+        hoverSelect?.code === '默认分组' ? (
+          <div>不能删除根部门和系统默认分组</div>
+        ) : hoverSelect?.children?.length || hoverSelect?.memberList?.length ? (
+          <div>请删除此部门下的成员或子部门后，再删除此部门</div>
+        ) : (
+          <div>是否删除${hoverSelect?.name}部门？</div>
+        )}
       </Modal>
     </Card>
   );
