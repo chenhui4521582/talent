@@ -41,7 +41,7 @@ export default () => {
           {listForm.map(u => {
             return (
               <Button className="button-right" key={u.id}>
-                <Link to={`homedetail?id=${u.id}`}>{u.name}</Link>
+                <Link to={`homedetail/${u.id}`}>{u.name}</Link>
               </Button>
             );
           })}

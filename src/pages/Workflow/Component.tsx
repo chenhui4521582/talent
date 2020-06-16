@@ -23,7 +23,8 @@ const { TextArea } = Input;
 const { TreeNode } = TreeSelect;
 
 export default props => {
-  const { s_type } = props;
+  const { s_type, disabled, list, changSubData, id } = props;
+
   switch (s_type) {
     //单行文本
     case 'text':
@@ -51,16 +52,16 @@ export default props => {
       return <MultipleTemplate {...props} />;
     //附件上传
     case 'files':
-      return <Upload {...props} />;
+      return <Upload />;
     //remark 说明文字（<p><p>）
     case 'remark':
-      return <TextArea {...props} />;
+      return <TextArea />;
     //成员 user多选框
     case 'user':
       return <OzTreeSlect onlyUser={true} singleChoice={true} {...props} />;
     //department 部门 走组织架构
     case 'department':
-      return <DepartmentTemplate {...props} />;
+      return <OzTreeSlect singleChoice={true} {...props} />;
     //业务线 business
     case 'business':
       return <BusinessTemplate {...props} />;
@@ -69,22 +70,22 @@ export default props => {
       return <CompanyTemplate {...props} />;
     //currUser 当前成员
     case 'currUser':
-      return <Input {...props} placeholder="当前成员" readOnly />;
+      return <Input {...props} placeholder="当前成员" />;
     //currDepartment 当前部门
     case 'currDepartment':
-      return <Input {...props} placeholder="当前部门" readOnly />;
+      return <Input {...props} placeholder="当前部门" />;
     //currBusiness 当前业务线
     case 'currBusiness':
-      return <Input {...props} placeholder="当前业务线" readOnly />;
+      return <Input {...props} placeholder="当前业务线" />;
     //currCompany 当前公司
     case 'currCompany':
-      return <Input {...props} placeholder="当前公司" readOnly />;
+      return <Input {...props} placeholder="当前公司" />;
     //currDate 当前日期
     case 'currDate':
-      return <Input {...props} placeholder="当前日期" readOnly />;
+      return <Input {...props} placeholder="当前日期" />;
     //currDatetime 当前日期+时间
     case 'currDatetime':
-      return <Input {...props} placeholder="当前日期+时间" readOnly />;
+      return <Input {...props} placeholder="当前日期+时间" />;
     //position 职位
     case 'position':
       return <PositionTemplate {...props} />;
@@ -93,16 +94,16 @@ export default props => {
       return <JobTemplate {...props} />;
     //title 标题
     case 'title':
-      return <Input {...props} placeholder="标题" readOnly />;
+      return <Input placeholder="标题" {...props} />;
     //formNumber 申请单号
     case 'formNumber':
-      return <Input {...props} placeholder="申请单号" readOnly />;
+      return <Input placeholder="申请单号" {...props} />;
     //positionLevel 职级
     case 'positionLevel':
       return <LevelTemplate {...props} />;
     //wkTask 关联流程
     case 'wkTask':
-      return <Input {...props} placeholder="关联流程" readOnly />;
+      return <Input {...props} placeholder="关联流程" />;
 
     default:
       return <></>;
@@ -126,7 +127,7 @@ const SelectTemplate = props => {
     >
       {data.map((item, index) => {
         return (
-          <Option key={index} value={item}>
+          <Option key={index} value={item + '-$-' + item}>
             {item}
           </Option>
         );
@@ -138,6 +139,7 @@ const SelectTemplate = props => {
 // 业务线单选框
 const BusinessTemplate = props => {
   const { departmentList } = useDepartment(1);
+  const { changSubData, id } = props;
   return (
     <Select
       showSearch
@@ -145,11 +147,17 @@ const BusinessTemplate = props => {
       filterOption={(input, option) =>
         option?.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
       }
-      defaultValue="请选择职位"
+      defaultValue="请选择业务线"
+      onSelect={e => {
+        changSubData(id, e);
+      }}
     >
       {departmentList?.map(item => {
         return (
-          <Option key={item.code} value={item.code}>
+          <Option
+            key={item.code + '-$-' + item.name}
+            value={item.code + '-$-' + item.name}
+          >
             {item.name}
           </Option>
         );
@@ -161,6 +169,7 @@ const BusinessTemplate = props => {
 // 公司单选框
 const CompanyTemplate = props => {
   const { companyList } = useCompany();
+  const { changSubData, id } = props;
   return (
     <Select
       showSearch
@@ -168,11 +177,17 @@ const CompanyTemplate = props => {
       filterOption={(input, option) =>
         option?.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
       }
-      defaultValue="请选择职位"
+      onSelect={e => {
+        changSubData(id, e);
+      }}
+      defaultValue="请选择公司"
     >
       {companyList?.map(item => {
         return (
-          <Option key={item.companyId} value={item.companyId}>
+          <Option
+            key={item.companyId + '-$-' + item.companyName}
+            value={item.companyId + '-$-' + item.companyName}
+          >
             {item.companyName}
           </Option>
         );
@@ -180,9 +195,11 @@ const CompanyTemplate = props => {
     </Select>
   );
 };
-// 公司职位单选框  useTitle
+
+// 职位单选框  useTitle
 const PositionTemplate = props => {
   const { titleList } = useTitle();
+  const { changSubData, id } = props;
   return (
     <Select
       showSearch
@@ -190,11 +207,17 @@ const PositionTemplate = props => {
       filterOption={(input, option) =>
         option?.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
       }
-      defaultValue="请选择职位"
+      defaultValue="请选择公司职位"
+      onSelect={e => {
+        changSubData(id, e);
+      }}
     >
       {titleList?.map(item => {
         return (
-          <Option key={item.titleId} value={item.titleId}>
+          <Option
+            key={item.titleId + '-$-' + item.titleName}
+            value={item.titleId + '-$-' + item.titleId}
+          >
             {item.titleName}
           </Option>
         );
@@ -206,6 +229,7 @@ const PositionTemplate = props => {
 // 岗位单选框
 const JobTemplate = props => {
   const { jobList } = useJob();
+  const { changSubData, id } = props;
   return (
     <Select
       showSearch
@@ -214,10 +238,16 @@ const JobTemplate = props => {
         option?.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
       }
       defaultValue="请选择岗位"
+      onSelect={e => {
+        changSubData(id, e);
+      }}
     >
       {jobList?.map(item => {
         return (
-          <Option key={item.jobId} value={item.jobId}>
+          <Option
+            key={item.jobId + '-$-' + item.jobName}
+            value={item.jobId + '-$-' + item.jobName}
+          >
             {item.jobName}
           </Option>
         );
@@ -229,6 +259,7 @@ const JobTemplate = props => {
 // 职级下拉框
 const LevelTemplate = props => {
   const { rankList } = useRank();
+  const { changSubData, id } = props;
   return (
     <Select
       showSearch
@@ -237,10 +268,16 @@ const LevelTemplate = props => {
         option?.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
       }
       defaultValue="请选择职级"
+      onSelect={e => {
+        changSubData(id, e);
+      }}
     >
       {rankList?.map(item => {
         return (
-          <Option key={item.rankId} value={item.rankId}>
+          <Option
+            key={item.rankId + '-$-' + item.rankName}
+            value={item.rankId + '-$-' + item.rankName}
+          >
             {item.rankName}
           </Option>
         );
@@ -265,39 +302,3 @@ const MultipleTemplate = props => {
     </TreeSelect>
   );
 };
-
-// 成员多选组织架构
-const UserTemplate = peops => {
-  return (
-    <TreeSelect placeholder="Please select 我是成员">
-      <TreeNode value="parent 1" title="parent 1">
-        <TreeNode value="parent 1-0" title="parent 1-0">
-          <TreeNode value="leaf1" title="my leaf" />
-          <TreeNode value="leaf2" title="your leaf" />
-        </TreeNode>
-        <TreeNode value="parent 1-1" title="parent 1-1">
-          <TreeNode value="sss" title={<b style={{ color: '#08c' }}>sss</b>} />
-        </TreeNode>
-      </TreeNode>
-    </TreeSelect>
-  );
-};
-
-// department 部门多选组织架构
-const DepartmentTemplate = props => {
-  return (
-    <TreeSelect placeholder="Please select 我是部门组织架构">
-      <TreeNode value="parent 1" title="parent 1">
-        <TreeNode value="parent 1-0" title="parent 1-0">
-          <TreeNode value="leaf1" title="my leaf" />
-          <TreeNode value="leaf2" title="your leaf" />
-        </TreeNode>
-        <TreeNode value="parent 1-1" title="parent 1-1">
-          <TreeNode value="sss" title={<b style={{ color: '#08c' }}>sss</b>} />
-        </TreeNode>
-      </TreeNode>
-    </TreeSelect>
-  );
-};
-
-// 人员， 组织架构  关联流程 （部门 走组织架构）

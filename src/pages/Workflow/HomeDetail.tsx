@@ -11,15 +11,19 @@ import { Card, Descriptions, Button, Form } from 'antd';
 import Temp from './Component';
 import './style/home.less';
 
-export default () => {
+export default props => {
+  const formId = props.match.params.id;
+
   const [formList, setFormList] = useState<tsFormChildlist[]>([]);
   const [title, setTitle] = useState<string | null>('');
   const [mount, setMount] = useState<Boolean>(false);
+  const [idItemList, setIdItemList] = useState<any[]>([]);
 
   const [form] = Form.useForm();
   useEffect(() => {
+    let idItem: any = [];
     async function getFrom() {
-      let json: GlobalResParams<tsWfFormDetail> = await wfFormDetail(1);
+      let json: GlobalResParams<tsWfFormDetail> = await wfFormDetail(formId);
       if (json.status === 200) {
         setMount(true);
         let obj = json.obj || {};
@@ -29,6 +33,7 @@ export default () => {
         for (let k = 0; k < formChildlist.length; k++) {
           let fromItem = formChildlist[k];
           let controlList = fromItem.controlList;
+          idItem = idItem.concat(controlList);
           data[k] = fromItem;
           data[k].list = [];
           data[k].arr = [];
@@ -62,6 +67,9 @@ export default () => {
             data[k].list = controlList;
           }
         }
+        console.log('idItem');
+        console.log(idItem);
+        setIdItemList(idItem);
         setTitle(obj.name);
         setFormList(data);
       }
@@ -75,7 +83,6 @@ export default () => {
   };
 
   const fromContent = useMemo(() => {
-    console.log(formList);
     return formList.map(fromItem => {
       let list: any[] = fromItem.list;
       return (
@@ -113,7 +120,6 @@ export default () => {
                         >
                           {listItem.name}
                         </div>
-
                         <div style={{ display: 'flex', flex: 1 }}>
                           <Form.Item
                             style={{ width: '100%' }}
@@ -125,14 +131,14 @@ export default () => {
                             ]}
                             name={listItem.id}
                             initialValue={
-                              listItem.defaulShowValue
-                                ? listItem.defaulShowValue
-                                : listItem.defaultValue
+                              listItem.defaultShowValue
+                                ? listItem.defaultValue
+                                : listItem.defaultShowValue
                             }
                           >
                             <Temp
                               s_type={listItem.baseControlType}
-                              readOnly={listItem.isLocked}
+                              disabled={listItem.isLocked}
                               list={listItem.itemList || []}
                               changSubData={changSubData}
                               id={listItem.id}
@@ -161,8 +167,8 @@ export default () => {
                     style={{ width: '100%' }}
                     name={groupItem.id}
                     initialValue={
-                      groupItem.defaulShowValue
-                        ? groupItem.defaulShowValue
+                      groupItem.defaultShowValue
+                        ? groupItem.defaultShowValue
                         : groupItem.defaultValue
                     }
                     rules={[
@@ -174,8 +180,9 @@ export default () => {
                   >
                     <Temp
                       s_type={groupItem.baseControlType}
-                      readOnly={groupItem.isLocked}
+                      disabled={groupItem.isLocked}
                       list={groupItem.itemList || []}
+                      changSubData={changSubData}
                       id={groupItem.id}
                     />
                   </Form.Item>
@@ -188,6 +195,29 @@ export default () => {
     });
   }, [formList]);
 
+  const submit = (): void => {
+    form.submit();
+    console.log(form.getFieldsValue());
+    // form.validateFields().then(()=>{
+    //   let fromSubData = form.getFieldsValue();
+    //   let subList: any = []
+    //   idItemList.map(item=>{
+    //     console.log(fromSubData[item.id])
+    //     subList.push({
+    //       id: item.id,
+    //       multipleNumber:1,
+    //       showValue: fromSubData[item.id].indexOf('-$-')>-1 ? fromSubData[item.id].split('-$-')[1] : item.defaultShowValue,
+    //       value: fromSubData[item.id].indexOf('-$-')>-1 ? fromSubData[item.id].split('-$-')[0] : fromSubData[item.id]
+    //     })
+    //   })
+    //   saveTaskForm({
+    //     resFormId: formId,
+    //     wfResFormSaveItemCrudParamList:subList,
+    //     wfTaskFormFilesCrudParamList:[]
+    //   })
+    // })
+  };
+
   return (
     <Card title={`发起流程  /  ${title}-创建`} className="home-detail">
       <Form form={form}>
@@ -198,8 +228,7 @@ export default () => {
               type="primary"
               style={{ marginRight: 20 }}
               onClick={() => {
-                console.log(form.getFieldsValue());
-                form.submit();
+                submit();
               }}
             >
               提交

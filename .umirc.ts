@@ -201,7 +201,7 @@ export default defineConfig({
           component: '@/pages/Workflow/Home',
         },
         {
-          path: '/talent/workflow/homedetail',
+          path: '/talent/workflow/homedetail/:id',
           component: '@/pages/Workflow/HomeDetail',
         },
         {

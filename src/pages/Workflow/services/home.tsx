@@ -76,11 +76,9 @@ export interface PaginationTableParams {
   [propName: string]: any;
 }
 
-export interface tsSaveTaskForm {
-  resFormId: number;
-  wfResFormSaveItem: tsFormSaveItem[];
-  wfTaskFormFilesCrudParamList: tsFormFiledSaveItem[];
-}
+// export interface tsSaveTaskForm<T> {
+//   T
+// }
 
 export interface tsFormSaveItem {
   id: number;
@@ -118,7 +116,7 @@ export async function wfFormDetail(id: number) {
 }
 
 //提交流程表单
-export async function saveTaskForm(params: tsSaveTaskForm) {
+export async function saveTaskForm(params: any) {
   return request(`/api/talent/wftaskform/saveTaskForm`, {
     method: 'POST',
     data: params,

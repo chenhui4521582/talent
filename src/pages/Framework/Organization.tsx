@@ -246,7 +246,7 @@ export default () => {
       <span
         style={{
           display: 'flex',
-          flex: '1',
+          width: '1em',
           justifyContent: 'flex-end',
         }}
         onClick={e => {
@@ -318,7 +318,7 @@ export default () => {
           <span
             style={{
               display: 'flex',
-              width: '2em',
+              width: '1em',
               justifyContent: 'flex-end',
             }}
             onClick={e => {
@@ -343,7 +343,7 @@ export default () => {
           const afterStr = list[i].title.substr(index + searchValue.length);
           if (list[i].title === '奖多多集团') {
             list[i].title = (
-              <div style={{ width: '8em', display: 'flex' }}>
+              <div style={{ minWidth: '10em', display: 'flex' }}>
                 {beforeStr}{' '}
                 <span style={{ color: 'red' }}> {searchValue} </span>
                 {afterStr}
@@ -368,22 +368,23 @@ export default () => {
             if (list[i].code === hoverItemCode) {
               list[i].title = (
                 <div
-                  style={{ width: '8em', display: 'flex' }}
+                  style={{ minWidth: '10em', display: 'flex' }}
                   onClick={e => {
                     e.preventDefault();
-                    // e.stopPropagation();
                   }}
                 >
-                  {' '}
-                  {beforeStr}{' '}
-                  <span style={{ color: 'red' }}>{searchValue}</span> {afterStr}
+                  <span style={{ flex: 1, display: 'flex' }}>
+                    {beforeStr}{' '}
+                    <span style={{ color: 'red' }}>{searchValue}</span>{' '}
+                    {afterStr}{' '}
+                  </span>
                   {more}
                 </div>
               );
             } else {
               list[i].title = (
                 <div
-                  style={{ width: '8em' }}
+                  style={{ minWidth: '10em', display: 'flex' }}
                   onMouseOver={e => {
                     e.preventDefault();
                     setHoverItemCode(list[i].code);
@@ -391,12 +392,14 @@ export default () => {
                   }}
                   onClick={e => {
                     e.preventDefault();
-                    // e.stopPropagation();
                   }}
                 >
-                  {' '}
-                  {beforeStr}{' '}
-                  <span style={{ color: 'red' }}>{searchValue}</span> {afterStr}{' '}
+                  <span style={{ flex: 1, display: 'flex' }}>
+                    {' '}
+                    {beforeStr}{' '}
+                    <span style={{ color: 'red' }}>{searchValue}</span>{' '}
+                    {afterStr}{' '}
+                  </span>
                 </div>
               );
             }
@@ -404,7 +407,7 @@ export default () => {
         } else {
           if (list[i].title === '奖多多集团') {
             list[i].title = (
-              <div style={{ width: '8em', display: 'flex' }}>
+              <div style={{ minWidth: '10em', display: 'flex' }}>
                 {list[i].name}
                 <span
                   style={{
@@ -425,7 +428,7 @@ export default () => {
             if (list[i].code === hoverItemCode) {
               list[i].title = (
                 <div
-                  style={{ width: '8em', display: 'flex', flex: '1' }}
+                  style={{ minWidth: '10em', display: 'flex', flex: '1' }}
                   onMouseLeave={e => {
                     if (flag) {
                       setHoverItemCode('');
@@ -435,14 +438,16 @@ export default () => {
                     e.preventDefault();
                   }}
                 >
-                  <span>{list[i].name}</span>
+                  <span style={{ display: 'flex', flex: '1' }}>
+                    {list[i].name}
+                  </span>
                   {more}
                 </div>
               );
             } else {
               list[i].title = (
                 <div
-                  style={{ width: '8em', display: 'flex', flex: '1' }}
+                  style={{ minWidth: '10em', display: 'flex', flex: '1' }}
                   onMouseEnter={e => {
                     e.preventDefault();
                     setHoverItemCode(list[i].code);
@@ -452,7 +457,9 @@ export default () => {
                     e.preventDefault();
                   }}
                 >
-                  <span>{list[i].name}</span>
+                  <span style={{ display: 'flex', flex: '1' }}>
+                    {list[i].name}
+                  </span>
                 </div>
               );
             }
