@@ -117,13 +117,15 @@ const SelectTemplate = props => {
   if (Object.prototype.toString.call(list) === '[object String]') {
     data = list.split('|');
   }
+  console.log(props.disabled);
   return (
     <Select
       placeholder="请选择"
       style={{ width: '100%' }}
-      onSelect={e => {
-        changSubData(id, e);
-      }}
+      // onSelect={e => {
+      //   changSubData(id, e);
+      // }}
+      {...props}
     >
       {data.map((item, index) => {
         return (
@@ -148,9 +150,10 @@ const BusinessTemplate = props => {
         option?.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
       }
       defaultValue="请选择业务线"
-      onSelect={e => {
-        changSubData(id, e);
-      }}
+      // onSelect={e => {
+      //   changSubData(id, e);
+      // }}
+      {...props}
     >
       {departmentList?.map(item => {
         return (
@@ -177,10 +180,11 @@ const CompanyTemplate = props => {
       filterOption={(input, option) =>
         option?.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
       }
-      onSelect={e => {
-        changSubData(id, e);
-      }}
+      // onSelect={e => {
+      //   changSubData(id, e);
+      // }}
       defaultValue="请选择公司"
+      {...props}
     >
       {companyList?.map(item => {
         return (
@@ -208,9 +212,10 @@ const PositionTemplate = props => {
         option?.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
       }
       defaultValue="请选择公司职位"
-      onSelect={e => {
-        changSubData(id, e);
-      }}
+      // onSelect={e => {
+      //   changSubData(id, e);
+      // }}
+      {...props}
     >
       {titleList?.map(item => {
         return (
@@ -238,9 +243,10 @@ const JobTemplate = props => {
         option?.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
       }
       defaultValue="请选择岗位"
-      onSelect={e => {
-        changSubData(id, e);
-      }}
+      // onSelect={e => {
+      //   changSubData(id, e);
+      // }}
+      {...props}
     >
       {jobList?.map(item => {
         return (
@@ -268,9 +274,10 @@ const LevelTemplate = props => {
         option?.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
       }
       defaultValue="请选择职级"
-      onSelect={e => {
-        changSubData(id, e);
-      }}
+      // onSelect={e => {
+      //   changSubData(id, e);
+      // }}
+      {...props}
     >
       {rankList?.map(item => {
         return (
