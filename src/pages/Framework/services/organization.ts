@@ -44,7 +44,7 @@ export async function getOrganization() {
 
 // 获取已删除分组
 export async function getDeleteGroup() {
-  return request(`/api/talent/department/listDeletedDepartment`, {
+  return request(`/api/talent/departmentUser/listDeletedDepartmentUser`, {
     method: 'POST',
   });
 }
