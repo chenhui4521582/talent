@@ -26,13 +26,14 @@ const status = {
   0: '没处理',
   1: '通过',
   2: '退回',
+  3: '已提交',
 };
 
 const columns: ColumnProps<tsLog>[] = [
   {
     title: '操作人',
-    key: 'apprUserTruename ',
-    dataIndex: 'apprUserTruename ',
+    key: 'apprUserTruename',
+    dataIndex: 'apprUserTruename',
     align: 'center',
   },
   {
@@ -60,14 +61,6 @@ const columns: ColumnProps<tsLog>[] = [
     key: 'apprRemark',
     align: 'center',
   },
-  // {
-  //   title: '操作',
-  //   key: 'action',
-  //   align: 'center',
-  //   render: (_, record: tsList) => (
-  //     <Link to={`detail/${record.id}`}>点击查看</Link>
-  //   ),
-  // },
 ];
 
 export default props => {
@@ -267,9 +260,29 @@ export default props => {
     });
   }, [formList, mount]);
 
+  const btnRender = useMemo(() => {
+    return mount ? (
+      <Form.Item name="">
+        <TextArea rows={3} placeholder="签字意见" />
+        <div style={{ position: 'absolute', bottom: '10px', right: 20 }}>
+          {btnObj?.approver ? <Button>通过</Button> : null}
+          {btnObj?.approver ? <Button>驳回</Button> : null}
+          {btnObj?.applicant ? <Button>撤销</Button> : null}
+        </div>
+      </Form.Item>
+    ) : null;
+  }, [btnObj, mount]);
+
   const renderLog = useMemo(() => {
     return mount ? (
-      <Table style={{ width: '100%' }} columns={columns} dataSource={logList} />
+      <Table
+        title={() => {
+          return <h3>流转意见</h3>;
+        }}
+        style={{ width: '100%', marginTop: 20 }}
+        columns={columns}
+        dataSource={logList}
+      />
     ) : null;
   }, [logList, mount]);
 
@@ -277,14 +290,7 @@ export default props => {
     <Card title={`流程详情  /  ${title}`} className="home-detail">
       <Form>
         {fromContent}
-        <Form.Item name="">
-          <TextArea placeholder="签字意见" />
-          <div style={{ position: 'absolute', bottom: '10px', right: 20 }}>
-            <Button>通过</Button>
-            <Button>驳回</Button>
-            <Button>撤销</Button>
-          </div>
-        </Form.Item>
+        {btnRender}
       </Form>
       {renderLog}
     </Card>
