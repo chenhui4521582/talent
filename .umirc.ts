@@ -217,7 +217,7 @@ export default defineConfig({
           component: '@/pages/Workflow/ToDo',
         },
         {
-          path: '/talent/workflow/detail',
+          path: '/talent/workflow/detail/:id',
           component: '@/pages/Workflow/Detail',
         },
         {

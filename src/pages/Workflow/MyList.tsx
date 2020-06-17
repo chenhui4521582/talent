@@ -42,7 +42,7 @@ export default () => {
       key: 'action',
       align: 'center',
       render: (_, record: tsList) => (
-        <Link to={`detail?id=${record.id}`}>点击查看</Link>
+        <Link to={`detail/${record.id}`}>点击查看</Link>
       ),
     },
   ];

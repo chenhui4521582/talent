@@ -90,7 +90,7 @@ export default props => {
           title={<div style={{ textAlign: 'center' }}>{fromItem.name}</div>}
           key={fromItem.id}
           bordered
-          column={1}
+          column={fromItem.columnNum}
           style={{ marginBottom: 40, width: '80%', marginLeft: '10%' }}
         >
           {list.map(groupItem => {
@@ -99,7 +99,7 @@ export default props => {
                 <Descriptions.Item
                   key={groupItem.id}
                   label={groupItem.name}
-                  span={1}
+                  span={groupItem.colspan}
                 >
                   {groupItem.list.map(listItem => {
                     return (

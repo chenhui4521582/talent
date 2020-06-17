@@ -31,7 +31,7 @@ export default props => {
       return <Input {...props} />;
     //多行文本
     case 'areatext':
-      return <TextArea {...props} />;
+      return <TextArea {...props} style={{ width: '100%' }} />;
     //数字
     case 'number':
       return <InputNumber {...props} />;
@@ -52,10 +52,10 @@ export default props => {
       return <MultipleTemplate {...props} />;
     //附件上传
     case 'files':
-      return <Upload />;
+      return <Upload {...props} />;
     //remark 说明文字（<p><p>）
     case 'remark':
-      return <TextArea />;
+      return <TextArea {...props} style={{ width: '100%' }} />;
     //成员 user多选框
     case 'user':
       return <OzTreeSlect onlyUser={true} singleChoice={true} {...props} />;
