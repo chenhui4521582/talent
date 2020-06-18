@@ -1,9 +1,19 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { getLableList, getLableMemberList } from './services/role';
+import {
+  getLableList,
+  getLableMemberList,
+  deleteLable,
+  newLable,
+  editLable,
+  deleteBatchLabelmember,
+  newBatchLabelmember,
+} from './services/role';
 import { GlobalResParams } from '@/types/ITypes';
-import { Card, Input, Table, Popconfirm, Modal, Divider } from 'antd';
+import { Card, Input, Table, Popconfirm, Modal, Divider, Form } from 'antd';
 import { ColumnProps } from 'antd/es/table';
+import Organization from './components/Organization';
 import './style/role.less';
+import { Store } from '@umijs/hooks/lib/useFormTable';
 
 const { Search } = Input;
 
@@ -38,13 +48,16 @@ const columns: ColumnProps<tsUser>[] = [
 ];
 
 export default () => {
+  const [newForm] = Form.useForm();
   const [dataList, setDataList] = useState<tsRolrLable[]>([]);
   const [mount, setMount] = useState<boolean>(false);
   const [selectItem, setSelectItem] = useState<tsRolrLable>();
   const [removeLableVisible, setRemoveLableVisible] = useState<boolean>(false);
   const [changeLableVisible, setChangeLableVisible] = useState<boolean>(false);
   const [changeOrAdd, setChangeOrAdd] = useState<'add' | 'change'>();
-  const [userList, setUserList] = useState<tsUser[]>();
+  const [userList, setUserList] = useState<tsUser[]>([]);
+  const [removeType, setRemoveType] = useState<'lable' | 'user'>();
+  const [moveInVisible, setMoveInVisible] = useState<boolean>(false);
 
   useEffect(() => {
     getApilableList();
@@ -99,6 +112,9 @@ export default () => {
                   <div
                     className="alert-hover"
                     onClick={() => {
+                      newForm.setFieldsValue({
+                        labelName: selectItem?.labelName,
+                      });
                       setChangeLableVisible(true);
                       setChangeOrAdd('change');
                     }}
@@ -108,6 +124,7 @@ export default () => {
                   <div
                     className="alert-hover"
                     onClick={() => {
+                      setRemoveType('lable');
                       setRemoveLableVisible(true);
                     }}
                   >
@@ -125,19 +142,37 @@ export default () => {
   }, [dataList, selectItem, removeLableVisible, changeLableVisible]);
 
   const renderRight = useMemo(() => {
+    const rowSelection = {
+      onChange: (selectedRowKeys, selectedRows) => {
+        console.log(
+          `selectedRowKeys: ${selectedRowKeys}`,
+          'selectedRows: ',
+          selectedRows,
+        );
+      },
+      onSelect: (record, selected, selectedRows) => {
+        console.log(record, selected, selectedRows);
+      },
+      onSelectAll: (selected, selectedRows, changeRows) => {
+        console.log(selected, selectedRows, changeRows);
+      },
+    };
     const tableTitle = (
       <div className="table-title">
         <span
+          style={{ color: '#1890ff', cursor: 'pointer' }}
           onClick={() => {
-            // setMoveInVisible(true);
+            setMoveInVisible(true);
           }}
         >
           从其他部门移入
         </span>
         <Divider type="vertical" />
         <span
+          style={{ color: '#1890ff', cursor: 'pointer' }}
           onClick={() => {
-            // setRemoveUserVisible(true);
+            setRemoveType('user');
+            setRemoveLableVisible(true);
           }}
         >
           移除
@@ -148,7 +183,7 @@ export default () => {
     {
       return selectItem ? (
         <div className="role-right">
-          {`${selectItem?.labelName}(${userList?.length})`}
+          <h3>{`${selectItem?.labelName}(${userList?.length})`}</h3>
           <Table
             title={() => {
               return tableTitle;
@@ -163,47 +198,71 @@ export default () => {
     }
   }, [userList, selectItem]);
 
-  const rowSelection = {
-    onChange: (selectedRowKeys, selectedRows) => {
-      console.log(
-        `selectedRowKeys: ${selectedRowKeys}`,
-        'selectedRows: ',
-        selectedRows,
-      );
-    },
-    onSelect: (record, selected, selectedRows) => {
-      console.log(record, selected, selectedRows);
-    },
-    onSelectAll: (selected, selectedRows, changeRows) => {
-      console.log(selected, selectedRows, changeRows);
-    },
+  const delectOk = async () => {
+    let deleteApi;
+    let submitData;
+    if (removeType === 'lable') {
+      deleteApi = deleteLable;
+      submitData = selectItem?.id;
+    } else {
+      deleteApi = deleteBatchLabelmember;
+    }
+
+    let res: GlobalResParams<string> = await deleteApi(submitData);
+    if (res.status === 200) {
+      getApilableList();
+      removeType === 'lable' ? setSelectItem(undefined) : null;
+      setRemoveLableVisible(false);
+    }
+  };
+
+  const newOrAddOk = async () => {
+    let submit;
+    if (changeOrAdd === 'change') {
+      submit = editLable;
+    } else {
+      submit = newLable;
+    }
+    newForm.validateFields().then(async values => {
+      if (changeOrAdd === 'change') {
+        values.id = selectItem?.id;
+      }
+      let res: GlobalResParams<string> = await submit(values);
+      if (res.status === 200) {
+        getApilableList();
+        setChangeLableVisible(false);
+      }
+    });
   };
 
   return (
-    <Card title="角色标签管理" className="role">
-      <div style={{ width: '20%' }} className="role-left">
-        {mount ? (
-          <Search
-            type="search"
-            placeholder="请搜索"
-            onChange={searchChange}
-            style={{ marginBottom: 30 }}
-          />
-        ) : null}
-        <div className="role-title">
-          所有标签名
-          <span
-            onClick={() => {
-              setChangeLableVisible(true);
-              setChangeOrAdd('add');
-            }}
-          >
-            +
-          </span>
+    <Card title="角色标签管理">
+      <div className="role">
+        <div style={{ width: '20%' }} className="role-left">
+          {mount ? (
+            <Search
+              type="search"
+              placeholder="请搜索"
+              onChange={searchChange}
+              style={{ marginBottom: 30 }}
+            />
+          ) : null}
+          <div className="role-title">
+            所有标签名
+            <span
+              onClick={() => {
+                newForm.setFieldsValue({ labelName: null });
+                setChangeLableVisible(true);
+                setChangeOrAdd('add');
+              }}
+            >
+              +
+            </span>
+          </div>
+          {renderRoleLable}
         </div>
-        {renderRoleLable}
+        {renderRight}
       </div>
-      {renderRight}
 
       <Modal
         title="删除标签"
@@ -213,14 +272,13 @@ export default () => {
         onCancel={() => {
           setRemoveLableVisible(false);
         }}
-        onOk={() => {
-          setRemoveLableVisible(false);
-        }}
+        onOk={delectOk}
       >
         <h3>确认删除？</h3>
         <div>删除标签不会导致包含部门或成员从组织架构删除</div>
       </Modal>
       <Modal
+        // key = {changeOrAdd}
         title={changeOrAdd === 'add' ? '新建标签' : '修改名称'}
         visible={changeLableVisible}
         okText="确认"
@@ -228,19 +286,37 @@ export default () => {
         onCancel={() => {
           setChangeLableVisible(false);
         }}
+        onOk={newOrAddOk}
+      >
+        <div>标签名称</div>
+        <Form form={newForm}>
+          <Form.Item
+            name="labelName"
+            rules={[
+              {
+                required: true,
+                message: `标签名必填!`,
+              },
+            ]}
+          >
+            <Input placeholder="如：行政/财务/华南区/领导" />
+          </Form.Item>
+        </Form>
+      </Modal>
+      <Modal
+        width="50vw"
+        title="从其他部门移入"
+        visible={false}
+        okText="确认"
+        cancelText="取消"
+        onCancel={() => {
+          setMoveInVisible(false);
+        }}
         onOk={() => {
           setChangeLableVisible(false);
         }}
       >
-        <div>标签名称</div>
-        {changeOrAdd === 'add' ? (
-          <Input placeholder="如：行政/财务/华南区/领导" />
-        ) : (
-          <Input
-            placeholder="如：行政/财务/华南区/领导"
-            defaultValue={selectItem?.labelName}
-          />
-        )}
+        <Organization />
       </Modal>
     </Card>
   );

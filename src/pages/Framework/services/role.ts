@@ -18,23 +18,23 @@ export async function deleteLable(id: number) {
 }
 
 // 标签新增
-export async function newLable(labelName: string) {
+export async function newLable(param: tsEditLable) {
   return request(`/api/talent/wfresapprlabel/saveLabel`, {
     method: 'POST',
-    data: {
-      labelName,
-    },
+    data: param,
   });
 }
 
+interface tsEditLable {
+  id: number;
+  labelName: string;
+}
+
 // 标签修改
-export async function editLable(id: number, labelName: string) {
+export async function editLable(param: tsEditLable) {
   return request(`/api/talent/wfresapprlabel/update`, {
     method: 'POST',
-    data: {
-      id,
-      labelName,
-    },
+    data: param,
   });
 }
 
