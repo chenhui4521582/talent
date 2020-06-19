@@ -1,10 +1,4 @@
-import React, {
-  useState,
-  useEffect,
-  useMemo,
-  useRef,
-  useImperativeHandle,
-} from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import {
   getLableList,
   getLableMemberList,
@@ -396,7 +390,7 @@ export default () => {
         }}
         onOk={moveIn}
       >
-        <Organization ref={formRef} />
+        <Organization ref={formRef} renderUser={true} />
       </Modal>
     </Card>
   );

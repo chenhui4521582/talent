@@ -17,6 +17,8 @@ import {
   deleteGroup,
   newGroup,
   editGroup,
+  deleteUserApi,
+  moveInUser,
   tsListItem,
   tsDeleteItem,
   tsDefaultItem,
@@ -58,6 +60,7 @@ export default () => {
   const [expandedKeys, setExpandedKeys] = useState<any[]>([]);
   const [autoExpandParent, setAutoExpandParent] = useState<boolean>(true);
   const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
+  const [selectUserkeys, setSelectUserkeys] = useState<string[]>([]);
   //所有的列表item
   const [keyTitleList, setKeyTitleList] = useState<tsSlectGroup[]>([]);
   // 选择组下面人的对象
@@ -151,9 +154,6 @@ export default () => {
       };
 
       list.push(defaultGroupObj);
-
-      console.log(list);
-
       let newObj: tsListItem = {
         id: 0,
         key: '奖多多集团',
@@ -182,6 +182,9 @@ export default () => {
           children: list[i].children,
         });
         if (list[i].memberList && list[i].memberList.length) {
+          for (let k = 0; k < list[i].memberList.length; k++) {
+            list[i].memberList[k].key = list[i].memberList[k].code;
+          }
           userList[list[i].code] = list[i].memberList;
         }
         if (list[i].children) {
@@ -193,6 +196,7 @@ export default () => {
     handleItem(data);
     setDataList(data);
     setKeyTitleList(keyTitle);
+    newKey(keyTitle);
     setUserList(userList);
   };
 
@@ -234,8 +238,16 @@ export default () => {
     setAutoExpandParent(false);
   };
 
+  const newKey = keyTitle => {
+    keyTitle.map(item => {
+      if (item.key === selectedKeys[0]) {
+        console.log(item);
+        setSelectGroup(item);
+      }
+    });
+  };
+
   const onTreeSelect = e => {
-    console.log(e);
     setSelectedKeys(e);
     keyTitleList.map(item => {
       if (item.key === e[0]) {
@@ -444,18 +456,87 @@ export default () => {
 
   const rowSelection = {
     onChange: (selectedRowKeys, selectedRows) => {
-      console.log(
-        `selectedRowKeys: ${selectedRowKeys}`,
-        'selectedRows: ',
-        selectedRows,
-      );
+      setSelectUserkeys(selectedRowKeys);
     },
-    onSelect: (record, selected, selectedRows) => {
-      console.log(record, selected, selectedRows);
-    },
-    onSelectAll: (selected, selectedRows, changeRows) => {
-      console.log(selected, selectedRows, changeRows);
-    },
+    onSelect: (record, selected, selectedRows) => {},
+    onSelectAll: (selected, selectedRows, changeRows) => {},
+  };
+
+  //删除功能
+  const handleDeleteGroup = async () => {
+    let json: GlobalResParams<string> = await deleteGroup(selectGroup?.id);
+    if (json.status === 200) {
+      getJson();
+      setRemoveGroupVisible(false);
+    }
+  };
+
+  // 新增或者修改
+  const newAndChangeGroupOk = async () => {
+    let submit;
+    if (changeOrNewType === '修改名称') {
+      submit = editGroup;
+    } else {
+      submit = newGroup;
+    }
+
+    changeForm.validateFields().then(async values => {
+      if (changeOrNewType === '修改名称') {
+        values.id = selectGroup.id;
+        values.code = selectGroup.key;
+        values.parentCode = selectGroup.parentCode;
+      } else {
+        values.parentCode = selectGroup.key;
+      }
+      values.status = 1;
+      let res: GlobalResParams<string> = await submit(values);
+      if (res.status === 200) {
+        getJson();
+        setNewChildGropVisible(false);
+      }
+    });
+  };
+
+  // 从其他部门移入人员
+  const moveInOk = async () => {
+    // moveInUser
+    let arr: any = [];
+    formRef.current?.getvalue().map(item => {
+      arr.push(item.key);
+    });
+    let json: GlobalResParams<string> = await moveInUser(
+      selectGroup.key,
+      arr.join(','),
+    );
+    if (json.status === 200) {
+      getJson();
+      setMoveInVisible(false);
+    }
+  };
+
+  const deleteUser = async () => {
+    let json: GlobalResParams<string> = await deleteUserApi(
+      selectUserkeys.join(','),
+    );
+    if (json.status === 200) {
+      getJson();
+      setRemoveUserVisible(false);
+    }
+  };
+
+  const moveOther = async () => {
+    let arr: any = [];
+    formRef.current?.getvalue().map(item => {
+      arr.push(item.key);
+    });
+    let json: GlobalResParams<string> = await moveInUser(
+      arr.join(','),
+      selectUserkeys.join(','),
+    );
+    if (json.status === 200) {
+      getJson();
+      setDepartmentVisible(false);
+    }
   };
 
   const renderRight = useMemo(() => {
@@ -525,8 +606,7 @@ export default () => {
         </div>
       </div>
     );
-
-    if (currentUserList.length) {
+    if (selectGroup.memberList) {
       return (
         <div className="right-box">
           {selectGroup.title ? groupTitle : null}
@@ -536,7 +616,7 @@ export default () => {
             }}
             style={{ width: '100%' }}
             columns={columns}
-            dataSource={currentUserList}
+            dataSource={selectGroup.memberList}
             rowSelection={rowSelection}
           />
         </div>
@@ -546,44 +626,7 @@ export default () => {
         <div className="right-box">{selectGroup.title ? groupTitle : null}</div>
       );
     }
-  }, [currentUserList]);
-
-  //删除功能
-  const handleDeleteGroup = async () => {
-    console.log(selectGroup);
-    let json: GlobalResParams<string> = await deleteGroup(selectGroup?.id);
-    if (json.status === 200) {
-      getJson();
-      setRemoveGroupVisible(false);
-    }
-  };
-
-  // 新增或者修改
-  const newAndChangeGroupOk = async () => {
-    let submit;
-    if (changeOrNewType === '修改名称') {
-      submit = editGroup;
-    } else {
-      submit = newGroup;
-    }
-
-    changeForm.validateFields().then(async values => {
-      if (changeOrNewType === '修改名称') {
-        values.id = selectGroup.id;
-        values.code = selectGroup.key;
-        values.parentCode = selectGroup.parentCode;
-      } else {
-        values.parentCode = selectGroup.key;
-      }
-      values.status = 1;
-      console.log(values);
-      let res: GlobalResParams<string> = await submit(values);
-      if (res.status === 200) {
-        getJson();
-        setNewChildGropVisible(false);
-      }
-    });
-  };
+  }, [currentUserList, dataList, selectGroup.memberList]);
 
   return (
     <Card title="组织架构">
@@ -598,9 +641,6 @@ export default () => {
           key={searchValue}
           onExpand={onExpand}
           showLine={true}
-          onRightClick={e => {
-            console.log(e);
-          }}
           treeData={Loop(dataList)}
           expandedKeys={expandedKeys}
           autoExpandParent={autoExpandParent}
@@ -670,10 +710,8 @@ export default () => {
         onCancel={() => {
           setRemoveUserVisible(false);
         }}
-        onOk={() => {
-          setRemoveUserVisible(false);
-        }}
-        okText="保存"
+        onOk={deleteUser}
+        okText="确认"
         cancelText="取消"
       >
         <p>删除后，成员的上级属性将完全被清除</p>
@@ -686,29 +724,30 @@ export default () => {
         onCancel={() => {
           setMoveInVisible(false);
         }}
-        onOk={() => {
-          //  changeForm.submit()
-        }}
+        onOk={moveInOk}
         okText="保存"
         cancelText="取消"
       >
-        <Organization renderUser={true} />
+        <Organization
+          key={moveInVisible + ''}
+          renderUser={true}
+          onlySelectUser={true}
+          ref={formRef}
+        />
       </Modal>
       {/* 设置所在部门 */}
       <Modal
         width="50vw"
-        title="从其他部门移入"
+        title="移入其他部门"
         visible={departmentVisible}
         onCancel={() => {
           setDepartmentVisible(false);
         }}
-        onOk={() => {
-          //  changeForm.submit()
-        }}
+        onOk={moveOther}
         okText="保存"
         cancelText="取消"
       >
-        <Organization renderUser={true} />
+        <Organization onlyDepart={true} ref={formRef} />
       </Modal>
       {/* 设置上级 */}
       <Modal

@@ -12,6 +12,7 @@ import {
   tsListItem,
   tsDeleteItem,
   tsDefaultItem,
+  tsUserItem,
 } from '../services/organization';
 import { GlobalResParams } from '@/types/ITypes';
 
@@ -20,10 +21,11 @@ interface tsProps {
   renderUser?: boolean;
   onlySelectUser?: boolean;
   ref: any;
+  onlyDepart?: boolean;
 }
 
 function Organization(props: tsProps, formRef) {
-  const { renderUser, onlySelectUser } = props;
+  const { renderUser, onlySelectUser, onlyDepart } = props;
   const [dataList, setDataList] = useState<any>([]);
   const [searchValue, setSearchValue] = useState<string>('');
   const [expandedKeys, setExpandedKeys] = useState<any[]>([]);
@@ -32,6 +34,7 @@ function Organization(props: tsProps, formRef) {
   const [userListObj, setUserList] = useState<any>({});
   const [userKeyList, setUserKeyList] = useState<any[]>([]);
   const [checkedKeys, setCheckedKeys] = useState<any[]>([]);
+  const [departList, setdepartList] = useState<any[]>([]);
   useEffect(() => {
     getJson();
   }, []);
@@ -108,8 +111,6 @@ function Organization(props: tsProps, formRef) {
   useImperativeHandle(formRef, () => {
     return {
       getvalue: () => {
-        console.log(checkedKeys);
-        console.log(keyTitleList);
         let arr: any = [];
         checkedKeys.map(item => {
           keyTitleList.map(u => {
@@ -127,6 +128,7 @@ function Organization(props: tsProps, formRef) {
     let keyTitle = keyTitleList;
     let userList = userListObj;
     let userKeyArr = userKeyList;
+    let departListkey = departList;
     const handleItem = list => {
       for (let i = 0; i < list.length; i++) {
         list[i].key = list[i].code;
@@ -140,6 +142,10 @@ function Organization(props: tsProps, formRef) {
           children: list[i].children,
           type: list[i].memberList ? 'user' : 'department',
         });
+        if (list[i].memberList) {
+          departListkey.push(list[i].code);
+        }
+
         if (list[i].memberList && list[i].memberList.length) {
           userList[list[i].code] = list[i].memberList;
           if (renderUser) {
@@ -158,6 +164,7 @@ function Organization(props: tsProps, formRef) {
       }
     };
     console.log(data);
+    setdepartList(departListkey);
     setUserKeyList(userKeyArr);
     handleItem(data);
     setDataList(data);
@@ -268,6 +275,17 @@ function Organization(props: tsProps, formRef) {
       checked,
       node: { key },
     } = e;
+
+    if (onlyDepart) {
+      if (departList.indexOf(key) > -1) {
+        setCheckedKeys([keys.checked[keys.checked.length - 1]]);
+        return;
+      } else {
+        setCheckedKeys(checkedKeys);
+        return;
+      }
+    }
+
     if (onlySelectUser && checked) {
       if (userKeyList.indexOf(key) > -1) {
         setCheckedKeys(keys.checked);

@@ -140,7 +140,7 @@ export default props => {
                               s_type={listItem.baseControlType}
                               disabled={listItem.isLocked}
                               list={listItem.itemList || []}
-                              changSubData={changSubData}
+                              // changSubData={changSubData}
                               id={listItem.id}
                             />
                           </Form.Item>
@@ -182,7 +182,7 @@ export default props => {
                       s_type={groupItem.baseControlType}
                       disabled={groupItem.isLocked}
                       list={groupItem.itemList || []}
-                      changSubData={changSubData}
+                      // changSubData={changSubData}
                       id={groupItem.id}
                     />
                   </Form.Item>
@@ -196,26 +196,32 @@ export default props => {
   }, [formList]);
 
   const submit = (): void => {
-    form.submit();
-    console.log(form.getFieldsValue());
-    // form.validateFields().then(()=>{
-    //   let fromSubData = form.getFieldsValue();
-    //   let subList: any = []
-    //   idItemList.map(item=>{
-    //     console.log(fromSubData[item.id])
-    //     subList.push({
-    //       id: item.id,
-    //       multipleNumber:1,
-    //       showValue: fromSubData[item.id].indexOf('-$-')>-1 ? fromSubData[item.id].split('-$-')[1] : item.defaultShowValue,
-    //       value: fromSubData[item.id].indexOf('-$-')>-1 ? fromSubData[item.id].split('-$-')[0] : fromSubData[item.id]
-    //     })
-    //   })
-    //   saveTaskForm({
-    //     resFormId: formId,
-    //     wfResFormSaveItemCrudParamList:subList,
-    //     wfTaskFormFilesCrudParamList:[]
-    //   })
-    // })
+    // form.submit();
+    // console.log(form.getFieldsValue());
+    form.validateFields().then(() => {
+      let fromSubData = form.getFieldsValue();
+      let subList: any = [];
+      idItemList.map(item => {
+        console.log(fromSubData[item.id]);
+        subList.push({
+          id: item.id,
+          multipleNumber: 1,
+          showValue:
+            fromSubData[item.id].toString().indexOf('-$-') > -1
+              ? fromSubData[item.id].split('-$-')[1]
+              : item.defaultShowValue,
+          value:
+            fromSubData[item.id].toString().indexOf('-$-') > -1
+              ? fromSubData[item.id].split('-$-')[0]
+              : fromSubData[item.id],
+        });
+      });
+      saveTaskForm({
+        resFormId: formId,
+        wfResFormSaveItemCrudParamList: subList,
+        wfTaskFormFilesCrudParamList: [],
+      });
+    });
   };
 
   return (

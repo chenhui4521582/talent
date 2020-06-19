@@ -23,7 +23,7 @@ const { TextArea } = Input;
 const { TreeNode } = TreeSelect;
 
 export default props => {
-  const { s_type, disabled, list, changSubData, id } = props;
+  const { s_type } = props;
 
   switch (s_type) {
     //单行文本
@@ -112,21 +112,14 @@ export default props => {
 
 // 单选框
 const SelectTemplate = props => {
-  const { list, changSubData, id } = props;
+  const { list } = props;
   let data = [];
   if (Object.prototype.toString.call(list) === '[object String]') {
     data = list.split('|');
   }
   console.log(props.disabled);
   return (
-    <Select
-      placeholder="请选择"
-      style={{ width: '100%' }}
-      // onSelect={e => {
-      //   changSubData(id, e);
-      // }}
-      {...props}
-    >
+    <Select placeholder="请选择" style={{ width: '100%' }} {...props}>
       {data.map((item, index) => {
         return (
           <Option key={index} value={item + '-$-' + item}>
@@ -140,8 +133,7 @@ const SelectTemplate = props => {
 
 // 业务线单选框
 const BusinessTemplate = props => {
-  const { departmentList } = useDepartment(1);
-  const { changSubData, id } = props;
+  const { departmentList } = useDepartment(2);
   return (
     <Select
       showSearch
@@ -150,9 +142,6 @@ const BusinessTemplate = props => {
         option?.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
       }
       defaultValue="请选择业务线"
-      // onSelect={e => {
-      //   changSubData(id, e);
-      // }}
       {...props}
     >
       {departmentList?.map(item => {
@@ -172,7 +161,6 @@ const BusinessTemplate = props => {
 // 公司单选框
 const CompanyTemplate = props => {
   const { companyList } = useCompany();
-  const { changSubData, id } = props;
   return (
     <Select
       showSearch
@@ -180,9 +168,6 @@ const CompanyTemplate = props => {
       filterOption={(input, option) =>
         option?.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
       }
-      // onSelect={e => {
-      //   changSubData(id, e);
-      // }}
       defaultValue="请选择公司"
       {...props}
     >
@@ -203,7 +188,6 @@ const CompanyTemplate = props => {
 // 职位单选框  useTitle
 const PositionTemplate = props => {
   const { titleList } = useTitle();
-  const { changSubData, id } = props;
   return (
     <Select
       showSearch
@@ -212,9 +196,6 @@ const PositionTemplate = props => {
         option?.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
       }
       defaultValue="请选择公司职位"
-      // onSelect={e => {
-      //   changSubData(id, e);
-      // }}
       {...props}
     >
       {titleList?.map(item => {
@@ -234,7 +215,6 @@ const PositionTemplate = props => {
 // 岗位单选框
 const JobTemplate = props => {
   const { jobList } = useJob();
-  const { changSubData, id } = props;
   return (
     <Select
       showSearch
@@ -243,9 +223,6 @@ const JobTemplate = props => {
         option?.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
       }
       defaultValue="请选择岗位"
-      // onSelect={e => {
-      //   changSubData(id, e);
-      // }}
       {...props}
     >
       {jobList?.map(item => {
@@ -265,7 +242,6 @@ const JobTemplate = props => {
 // 职级下拉框
 const LevelTemplate = props => {
   const { rankList } = useRank();
-  const { changSubData, id } = props;
   return (
     <Select
       showSearch
@@ -274,9 +250,6 @@ const LevelTemplate = props => {
         option?.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
       }
       defaultValue="请选择职级"
-      // onSelect={e => {
-      //   changSubData(id, e);
-      // }}
       {...props}
     >
       {rankList?.map(item => {

@@ -98,3 +98,24 @@ export async function editGroupSort() {
     method: 'POST',
   });
 }
+
+// 批量删除人员
+export async function deleteUserApi(userCode: string) {
+  return request(`/api/talent/departmentUser/removeUserToDeleteGroupBatch`, {
+    method: 'POST',
+    data: {
+      userCode,
+    },
+  });
+}
+
+//批量移入
+export async function moveInUser(groupCode: string, userCode: string) {
+  return request(`/api/talent/departmentUser/updateUserGroupBatch`, {
+    method: 'POST',
+    data: {
+      groupCode,
+      userCode,
+    },
+  });
+}
