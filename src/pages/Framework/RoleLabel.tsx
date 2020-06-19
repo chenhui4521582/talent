@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useMemo,
+  useRef,
+  useImperativeHandle,
+} from 'react';
 import {
   getLableList,
   getLableMemberList,
@@ -7,13 +13,13 @@ import {
   editLable,
   deleteBatchLabelmember,
   newBatchLabelmember,
+  tsUser,
 } from './services/role';
 import { GlobalResParams } from '@/types/ITypes';
 import { Card, Input, Table, Popconfirm, Modal, Divider, Form } from 'antd';
 import { ColumnProps } from 'antd/es/table';
 import Organization from './components/Organization';
 import './style/role.less';
-import { Store } from '@umijs/hooks/lib/useFormTable';
 
 const { Search } = Input;
 
@@ -22,16 +28,6 @@ interface tsRolrLable {
   labelName: string;
   status: number;
   updatedBy: string | null;
-}
-
-interface tsUser {
-  department: string;
-  departmentCode: string;
-  id: number;
-  labelId: null | number;
-  memberType: number;
-  name: string;
-  userCode?: string;
 }
 
 const columns: ColumnProps<tsUser>[] = [
@@ -47,17 +43,24 @@ const columns: ColumnProps<tsUser>[] = [
   },
 ];
 
+interface tsId {
+  id: Number;
+}
+
 export default () => {
   const [newForm] = Form.useForm();
+  const formRef = useRef();
   const [dataList, setDataList] = useState<tsRolrLable[]>([]);
   const [mount, setMount] = useState<boolean>(false);
-  const [selectItem, setSelectItem] = useState<tsRolrLable>();
+  const [selectItem, setSelectItem] = useState<tsRolrLable>({});
   const [removeLableVisible, setRemoveLableVisible] = useState<boolean>(false);
   const [changeLableVisible, setChangeLableVisible] = useState<boolean>(false);
   const [changeOrAdd, setChangeOrAdd] = useState<'add' | 'change'>();
   const [userList, setUserList] = useState<tsUser[]>([]);
   const [removeType, setRemoveType] = useState<'lable' | 'user'>();
   const [moveInVisible, setMoveInVisible] = useState<boolean>(false);
+  const [searchValue, setSearchValue] = useState<string>();
+  const [selectUser, setSelectUser] = useState<tsUser[]>();
 
   useEffect(() => {
     getApilableList();
@@ -72,27 +75,106 @@ export default () => {
   };
 
   const searchChange = (e): void => {
-    console.log(e);
+    const {
+      target: { value },
+    } = e;
+    setSearchValue(value);
   };
 
-  const handleSelectRole = async (item: tsRolrLable) => {
-    setSelectItem(item);
-    let json: GlobalResParams<tsUser[]> = await getLableMemberList(item.id);
+  const handleSelectRole = async (id: number) => {
+    setSelectUser([]);
+    let json: GlobalResParams<tsUser[]> = await getLableMemberList(id);
     if (json.status === 200) {
+      json.obj.map(item => {
+        item.key = item.id;
+      });
       setUserList(json.obj);
     }
   };
 
+  const delectOk = async () => {
+    let deleteApi;
+    let submitData;
+    if (removeType === 'lable') {
+      deleteApi = deleteLable;
+      submitData = selectItem?.id;
+    } else {
+      let arr: tsId[] = [];
+      deleteApi = deleteBatchLabelmember;
+      selectUser?.map(item => {
+        arr.push({ id: item.id });
+      });
+
+      submitData = arr;
+    }
+
+    let res: GlobalResParams<string> = await deleteApi(submitData);
+    if (res.status === 200) {
+      if (removeType === 'lable') {
+        getApilableList();
+        setSelectItem(undefined);
+      } else {
+        handleSelectRole(selectItem?.id);
+      }
+
+      setRemoveLableVisible(false);
+    }
+  };
+
+  const newOrAddOk = async () => {
+    let submit;
+    if (changeOrAdd === 'change') {
+      submit = editLable;
+    } else {
+      submit = newLable;
+    }
+    newForm.validateFields().then(async values => {
+      if (changeOrAdd === 'change') {
+        values.id = selectItem?.id;
+      }
+      let res: GlobalResParams<string> = await submit(values);
+      if (res.status === 200) {
+        getApilableList();
+        setChangeLableVisible(false);
+      }
+    });
+  };
+
+  const loop = list => {
+    let loopdata = JSON.parse(JSON.stringify(list));
+    for (let i = 0; i < loopdata.length; i++) {
+      if (
+        searchValue?.length &&
+        loopdata[i].labelName.indexOf(searchValue) > -1
+      ) {
+        const index = loopdata[i].labelName.indexOf(searchValue);
+        const beforeStr = loopdata[i].labelName.substr(0, index);
+        const afterStr = loopdata[i].labelName.substr(
+          index + searchValue.length,
+        );
+        loopdata[i].labelName = (
+          <>
+            {beforeStr}
+            <span style={{ color: 'red' }}>{searchValue}</span>
+            {afterStr}
+          </>
+        );
+      }
+    }
+    return loopdata;
+  };
+
   const renderRoleLable = useMemo(() => {
-    return dataList.map(item => {
+    return loop(dataList).map(item => {
       return (
         <div
           className={
             item.id === selectItem?.id ? 'role-select-item' : 'role-item'
           }
           key={item.id}
-          onClick={e => {
-            handleSelectRole(item);
+          onClick={() => {
+            setSelectItem(item);
+            handleSelectRole(item.id);
           }}
         >
           {item.labelName}
@@ -139,24 +221,27 @@ export default () => {
         </div>
       );
     });
-  }, [dataList, selectItem, removeLableVisible, changeLableVisible]);
+  }, [
+    dataList,
+    selectItem,
+    removeLableVisible,
+    changeLableVisible,
+    searchValue,
+  ]);
+
+  const rowSelection = {
+    onChange: (selectedRowKeys, selectedRows) => {
+      setSelectUser(selectedRows);
+    },
+    onSelect: (record, selected, selectedRows) => {
+      console.log(record, selected, selectedRows);
+    },
+    onSelectAll: (selected, selectedRows, changeRows) => {
+      console.log(selected, selectedRows, changeRows);
+    },
+  };
 
   const renderRight = useMemo(() => {
-    const rowSelection = {
-      onChange: (selectedRowKeys, selectedRows) => {
-        console.log(
-          `selectedRowKeys: ${selectedRowKeys}`,
-          'selectedRows: ',
-          selectedRows,
-        );
-      },
-      onSelect: (record, selected, selectedRows) => {
-        console.log(record, selected, selectedRows);
-      },
-      onSelectAll: (selected, selectedRows, changeRows) => {
-        console.log(selected, selectedRows, changeRows);
-      },
-    };
     const tableTitle = (
       <div className="table-title">
         <span
@@ -181,7 +266,7 @@ export default () => {
     );
 
     {
-      return selectItem ? (
+      return selectItem.id ? (
         <div className="role-right">
           <h3>{`${selectItem?.labelName}(${userList?.length})`}</h3>
           <Table
@@ -198,43 +283,40 @@ export default () => {
     }
   }, [userList, selectItem]);
 
-  const delectOk = async () => {
-    let deleteApi;
-    let submitData;
-    if (removeType === 'lable') {
-      deleteApi = deleteLable;
-      submitData = selectItem?.id;
-    } else {
-      deleteApi = deleteBatchLabelmember;
-    }
+  const moveIn = async () => {
+    let values: any = [];
 
-    let res: GlobalResParams<string> = await deleteApi(submitData);
-    if (res.status === 200) {
-      getApilableList();
-      removeType === 'lable' ? setSelectItem(undefined) : null;
-      setRemoveLableVisible(false);
-    }
-  };
+    // labelId: number,
+    // memberType: number,
+    // userCode?: string,
+    // departmentCode?: string,
 
-  const newOrAddOk = async () => {
-    let submit;
-    if (changeOrAdd === 'change') {
-      submit = editLable;
-    } else {
-      submit = newLable;
-    }
-    newForm.validateFields().then(async values => {
-      if (changeOrAdd === 'change') {
-        values.id = selectItem?.id;
-      }
-      let res: GlobalResParams<string> = await submit(values);
-      if (res.status === 200) {
-        getApilableList();
-        setChangeLableVisible(false);
+    let list: any = formRef?.current?.getvalue();
+    list.map(item => {
+      // type: list[i].memberList?'user':'department',
+      values.id = selectItem?.id;
+      if (item.type === 'user') {
+        values.push({
+          labelId: selectItem?.id,
+          memberType: 1,
+          userCode: item.key,
+        });
+      } else {
+        values.push({
+          labelId: selectItem?.id,
+          memberType: 2,
+          departmentCode: item.key,
+        });
       }
     });
-  };
 
+    let json: GlobalResParams<string> = await newBatchLabelmember(values);
+    if (json.status === 200) {
+      getApilableList();
+      handleSelectRole(selectItem?.id);
+      setMoveInVisible(false);
+    }
+  };
   return (
     <Card title="角色标签管理">
       <div className="role">
@@ -306,17 +388,15 @@ export default () => {
       <Modal
         width="50vw"
         title="从其他部门移入"
-        visible={false}
+        visible={moveInVisible}
         okText="确认"
         cancelText="取消"
         onCancel={() => {
           setMoveInVisible(false);
         }}
-        onOk={() => {
-          setChangeLableVisible(false);
-        }}
+        onOk={moveIn}
       >
-        <Organization />
+        <Organization ref={formRef} />
       </Modal>
     </Card>
   );

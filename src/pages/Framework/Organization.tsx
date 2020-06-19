@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import {
   Card,
   Tree,
@@ -15,16 +15,20 @@ import {
   getDeleteGroup,
   getDefaultGroup,
   deleteGroup,
+  newGroup,
+  editGroup,
   tsListItem,
   tsDeleteItem,
   tsDefaultItem,
   tsSlectGroup,
   tsUserItem,
+  tsNewParam,
 } from './services/organization';
 import Organization from './components/Organization';
 import OzTreeSlect from './components/OzTreeSlect';
 import { GlobalResParams } from '@/types/ITypes';
 import './style/organization.less';
+import { submit } from '../Workflow/services/detail';
 const { Search } = Input;
 
 const columns: any = [
@@ -46,6 +50,7 @@ const columns: any = [
 ];
 
 export default () => {
+  const formRef = useRef();
   const [newGropForm] = Form.useForm();
   const [changeForm] = Form.useForm();
   const [dataList, setDataList] = useState<any>([]);
@@ -54,26 +59,23 @@ export default () => {
   const [autoExpandParent, setAutoExpandParent] = useState<boolean>(true);
   const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
   //所有的列表item
-  const [keyTitleList, setKeyTitleList] = useState<any[]>([]);
+  const [keyTitleList, setKeyTitleList] = useState<tsSlectGroup[]>([]);
   // 选择组下面人的对象
   const [userListObj, setUserList] = useState<any>({});
   // 当前的选准的组对象下面的人
   const [currentUserList, setCurrentUserList] = useState<any[]>([]);
-  // 鼠标划入treeItem的选项
-  const [hoverItemCode, setHoverItemCode] = useState<string>('');
   // 点击选准的treeitem
   const [selectGroup, setSelectGroup] = useState<tsSlectGroup>({
     title: '',
     key: '',
+    id: 0,
+    parentCode: '',
   });
-  // 存储 换气菜单的item；
-  const [hoverSelect, setHoverSelect] = useState<tsListItem | undefined>();
-  // 接了解决点击弹窗的一个bug
-  const [flag, setFlag] = useState<Boolean>(true);
   // 因为新建子部门跟，修改部门名称是同一个   modal
   const [newChildGropVisible, setNewChildGropVisible] = useState<boolean>(
     false,
   );
+  const [flag, setFlag] = useState<boolean>(false);
   // 判断是新增还是修改选准的部门新增子部门
   const [changeOrNewType, setChangeOrNewType] = useState<
     '添加子部门' | '修改名称'
@@ -105,23 +107,24 @@ export default () => {
       defaultGroupJson.status === 200
     ) {
       let list = organizationJson.obj;
-      let deleteGroupList: tsListItem[] = [];
+      let deleteGroupList: tsUserItem[] = [];
       for (let i = 0; i < deleteGroupJson.obj.length; i++) {
         deleteGroupList.push({
           key: deleteGroupJson.obj[i].userCode,
           title: deleteGroupJson.obj[i].trueName,
           code: deleteGroupJson.obj[i].userCode,
-          parentCode: '已删除组',
+          groupCode: '已删除组',
           name: deleteGroupJson.obj[i].trueName,
         });
       }
       let deleteGroupObj: tsListItem = {
+        id: -1,
         code: '已删除组',
         name: '已删除组',
         parentCode: '奖多多集团',
         key: '已删除组',
         title: '已删除组',
-        children: deleteGroupList,
+        memberList: deleteGroupList,
       };
 
       list.push(deleteGroupObj);
@@ -132,12 +135,13 @@ export default () => {
           key: defaultGroupJson.obj[i].userCode,
           title: defaultGroupJson.obj[i].trueName,
           code: defaultGroupJson.obj[i].userCode,
-          groupCode: '已删除组',
+          groupCode: '默认分组',
           name: defaultGroupJson.obj[i].trueName,
         });
       }
 
       let defaultGroupObj: tsListItem = {
+        id: -2,
         code: '默认分组',
         name: '默认分组',
         parentCode: '奖多多集团',
@@ -151,6 +155,7 @@ export default () => {
       console.log(list);
 
       let newObj: tsListItem = {
+        id: 0,
         key: '奖多多集团',
         title: '奖多多集团',
         code: '奖多多集团',
@@ -162,7 +167,7 @@ export default () => {
   }
 
   const handleList = data => {
-    let keyTitle = keyTitleList;
+    let keyTitle: tsSlectGroup[] = [];
     let userList = userListObj;
     const handleItem = list => {
       for (let i = 0; i < list.length; i++) {
@@ -171,6 +176,10 @@ export default () => {
         keyTitle.push({
           key: list[i].code,
           title: list[i].name,
+          id: list[i].id,
+          parentCode: list[i].parentCode,
+          memberList: list[i].memberList,
+          children: list[i].children,
         });
         if (list[i].memberList && list[i].memberList.length) {
           userList[list[i].code] = list[i].memberList;
@@ -226,6 +235,7 @@ export default () => {
   };
 
   const onTreeSelect = e => {
+    console.log(e);
     setSelectedKeys(e);
     keyTitleList.map(item => {
       if (item.key === e[0]) {
@@ -252,54 +262,49 @@ export default () => {
         onClick={e => {
           e.preventDefault();
           e.stopPropagation();
-          setSelectedKeys([hoverItemCode]);
         }}
       >
+        {/* {!flag? */}
         <Popconfirm
+          key={flag + ''}
           title={
             <div className="hover">
               <p
                 onClick={e => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setFlag(true);
                   setChangeOrNewType('添加子部门');
                   setNewChildGropVisible(true);
-                  setHoverItemCode('');
+                  setFlag(!flag);
+                  changeForm.setFieldsValue({
+                    name: '',
+                  });
                 }}
               >
                 添加子部门
               </p>
               <p
                 onClick={e => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setFlag(true);
                   setChangeOrNewType('修改名称');
+                  changeForm.setFieldsValue({
+                    name: selectGroup.title,
+                  });
+                  setFlag(!flag);
                   setNewChildGropVisible(true);
-                  setHoverItemCode('');
                 }}
               >
                 修改名称
               </p>
               <p
                 onClick={e => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setFlag(true);
+                  setFlag(!flag);
                   setSuperiorVisible(true);
-                  setHoverItemCode('');
                 }}
               >
                 设置上级
               </p>
               <p
                 onClick={e => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setFlag(true);
+                  setFlag(!flag);
                   setRemoveGroupVisible(true);
-                  setHoverItemCode('');
                 }}
               >
                 删除
@@ -320,12 +325,6 @@ export default () => {
               display: 'flex',
               width: '1em',
               justifyContent: 'flex-end',
-            }}
-            onClick={e => {
-              e.preventDefault();
-              e.stopPropagation();
-              setSelectedKeys([hoverItemCode]);
-              setFlag(false);
             }}
           >
             ⋮
@@ -355,8 +354,7 @@ export default () => {
                     justifyContent: 'flex-end',
                     fontSize: 20,
                   }}
-                  onClick={e => {
-                    setSelectedKeys([hoverItemCode]);
+                  onClick={() => {
                     setNewVisible(true);
                   }}
                 >
@@ -365,14 +363,9 @@ export default () => {
               </div>
             );
           } else {
-            if (list[i].code === hoverItemCode) {
+            if (list[i].code === selectGroup.key) {
               list[i].title = (
-                <div
-                  style={{ minWidth: '10em', display: 'flex' }}
-                  onClick={e => {
-                    e.preventDefault();
-                  }}
-                >
+                <div style={{ minWidth: '10em', display: 'flex' }}>
                   <span style={{ flex: 1, display: 'flex' }}>
                     {beforeStr}{' '}
                     <span style={{ color: 'red' }}>{searchValue}</span>{' '}
@@ -385,11 +378,6 @@ export default () => {
               list[i].title = (
                 <div
                   style={{ minWidth: '10em', display: 'flex' }}
-                  onMouseOver={e => {
-                    e.preventDefault();
-                    setHoverItemCode(list[i].code);
-                    setHoverSelect(list[i]);
-                  }}
                   onClick={e => {
                     e.preventDefault();
                   }}
@@ -425,19 +413,9 @@ export default () => {
               </div>
             );
           } else {
-            if (list[i].code === hoverItemCode) {
+            if (list[i].code === selectGroup.key) {
               list[i].title = (
-                <div
-                  style={{ minWidth: '10em', display: 'flex', flex: '1' }}
-                  onMouseLeave={e => {
-                    if (flag) {
-                      setHoverItemCode('');
-                    }
-                  }}
-                  onClick={e => {
-                    e.preventDefault();
-                  }}
-                >
+                <div style={{ minWidth: '10em', display: 'flex', flex: '1' }}>
                   <span style={{ display: 'flex', flex: '1' }}>
                     {list[i].name}
                   </span>
@@ -446,17 +424,7 @@ export default () => {
               );
             } else {
               list[i].title = (
-                <div
-                  style={{ minWidth: '10em', display: 'flex', flex: '1' }}
-                  onMouseEnter={e => {
-                    e.preventDefault();
-                    setHoverItemCode(list[i].code);
-                    setHoverSelect(list[i]);
-                  }}
-                  onClick={e => {
-                    e.preventDefault();
-                  }}
-                >
+                <div style={{ minWidth: '10em', display: 'flex', flex: '1' }}>
                   <span style={{ display: 'flex', flex: '1' }}>
                     {list[i].name}
                   </span>
@@ -528,8 +496,10 @@ export default () => {
         <div>
           <span
             onClick={() => {
-              setFlag(true);
               setChangeOrNewType('修改名称');
+              changeForm.setFieldsValue({
+                name: selectGroup.title,
+              });
               setNewChildGropVisible(true);
             }}
           >
@@ -538,7 +508,6 @@ export default () => {
           <Divider type="vertical" />
           <span
             onClick={() => {
-              setFlag(true);
               setChangeOrNewType('添加子部门');
               setNewChildGropVisible(true);
             }}
@@ -548,7 +517,6 @@ export default () => {
           <Divider type="vertical" />
           <span
             onClick={() => {
-              setFlag(true);
               setSuperiorVisible(true);
             }}
           >
@@ -582,10 +550,39 @@ export default () => {
 
   //删除功能
   const handleDeleteGroup = async () => {
-    let json: GlobalResParams<string> = await deleteGroup(hoverSelect?.code);
+    console.log(selectGroup);
+    let json: GlobalResParams<string> = await deleteGroup(selectGroup?.id);
     if (json.status === 200) {
       getJson();
+      setRemoveGroupVisible(false);
     }
+  };
+
+  // 新增或者修改
+  const newAndChangeGroupOk = async () => {
+    let submit;
+    if (changeOrNewType === '修改名称') {
+      submit = editGroup;
+    } else {
+      submit = newGroup;
+    }
+
+    changeForm.validateFields().then(async values => {
+      if (changeOrNewType === '修改名称') {
+        values.id = selectGroup.id;
+        values.code = selectGroup.key;
+        values.parentCode = selectGroup.parentCode;
+      } else {
+        values.parentCode = selectGroup.key;
+      }
+      values.status = 1;
+      console.log(values);
+      let res: GlobalResParams<string> = await submit(values);
+      if (res.status === 200) {
+        getJson();
+        setNewChildGropVisible(false);
+      }
+    });
   };
 
   return (
@@ -635,22 +632,23 @@ export default () => {
           </Form.Item>
           <Form.Item
             label="所属部门"
-            name="gropName"
+            name="group"
             rules={[{ required: true, message: '请选择所属部门!' }]}
           >
-            <OzTreeSlect />
+            <OzTreeSlect ref={formRef} />
           </Form.Item>
         </Form>
       </Modal>
       {/* 修改部门名称，新建子部门 */}
       <Modal
+        key={newChildGropVisible + ''}
         title={changeOrNewType}
         visible={newChildGropVisible}
         onCancel={() => {
           setNewChildGropVisible(false);
         }}
         onOk={() => {
-          changeForm.submit();
+          newAndChangeGroupOk();
         }}
         okText="保存"
         cancelText="取消"
@@ -658,7 +656,7 @@ export default () => {
         <Form form={changeForm}>
           <Form.Item
             label="部门名称"
-            name="userName"
+            name="name"
             rules={[{ required: true, message: '请输入部门名称!' }]}
           >
             <Input placeholder="请输入部门名称" />
@@ -714,7 +712,7 @@ export default () => {
       </Modal>
       {/* 设置上级 */}
       <Modal
-        width="50vw"
+        width="40vw"
         title="设置上级"
         visible={superiorVisible}
         onCancel={() => {
@@ -735,21 +733,19 @@ export default () => {
         visible={removeGroupVisible}
         onCancel={() => {
           setRemoveGroupVisible(false);
-          setHoverSelect(undefined);
         }}
         footer={[
           <Button
             onClick={() => {
               setRemoveGroupVisible(false);
-              setHoverSelect(undefined);
             }}
           >
             返回
           </Button>,
-          hoverSelect?.code === '已删除组' ||
-          hoverSelect?.code === '默认分组' ||
-          hoverSelect?.children?.length ||
-          hoverSelect?.memberList?.length ? null : (
+          selectGroup?.key === '已删除组' ||
+          selectGroup?.key === '默认分组' ||
+          selectGroup?.children?.length ||
+          selectGroup?.memberList?.length ? null : (
             <Button
               type="primary"
               onClick={() => {
@@ -761,13 +757,14 @@ export default () => {
           ),
         ]}
       >
-        {hoverSelect?.code === '已删除组' ||
-        hoverSelect?.code === '默认分组' ? (
-          <div>不能删除根部门和系统默认分组</div>
-        ) : hoverSelect?.children?.length || hoverSelect?.memberList?.length ? (
-          <div>请删除此部门下的成员或子部门后，再删除此部门</div>
+        {selectGroup?.key === '已删除组' || selectGroup?.key === '默认分组' ? (
+          <div key={selectGroup?.key}>不能删除根部门和系统默认分组</div>
+        ) : selectGroup?.children?.length || selectGroup?.memberList?.length ? (
+          <div key={selectGroup?.key}>
+            请删除此部门下的成员或子部门后，再删除此部门
+          </div>
         ) : (
-          <div>是否删除${hoverSelect?.name}部门？</div>
+          <div key={selectGroup?.key}>是否删除${selectGroup?.title}部门？</div>
         )}
       </Modal>
     </Card>

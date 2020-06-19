@@ -48,53 +48,35 @@ export async function getLableMemberList(labelId: number) {
   });
 }
 
-//标签成员删除
-// export async function deleteLabelmember(id:number) {
-//   return request(`/api/talent/wfresapprlabelmember/delete`, {
-//     method: 'POST',
-//     data:{
-//       id,
-//     }
-//   });
-// }
+export interface tsUser {
+  department: string;
+  departmentCode: string;
+  id: number;
+  labelId: null | number;
+  memberType: number;
+  name: string;
+  userCode?: string;
+  key?: number;
+}
 
 // 标签成员批量删除
-export async function deleteBatchLabelmember(id: number) {
+export async function deleteBatchLabelmember(param: tsUser[]) {
   return request(`/api/talent/wfresapprlabelmember/deleteBatch`, {
     method: 'POST',
-    data: {
-      id,
-    },
+    data: param,
   });
 }
 
-// 新增
-// export async function newLabelmember(labelId:number, memberType:number, userCode?:string, departmentCode?:string) {
-//   return request(`/api/talent/wfresapprlabelmember/save`, {
-//     method: 'POST',
-//     data:{
-//       labelId,
-//       memberType,
-//       userCode,
-//       departmentCode
-//     }
-//   });
-// }
-
 // 批量新增 1:用户;2:部门
-export async function newBatchLabelmember(
-  labelId: number,
-  memberType: number,
-  userCode?: string,
-  departmentCode?: string,
-) {
+interface tsNewMember {
+  labelId: number;
+  memberType: number;
+  userCode?: string;
+  departmentCode?: string;
+}
+export async function newBatchLabelmember(param: tsNewMember) {
   return request(`/api/talent/wfresapprlabelmember/saveBatch`, {
     method: 'POST',
-    data: {
-      labelId,
-      memberType,
-      userCode,
-      departmentCode,
-    },
+    data: param,
   });
 }

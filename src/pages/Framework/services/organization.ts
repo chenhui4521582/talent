@@ -3,13 +3,17 @@ import request from '@/utils/request';
 export interface tsSlectGroup {
   key: string;
   title: string;
+  id: number;
+  parentCode: string;
+  children?: tsListItem[];
+  memberList?: tsUserItem[];
 }
 
 export interface tsListItem {
   code: string;
   key?: string;
   title?: string;
-  id?: number | null;
+  id: number;
   level?: number;
   memberList?: tsUserItem[];
   name: string;
@@ -35,9 +39,17 @@ export interface tsDefaultItem {
   userCode: string;
 }
 
+export interface tsNewParam {
+  id?: number;
+  name: string;
+  businessCode?: string;
+  status: number;
+  parentCode?: string;
+}
+
 // 获取组织架构主体
 export async function getOrganization() {
-  return request(`/api/talent/department/listDefaultGroupMember`, {
+  return request(`/api/talent/department/listOrganization`, {
     method: 'POST',
   });
 }
@@ -57,7 +69,7 @@ export async function getDefaultGroup() {
 }
 
 // 删除分组
-export async function deleteGroup(id?: string) {
+export async function deleteGroup(id?: number) {
   return request(`/api/talent/department/delete`, {
     method: 'POST',
     data: { id },
@@ -65,16 +77,18 @@ export async function deleteGroup(id?: string) {
 }
 
 // 新增分组
-export async function newGroup() {
+export async function newGroup(param: tsNewParam) {
   return request(`/api/talent/department/save`, {
     method: 'POST',
+    data: param,
   });
 }
 
 // 编辑分组
-export async function editGroup() {
+export async function editGroup(param: tsNewParam) {
   return request(`/api/talent/department/update`, {
     method: 'POST',
+    data: param,
   });
 }
 
