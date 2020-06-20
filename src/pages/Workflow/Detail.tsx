@@ -74,79 +74,82 @@ export default props => {
   const [form] = Form.useForm();
 
   useEffect(() => {
-    let idItem: any = [];
-    async function getData() {
-      let json: GlobalResParams<tsDetail> = await getDetail(formId);
-      let btnJson: GlobalResParams<tsBtn> = await getButtonStatus(formId);
-      let LogJson: GlobalResParams<tsLog[]> = await gefLogList(formId);
-      if (json.status === 200) {
-        setMount(true);
-        let obj = json.obj || {};
-        let formChildlist = obj.formChildlist || [];
-        let groupList = obj.groupList || [];
-        let data: any = [];
-        for (let k = 0; k < formChildlist.length; k++) {
-          let fromItem = formChildlist[k];
-          let controlList = fromItem.controlList;
-          idItem = idItem.concat(controlList);
-          data[k] = fromItem;
-          data[k].list = [];
-          data[k].arr = [];
-          data[k].groupColArr = [];
-          if (groupList.length) {
-            for (let i = 0; i < groupList.length; i++) {
-              let groupItem = groupList[i];
-              let list: any = [];
-              for (let g = 0; g < controlList.length; g++) {
-                if (groupItem.id === controlList[g].resGroupId) {
-                  data[k].groupColArr.push(formChildlist[k].controlList[g].id);
-                  list.push(controlList[g]);
-                  groupItem.list = list;
-                  data[k].list.push(groupItem);
-                }
-                if (
-                  data[k].arr.indexOf(formChildlist[k].controlList[g].id) ===
-                    -1 &&
-                  data[k].groupColArr.indexOf(
-                    formChildlist[k].controlList[g].id,
-                  ) === -1 &&
-                  i === groupList.length - 1
-                ) {
-                  data[k].arr.push(formChildlist[k].controlList[g].id);
-                  data[k].list.push(controlList[g]);
-                }
-              }
-              data[k].list = [...new Set(data[k].list)];
-            }
-          } else {
-            data[k].list = controlList;
-          }
-        }
-        console.log('idItem');
-        console.log(idItem);
-        setIdItemList(idItem);
-        setTitle(obj.name);
-        setFormList(data);
-      }
-
-      if (LogJson.status === 200) {
-        setLogList(LogJson.obj);
-      }
-
-      if (btnJson.status === 200) {
-        setBtnObj(btnJson.obj);
-      }
-
-      console.log('表单');
-      console.log(json);
-      console.log('按钮');
-      console.log(btnJson);
-      console.log('历史');
-      console.log(LogJson);
-    }
     getData();
   }, []);
 
+  async function getData() {
+    let idItem: any = [];
+    let json: GlobalResParams<tsDetail> = await getDetail(formId);
+    let btnJson: GlobalResParams<tsBtn> = await getButtonStatus(formId);
+    let LogJson: GlobalResParams<tsLog[]> = await gefLogList(formId);
+    if (json.status === 200) {
+      setMount(true);
+      let obj = json.obj || {};
+      let formChildlist = obj.formChildlist || [];
+      let groupList = obj.groupList || [];
+      let data: any = [];
+      for (let k = 0; k < formChildlist.length; k++) {
+        let fromItem = formChildlist[k];
+        let controlList = fromItem.controlList;
+        idItem = idItem.concat(controlList);
+        data[k] = fromItem;
+        data[k].list = [];
+        data[k].arr = [];
+        data[k].groupColArr = [];
+        if (groupList.length) {
+          for (let i = 0; i < groupList.length; i++) {
+            let groupItem = groupList[i];
+            let list: any = [];
+            for (let g = 0; g < controlList.length; g++) {
+              if (groupItem.id === controlList[g].resGroupId) {
+                data[k].groupColArr.push(formChildlist[k].controlList[g].id);
+                list.push(controlList[g]);
+                groupItem.list = list;
+                data[k].list.push(groupItem);
+              }
+              if (
+                data[k].arr.indexOf(formChildlist[k].controlList[g].id) ===
+                  -1 &&
+                data[k].groupColArr.indexOf(
+                  formChildlist[k].controlList[g].id,
+                ) === -1 &&
+                i === groupList.length - 1
+              ) {
+                data[k].arr.push(formChildlist[k].controlList[g].id);
+                data[k].list.push(controlList[g]);
+              }
+            }
+            data[k].list = [...new Set(data[k].list)];
+          }
+        } else {
+          data[k].list = controlList;
+        }
+      }
+      console.log('idItem');
+      console.log(idItem);
+      setIdItemList(idItem);
+      setTitle(obj.name);
+      setFormList(data);
+    }
+
+    if (LogJson.status === 200) {
+      LogJson.obj.map(item => {
+        item.key = item.taskApprStepId;
+      });
+      setLogList(LogJson.obj);
+    }
+
+    if (btnJson.status === 200) {
+      setBtnObj(btnJson.obj);
+    }
+
+    console.log('表单');
+    console.log(json);
+    console.log('按钮');
+    console.log(btnJson);
+    console.log('历史');
+    console.log(LogJson);
+  }
   const fromContent = useMemo(() => {
     return formList.map(fromItem => {
       let list: any[] = fromItem.list;
@@ -205,8 +208,6 @@ export default props => {
                               s_type={listItem.baseControlType}
                               disabled={listItem.isLocked}
                               list={listItem.itemList || []}
-                              // changSubData={changSubData}
-                              id={listItem.id}
                             />
                           </Form.Item>
                         </div>
@@ -247,8 +248,6 @@ export default props => {
                       s_type={groupItem.baseControlType}
                       disabled={groupItem.isLocked}
                       list={groupItem.itemList || []}
-                      // changSubData={changSubData}
-                      id={groupItem.id}
                     />
                   </Form.Item>
                 </Descriptions.Item>
@@ -260,14 +259,69 @@ export default props => {
     });
   }, [formList, mount]);
 
+  const submitData = (type: number): void => {
+    form.validateFields().then(async fromSubData => {
+      // let fromSubData = form.getFieldsValue();
+      let subList: any = [];
+      idItemList.map(item => {
+        console.log(fromSubData[item.id]);
+        subList.push({
+          id: item.id,
+          multipleNumber: 1,
+          showValue:
+            fromSubData[item.id].toString().indexOf('-$-') > -1
+              ? fromSubData[item.id].split('-$-')[1]
+              : item.defaultShowValue,
+          value:
+            fromSubData[item.id].toString().indexOf('-$-') > -1
+              ? fromSubData[item.id].split('-$-')[0]
+              : fromSubData[item.id],
+        });
+      });
+      let json: GlobalResParams<string> = await submit({
+        remark: fromSubData.remark,
+        taskFormId: formId,
+        type: type,
+        wfResFormSaveItemCrudParamList: subList,
+        wfTaskFormFilesCrudParamList: [],
+      });
+
+      if (json.status === 200) {
+        getData();
+      }
+    });
+  };
+
+  const cancel = async function() {
+    let json: GlobalResParams<string> = await detailCanceled(formId);
+    if (json.status === 200) {
+      getData();
+    }
+  };
   const btnRender = useMemo(() => {
     return mount ? (
-      <Form.Item name="">
+      <Form.Item name="remark">
         <TextArea rows={3} placeholder="签字意见" />
         <div style={{ position: 'absolute', bottom: '10px', right: 20 }}>
-          {btnObj?.approver ? <Button>通过</Button> : null}
-          {btnObj?.approver ? <Button>驳回</Button> : null}
-          {btnObj?.applicant ? <Button>撤销</Button> : null}
+          {btnObj?.approver ? (
+            <Button
+              onClick={() => {
+                submitData(1);
+              }}
+            >
+              通过
+            </Button>
+          ) : null}
+          {btnObj?.approver ? (
+            <Button
+              onClick={() => {
+                submitData(2);
+              }}
+            >
+              驳回
+            </Button>
+          ) : null}
+          {btnObj?.applicant ? <Button onClick={cancel}>撤销</Button> : null}
         </div>
       </Form.Item>
     ) : null;
@@ -288,7 +342,7 @@ export default props => {
 
   return (
     <Card title={`流程详情  /  ${title}`} className="home-detail">
-      <Form>
+      <Form form={form}>
         {fromContent}
         {btnRender}
       </Form>

@@ -258,23 +258,20 @@ export default () => {
         </span>
       </div>
     );
-
-    {
-      return selectItem.id ? (
-        <div className="role-right">
-          <h3>{`${selectItem?.labelName}(${userList?.length})`}</h3>
-          <Table
-            title={() => {
-              return tableTitle;
-            }}
-            style={{ width: '60vw' }}
-            columns={columns}
-            dataSource={userList}
-            rowSelection={rowSelection}
-          />
-        </div>
-      ) : null;
-    }
+    return selectItem.id ? (
+      <div className="role-right">
+        <h3>{`${selectItem?.labelName}(${userList?.length})`}</h3>
+        <Table
+          title={() => {
+            return tableTitle;
+          }}
+          style={{ width: '60vw' }}
+          columns={columns}
+          dataSource={userList}
+          rowSelection={rowSelection}
+        />
+      </div>
+    ) : null;
   }, [userList, selectItem]);
 
   const moveIn = async () => {

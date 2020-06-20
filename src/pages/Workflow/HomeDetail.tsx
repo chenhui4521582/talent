@@ -76,11 +76,6 @@ export default props => {
     }
     getFrom();
   }, []);
-  const changSubData = (id: string, value: string): void => {
-    let obj = {};
-    obj[id] = value;
-    form.setFieldsValue(obj);
-  };
 
   const fromContent = useMemo(() => {
     return formList.map(fromItem => {
@@ -194,8 +189,8 @@ export default props => {
   const submit = (): void => {
     // form.submit();
     // console.log(form.getFieldsValue());
-    form.validateFields().then(() => {
-      let fromSubData = form.getFieldsValue();
+    form.validateFields().then(async fromSubData => {
+      // let fromSubData = form.getFieldsValue();
       let subList: any = [];
       idItemList.map(item => {
         console.log(fromSubData[item.id]);
@@ -212,11 +207,14 @@ export default props => {
               : fromSubData[item.id],
         });
       });
-      saveTaskForm({
+      let json: GlobalResParams<string> = await saveTaskForm({
         resFormId: formId,
         wfResFormSaveItemCrudParamList: subList,
         wfTaskFormFilesCrudParamList: [],
       });
+      if (json.status === 200) {
+        alert('成功');
+      }
     });
   };
 

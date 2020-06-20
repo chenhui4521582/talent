@@ -8,7 +8,15 @@ import {
   editLable,
 } from './services/system';
 import { GlobalResParams } from '@/types/ITypes';
-import { Card, Input, Popconfirm, Modal, Form } from 'antd';
+import {
+  Card,
+  Input,
+  Popconfirm,
+  Modal,
+  Form,
+  Descriptions,
+  Button,
+} from 'antd';
 import './style/role.less';
 
 const { Search, TextArea } = Input;
@@ -31,6 +39,7 @@ export default () => {
   const [mount, setMount] = useState<boolean>(false);
   const [removeLableVisible, setRemoveLableVisible] = useState<boolean>(false);
   const [selectItem, setSelectItem] = useState<tsRolrLable>();
+  const [detail, setDetail] = useState<any>();
   const [searchValue, setSearchValue] = useState<string>();
   const [editVisible, setEditVisible] = useState<boolean>(false);
   const [type, setType] = useState<'add' | 'edit'>('add');
@@ -55,9 +64,12 @@ export default () => {
     setSearchValue(value);
   };
 
-  const handleSelectRole = async (id: number) => {
-    let json: GlobalResParams<tsRolrLable[]> = await getLableMemberList(id);
+  const handleSelectRole = async (id?: number) => {
+    let json: GlobalResParams<any> = await getLableMemberList(id);
     console.log(json);
+    if (json.status === 200) {
+      setDetail(json.obj);
+    }
   };
 
   const delectOk = async () => {
@@ -70,20 +82,29 @@ export default () => {
 
   const editOk = async () => {
     // newForm
-    newForm.submit();
-    newForm.validateFields().then(async values => {
+    editForm.validateFields().then(async values => {
       console.log(values);
+      values.id = selectItem?.id;
+      let json: GlobalResParams<string> = await editLable(values);
+      if (json.status === 200) {
+        handleSelectRole(selectItem?.id);
+        getApilableList();
+        setEditVisible(false);
+      }
     });
-
-    setRemoveLableVisible(false);
   };
 
   const nameOk = () => {
-    // changeNameLable,  newLable,
-    console.log(newForm.getFieldsValue());
     newForm.validateFields().then(async values => {
+      let submit;
+      if (type === 'edit') {
+        submit = changeNameLable;
+        values.id = selectItem?.id;
+      } else {
+        submit = newLable;
+      }
       console.log(values);
-      let json: GlobalResParams<string> = await newLable(values.labelName);
+      let json: GlobalResParams<string> = await submit(values);
       if (json.status === 200) {
         setChangeOrAddVisible(false);
         getApilableList();
@@ -131,7 +152,7 @@ export default () => {
           {item.labelName}
           {item.id === selectItem?.id ? (
             <Popconfirm
-              key={'' + removeLableVisible}
+              key={changeOrAddVisible + '' + removeLableVisible}
               icon={<></>}
               onConfirm={() => {}}
               onCancel={() => {}}
@@ -146,10 +167,10 @@ export default () => {
                     className="alert-hover"
                     onClick={() => {
                       setType('edit');
+                      newForm.setFieldsValue({
+                        labelName: selectItem?.labelName,
+                      });
                       setChangeOrAddVisible(true);
-                      // newForm.setFieldsValue({
-                      //   labelName: selectItem?.labelName,
-                      // });
                     }}
                   >
                     修改名称
@@ -171,11 +192,52 @@ export default () => {
         </div>
       );
     });
-  }, [dataList, selectItem, searchValue]);
+  }, [
+    dataList,
+    selectItem,
+    searchValue,
+    changeOrAddVisible,
+    removeLableVisible,
+  ]);
 
   const renderRight = useMemo(() => {
-    const tableTitle = <div className="table-title">右边</div>;
-  }, [selectItem]);
+    return selectItem?.id ? (
+      <div className="role-right" style={{ width: '70%', marginLeft: 60 }}>
+        <div className="table-title">
+          {selectItem?.labelName}
+          <span
+            style={{
+              color: 'rgb(24, 144, 255)',
+              cursor: 'pointer',
+              marginLeft: 50,
+            }}
+            onClick={() => {
+              editForm.setFieldsValue(detail);
+              setEditVisible(true);
+            }}
+          >
+            编辑
+          </span>
+        </div>
+
+        <Descriptions
+          // title={selectItem?.labelName}
+          layout="vertical"
+          bordered
+          column={1}
+          style={{ width: '100%', marginTop: 20 }}
+        >
+          <Descriptions.Item label="URL内容：">{detail?.url}</Descriptions.Item>
+          <Descriptions.Item label="参数名称：">
+            {detail?.param}
+          </Descriptions.Item>
+          <Descriptions.Item label="标签描述：">
+            {detail?.remark}
+          </Descriptions.Item>
+        </Descriptions>
+      </div>
+    ) : null;
+  }, [selectItem, detail]);
 
   return (
     <Card title="角色标签管理">

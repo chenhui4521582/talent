@@ -7,7 +7,6 @@ interface tsProps {
   renderUser?: boolean;
   onlySelectUser?: boolean;
   onlySelect?: boolean;
-  id: number;
 }
 
 export default (props: tsProps) => {

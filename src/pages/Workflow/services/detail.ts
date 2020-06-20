@@ -24,12 +24,16 @@ export interface tsLog {
   nextStepUserCodes: string | null;
   nextStepUserNames: string | null;
   taskApprStepId: number;
+  key: number;
 }
 
 // 工作流撤回接口
 export async function detailCanceled(id: number) {
   return request(`/api/talent/wftaskform/canceled`, {
     method: 'POST',
+    data: {
+      id,
+    },
   });
 }
 
@@ -64,17 +68,9 @@ export async function gefLogList(taskFormId: number) {
 }
 
 // 提交按钮 1.通过，2驳回 3申请人提交
-export function submit(
-  taskFormId: number,
-  remark: number | string,
-  type: number,
-) {
-  return request(`/api/talent/wftaskapprstep/process`, {
+export function submit(params: any) {
+  return request(`/api/talent/wftaskform/processTaskForm`, {
     method: 'POST',
-    data: {
-      taskFormId,
-      remark,
-      type,
-    },
+    data: params,
   });
 }

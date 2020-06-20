@@ -22,7 +22,7 @@ export async function getLableMemberList(labelId: number) {
   return request(`/api/talent/wfresapprsyslabel/get`, {
     method: 'POST',
     data: {
-      labelId,
+      id: labelId,
     },
   });
 }
@@ -38,21 +38,17 @@ export async function newLable(labelName: string) {
 }
 
 // 编辑系统标签
-export async function editLable(labelId: number) {
+export async function editLable(param) {
   return request(`/api/talent/wfresapprsyslabel/update`, {
     method: 'POST',
-    data: {
-      labelId,
-    },
+    data: param,
   });
 }
 
 // 修改名称
-export async function changeNameLable(labelId: number, labelName: string) {
+export async function changeNameLable(param) {
   return request(`/api/talent/wfresapprsyslabel/updateLabelName`, {
     method: 'POST',
-    data: {
-      labelId,
-    },
+    data: param,
   });
 }

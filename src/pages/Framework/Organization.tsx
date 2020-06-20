@@ -51,7 +51,7 @@ const columns: any = [
   },
 ];
 
-export default () => {
+export default props => {
   const formRef = useRef();
   const [newGropForm] = Form.useForm();
   const [changeForm] = Form.useForm();
@@ -628,6 +628,23 @@ export default () => {
     }
   }, [currentUserList, dataList, selectGroup.memberList]);
 
+  const newAdd = () => {
+    console.log(newGropForm.getFieldsValue());
+    newGropForm.validateFields().then(async values => {
+      let data = {
+        name: values.name,
+        parentCode: values.parentCode.split('-$-')[0],
+        status: 1,
+      };
+
+      let res: GlobalResParams<string> = await newGroup(data);
+      if (res.status === 200) {
+        getJson();
+        setNewVisible(false);
+      }
+    });
+  };
+
   return (
     <Card title="组织架构">
       <div style={{ width: '20%', float: 'left' }}>
@@ -656,26 +673,24 @@ export default () => {
         onCancel={() => {
           setNewVisible(false);
         }}
-        onOk={() => {
-          newGropForm.submit();
-        }}
+        onOk={newAdd}
         okText="保存"
         cancelText="取消"
       >
         <Form form={newGropForm}>
           <Form.Item
             label="部门名称"
-            name="userName"
+            name="name"
             rules={[{ required: true, message: '请输入部门名称!' }]}
           >
             <Input placeholder="请输入部门名称" />
           </Form.Item>
           <Form.Item
             label="所属部门"
-            name="group"
+            name="parentCode"
             rules={[{ required: true, message: '请选择所属部门!' }]}
           >
-            <OzTreeSlect ref={formRef} />
+            <OzTreeSlect onlySelect={true} {...props} />
           </Form.Item>
         </Form>
       </Modal>
