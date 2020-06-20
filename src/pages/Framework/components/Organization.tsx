@@ -5,15 +5,7 @@ import React, {
   forwardRef,
 } from 'react';
 import { Tree, Input, Divider } from 'antd';
-import {
-  getOrganization,
-  getDeleteGroup,
-  getDefaultGroup,
-  tsListItem,
-  tsDeleteItem,
-  tsDefaultItem,
-  tsUserItem,
-} from '../services/organization';
+import { getOrganization, tsListItem } from '../services/organization';
 import { GlobalResParams } from '@/types/ITypes';
 
 const { Search } = Input;
@@ -41,70 +33,9 @@ function Organization(props: tsProps, formRef) {
 
   async function getJson() {
     let organizationJson: GlobalResParams<tsListItem[]> = await getOrganization();
-    let deleteGroupJson: GlobalResParams<tsDeleteItem[]> = await getDeleteGroup();
-    let defaultGroupJson: GlobalResParams<tsDefaultItem[]> = await getDefaultGroup();
-    if (
-      organizationJson.status === 200 &&
-      deleteGroupJson.status === 200 &&
-      defaultGroupJson.status === 200
-    ) {
+    if (organizationJson.status === 200) {
       let list = organizationJson.obj;
-      let deleteGroupList: tsUserItem[] = [];
-      for (let i = 0; i < deleteGroupJson.obj.length; i++) {
-        deleteGroupList.push({
-          key: deleteGroupJson.obj[i].userCode,
-          title: deleteGroupJson.obj[i].trueName,
-          code: deleteGroupJson.obj[i].userCode,
-          groupCode: '已删除组',
-          name: deleteGroupJson.obj[i].trueName,
-        });
-      }
-      let deleteGroupObj: tsListItem = {
-        id: -1,
-        code: '已删除组',
-        name: '已删除组',
-        parentCode: '奖多多集团',
-        key: '已删除组',
-        title: '已删除组',
-        memberList: deleteGroupList,
-      };
-
-      list.push(deleteGroupObj);
-
-      let defaulGroupList: tsUserItem[] = [];
-      for (let i = 0; i < defaultGroupJson.obj.length; i++) {
-        defaulGroupList.push({
-          key: defaultGroupJson.obj[i].userCode,
-          title: defaultGroupJson.obj[i].trueName,
-          code: defaultGroupJson.obj[i].userCode,
-          groupCode: '默认分组',
-          name: defaultGroupJson.obj[i].trueName,
-        });
-      }
-
-      let defaultGroupObj: tsListItem = {
-        id: -2,
-        code: '默认分组',
-        name: '默认分组',
-        parentCode: '奖多多集团',
-        key: '默认分组',
-        title: '默认分组',
-        memberList: defaulGroupList,
-      };
-
-      list.push(defaultGroupObj);
-
-      console.log(list);
-
-      let newObj: tsListItem = {
-        id: 0,
-        key: '奖多多集团',
-        title: '奖多多集团',
-        code: '奖多多集团',
-        name: '奖多多集团',
-        children: list,
-      };
-      handleList([newObj]);
+      handleList(list);
     }
   }
 
@@ -157,9 +88,6 @@ function Organization(props: tsProps, formRef) {
         }
         if (list[i].children) {
           handleItem(list[i].children);
-        }
-        if (list[i].level === 1) {
-          list[i].parentCode = '奖多多集团';
         }
       }
     };

@@ -43,7 +43,7 @@ export default props => {
       return <DatePicker {...props} />;
     //日期+时间
     case 'datetime':
-      return <DatePicker showTime {...props} />;
+      return <DatePicker {...props} showTime />;
     //单选框
     case 'select':
       return <SelectTemplate {...props} />;
@@ -58,10 +58,17 @@ export default props => {
       return <TextArea {...props} style={{ width: '100%' }} />;
     //成员 user多选框
     case 'user':
-      return <OzTreeSlect onlyUser={true} singleChoice={true} {...props} />;
+      return (
+        <OzTreeSlect
+          renderUser={true}
+          onlySelectUser={true}
+          onlySelect={true}
+          {...props}
+        />
+      );
     //department 部门 走组织架构
     case 'department':
-      return <OzTreeSlect singleChoice={true} {...props} />;
+      return <OzTreeSlect singleChoice={true} onlySelect={true} {...props} />;
     //业务线 business
     case 'business':
       return <BusinessTemplate {...props} />;
@@ -94,10 +101,10 @@ export default props => {
       return <JobTemplate {...props} />;
     //title 标题
     case 'title':
-      return <Input placeholder="标题" {...props} />;
+      return <Input {...props} placeholder="标题" />;
     //formNumber 申请单号
     case 'formNumber':
-      return <Input placeholder="申请单号" {...props} />;
+      return <Input {...props} placeholder="申请单号" />;
     //positionLevel 职级
     case 'positionLevel':
       return <LevelTemplate {...props} />;

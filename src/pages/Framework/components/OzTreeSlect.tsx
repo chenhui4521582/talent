@@ -1,29 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { TreeSelect } from 'antd';
-import {
-  getOrganization,
-  getDeleteGroup,
-  getDefaultGroup,
-  tsListItem,
-  tsDeleteItem,
-  tsDefaultItem,
-  tsUserItem,
-} from '../services/organization';
+import { getOrganization, tsListItem } from '../services/organization';
 import { GlobalResParams } from '@/types/ITypes';
 
 interface tsProps {
   renderUser?: boolean;
   onlySelectUser?: boolean;
+  onlySelect?: boolean;
+  id: number;
 }
 
 export default (props: tsProps) => {
-  const { renderUser, onlySelectUser } = props;
+  const { renderUser, onlySelectUser, onlySelect } = props;
   const [dataList, setDataList] = useState<any>([]);
   const [keyTitleList, setKeyTitleList] = useState<any[]>([]);
   const [userListObj, setUserList] = useState<any>({});
   const [userKeyList, setUserKeyList] = useState<any[]>([]);
   const [searchValue, setSearchValue] = useState<string>('');
   const [values, setValues] = useState<string[]>([]);
+  const [treeExpandedKeys, setTreeExpandedKeys] = useState<any[]>([]);
+  const [expandAll, setExpandAll] = useState<boolean>(false);
 
   useEffect(() => {
     getJson();
@@ -31,70 +27,9 @@ export default (props: tsProps) => {
 
   async function getJson() {
     let organizationJson: GlobalResParams<tsListItem[]> = await getOrganization();
-    let deleteGroupJson: GlobalResParams<tsDeleteItem[]> = await getDeleteGroup();
-    let defaultGroupJson: GlobalResParams<tsDefaultItem[]> = await getDefaultGroup();
-    if (
-      organizationJson.status === 200 &&
-      deleteGroupJson.status === 200 &&
-      defaultGroupJson.status === 200
-    ) {
+    if (organizationJson.status === 200) {
       let list = organizationJson.obj;
-      let deleteGroupList: tsUserItem[] = [];
-      for (let i = 0; i < deleteGroupJson.obj.length; i++) {
-        deleteGroupList.push({
-          key: deleteGroupJson.obj[i].userCode,
-          title: deleteGroupJson.obj[i].trueName,
-          code: deleteGroupJson.obj[i].userCode,
-          groupCode: '已删除组',
-          name: deleteGroupJson.obj[i].trueName,
-        });
-      }
-      let deleteGroupObj: tsListItem = {
-        id: -1,
-        code: '已删除组',
-        name: '已删除组',
-        parentCode: '奖多多集团',
-        key: '已删除组',
-        title: '已删除组',
-        memberList: deleteGroupList,
-      };
-
-      list.push(deleteGroupObj);
-
-      let defaulGroupList: tsUserItem[] = [];
-      for (let i = 0; i < defaultGroupJson.obj.length; i++) {
-        defaulGroupList.push({
-          key: defaultGroupJson.obj[i].userCode,
-          title: defaultGroupJson.obj[i].trueName,
-          code: defaultGroupJson.obj[i].userCode,
-          groupCode: '默认分组',
-          name: defaultGroupJson.obj[i].trueName,
-        });
-      }
-
-      let defaultGroupObj: tsListItem = {
-        id: -2,
-        code: '默认分组',
-        name: '默认分组',
-        parentCode: '奖多多集团',
-        key: '默认分组',
-        title: '默认分组',
-        memberList: defaulGroupList,
-      };
-
-      list.push(defaultGroupObj);
-
-      console.log(list);
-
-      let newObj: tsListItem = {
-        id: 0,
-        key: '奖多多集团',
-        title: '奖多多集团',
-        code: '奖多多集团',
-        name: '奖多多集团',
-        children: list,
-      };
-      handleList([newObj]);
+      handleList(list);
     }
   }
 
@@ -114,7 +49,10 @@ export default (props: tsProps) => {
           parentCode: list[i].parentCode,
           memberList: list[i].memberList,
           children: list[i].children,
-          type: list[i].memberList ? 'user' : 'department',
+          type:
+            list[i].memberList && list[i].memberList.length
+              ? 'user'
+              : 'department',
         });
         if (list[i].memberList && list[i].memberList.length) {
           userList[list[i].code] = list[i].memberList;
@@ -128,11 +66,10 @@ export default (props: tsProps) => {
         if (list[i].children) {
           handleItem(list[i].children);
         }
-        if (list[i].level === 1) {
-          list[i].parentCode = '奖多多集团';
-        }
       }
     };
+
+    console.log('data');
     console.log(data);
     setUserKeyList(userKeyArr);
     handleItem(data);
@@ -141,26 +78,21 @@ export default (props: tsProps) => {
     setUserList(userList);
   };
 
-  const onSearch = value => {
-    setSearchValue(value);
-    console.log(value);
-  };
-
   const loop = data => {
     let loopdata = JSON.parse(JSON.stringify(data));
 
     const handleItem = list => {
       for (let i = 0; i < list.length; i++) {
         list[i].key = list[i].code;
-        if (searchValue.length && list[i].value.indexOf(searchValue) > -1) {
+        if (searchValue.length && list[i].title.indexOf(searchValue) > -1) {
           const index = list[i].title.indexOf(searchValue);
           const beforeStr = list[i].title.substr(0, index);
           const afterStr = list[i].title.substr(index + searchValue.length);
           list[i].title = (
             <div>
-              {' '}
-              {beforeStr} <span style={{ color: 'red' }}>{searchValue}</span>{' '}
-              {afterStr}{' '}
+              {beforeStr}
+              <span style={{ color: 'red' }}>{searchValue}</span>
+              {afterStr}
             </div>
           );
         } else {
@@ -233,24 +165,87 @@ export default (props: tsProps) => {
     });
     console.log(keyArr);
     setValues(keyArr);
+    props.onChange(keyArr);
   };
 
   const onChange = value => {
-    console.log(value);
-    console.log(value[value.length - 1]);
-    // setValues(value);
-    handleCheckKey(value, value[value.length - 1]);
+    if (onlySelect) {
+      if (onlySelectUser) {
+        if (userKeyList.indexOf(value) > -1) {
+          setValues(value);
+          keyTitleList.map(item => {
+            if (item.key === value) {
+              props.onChange(`${value}-$-${item.title}`);
+            }
+          });
+          return;
+        } else {
+          props.onChange([]);
+          setValues([]);
+          return;
+        }
+      }
+      keyTitleList.map(item => {
+        if (item.key === value) {
+          props.onChange(`${value}-$-${item.title}`);
+        }
+      });
+      setValues(value);
+    } else {
+      handleCheckKey(value, value[value.length - 1]);
+    }
   };
 
+  const getParentKey = keys => {
+    let parentKey: string[] = [];
+    let newData = JSON.parse(JSON.stringify(dataList));
+
+    const handleItem = (list, key) => {
+      for (let i = 0; i < list.length; i++) {
+        let item = list[i];
+        if (key === item.code) {
+          if (item.parentCode) {
+            parentKey.push(item.parentCode);
+            handleItem(newData, item.parentCode);
+            // break;
+          }
+
+          if (item.groupCode) {
+            parentKey.push(item.groupCode);
+            handleItem(newData, item.groupCode);
+            // break;
+          }
+        }
+        if (item.children) {
+          handleItem(item.children, key);
+        }
+      }
+    };
+    handleItem(newData, keys);
+    console.log(parentKey);
+    return parentKey;
+  };
+
+  const searchChange = (e): void => {
+    setExpandAll(true);
+    setSearchValue(e);
+  };
+
+  const onTreeExpand = expandedKeys => {
+    setExpandAll(false);
+    setTreeExpandedKeys(expandedKeys);
+  };
   return (
     <TreeSelect
-      // searchValue=''
+      {...props}
       placeholder="请选择"
-      multiple={true}
       showSearch={true}
       treeData={loop(dataList)}
+      treeDefaultExpandAll={expandAll}
+      onTreeExpand={onTreeExpand}
       style={{ minWidth: '200px', width: '100%' }}
-      onSearch={onSearch}
+      onSearch={searchChange}
+      multiple={!onlySelect}
       onChange={onChange}
       value={values}
     />

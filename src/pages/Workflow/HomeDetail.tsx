@@ -140,8 +140,6 @@ export default props => {
                               s_type={listItem.baseControlType}
                               disabled={listItem.isLocked}
                               list={listItem.itemList || []}
-                              // changSubData={changSubData}
-                              id={listItem.id}
                             />
                           </Form.Item>
                         </div>
@@ -182,8 +180,6 @@ export default props => {
                       s_type={groupItem.baseControlType}
                       disabled={groupItem.isLocked}
                       list={groupItem.itemList || []}
-                      // changSubData={changSubData}
-                      id={groupItem.id}
                     />
                   </Form.Item>
                 </Descriptions.Item>
