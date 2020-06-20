@@ -66,7 +66,6 @@ export default () => {
 
   const handleSelectRole = async (id?: number) => {
     let json: GlobalResParams<any> = await getLableMemberList(id);
-    console.log(json);
     if (json.status === 200) {
       setDetail(json.obj);
     }
@@ -77,11 +76,11 @@ export default () => {
     if (json.status === 200) {
       setRemoveLableVisible(false);
       getApilableList();
+      setDetail(undefined);
     }
   };
 
   const editOk = async () => {
-    // newForm
     editForm.validateFields().then(async values => {
       console.log(values);
       values.id = selectItem?.id;
@@ -201,7 +200,9 @@ export default () => {
   ]);
 
   const renderRight = useMemo(() => {
-    return selectItem?.id ? (
+    console.log(detail);
+    console.log('detail');
+    return detail?.id ? (
       <div className="role-right" style={{ width: '70%', marginLeft: 60 }}>
         <div className="table-title">
           {selectItem?.labelName}

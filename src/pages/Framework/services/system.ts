@@ -28,12 +28,10 @@ export async function getLableMemberList(labelId: number) {
 }
 
 // 新增
-export async function newLable(labelName: string) {
+export async function newLable(param) {
   return request(`/api/talent/wfresapprsyslabel/savesysLabel`, {
     method: 'POST',
-    data: {
-      labelName,
-    },
+    data: param,
   });
 }
 
