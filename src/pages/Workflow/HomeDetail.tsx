@@ -7,7 +7,7 @@ import {
   saveTaskForm,
 } from './services/home';
 import { GlobalResParams } from '@/types/ITypes';
-import { Card, Descriptions, Button, Form } from 'antd';
+import { Card, Descriptions, Button, Form, notification } from 'antd';
 import Temp from './Component';
 import './style/home.less';
 
@@ -21,61 +21,61 @@ export default props => {
 
   const [form] = Form.useForm();
   useEffect(() => {
-    let idItem: any = [];
-    async function getFrom() {
-      let json: GlobalResParams<tsWfFormDetail> = await wfFormDetail(formId);
-      if (json.status === 200) {
-        setMount(true);
-        let obj = json.obj || {};
-        let formChildlist = obj.formChildlist || [];
-        let groupList = obj.groupList || [];
-        let data: any = [];
-        for (let k = 0; k < formChildlist.length; k++) {
-          let fromItem = formChildlist[k];
-          let controlList = fromItem.controlList;
-          idItem = idItem.concat(controlList);
-          data[k] = fromItem;
-          data[k].list = [];
-          data[k].arr = [];
-          data[k].groupColArr = [];
-          if (groupList.length) {
-            for (let i = 0; i < groupList.length; i++) {
-              let groupItem = groupList[i];
-              let list: any = [];
-              for (let g = 0; g < controlList.length; g++) {
-                if (groupItem.id === controlList[g].resGroupId) {
-                  data[k].groupColArr.push(formChildlist[k].controlList[g].id);
-                  list.push(controlList[g]);
-                  groupItem.list = list;
-                  data[k].list.push(groupItem);
-                }
-                if (
-                  data[k].arr.indexOf(formChildlist[k].controlList[g].id) ===
-                    -1 &&
-                  data[k].groupColArr.indexOf(
-                    formChildlist[k].controlList[g].id,
-                  ) === -1 &&
-                  i === groupList.length - 1
-                ) {
-                  data[k].arr.push(formChildlist[k].controlList[g].id);
-                  data[k].list.push(controlList[g]);
-                }
-              }
-              data[k].list = [...new Set(data[k].list)];
-            }
-          } else {
-            data[k].list = controlList;
-          }
-        }
-        console.log('idItem');
-        console.log(idItem);
-        setIdItemList(idItem);
-        setTitle(obj.name);
-        setFormList(data);
-      }
-    }
     getFrom();
   }, []);
+  const getFrom = async () => {
+    let idItem: any = [];
+    let json: GlobalResParams<tsWfFormDetail> = await wfFormDetail(formId);
+    if (json.status === 200) {
+      setMount(true);
+      let obj = json.obj || {};
+      let formChildlist = obj.formChildlist || [];
+      let groupList = obj.groupList || [];
+      let data: any = [];
+      for (let k = 0; k < formChildlist.length; k++) {
+        let fromItem = formChildlist[k];
+        let controlList = fromItem.controlList;
+        idItem = idItem.concat(controlList);
+        data[k] = fromItem;
+        data[k].list = [];
+        data[k].arr = [];
+        data[k].groupColArr = [];
+        if (groupList.length) {
+          for (let i = 0; i < groupList.length; i++) {
+            let groupItem = groupList[i];
+            let list: any = [];
+            for (let g = 0; g < controlList.length; g++) {
+              if (groupItem.id === controlList[g].resGroupId) {
+                data[k].groupColArr.push(formChildlist[k].controlList[g].id);
+                list.push(controlList[g]);
+                groupItem.list = list;
+                data[k].list.push(groupItem);
+              }
+              if (
+                data[k].arr.indexOf(formChildlist[k].controlList[g].id) ===
+                  -1 &&
+                data[k].groupColArr.indexOf(
+                  formChildlist[k].controlList[g].id,
+                ) === -1 &&
+                i === groupList.length - 1
+              ) {
+                data[k].arr.push(formChildlist[k].controlList[g].id);
+                data[k].list.push(controlList[g]);
+              }
+            }
+            data[k].list = [...new Set(data[k].list)];
+          }
+        } else {
+          data[k].list = controlList;
+        }
+      }
+      console.log('idItem');
+      console.log(idItem);
+      setIdItemList(idItem);
+      setTitle(obj.name);
+      setFormList(data);
+    }
+  };
 
   const fromContent = useMemo(() => {
     return formList.map(fromItem => {
@@ -187,24 +187,30 @@ export default props => {
   }, [formList]);
 
   const submit = (): void => {
-    // form.submit();
-    // console.log(form.getFieldsValue());
     form.validateFields().then(async fromSubData => {
-      // let fromSubData = form.getFieldsValue();
       let subList: any = [];
       idItemList.map(item => {
-        console.log(fromSubData[item.id]);
+        let showArr: any = [];
+        let valueArr: any = [];
+        if (fromSubData[item.id].constructor === Array) {
+          fromSubData[item.id].map(u => {
+            showArr.push(u.toString().split('-$-')[1]);
+            valueArr.push(u.toString().split('-$-')[0]);
+          });
+        } else {
+          fromSubData[item.id].toString().indexOf('-$-') > -1
+            ? showArr.push(fromSubData[item.id].split('-$-')[1])
+            : showArr.push(item.defaultShowValue);
+
+          fromSubData[item.id].toString().indexOf('-$-') > -1
+            ? valueArr.push(fromSubData[item.id].split('-$-')[0])
+            : valueArr.push(fromSubData[item.id]);
+        }
         subList.push({
           id: item.id,
           multipleNumber: 1,
-          showValue:
-            fromSubData[item.id].toString().indexOf('-$-') > -1
-              ? fromSubData[item.id].split('-$-')[1]
-              : item.defaultShowValue,
-          value:
-            fromSubData[item.id].toString().indexOf('-$-') > -1
-              ? fromSubData[item.id].split('-$-')[0]
-              : fromSubData[item.id],
+          showValue: showArr.join(','),
+          value: valueArr.join(','),
         });
       });
       let json: GlobalResParams<string> = await saveTaskForm({
@@ -213,7 +219,16 @@ export default props => {
         wfTaskFormFilesCrudParamList: [],
       });
       if (json.status === 200) {
-        alert('成功');
+        notification['success']({
+          message: json.msg,
+          description: '',
+        });
+        getFrom();
+      } else {
+        notification['error']({
+          message: json.msg,
+          description: '',
+        });
       }
     });
   };

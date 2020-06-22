@@ -1,5 +1,13 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Card, Descriptions, Button, Form, Input, Table } from 'antd';
+import {
+  Card,
+  Descriptions,
+  Button,
+  Form,
+  Input,
+  Table,
+  notification,
+} from 'antd';
 import Temp from './Component';
 import './style/home.less';
 import {
@@ -77,7 +85,7 @@ export default props => {
     getData();
   }, []);
 
-  async function getData() {
+  const getData = async () => {
     let idItem: any = [];
     let json: GlobalResParams<tsDetail> = await getDetail(formId);
     let btnJson: GlobalResParams<tsBtn> = await getButtonStatus(formId);
@@ -149,7 +157,7 @@ export default props => {
     console.log(btnJson);
     console.log('历史');
     console.log(LogJson);
-  }
+  };
   const fromContent = useMemo(() => {
     return formList.map(fromItem => {
       let list: any[] = fromItem.list;
@@ -261,21 +269,29 @@ export default props => {
 
   const submitData = (type: number): void => {
     form.validateFields().then(async fromSubData => {
-      // let fromSubData = form.getFieldsValue();
       let subList: any = [];
       idItemList.map(item => {
-        console.log(fromSubData[item.id]);
+        let showArr: any = [];
+        let valueArr: any = [];
+        if (fromSubData[item.id].constructor === Array) {
+          fromSubData[item.id].map(u => {
+            showArr.push(u.toString().split('-$-')[1]);
+            valueArr.push(u.toString().split('-$-')[0]);
+          });
+        } else {
+          fromSubData[item.id].toString().indexOf('-$-') > -1
+            ? showArr.push(fromSubData[item.id].split('-$-')[1])
+            : showArr.push(item.defaultShowValue);
+
+          fromSubData[item.id].toString().indexOf('-$-') > -1
+            ? valueArr.push(fromSubData[item.id].split('-$-')[0])
+            : valueArr.push(fromSubData[item.id]);
+        }
         subList.push({
           id: item.id,
           multipleNumber: 1,
-          showValue:
-            fromSubData[item.id].toString().indexOf('-$-') > -1
-              ? fromSubData[item.id].split('-$-')[1]
-              : item.defaultShowValue,
-          value:
-            fromSubData[item.id].toString().indexOf('-$-') > -1
-              ? fromSubData[item.id].split('-$-')[0]
-              : fromSubData[item.id],
+          showValue: showArr.join(','),
+          value: valueArr.join(','),
         });
       });
       let json: GlobalResParams<string> = await submit({
@@ -287,7 +303,16 @@ export default props => {
       });
 
       if (json.status === 200) {
+        notification['success']({
+          message: json.msg,
+          description: '',
+        });
         getData();
+      } else {
+        notification['error']({
+          message: json.msg,
+          description: '',
+        });
       }
     });
   };
@@ -295,9 +320,19 @@ export default props => {
   const cancel = async function() {
     let json: GlobalResParams<string> = await detailCanceled(formId);
     if (json.status === 200) {
+      notification['success']({
+        message: json.msg,
+        description: '',
+      });
       getData();
+    } else {
+      notification['error']({
+        message: json.msg,
+        description: '',
+      });
     }
   };
+
   const btnRender = useMemo(() => {
     return mount ? (
       <Form.Item name="remark">

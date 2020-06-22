@@ -15,7 +15,7 @@ import {
   Modal,
   Form,
   Descriptions,
-  Button,
+  notification,
 } from 'antd';
 import './style/role.less';
 
@@ -74,9 +74,18 @@ export default () => {
   const delectOk = async () => {
     let json: GlobalResParams<string> = await deleteLable(selectItem?.id);
     if (json.status === 200) {
+      notification['success']({
+        message: json.msg,
+        description: '',
+      });
       setRemoveLableVisible(false);
       getApilableList();
       setDetail(undefined);
+    } else {
+      notification['error']({
+        message: json.msg,
+        description: '',
+      });
     }
   };
 
@@ -86,9 +95,18 @@ export default () => {
       values.id = selectItem?.id;
       let json: GlobalResParams<string> = await editLable(values);
       if (json.status === 200) {
+        notification['success']({
+          message: json.msg,
+          description: '',
+        });
         handleSelectRole(selectItem?.id);
         getApilableList();
         setEditVisible(false);
+      } else {
+        notification['error']({
+          message: json.msg,
+          description: '',
+        });
       }
     });
   };
@@ -102,11 +120,19 @@ export default () => {
       } else {
         submit = newLable;
       }
-      console.log(values);
       let json: GlobalResParams<string> = await submit(values);
       if (json.status === 200) {
+        notification['success']({
+          message: json.msg,
+          description: '',
+        });
         setChangeOrAddVisible(false);
         getApilableList();
+      } else {
+        notification['success']({
+          message: json.msg,
+          description: '',
+        });
       }
     });
   };

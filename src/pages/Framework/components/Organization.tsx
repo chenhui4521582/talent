@@ -14,10 +14,11 @@ interface tsProps {
   onlySelectUser?: boolean;
   ref: any;
   onlyDepart?: boolean;
+  onlySelect?: boolean;
 }
 
 function Organization(props: tsProps, formRef) {
-  const { renderUser, onlySelectUser, onlyDepart } = props;
+  const { renderUser, onlySelectUser, onlyDepart, onlySelect } = props;
   const [dataList, setDataList] = useState<any>([]);
   const [searchValue, setSearchValue] = useState<string>('');
   const [expandedKeys, setExpandedKeys] = useState<any[]>([]);
@@ -46,6 +47,13 @@ function Organization(props: tsProps, formRef) {
         checkedKeys.map(item => {
           keyTitleList.map(u => {
             if (item === u.key) {
+              if (userKeyList.indexOf(u.key) > -1) {
+                u.type = 'user';
+              } else {
+                u.type = 'department';
+              }
+              console.log('u');
+              console.log(u);
               arr.push(u);
             }
           });
@@ -71,7 +79,6 @@ function Organization(props: tsProps, formRef) {
           parentCode: list[i].parentCode,
           memberList: list[i].memberList,
           children: list[i].children,
-          type: list[i].memberList ? 'user' : 'department',
         });
         if (list[i].memberList) {
           departListkey.push(list[i].code);
@@ -204,6 +211,12 @@ function Organization(props: tsProps, formRef) {
       node: { key },
     } = e;
 
+    // keys =  [keys.checked[keys.checked.length-1]]
+
+    // if(onlySelect){
+    //   keys = [[keys.checked[keys.checked.length - 1]]]
+    // }
+
     if (onlyDepart) {
       if (departList.indexOf(key) > -1) {
         setCheckedKeys([keys.checked[keys.checked.length - 1]]);
@@ -216,7 +229,11 @@ function Organization(props: tsProps, formRef) {
 
     if (onlySelectUser && checked) {
       if (userKeyList.indexOf(key) > -1) {
-        setCheckedKeys(keys.checked);
+        if (onlySelect) {
+          setCheckedKeys([keys.checked[keys.checked.length - 1]]);
+        } else {
+          setCheckedKeys(keys.checked);
+        }
       }
     } else {
       if (checked) {

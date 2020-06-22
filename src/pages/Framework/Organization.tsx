@@ -9,6 +9,7 @@ import {
   Popconfirm,
   Form,
   Button,
+  notification,
 } from 'antd';
 import {
   getOrganization,
@@ -40,14 +41,9 @@ const columns: any = [
     key: 'name',
   },
   {
-    title: '年龄',
+    title: 'code',
     dataIndex: 'groupCode',
     key: 'groupCode',
-  },
-  {
-    title: '住址',
-    dataIndex: 'code',
-    key: 'code',
   },
 ];
 
@@ -466,8 +462,17 @@ export default props => {
   const handleDeleteGroup = async () => {
     let json: GlobalResParams<string> = await deleteGroup(selectGroup?.id);
     if (json.status === 200) {
+      notification['success']({
+        message: json.msg,
+        description: '',
+      });
       getJson();
       setRemoveGroupVisible(false);
+    } else {
+      notification['error']({
+        message: json.msg,
+        description: '',
+      });
     }
   };
 
@@ -489,10 +494,19 @@ export default props => {
         values.parentCode = selectGroup.key;
       }
       values.status = 1;
-      let res: GlobalResParams<string> = await submit(values);
-      if (res.status === 200) {
+      let json: GlobalResParams<string> = await submit(values);
+      if (json.status === 200) {
+        notification['success']({
+          message: json.msg,
+          description: '',
+        });
         getJson();
         setNewChildGropVisible(false);
+      } else {
+        notification['error']({
+          message: json.msg,
+          description: '',
+        });
       }
     });
   };
@@ -509,8 +523,17 @@ export default props => {
       arr.join(','),
     );
     if (json.status === 200) {
+      notification['success']({
+        message: json.msg,
+        description: '',
+      });
       getJson();
       setMoveInVisible(false);
+    } else {
+      notification['error']({
+        message: json.msg,
+        description: '',
+      });
     }
   };
 
@@ -519,8 +542,17 @@ export default props => {
       selectUserkeys.join(','),
     );
     if (json.status === 200) {
+      notification['success']({
+        message: json.msg,
+        description: '',
+      });
       getJson();
       setRemoveUserVisible(false);
+    } else {
+      notification['error']({
+        message: json.msg,
+        description: '',
+      });
     }
   };
 
@@ -534,8 +566,45 @@ export default props => {
       selectUserkeys.join(','),
     );
     if (json.status === 200) {
+      notification['success']({
+        message: json.msg,
+        description: '',
+      });
       getJson();
       setDepartmentVisible(false);
+    } else {
+      notification['error']({
+        message: json.msg,
+        description: '',
+      });
+    }
+  };
+
+  const setSuperior = async () => {
+    let arr: any = [];
+    formRef.current?.getvalue().map(item => {
+      arr.push(item.key);
+    });
+
+    let values: any = {};
+    values.id = selectGroup.id;
+    values.code = selectGroup.key;
+    values.parentCode = selectGroup.parentCode;
+    values.leaderCode = arr.join(',');
+    values.status = 1;
+    let json: GlobalResParams<string> = await editGroup(values);
+    if (json.status === 200) {
+      notification['success']({
+        message: json.msg,
+        description: '',
+      });
+      getJson();
+      setSuperiorVisible(false);
+    } else {
+      notification['error']({
+        message: json.msg,
+        description: '',
+      });
     }
   };
 
@@ -591,6 +660,9 @@ export default props => {
             onClick={() => {
               setChangeOrNewType('添加子部门');
               setNewChildGropVisible(true);
+              changeForm.setFieldsValue({
+                name: '',
+              });
             }}
           >
             添加子部门
@@ -696,7 +768,7 @@ export default props => {
       </Modal>
       {/* 修改部门名称，新建子部门 */}
       <Modal
-        key={newChildGropVisible + ''}
+        // key={!newChildGropVisible + ''}
         title={changeOrNewType}
         visible={newChildGropVisible}
         onCancel={() => {
@@ -772,13 +844,16 @@ export default props => {
         onCancel={() => {
           setSuperiorVisible(false);
         }}
-        onOk={() => {
-          //  changeForm.submit()
-        }}
+        onOk={setSuperior}
         okText="保存"
         cancelText="取消"
       >
-        <Organization renderUser={true} onlySelectUser={true} />
+        <Organization
+          renderUser={true}
+          onlySelect={true}
+          onlySelectUser={true}
+          ref={formRef}
+        />
       </Modal>
       {/* 删除分组 */}
       <Modal

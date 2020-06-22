@@ -164,34 +164,61 @@ export default (props: tsProps) => {
     });
     console.log(keyArr);
     setValues(keyArr);
-    props.onChange(keyArr);
+    let formArr: any = [];
+    keyTitleList.map(item => {
+      if (keyArr.indexOf(item.key)) {
+        formArr.push(`${item.key}-$-${item.title}`);
+      }
+    });
+
+    props.onChange(formArr);
   };
 
   const onChange = value => {
+    console.log(value);
+    console.log('value');
     if (onlySelect) {
       if (onlySelectUser) {
         if (userKeyList.indexOf(value) > -1) {
           setValues(value);
           keyTitleList.map(item => {
             if (item.key === value) {
-              props.onChange(`${value}-$-${item.title}`);
+              setValues(value);
+              props.onChange([`${value}-$-${item.title}`]);
             }
           });
-          return;
         } else {
           props.onChange([]);
           setValues([]);
-          return;
         }
+      } else {
+        setValues(value);
+        keyTitleList.map(item => {
+          if (item.key === value) {
+            setValues(value);
+            props.onChange([`${value}-$-${item.title}`]);
+          }
+        });
       }
-      keyTitleList.map(item => {
-        if (item.key === value) {
-          props.onChange(`${value}-$-${item.title}`);
-        }
-      });
-      setValues(value);
     } else {
-      handleCheckKey(value, value[value.length - 1]);
+      if (onlySelectUser) {
+        let arr: any = [];
+        let formArr: any = [];
+        value.map(item => {
+          if (userKeyList.indexOf(item) > -1) {
+            keyTitleList.map(u => {
+              if (u.key === item) {
+                formArr.push(`${item}-$-${u.title}`);
+              }
+            });
+            arr.push(item);
+            setValues(arr);
+            props.onChange(formArr);
+          }
+        });
+      } else {
+        handleCheckKey(value, value[value.length - 1]);
+      }
     }
   };
 

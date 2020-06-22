@@ -10,7 +10,16 @@ import {
   tsUser,
 } from './services/role';
 import { GlobalResParams } from '@/types/ITypes';
-import { Card, Input, Table, Popconfirm, Modal, Divider, Form } from 'antd';
+import {
+  Card,
+  Input,
+  Table,
+  Popconfirm,
+  Modal,
+  Divider,
+  Form,
+  notification,
+} from 'antd';
 import { ColumnProps } from 'antd/es/table';
 import Organization from './components/Organization';
 import './style/role.less';
@@ -102,16 +111,24 @@ export default () => {
       submitData = arr;
     }
 
-    let res: GlobalResParams<string> = await deleteApi(submitData);
-    if (res.status === 200) {
+    let json: GlobalResParams<string> = await deleteApi(submitData);
+    if (json.status === 200) {
+      notification['success']({
+        message: json.msg,
+        description: '',
+      });
       if (removeType === 'lable') {
         getApilableList();
         setSelectItem(undefined);
       } else {
         handleSelectRole(selectItem?.id);
       }
-
       setRemoveLableVisible(false);
+    } else {
+      notification['error']({
+        message: json.msg,
+        description: '',
+      });
     }
   };
 
@@ -126,10 +143,19 @@ export default () => {
       if (changeOrAdd === 'change') {
         values.id = selectItem?.id;
       }
-      let res: GlobalResParams<string> = await submit(values);
-      if (res.status === 200) {
+      let json: GlobalResParams<string> = await submit(values);
+      if (json.status === 200) {
+        notification['success']({
+          message: json.msg,
+          description: '',
+        });
         getApilableList();
         setChangeLableVisible(false);
+      } else {
+        notification['error']({
+          message: json.msg,
+          description: '',
+        });
       }
     });
   };
@@ -277,14 +303,9 @@ export default () => {
   const moveIn = async () => {
     let values: any = [];
 
-    // labelId: number,
-    // memberType: number,
-    // userCode?: string,
-    // departmentCode?: string,
-
     let list: any = formRef?.current?.getvalue();
     list.map(item => {
-      // type: list[i].memberList?'user':'department',
+      console.log(item);
       values.id = selectItem?.id;
       if (item.type === 'user') {
         values.push({
@@ -303,9 +324,18 @@ export default () => {
 
     let json: GlobalResParams<string> = await newBatchLabelmember(values);
     if (json.status === 200) {
+      notification['success']({
+        message: json.msg,
+        description: '',
+      });
       getApilableList();
       handleSelectRole(selectItem?.id);
       setMoveInVisible(false);
+    } else {
+      notification['error']({
+        message: json.msg,
+        description: '',
+      });
     }
   };
   return (

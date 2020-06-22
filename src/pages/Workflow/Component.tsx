@@ -28,25 +28,27 @@ export default props => {
   switch (s_type) {
     //单行文本
     case 'text':
-      return <Input {...props} />;
+      return <Input {...props} placeholder="请输入" />;
     //多行文本
     case 'areatext':
-      return <TextArea {...props} style={{ width: '100%' }} />;
+      return (
+        <TextArea {...props} placeholder="请输入" style={{ width: '100%' }} />
+      );
     //数字
     case 'number':
-      return <InputNumber {...props} />;
+      return <InputNumber {...props} placeholder="请输入" />;
     //金额
     case 'money':
-      return <InputNumber {...props} />;
+      return <InputNumber {...props} placeholder="请输入" />;
     //日期
     case 'date':
-      return <DatePicker {...props} />;
+      return <DatePicker {...props} placeholder="请输入" />;
     //日期+时间
     case 'datetime':
-      return <DatePicker {...props} showTime />;
+      return <DatePicker {...props} showTime placeholder="请选择" />;
     //单选框
     case 'select':
-      return <SelectTemplate {...props} />;
+      return <SelectTemplate {...props} placeholder="请选择" />;
     //多选框
     case 'multiple':
       return <MultipleTemplate {...props} />;
@@ -62,19 +64,19 @@ export default props => {
         <OzTreeSlect
           renderUser={true}
           onlySelectUser={true}
-          onlySelect={true}
+          // onlySelect={true}
           {...props}
         />
       );
     //department 部门 走组织架构
     case 'department':
-      return <OzTreeSlect singleChoice={true} onlySelect={true} {...props} />;
+      return <OzTreeSlect onlySelect={true} {...props} />;
     //业务线 business
     case 'business':
-      return <BusinessTemplate {...props} />;
+      return <BusinessTemplate {...props} placeholder="请选择" />;
     //company 公司
     case 'company':
-      return <CompanyTemplate {...props} />;
+      return <CompanyTemplate {...props} placeholder="请选择" />;
     //currUser 当前成员
     case 'currUser':
       return <Input {...props} placeholder="当前成员" />;
@@ -95,10 +97,10 @@ export default props => {
       return <Input {...props} placeholder="当前日期+时间" />;
     //position 职位
     case 'position':
-      return <PositionTemplate {...props} />;
+      return <PositionTemplate {...props} placeholder="请选择" />;
     //job 岗位
     case 'job':
-      return <JobTemplate {...props} />;
+      return <JobTemplate {...props} placeholder="请选择" />;
     //title 标题
     case 'title':
       return <Input {...props} placeholder="标题" />;
@@ -107,10 +109,10 @@ export default props => {
       return <Input {...props} placeholder="申请单号" />;
     //positionLevel 职级
     case 'positionLevel':
-      return <LevelTemplate {...props} />;
+      return <LevelTemplate {...props} placeholder="请选择" />;
     //wkTask 关联流程
     case 'wkTask':
-      return <Input {...props} placeholder="关联流程" />;
+      return <Input placeholder="关联流程" {...props} />;
 
     default:
       return <></>;
@@ -126,7 +128,7 @@ const SelectTemplate = props => {
   }
   console.log(props.disabled);
   return (
-    <Select placeholder="请选择" style={{ width: '100%' }} {...props}>
+    <Select {...props} placeholder="请选择" style={{ width: '100%' }}>
       {data.map((item, index) => {
         return (
           <Option key={index} value={item + '-$-' + item}>
@@ -143,13 +145,13 @@ const BusinessTemplate = props => {
   const { departmentList } = useDepartment(2);
   return (
     <Select
+      {...props}
       showSearch
       style={{ width: '100%' }}
       filterOption={(input, option) =>
         option?.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
       }
-      defaultValue="请选择业务线"
-      {...props}
+      placeholder="请选择业务线"
     >
       {departmentList?.map(item => {
         return (
@@ -170,13 +172,13 @@ const CompanyTemplate = props => {
   const { companyList } = useCompany();
   return (
     <Select
+      {...props}
       showSearch
       style={{ width: '100%' }}
       filterOption={(input, option) =>
         option?.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
       }
-      defaultValue="请选择公司"
-      {...props}
+      placeholder="请选择公司"
     >
       {companyList?.map(item => {
         return (
@@ -197,13 +199,13 @@ const PositionTemplate = props => {
   const { titleList } = useTitle();
   return (
     <Select
+      {...props}
       showSearch
       style={{ width: '100%' }}
       filterOption={(input, option) =>
         option?.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
       }
-      defaultValue="请选择公司职位"
-      {...props}
+      placeholder="请选择公司职位"
     >
       {titleList?.map(item => {
         return (
@@ -224,13 +226,13 @@ const JobTemplate = props => {
   const { jobList } = useJob();
   return (
     <Select
+      {...props}
       showSearch
       style={{ width: '100%' }}
       filterOption={(input, option) =>
         option?.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
       }
-      defaultValue="请选择岗位"
-      {...props}
+      placeholder="请选择岗位"
     >
       {jobList?.map(item => {
         return (
@@ -251,13 +253,13 @@ const LevelTemplate = props => {
   const { rankList } = useRank();
   return (
     <Select
+      {...props}
       showSearch
       style={{ width: '100%' }}
       filterOption={(input, option) =>
         option?.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
       }
-      defaultValue="请选择职级"
-      {...props}
+      placeholder="请选择职级"
     >
       {rankList?.map(item => {
         return (

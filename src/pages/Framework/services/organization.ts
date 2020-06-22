@@ -45,6 +45,7 @@ export interface tsNewParam {
   businessCode?: string;
   status: number;
   parentCode?: string;
+  leaderCode?: string;
 }
 
 // 获取组织架构主体
