@@ -30,11 +30,12 @@ export default () => {
       dataIndex: 'status',
       key: 'status',
       align: 'center',
+      render: (_, record: tsList) => <span>{status[record.status]}</span>,
     },
     {
       title: '当前节点',
-      dataIndex: 'currStepName',
-      key: 'currStepName',
+      dataIndex: 'currStepStr',
+      key: 'currStepStr',
       align: 'center',
     },
     {

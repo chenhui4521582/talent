@@ -42,10 +42,17 @@ export default props => {
       return <InputNumber {...props} placeholder="请输入" />;
     //日期
     case 'date':
-      return <DatePicker {...props} placeholder="请输入" />;
+      return <DatePicker {...props} format="YYYY-MM-DD" placeholder="请输入" />;
     //日期+时间
     case 'datetime':
-      return <DatePicker {...props} showTime placeholder="请选择" />;
+      return (
+        <DatePicker
+          {...props}
+          format="YYYY-MM-DD HH:mm:ss"
+          showTime
+          placeholder="请选择"
+        />
+      );
     //单选框
     case 'select':
       return <SelectTemplate {...props} placeholder="请选择" />;
@@ -106,7 +113,7 @@ export default props => {
       return <Input {...props} placeholder="标题" />;
     //formNumber 申请单号
     case 'formNumber':
-      return <Input {...props} placeholder="申请单号" />;
+      return <Input {...props} />;
     //positionLevel 职级
     case 'positionLevel':
       return <LevelTemplate {...props} placeholder="请选择" />;

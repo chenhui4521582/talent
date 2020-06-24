@@ -280,11 +280,11 @@ export default () => {
             setRemoveLableVisible(true);
           }}
         >
-          移除
+          移出
         </span>
       </div>
     );
-    return selectItem.id ? (
+    return selectItem?.id ? (
       <div className="role-right">
         <h3>{`${selectItem?.labelName}(${userList?.length})`}</h3>
         <Table
@@ -368,7 +368,7 @@ export default () => {
       </div>
 
       <Modal
-        title="删除标签"
+        title={removeType === 'lable' ? '删除标签' : '成员移除'}
         visible={removeLableVisible}
         okText="确认"
         cancelText="取消"
@@ -377,8 +377,14 @@ export default () => {
         }}
         onOk={delectOk}
       >
-        <h3>确认删除？</h3>
-        <div>删除标签不会导致包含部门或成员从组织架构删除</div>
+        <h3>
+          {removeType === 'lable' ? '确认删除该标签？' : '确认移出所选成员？'}
+        </h3>
+        {removeType === 'lable' ? (
+          <div>删除标签不会导致包含部门或成员从组织架构删除</div>
+        ) : (
+          ''
+        )}
       </Modal>
       <Modal
         // key = {changeOrAdd}

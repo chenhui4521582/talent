@@ -8,6 +8,7 @@ import {
 } from './services/home';
 import { GlobalResParams } from '@/types/ITypes';
 import { Card, Descriptions, Button, Form, notification } from 'antd';
+import moment from 'moment';
 import Temp from './Component';
 import './style/home.less';
 
@@ -78,112 +79,116 @@ export default props => {
   };
 
   const fromContent = useMemo(() => {
-    return formList.map(fromItem => {
-      let list: any[] = fromItem.list;
-      return (
-        <Descriptions
-          title={<div style={{ textAlign: 'center' }}>{fromItem.name}</div>}
-          key={fromItem.id}
-          bordered
-          column={fromItem.columnNum}
-          style={{ marginBottom: 40, width: '80%', marginLeft: '10%' }}
-        >
-          {list.map(groupItem => {
-            if (groupItem.list && groupItem.list.length) {
-              return (
-                <Descriptions.Item
-                  key={groupItem.id}
-                  label={groupItem.name}
-                  span={groupItem.colspan}
-                >
-                  {groupItem.list.map(listItem => {
-                    return (
-                      <div
-                        key={listItem.id}
-                        style={{
-                          display: 'flex',
-                          flex: 1,
-                          flexDirection: 'row',
-                          margin: '10px',
-                        }}
-                      >
-                        <div
-                          className={
-                            listItem.isRequired ? 'label-required' : ''
-                          }
-                          style={{ display: 'flex', flex: 1 }}
-                        >
-                          {listItem.name}
-                        </div>
-                        <div style={{ display: 'flex', flex: 1 }}>
-                          <Form.Item
-                            style={{ width: '100%' }}
-                            rules={[
-                              {
-                                required: listItem.isRequired,
-                                message: `${listItem.name}'必填!`,
-                              },
-                            ]}
-                            name={listItem.id}
-                            initialValue={
-                              listItem.defaultShowValue
-                                ? listItem.defaultValue
-                                : listItem.defaultShowValue
-                            }
-                          >
-                            <Temp
-                              s_type={listItem.baseControlType}
-                              disabled={listItem.isLocked}
-                              list={listItem.itemList || []}
-                            />
-                          </Form.Item>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </Descriptions.Item>
-              );
-            } else {
-              return (
-                <Descriptions.Item
-                  key={groupItem.id}
-                  label={
-                    <span
-                      className={groupItem.isRequired ? 'label-required' : ''}
-                    >
-                      {groupItem.name}
-                    </span>
-                  }
-                  span={groupItem.colspan}
-                >
-                  <Form.Item
-                    style={{ width: '100%' }}
-                    name={groupItem.id}
-                    initialValue={
-                      groupItem.defaultShowValue
-                        ? groupItem.defaultShowValue
-                        : groupItem.defaultValue
-                    }
-                    rules={[
-                      {
-                        required: groupItem.isRequired,
-                        message: `${groupItem.name}'必填!`,
-                      },
-                    ]}
+    if (formList.length) {
+      return formList.map(fromItem => {
+        let list: any[] = fromItem.list;
+        return (
+          <Descriptions
+            title={<div style={{ textAlign: 'center' }}>{fromItem.name}</div>}
+            key={fromItem.id}
+            bordered
+            column={fromItem.columnNum}
+            style={{ marginBottom: 40, width: '80%', marginLeft: '10%' }}
+          >
+            {list.map(groupItem => {
+              if (groupItem.list && groupItem.list.length) {
+                return (
+                  <Descriptions.Item
+                    key={groupItem.id}
+                    label={groupItem.name}
+                    span={groupItem.colspan}
                   >
-                    <Temp
-                      s_type={groupItem.baseControlType}
-                      disabled={groupItem.isLocked}
-                      list={groupItem.itemList || []}
-                    />
-                  </Form.Item>
-                </Descriptions.Item>
-              );
-            }
-          })}
-        </Descriptions>
-      );
-    });
+                    {groupItem.list.map(listItem => {
+                      return (
+                        <div
+                          key={listItem.id}
+                          style={{
+                            display: 'flex',
+                            flex: 1,
+                            flexDirection: 'row',
+                            margin: '10px',
+                          }}
+                        >
+                          <div
+                            className={
+                              listItem.isRequired ? 'label-required' : ''
+                            }
+                            style={{ display: 'flex', flex: 1 }}
+                          >
+                            {listItem.name}
+                          </div>
+                          <div style={{ display: 'flex', flex: 1 }}>
+                            <Form.Item
+                              style={{ width: '100%' }}
+                              rules={[
+                                {
+                                  required: listItem.isRequired,
+                                  message: `${listItem.name}'必填!`,
+                                },
+                              ]}
+                              name={listItem.id}
+                              initialValue={
+                                listItem.defaultShowValue
+                                  ? listItem.defaultValue
+                                  : listItem.defaultShowValue
+                              }
+                            >
+                              <Temp
+                                s_type={listItem.baseControlType}
+                                disabled={listItem.isLocked}
+                                list={listItem.itemList || []}
+                              />
+                            </Form.Item>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </Descriptions.Item>
+                );
+              } else {
+                return (
+                  <Descriptions.Item
+                    key={groupItem.id}
+                    label={
+                      <span
+                        className={groupItem.isRequired ? 'label-required' : ''}
+                      >
+                        {groupItem.name}
+                      </span>
+                    }
+                    span={groupItem.colspan}
+                  >
+                    <Form.Item
+                      style={{ width: '100%' }}
+                      name={groupItem.id}
+                      initialValue={
+                        groupItem.defaultShowValue
+                          ? groupItem.defaultShowValue
+                          : groupItem.defaultValue
+                      }
+                      rules={[
+                        {
+                          required: groupItem.isRequired,
+                          message: `${groupItem.name}'必填!`,
+                        },
+                      ]}
+                    >
+                      <Temp
+                        s_type={groupItem.baseControlType}
+                        disabled={groupItem.isLocked}
+                        list={groupItem.itemList || []}
+                      />
+                    </Form.Item>
+                  </Descriptions.Item>
+                );
+              }
+            })}
+          </Descriptions>
+        );
+      });
+    } else {
+      return null;
+    }
   }, [formList]);
 
   const submit = (): void => {
@@ -206,12 +211,52 @@ export default props => {
             ? valueArr.push(fromSubData[item.id].split('-$-')[0])
             : valueArr.push(fromSubData[item.id]);
         }
-        subList.push({
-          id: item.id,
-          multipleNumber: 1,
-          showValue: showArr.join(','),
-          value: valueArr.join(','),
-        });
+        if (item.isLocked) {
+          subList.push({
+            id: item.id,
+            multipleNumber: 1,
+            showValue: item.defaultShowValue,
+            value: item.defaultValue,
+          });
+        } else {
+          if (item.baseControlType === 'datetime') {
+            subList.push({
+              id: item.id,
+              multipleNumber: 1,
+              showValue: moment(valueArr.join(','))?.format(
+                'YYYY-MM-DD HH:mm:ss',
+              ),
+              value: moment(valueArr.join(','))?.format('YYYY-MM-DD HH:mm:ss'),
+            });
+          } else if (item.baseControlType === 'date') {
+            subList.push({
+              id: item.id,
+              multipleNumber: 1,
+              showValue: moment(valueArr.join(','))?.format('YYYY-MM-DD'),
+              value: moment(valueArr.join(','))?.format('YYYY-MM-DD'),
+            });
+          } else if (
+            item.baseControlType === 'text' ||
+            item.baseControlType === 'areatext' ||
+            item.baseControlType === 'number' ||
+            item.baseControlType === 'money' ||
+            item.baseControlType === 'remark'
+          ) {
+            subList.push({
+              id: item.id,
+              multipleNumber: 1,
+              showValue: valueArr.join(','),
+              value: valueArr.join(','),
+            });
+          } else {
+            subList.push({
+              id: item.id,
+              multipleNumber: 1,
+              showValue: showArr.join(','),
+              value: valueArr.join(','),
+            });
+          }
+        }
       });
       let json: GlobalResParams<string> = await saveTaskForm({
         resFormId: formId,
@@ -223,7 +268,8 @@ export default props => {
           message: json.msg,
           description: '',
         });
-        getFrom();
+        window.location.href = '/talent/workflow/mylist';
+        // getFrom();
       } else {
         notification['error']({
           message: json.msg,

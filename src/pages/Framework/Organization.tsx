@@ -31,7 +31,6 @@ import Organization from './components/Organization';
 import OzTreeSlect from './components/OzTreeSlect';
 import { GlobalResParams } from '@/types/ITypes';
 import './style/organization.less';
-import { submit } from '../Workflow/services/detail';
 const { Search } = Input;
 
 const columns: any = [
@@ -39,11 +38,26 @@ const columns: any = [
     title: '姓名',
     dataIndex: 'name',
     key: 'name',
+    align: 'center',
   },
   {
     title: 'code',
+    dataIndex: 'code',
+    key: 'code',
+    align: 'center',
+  },
+  {
+    title: '上级',
+    dataIndex: 'parentName',
+    key: 'parentName',
+    align: 'center',
+  },
+  {
+    title: '是否部门负责人',
     dataIndex: 'groupCode',
     key: 'groupCode',
+    align: 'center',
+    render: (_, record) => <span>{record.userType === 1 ? '否' : '是'}</span>,
   },
 ];
 
@@ -53,7 +67,7 @@ export default props => {
   const [changeForm] = Form.useForm();
   const [dataList, setDataList] = useState<any>([]);
   const [searchValue, setSearchValue] = useState<string>('');
-  const [expandedKeys, setExpandedKeys] = useState<any[]>([]);
+  const [expandedKeys, setExpandedKeys] = useState<string[]>(['奖多多集团']);
   const [autoExpandParent, setAutoExpandParent] = useState<boolean>(true);
   const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
   const [selectUserkeys, setSelectUserkeys] = useState<string[]>([]);
@@ -87,10 +101,12 @@ export default props => {
   const [moveInVisible, setMoveInVisible] = useState<boolean>(false);
   // 设置所在部门 modal
   const [departmentVisible, setDepartmentVisible] = useState<boolean>(false);
-  // 设置上级 modal
+  // 设置部门负责人 modal
   const [superiorVisible, setSuperiorVisible] = useState<boolean>(false);
   // 删除分组
   const [removeGroupVisible, setRemoveGroupVisible] = useState<boolean>(false);
+  // 设置直属上级
+  const [reportToVisible, setReportToVisible] = useState<boolean>(false);
 
   useEffect(() => {
     getJson();
@@ -177,6 +193,7 @@ export default props => {
           memberList: list[i].memberList,
           children: list[i].children,
         });
+
         if (list[i].memberList && list[i].memberList.length) {
           for (let k = 0; k < list[i].memberList.length; k++) {
             list[i].memberList[k].key = list[i].memberList[k].code;
@@ -188,7 +205,6 @@ export default props => {
         }
       }
     };
-
     handleItem(data);
     setDataList(data);
     setKeyTitleList(keyTitle);
@@ -272,7 +288,6 @@ export default props => {
           e.stopPropagation();
         }}
       >
-        {/* {!flag? */}
         <Popconfirm
           key={flag + ''}
           title={
@@ -307,7 +322,7 @@ export default props => {
                   setSuperiorVisible(true);
                 }}
               >
-                设置上级
+                设置部门负责人
               </p>
               <p
                 onClick={e => {
@@ -379,7 +394,9 @@ export default props => {
                     <span style={{ color: 'red' }}>{searchValue}</span>{' '}
                     {afterStr}{' '}
                   </span>
-                  {more}
+                  {list[i].title === '已删除组' || list[i].title === '默认分组'
+                    ? null
+                    : more}
                 </div>
               );
             } else {
@@ -427,7 +444,9 @@ export default props => {
                   <span style={{ display: 'flex', flex: '1' }}>
                     {list[i].name}
                   </span>
-                  {more}
+                  {list[i].title === '已删除组' || list[i].title === '默认分组'
+                    ? null
+                    : more}
                 </div>
               );
             } else {
@@ -555,7 +574,7 @@ export default props => {
       });
     }
   };
-
+  // 从本部门移出
   const moveOther = async () => {
     let arr: any = [];
     formRef.current?.getvalue().map(item => {
@@ -579,8 +598,8 @@ export default props => {
       });
     }
   };
-
-  const setSuperior = async () => {
+  // 设置部门负责人
+  const superior = async () => {
     let arr: any = [];
     formRef.current?.getvalue().map(item => {
       arr.push(item.key);
@@ -607,78 +626,116 @@ export default props => {
       });
     }
   };
+  // 设置直属上级
+  const reportTo = async () => {
+    setReportToVisible(false);
+    // selectUserkeys
+  };
+
+  const newAdd = () => {
+    console.log(newGropForm.getFieldsValue());
+    newGropForm.validateFields().then(async values => {
+      let data = {
+        name: values.name,
+        parentCode: values.parentCode[0].split('-$-')[0],
+        status: 1,
+      };
+
+      let res: GlobalResParams<string> = await newGroup(data);
+      if (res.status === 200) {
+        getJson();
+        setNewVisible(false);
+      }
+    });
+  };
 
   const renderRight = useMemo(() => {
-    const tableTitle = (
-      <div className="table-title">
-        <span
-          onClick={() => {
-            setMoveInVisible(true);
-          }}
-        >
-          从其他部门移入
-        </span>
-        <Divider type="vertical" />
-        <span
-          onClick={() => {
-            setDepartmentVisible(true);
-          }}
-        >
-          设置所在部门
-        </span>
-        {currentUserList.length ? (
-          <>
+    const tableTitle =
+      selectGroup.title === '已删除组' ||
+      selectGroup.title === '默认分组' ? null : (
+        <div className="table-title">
+          <span
+            onClick={() => {
+              setMoveInVisible(true);
+            }}
+          >
+            从其他部门移入
+          </span>
+          <Divider type="vertical" />
+          <span
+            onClick={() => {
+              setDepartmentVisible(true);
+            }}
+          >
+            设置所在部门
+          </span>
+          <Divider type="vertical" />
+          {selectGroup.memberList ? (
+            <span
+              onClick={() => {
+                setReportToVisible(true);
+              }}
+            >
+              设置直属上级
+            </span>
+          ) : null}
+          {currentUserList.length ? (
+            <>
+              <Divider type="vertical" />
+              <span
+                onClick={() => {
+                  setRemoveUserVisible(true);
+                }}
+              >
+                删除
+              </span>
+            </>
+          ) : null}
+        </div>
+      );
+    const groupTitle =
+      selectGroup.title === '已删除组' ||
+      selectGroup.title === '默认分组' ? null : (
+        <div className="group-title">
+          <h1>{selectGroup.title}</h1>
+          <div>
+            <span
+              onClick={() => {
+                setChangeOrNewType('修改名称');
+                changeForm.setFieldsValue({
+                  name: selectGroup.title,
+                });
+                setNewChildGropVisible(true);
+              }}
+            >
+              修改名称
+            </span>
             <Divider type="vertical" />
             <span
               onClick={() => {
-                setRemoveUserVisible(true);
+                setChangeOrNewType('添加子部门');
+                setNewChildGropVisible(true);
+                changeForm.setFieldsValue({
+                  name: '',
+                });
               }}
             >
-              删除
+              添加子部门
             </span>
-          </>
-        ) : null}
-      </div>
-    );
-    const groupTitle = (
-      <div className="group-title">
-        <h1>{selectGroup.title}</h1>
-        <div>
-          <span
-            onClick={() => {
-              setChangeOrNewType('修改名称');
-              changeForm.setFieldsValue({
-                name: selectGroup.title,
-              });
-              setNewChildGropVisible(true);
-            }}
-          >
-            修改名称
-          </span>
-          <Divider type="vertical" />
-          <span
-            onClick={() => {
-              setChangeOrNewType('添加子部门');
-              setNewChildGropVisible(true);
-              changeForm.setFieldsValue({
-                name: '',
-              });
-            }}
-          >
-            添加子部门
-          </span>
-          <Divider type="vertical" />
-          <span
-            onClick={() => {
-              setSuperiorVisible(true);
-            }}
-          >
-            设置上级
-          </span>
+            <Divider type="vertical" />
+            {selectGroup.memberList ? (
+              <span
+                onClick={() => {
+                  setSuperiorVisible(true);
+                }}
+              >
+                设置部门负责人
+              </span>
+            ) : null}
+          </div>
         </div>
-      </div>
-    );
-    if (selectGroup.memberList) {
+      );
+    if (selectGroup.key !== '奖多多集团' && selectGroup.title) {
       return (
         <div className="right-box">
           {selectGroup.title ? groupTitle : null}
@@ -699,25 +756,7 @@ export default props => {
       );
     }
   }, [currentUserList, dataList, selectGroup.memberList]);
-
-  const newAdd = () => {
-    console.log(newGropForm.getFieldsValue());
-    newGropForm.validateFields().then(async values => {
-      let data = {
-        name: values.name,
-        parentCode: values.parentCode.split('-$-')[0],
-        status: 1,
-      };
-
-      let res: GlobalResParams<string> = await newGroup(data);
-      if (res.status === 200) {
-        getJson();
-        setNewVisible(false);
-      }
-    });
-  };
-
-  return (
+  return dataList.length ? (
     <Card title="组织架构">
       <div style={{ width: '20%', float: 'left' }}>
         <Search
@@ -727,7 +766,6 @@ export default props => {
           style={{ marginBottom: 30 }}
         />
         <Tree
-          key={searchValue}
           onExpand={onExpand}
           showLine={true}
           treeData={Loop(dataList)}
@@ -735,11 +773,13 @@ export default props => {
           autoExpandParent={autoExpandParent}
           onSelect={onTreeSelect}
           selectedKeys={selectedKeys}
+          defaultExpandedKeys={expandedKeys}
         />
       </div>
       {renderRight}
       {/* 根目录下新建（+） */}
       <Modal
+        key={'' + newVisible}
         title="新建部门"
         visible={newVisible}
         onCancel={() => {
@@ -768,7 +808,7 @@ export default props => {
       </Modal>
       {/* 修改部门名称，新建子部门 */}
       <Modal
-        // key={!newChildGropVisible + ''}
+        key={'' + newChildGropVisible}
         title={changeOrNewType}
         visible={newChildGropVisible}
         onCancel={() => {
@@ -792,6 +832,7 @@ export default props => {
       </Modal>
       {/* 删除成员 */}
       <Modal
+        key={'' + removeUserVisible}
         title="删除成员"
         visible={removeUserVisible}
         onCancel={() => {
@@ -805,6 +846,7 @@ export default props => {
       </Modal>
       {/* 从其他部门移入 */}
       <Modal
+        key={'' + moveInVisible}
         width="50vw"
         title="从其他部门移入"
         visible={moveInVisible}
@@ -824,6 +866,7 @@ export default props => {
       </Modal>
       {/* 设置所在部门 */}
       <Modal
+        key={'' + departmentVisible}
         width="50vw"
         title="移入其他部门"
         visible={departmentVisible}
@@ -836,15 +879,16 @@ export default props => {
       >
         <Organization onlyDepart={true} ref={formRef} />
       </Modal>
-      {/* 设置上级 */}
+      {/* 设置部门负责人 */}
       <Modal
+        key={'' + superiorVisible}
         width="40vw"
-        title="设置上级"
+        title="设置部门负责人"
         visible={superiorVisible}
         onCancel={() => {
           setSuperiorVisible(false);
         }}
-        onOk={setSuperior}
+        onOk={superior}
         okText="保存"
         cancelText="取消"
       >
@@ -853,12 +897,13 @@ export default props => {
           onlySelect={true}
           onlySelectUser={true}
           ref={formRef}
+          propsData={selectGroup.memberList}
         />
       </Modal>
       {/* 删除分组 */}
       <Modal
-        width="50vw"
-        title="删除分组"
+        key={'' + removeGroupVisible}
+        title="删除部门"
         visible={removeGroupVisible}
         onCancel={() => {
           setRemoveGroupVisible(false);
@@ -893,9 +938,30 @@ export default props => {
             请删除此部门下的成员或子部门后，再删除此部门
           </div>
         ) : (
-          <div key={selectGroup?.key}>是否删除${selectGroup?.title}部门？</div>
+          <div key={selectGroup?.key}>确认删除{selectGroup?.title}？</div>
         )}
       </Modal>
+      <Modal
+        key={reportToVisible + ''}
+        width="50vw"
+        title="设置直属上级"
+        visible={reportToVisible}
+        onCancel={() => {
+          setReportToVisible(false);
+        }}
+        onOk={reportTo}
+        okText="保存"
+        cancelText="取消"
+      >
+        <Organization
+          renderUser={true}
+          onlySelectUser={true}
+          ref={formRef}
+          onlySelect={true}
+        />
+      </Modal>
     </Card>
+  ) : (
+    <Card title="组织架构"></Card>
   );
 };

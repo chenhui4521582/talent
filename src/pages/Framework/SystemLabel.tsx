@@ -283,6 +283,9 @@ export default () => {
             <span
               onClick={() => {
                 setType('add');
+                newForm.setFieldsValue({
+                  labelName: '',
+                });
                 setChangeOrAddVisible(true);
               }}
             >

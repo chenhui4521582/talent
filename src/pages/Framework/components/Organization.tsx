@@ -15,10 +15,17 @@ interface tsProps {
   ref: any;
   onlyDepart?: boolean;
   onlySelect?: boolean;
+  propsData?: any[];
 }
 
 function Organization(props: tsProps, formRef) {
-  const { renderUser, onlySelectUser, onlyDepart, onlySelect } = props;
+  const {
+    renderUser,
+    onlySelectUser,
+    onlyDepart,
+    onlySelect,
+    propsData,
+  } = props;
   const [dataList, setDataList] = useState<any>([]);
   const [searchValue, setSearchValue] = useState<string>('');
   const [expandedKeys, setExpandedKeys] = useState<any[]>([]);
@@ -34,6 +41,10 @@ function Organization(props: tsProps, formRef) {
 
   async function getJson() {
     let organizationJson: GlobalResParams<tsListItem[]> = await getOrganization();
+    if (propsData) {
+      handleList(propsData);
+      return;
+    }
     if (organizationJson.status === 200) {
       let list = organizationJson.obj;
       handleList(list);
@@ -82,6 +93,10 @@ function Organization(props: tsProps, formRef) {
         });
         if (list[i].memberList) {
           departListkey.push(list[i].code);
+        }
+
+        if (propsData) {
+          userKeyArr.push(list[i].key);
         }
 
         if (list[i].memberList && list[i].memberList.length) {
@@ -211,15 +226,10 @@ function Organization(props: tsProps, formRef) {
       node: { key },
     } = e;
 
-    // keys =  [keys.checked[keys.checked.length-1]]
-
-    // if(onlySelect){
-    //   keys = [[keys.checked[keys.checked.length - 1]]]
-    // }
-
     if (onlyDepart) {
       if (departList.indexOf(key) > -1) {
-        setCheckedKeys([keys.checked[keys.checked.length - 1]]);
+        // setCheckedKeys([keys.checked[keys.checked.length - 1]]);
+        handleCheckKey(keys.checked, key);
         return;
       } else {
         setCheckedKeys(checkedKeys);
@@ -342,7 +352,7 @@ function Organization(props: tsProps, formRef) {
         }}
       >
         <p style={{ height: 40, lineHeight: '40px', marginBottom: 30 }}>
-          成员将属于一下部门
+          选中列表
         </p>
         <div
           style={{ height: '60vh', overflowY: 'auto', flexDirection: 'column' }}

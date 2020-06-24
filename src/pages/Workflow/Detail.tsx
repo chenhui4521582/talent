@@ -22,6 +22,7 @@ import {
 import { tsFormChildlist } from './services/home';
 import { GlobalResParams } from '@/types/ITypes';
 import { ColumnProps } from 'antd/es/table';
+import moment from 'moment';
 
 const { TextArea } = Input;
 
@@ -159,112 +160,132 @@ export default props => {
     console.log(LogJson);
   };
   const fromContent = useMemo(() => {
-    return formList.map(fromItem => {
-      let list: any[] = fromItem.list;
-      return (
-        <Descriptions
-          title={<div style={{ textAlign: 'center' }}>{fromItem.name}</div>}
-          key={fromItem.id}
-          bordered
-          column={fromItem.columnNum}
-          style={{ marginBottom: 40, width: '80%', marginLeft: '10%' }}
-        >
-          {list.map(groupItem => {
-            if (groupItem.list && groupItem.list.length) {
-              return (
-                <Descriptions.Item
-                  key={groupItem.id}
-                  label={groupItem.name}
-                  span={1}
-                >
-                  {groupItem.list.map(listItem => {
-                    return (
-                      <div
-                        key={listItem.id}
-                        style={{
-                          display: 'flex',
-                          flex: 1,
-                          flexDirection: 'row',
-                          margin: '10px',
-                        }}
-                      >
-                        <div
-                          className={
-                            listItem.isRequired ? 'label-required' : ''
-                          }
-                          style={{ display: 'flex', flex: 1 }}
-                        >
-                          {listItem.name}
-                        </div>
-                        <div style={{ display: 'flex', flex: 1 }}>
-                          <Form.Item
-                            style={{ width: '100%' }}
-                            rules={[
-                              {
-                                required: listItem.isRequired,
-                                message: `${listItem.name}'必填!`,
-                              },
-                            ]}
-                            name={listItem.id}
-                            initialValue={
-                              listItem.defaultShowValue
-                                ? listItem.defaultValue
-                                : listItem.defaultShowValue
-                            }
-                          >
-                            <Temp
-                              s_type={listItem.baseControlType}
-                              disabled={listItem.isLocked}
-                              list={listItem.itemList || []}
-                            />
-                          </Form.Item>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </Descriptions.Item>
-              );
-            } else {
-              return (
-                <Descriptions.Item
-                  key={groupItem.id}
-                  label={
-                    <span
-                      className={groupItem.isRequired ? 'label-required' : ''}
-                    >
-                      {groupItem.name}
-                    </span>
-                  }
-                  span={groupItem.colspan}
-                >
-                  <Form.Item
-                    style={{ width: '100%' }}
-                    name={groupItem.id}
-                    initialValue={
-                      groupItem.defaultShowValue
-                        ? groupItem.defaultShowValue
-                        : groupItem.defaultValue
-                    }
-                    rules={[
-                      {
-                        required: groupItem.isRequired,
-                        message: `${groupItem.name}'必填!`,
-                      },
-                    ]}
+    if (formList.length) {
+      return formList.map(fromItem => {
+        let list: any[] = fromItem.list;
+        return (
+          <Descriptions
+            title={<div style={{ textAlign: 'center' }}>{fromItem.name}</div>}
+            key={fromItem.id}
+            bordered
+            column={fromItem.columnNum}
+            style={{ marginBottom: 40, width: '80%', marginLeft: '10%' }}
+          >
+            {list.map(groupItem => {
+              if (groupItem.list && groupItem.list.length) {
+                return (
+                  <Descriptions.Item
+                    key={groupItem.id}
+                    label={groupItem.name}
+                    span={1}
                   >
-                    <Temp
-                      s_type={groupItem.baseControlType}
-                      disabled={groupItem.isLocked}
-                      list={groupItem.itemList || []}
-                    />
-                  </Form.Item>
-                </Descriptions.Item>
-              );
-            }
-          })}
-        </Descriptions>
-      );
-    });
+                    {groupItem.list.map(listItem => {
+                      return (
+                        <div
+                          key={listItem.id}
+                          style={{
+                            display: 'flex',
+                            flex: 1,
+                            flexDirection: 'row',
+                            margin: '10px',
+                          }}
+                        >
+                          <div
+                            className={
+                              listItem.isRequired ? 'label-required' : ''
+                            }
+                            style={{ display: 'flex', flex: 1 }}
+                          >
+                            {listItem.name}
+                          </div>
+                          <div style={{ display: 'flex', flex: 1 }}>
+                            <Form.Item
+                              style={{ width: '100%' }}
+                              rules={[
+                                {
+                                  required: listItem.isRequired,
+                                  message: `${listItem.name}'必填!`,
+                                },
+                              ]}
+                              name={listItem.id}
+                              initialValue={
+                                listItem.baseControlType === 'datetime' ||
+                                listItem.baseControlType === 'date'
+                                  ? listItem.showValue
+                                    ? moment(
+                                        listItem.value,
+                                        'YYYY-MM-DD HH:mm:ss',
+                                      )
+                                    : moment(
+                                        listItem.showValue,
+                                        'YYYY-MM-DD HH:mm:ss',
+                                      )
+                                  : listItem.showValue
+                                  ? listItem.showValue
+                                  : listItem.value
+                              }
+                            >
+                              <Temp
+                                s_type={listItem.baseControlType}
+                                disabled={listItem.isLocked}
+                                list={listItem.itemList || []}
+                              />
+                            </Form.Item>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </Descriptions.Item>
+                );
+              } else {
+                return (
+                  <Descriptions.Item
+                    key={groupItem.id}
+                    label={
+                      <span
+                        className={groupItem.isRequired ? 'label-required' : ''}
+                      >
+                        {groupItem.name}
+                      </span>
+                    }
+                    span={groupItem.colspan}
+                  >
+                    <Form.Item
+                      style={{ width: '100%' }}
+                      name={groupItem.id}
+                      initialValue={
+                        groupItem.baseControlType === 'datetime' ||
+                        groupItem.baseControlType === 'date'
+                          ? groupItem.showValue
+                            ? moment(groupItem.value, 'YYYY-MM-DD HH:mm:ss')
+                            : moment(groupItem.showValue, 'YYYY-MM-DD HH:mm:ss')
+                          : groupItem.showValue
+                          ? groupItem.showValue
+                          : groupItem.value
+                      }
+                      rules={[
+                        {
+                          required: groupItem.isRequired,
+                          message: `${groupItem.name}'必填!`,
+                        },
+                      ]}
+                    >
+                      <Temp
+                        s_type={groupItem.baseControlType}
+                        disabled={groupItem.isLocked}
+                        list={groupItem.itemList || []}
+                      />
+                    </Form.Item>
+                  </Descriptions.Item>
+                );
+              }
+            })}
+          </Descriptions>
+        );
+      });
+    } else {
+      return null;
+    }
   }, [formList, mount]);
 
   const submitData = (type: number): void => {
@@ -281,18 +302,58 @@ export default props => {
         } else {
           fromSubData[item.id].toString().indexOf('-$-') > -1
             ? showArr.push(fromSubData[item.id].split('-$-')[1])
-            : showArr.push(item.defaultShowValue);
+            : showArr.push(item.showValue);
 
           fromSubData[item.id].toString().indexOf('-$-') > -1
             ? valueArr.push(fromSubData[item.id].split('-$-')[0])
             : valueArr.push(fromSubData[item.id]);
         }
-        subList.push({
-          id: item.id,
-          multipleNumber: 1,
-          showValue: showArr.join(','),
-          value: valueArr.join(','),
-        });
+        if (item.isLocked) {
+          subList.push({
+            id: item.id,
+            multipleNumber: 1,
+            showValue: item.showValue,
+            value: item.value,
+          });
+        } else {
+          if (item.baseControlType === 'datetime') {
+            subList.push({
+              id: item.id,
+              multipleNumber: 1,
+              showValue: moment(valueArr.join(','))?.format(
+                'YYYY-MM-DD HH:mm:ss',
+              ),
+              value: moment(valueArr.join(','))?.format('YYYY-MM-DD HH:mm:ss'),
+            });
+          } else if (item.baseControlType === 'date') {
+            subList.push({
+              id: item.id,
+              multipleNumber: 1,
+              showValue: moment(valueArr.join(','))?.format('YYYY-MM-DD'),
+              value: moment(valueArr.join(','))?.format('YYYY-MM-DD'),
+            });
+          } else if (
+            item.baseControlType === 'text' ||
+            item.baseControlType === 'areatext' ||
+            item.baseControlType === 'number' ||
+            item.baseControlType === 'money' ||
+            item.baseControlType === 'remark'
+          ) {
+            subList.push({
+              id: item.id,
+              multipleNumber: 1,
+              showValue: valueArr.join(','),
+              value: valueArr.join(','),
+            });
+          } else {
+            subList.push({
+              id: item.id,
+              multipleNumber: 1,
+              showValue: showArr.join(','),
+              value: valueArr.join(','),
+            });
+          }
+        }
       });
       let json: GlobalResParams<string> = await submit({
         remark: fromSubData.remark,
