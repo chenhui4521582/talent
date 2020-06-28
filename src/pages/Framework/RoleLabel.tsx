@@ -60,6 +60,7 @@ export default () => {
   const [changeLableVisible, setChangeLableVisible] = useState<boolean>(false);
   const [changeOrAdd, setChangeOrAdd] = useState<'add' | 'change'>();
   const [userList, setUserList] = useState<tsUser[]>([]);
+  const [userKeyList, setUserKeyList] = useState<string[]>([]);
   const [removeType, setRemoveType] = useState<'lable' | 'user'>();
   const [moveInVisible, setMoveInVisible] = useState<boolean>(false);
   const [searchValue, setSearchValue] = useState<string>();
@@ -86,11 +87,15 @@ export default () => {
 
   const handleSelectRole = async (id: number) => {
     setSelectUser([]);
+    let arr: any = [];
     let json: GlobalResParams<tsUser[]> = await getLableMemberList(id);
     if (json.status === 200) {
       json.obj.map(item => {
+        arr.push(item.departmentCode ? item.departmentCode : item.userCode);
         item.key = item.id;
       });
+      console.log(arr);
+      setUserKeyList(arr);
       setUserList(json.obj);
     }
   };
@@ -368,7 +373,7 @@ export default () => {
       </div>
 
       <Modal
-        title={removeType === 'lable' ? '删除标签' : '成员移除'}
+        title={removeType === 'lable' ? '删除标签' : '成员移出'}
         visible={removeLableVisible}
         okText="确认"
         cancelText="取消"
@@ -423,7 +428,11 @@ export default () => {
         }}
         onOk={moveIn}
       >
-        <Organization ref={formRef} renderUser={true} />
+        <Organization
+          ref={formRef}
+          renderUser={true}
+          selectKeys={userKeyList}
+        />
       </Modal>
     </Card>
   );

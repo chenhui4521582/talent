@@ -5,6 +5,14 @@ import { myToDoListPage, tsList } from './services/home';
 import { Link } from 'umi';
 import { ColumnProps } from 'antd/es/table';
 
+const status = {
+  '-1': '删除',
+  '0': '已撤销',
+  '1': '审批中',
+  '2': '已通过',
+  '3': '已驳回',
+};
+
 export default () => {
   const columns: ColumnProps<tsList>[] = [
     {
@@ -30,7 +38,7 @@ export default () => {
       dataIndex: 'status',
       key: 'status',
       align: 'center',
-      render: (_, record: tsList) => <span>{status[record.status]}</span>,
+      render: (_, record: tsList) => <span>待办</span>,
     },
     {
       title: '当前节点',

@@ -20,6 +20,8 @@ import {
   editGroup,
   deleteUserApi,
   moveInUser,
+  setDepartLeader,
+  setUserParent,
   tsListItem,
   tsDeleteItem,
   tsDefaultItem,
@@ -71,6 +73,7 @@ export default props => {
   const [autoExpandParent, setAutoExpandParent] = useState<boolean>(true);
   const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
   const [selectUserkeys, setSelectUserkeys] = useState<string[]>([]);
+  const [selectUserParent, setSelectUserParent] = useState<string[]>([]);
   //所有的列表item
   const [keyTitleList, setKeyTitleList] = useState<tsSlectGroup[]>([]);
   // 选择组下面人的对象
@@ -471,6 +474,12 @@ export default props => {
 
   const rowSelection = {
     onChange: (selectedRowKeys, selectedRows) => {
+      let arr: any = [];
+      console.log(selectedRows);
+      selectedRows.map(item => {
+        arr.push(item.parentCode);
+      });
+      setSelectUserParent(arr);
       setSelectUserkeys(selectedRowKeys);
     },
     onSelect: (record, selected, selectedRows) => {},
@@ -611,7 +620,10 @@ export default props => {
     values.parentCode = selectGroup.parentCode;
     values.leaderCode = arr.join(',');
     values.status = 1;
-    let json: GlobalResParams<string> = await editGroup(values);
+    let json: GlobalResParams<string> = await setDepartLeader(
+      arr[0],
+      selectGroup.key,
+    );
     if (json.status === 200) {
       notification['success']({
         message: json.msg,
@@ -628,12 +640,38 @@ export default props => {
   };
   // 设置直属上级
   const reportTo = async () => {
-    setReportToVisible(false);
-    // selectUserkeys
+    let arr: any = [];
+    formRef.current?.getvalue().map(item => {
+      arr.push(item.key);
+    });
+
+    let values: any = {};
+    values.id = selectGroup.id;
+    values.code = selectGroup.key;
+    values.parentCode = selectGroup.parentCode;
+    values.leaderCode = arr.join(',');
+    values.status = 1;
+    let json: GlobalResParams<string> = await setUserParent(
+      selectGroup.key,
+      selectUserkeys.join(','),
+      arr[0],
+    );
+    if (json.status === 200) {
+      notification['success']({
+        message: json.msg,
+        description: '',
+      });
+      getJson();
+      setReportToVisible(false);
+    } else {
+      notification['error']({
+        message: json.msg,
+        description: '',
+      });
+    }
   };
 
   const newAdd = () => {
-    console.log(newGropForm.getFieldsValue());
     newGropForm.validateFields().then(async values => {
       let data = {
         name: values.name,
@@ -862,6 +900,7 @@ export default props => {
           renderUser={true}
           onlySelectUser={true}
           ref={formRef}
+          renderDefault={true}
         />
       </Modal>
       {/* 设置所在部门 */}
@@ -897,7 +936,7 @@ export default props => {
           onlySelect={true}
           onlySelectUser={true}
           ref={formRef}
-          propsData={selectGroup.memberList}
+          // propsData={selectGroup.memberList}
         />
       </Modal>
       {/* 删除分组 */}
@@ -958,6 +997,7 @@ export default props => {
           onlySelectUser={true}
           ref={formRef}
           onlySelect={true}
+          selectKeys={selectUserParent.length ? [selectUserParent[0]] : []}
         />
       </Modal>
     </Card>

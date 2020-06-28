@@ -5,7 +5,13 @@ import React, {
   forwardRef,
 } from 'react';
 import { Tree, Input, Divider } from 'antd';
-import { getOrganization, tsListItem } from '../services/organization';
+import {
+  getOrganization,
+  tsListItem,
+  getDefaultGroup,
+  tsDefaultItem,
+  tsUserItem,
+} from '../services/organization';
 import { GlobalResParams } from '@/types/ITypes';
 
 const { Search } = Input;
@@ -16,6 +22,8 @@ interface tsProps {
   onlyDepart?: boolean;
   onlySelect?: boolean;
   propsData?: any[];
+  renderDefault?: boolean;
+  selectKeys?: string[];
 }
 
 function Organization(props: tsProps, formRef) {
@@ -25,10 +33,12 @@ function Organization(props: tsProps, formRef) {
     onlyDepart,
     onlySelect,
     propsData,
+    renderDefault,
+    selectKeys,
   } = props;
   const [dataList, setDataList] = useState<any>([]);
   const [searchValue, setSearchValue] = useState<string>('');
-  const [expandedKeys, setExpandedKeys] = useState<any[]>([]);
+  const [expandedKeys, setExpandedKeys] = useState<string[]>(['奖多多集团']);
   const [autoExpandParent, setAutoExpandParent] = useState<boolean>(true);
   const [keyTitleList, setKeyTitleList] = useState<any[]>([]);
   const [userListObj, setUserList] = useState<any>({});
@@ -37,48 +47,80 @@ function Organization(props: tsProps, formRef) {
   const [departList, setdepartList] = useState<any[]>([]);
   useEffect(() => {
     getJson();
+    console.log('selectKeys');
+    console.log(selectKeys);
   }, []);
+
+  // useEffect(() => {
+  //   console.log("selectKeys")
+  //   console.log(selectKeys)
+  //   if(selectKeys?.length&&selectKeys){
+  //     let expandedKey = keyTitleList
+  //     .map(item => {
+  //       if (selectKeys.indexOf(item.key) > -1) {
+  //         return getParentKey(item.key, dataList);
+  //       }
+  //       return null;
+  //     })
+  //     .filter((item, i, self) => item && self.indexOf(item) === i);
+  //     setCheckedKeys(selectKeys);
+  //     console.log(expandedKey)
+  //     console.log("expandedKey")
+  //     console.log(keyTitleList)
+  //     console.log("keyTitleList")
+  //     setExpandedKeys(expandedKey);
+  //     setAutoExpandParent(true);
+  //   }
+  // }, [keyTitleList, props.selectKeys]);
+  // console.log(keyTitleList)
+  // console.log("keyTitleList")
 
   async function getJson() {
     let organizationJson: GlobalResParams<tsListItem[]> = await getOrganization();
-    if (propsData) {
-      handleList(propsData);
-      return;
-    }
-    if (organizationJson.status === 200) {
+    let defaultGroupJson: GlobalResParams<tsDefaultItem[]> = await getDefaultGroup();
+    if (organizationJson.status === 200 && defaultGroupJson.status === 200) {
       let list = organizationJson.obj;
-      handleList(list);
+      let defaulGroupList: tsUserItem[] = [];
+      for (let i = 0; i < defaultGroupJson.obj.length; i++) {
+        defaulGroupList.push({
+          key: defaultGroupJson.obj[i].userCode,
+          title: defaultGroupJson.obj[i].trueName,
+          code: defaultGroupJson.obj[i].userCode,
+          groupCode: '默认分组',
+          name: defaultGroupJson.obj[i].trueName,
+        });
+      }
+      if (renderDefault) {
+        let defaultGroupObj: tsListItem = {
+          id: -2,
+          code: '默认分组',
+          name: '默认分组',
+          parentCode: '奖多多集团',
+          key: '默认分组',
+          title: '默认分组',
+          memberList: defaulGroupList,
+        };
+        list.push(defaultGroupObj);
+      }
+
+      let newObj: tsListItem = {
+        id: 0,
+        key: '奖多多集团',
+        title: '奖多多集团',
+        code: '奖多多集团',
+        name: '奖多多集团',
+        children: list,
+      };
+      handleList([newObj]);
     }
   }
-
-  useImperativeHandle(formRef, () => {
-    return {
-      getvalue: () => {
-        let arr: any = [];
-        checkedKeys.map(item => {
-          keyTitleList.map(u => {
-            if (item === u.key) {
-              if (userKeyList.indexOf(u.key) > -1) {
-                u.type = 'user';
-              } else {
-                u.type = 'department';
-              }
-              console.log('u');
-              console.log(u);
-              arr.push(u);
-            }
-          });
-        });
-        return arr;
-      },
-    };
-  });
 
   const handleList = data => {
     let keyTitle = keyTitleList;
     let userList = userListObj;
     let userKeyArr = userKeyList;
     let departListkey = departList;
+
     const handleItem = list => {
       for (let i = 0; i < list.length; i++) {
         list[i].key = list[i].code;
@@ -113,14 +155,51 @@ function Organization(props: tsProps, formRef) {
         }
       }
     };
-    console.log(data);
+
+    handleItem(data);
+    if (selectKeys?.length && selectKeys) {
+      let expandedKey = keyTitle
+        .map(item => {
+          if (selectKeys.indexOf(item.key) > -1) {
+            return getParentKey(item.key, data);
+          }
+          return null;
+        })
+        .filter((item, i, self) => item && self.indexOf(item) === i);
+      setCheckedKeys(selectKeys);
+      setExpandedKeys(expandedKey);
+      setAutoExpandParent(true);
+    }
+
     setdepartList(departListkey);
     setUserKeyList(userKeyArr);
-    handleItem(data);
     setDataList(data);
     setKeyTitleList(keyTitle);
     setUserList(userList);
   };
+
+  useImperativeHandle(formRef, () => {
+    return {
+      getvalue: () => {
+        let arr: any = [];
+        checkedKeys.map(item => {
+          keyTitleList.map(u => {
+            if (item === u.key) {
+              if (userKeyList.indexOf(u.key) > -1) {
+                u.type = 'user';
+              } else {
+                u.type = 'department';
+              }
+              console.log('u');
+              console.log(u);
+              arr.push(u);
+            }
+          });
+        });
+        return arr;
+      },
+    };
+  });
 
   const getParentKey = (key, tree) => {
     let parentKey;
@@ -313,7 +392,7 @@ function Organization(props: tsProps, formRef) {
     });
   };
 
-  return (
+  return dataList.length ? (
     <div style={{ display: 'flex', flexDirection: 'row' }}>
       <div style={{ width: '22vw' }}>
         <Search
@@ -361,7 +440,7 @@ function Organization(props: tsProps, formRef) {
         </div>
       </div>
     </div>
-  );
+  ) : null;
 }
 
 export default forwardRef(Organization);

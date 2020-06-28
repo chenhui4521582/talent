@@ -36,13 +36,32 @@ export default props => {
       );
     //数字
     case 'number':
-      return <InputNumber {...props} placeholder="请输入" />;
+      return (
+        <InputNumber
+          {...props}
+          placeholder="请输入"
+          style={{ width: '100%' }}
+        />
+      );
     //金额
     case 'money':
-      return <InputNumber {...props} placeholder="请输入" />;
+      return (
+        <InputNumber
+          {...props}
+          placeholder="请输入"
+          style={{ width: '100%' }}
+        />
+      );
     //日期
     case 'date':
-      return <DatePicker {...props} format="YYYY-MM-DD" placeholder="请输入" />;
+      return (
+        <DatePicker
+          {...props}
+          format="YYYY-MM-DD"
+          placeholder="请输入"
+          style={{ width: '100%' }}
+        />
+      );
     //日期+时间
     case 'datetime':
       return (
@@ -51,6 +70,7 @@ export default props => {
           format="YYYY-MM-DD HH:mm:ss"
           showTime
           placeholder="请选择"
+          style={{ width: '100%' }}
         />
       );
     //单选框

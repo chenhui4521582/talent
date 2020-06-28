@@ -70,11 +70,57 @@ export default props => {
           data[k].list = controlList;
         }
       }
-      console.log('idItem');
-      console.log(idItem);
       setIdItemList(idItem);
       setTitle(obj.name);
       setFormList(data);
+    }
+  };
+
+  const handleValue = item => {
+    const { baseControlType, defaultValue, defaultShowValue } = item;
+    switch (baseControlType) {
+      case 'department':
+        return defaultValue
+          ? defaultValue + '-$-' + defaultShowValue
+          : defaultShowValue;
+      case 'department':
+        return defaultValue
+          ? defaultValue + '-$-' + defaultShowValue
+          : defaultShowValue;
+      case 'business':
+        return defaultValue
+          ? defaultValue + '-$-' + defaultShowValue
+          : defaultShowValue;
+      case 'company':
+        return defaultValue
+          ? defaultValue + '-$-' + defaultShowValue
+          : defaultShowValue;
+      case 'position':
+        return defaultValue
+          ? defaultValue + '-$-' + defaultShowValue
+          : defaultShowValue;
+      case 'job':
+        return defaultValue
+          ? defaultValue + '-$-' + defaultShowValue
+          : defaultShowValue;
+      case 'positionLevel':
+        return defaultValue
+          ? defaultValue + '-$-' + defaultShowValue
+          : defaultShowValue;
+      case 'datetime':
+        return defaultShowValue
+          ? moment(defaultShowValue, 'YYYY-MM-DD HH:mm:ss')
+          : defaultValue
+          ? moment(defaultValue, 'YYYY-MM-DD HH:mm:ss')
+          : '';
+      case 'date':
+        return defaultShowValue
+          ? moment(defaultShowValue, 'YYYY-MM-DD HH:mm:ss')
+          : defaultValue
+          ? moment(defaultValue, 'YYYY-MM-DD HH:mm:ss')
+          : '';
+      default:
+        return defaultShowValue ? defaultShowValue : defaultValue;
     }
   };
 
@@ -88,7 +134,7 @@ export default props => {
             key={fromItem.id}
             bordered
             column={fromItem.columnNum}
-            style={{ marginBottom: 40, width: '80%', marginLeft: '10%' }}
+            style={{ marginBottom: 40, width: '90%', marginLeft: '5%' }}
           >
             {list.map(groupItem => {
               if (groupItem.list && groupItem.list.length) {
@@ -119,7 +165,11 @@ export default props => {
                           </div>
                           <div style={{ display: 'flex', flex: 1 }}>
                             <Form.Item
-                              style={{ width: '100%' }}
+                              style={{
+                                width: '100%',
+                                marginBottom: 6,
+                                marginTop: 6,
+                              }}
                               rules={[
                                 {
                                   required: listItem.isRequired,
@@ -127,11 +177,7 @@ export default props => {
                                 },
                               ]}
                               name={listItem.id}
-                              initialValue={
-                                listItem.defaultShowValue
-                                  ? listItem.defaultValue
-                                  : listItem.defaultShowValue
-                              }
+                              initialValue={handleValue(listItem)}
                             >
                               <Temp
                                 s_type={listItem.baseControlType}
@@ -159,13 +205,9 @@ export default props => {
                     span={groupItem.colspan}
                   >
                     <Form.Item
-                      style={{ width: '100%' }}
+                      style={{ width: '100%', marginBottom: 0, marginTop: 0 }}
                       name={groupItem.id}
-                      initialValue={
-                        groupItem.defaultShowValue
-                          ? groupItem.defaultShowValue
-                          : groupItem.defaultValue
-                      }
+                      initialValue={handleValue(groupItem)}
                       rules={[
                         {
                           required: groupItem.isRequired,
@@ -245,8 +287,8 @@ export default props => {
             subList.push({
               id: item.id,
               multipleNumber: 1,
-              showValue: valueArr.join(','),
-              value: valueArr.join(','),
+              showValue: valueArr.join(',').split('-$-')[1],
+              value: valueArr.join(',').split('-$-')[0],
             });
           } else {
             subList.push({

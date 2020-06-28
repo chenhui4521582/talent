@@ -120,3 +120,30 @@ export async function moveInUser(groupCode: string, userCode: string) {
     },
   });
 }
+
+// 设置部门负责人
+export async function setDepartLeader(leaderCode: string, code: string) {
+  return request(`/api/talent/department/updateLeader`, {
+    method: 'POST',
+    data: {
+      leaderCode,
+      code,
+    },
+  });
+}
+
+//设置人员上级
+export async function setUserParent(
+  departmentCode: string,
+  userCode: string,
+  parentCode: string,
+) {
+  return request(`/api/talent/departmentUser/updateUserParent`, {
+    method: 'POST',
+    data: {
+      departmentCode,
+      userCode,
+      parentCode,
+    },
+  });
+}

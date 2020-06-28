@@ -151,14 +151,42 @@ export default props => {
     if (btnJson.status === 200) {
       setBtnObj(btnJson.obj);
     }
-
-    console.log('表单');
-    console.log(json);
-    console.log('按钮');
-    console.log(btnJson);
-    console.log('历史');
-    console.log(LogJson);
   };
+
+  const handleValue = item => {
+    const { baseControlType, value, showValue } = item;
+    switch (baseControlType) {
+      case 'department':
+        return value ? value + '-$-' + showValue : showValue;
+      case 'department':
+        return value ? value + '-$-' + showValue : showValue;
+      case 'business':
+        return value ? value + '-$-' + showValue : showValue;
+      case 'company':
+        return value ? value + '-$-' + showValue : showValue;
+      case 'position':
+        return value ? value + '-$-' + showValue : showValue;
+      case 'job':
+        return value ? value + '-$-' + showValue : showValue;
+      case 'positionLevel':
+        return value ? value + '-$-' + showValue : showValue;
+      case 'datetime':
+        return showValue
+          ? moment(value, 'YYYY-MM-DD HH:mm:ss')
+          : showValue
+          ? moment(showValue, 'YYYY-MM-DD HH:mm:ss')
+          : '';
+      case 'date':
+        return showValue
+          ? moment(value, 'YYYY-MM-DD HH:mm:ss')
+          : showValue
+          ? moment(showValue, 'YYYY-MM-DD HH:mm:ss')
+          : '';
+      default:
+        return showValue ? showValue : value;
+    }
+  };
+
   const fromContent = useMemo(() => {
     if (formList.length) {
       return formList.map(fromItem => {
@@ -169,7 +197,7 @@ export default props => {
             key={fromItem.id}
             bordered
             column={fromItem.columnNum}
-            style={{ marginBottom: 40, width: '80%', marginLeft: '10%' }}
+            style={{ marginBottom: 40, width: '90%', marginLeft: '5%' }}
           >
             {list.map(groupItem => {
               if (groupItem.list && groupItem.list.length) {
@@ -177,7 +205,7 @@ export default props => {
                   <Descriptions.Item
                     key={groupItem.id}
                     label={groupItem.name}
-                    span={1}
+                    span={groupItem.colspan}
                   >
                     {groupItem.list.map(listItem => {
                       return (
@@ -187,7 +215,7 @@ export default props => {
                             display: 'flex',
                             flex: 1,
                             flexDirection: 'row',
-                            margin: '10px',
+                            // margin: '10px',
                           }}
                         >
                           <div
@@ -208,22 +236,7 @@ export default props => {
                                 },
                               ]}
                               name={listItem.id}
-                              initialValue={
-                                listItem.baseControlType === 'datetime' ||
-                                listItem.baseControlType === 'date'
-                                  ? listItem.showValue
-                                    ? moment(
-                                        listItem.value,
-                                        'YYYY-MM-DD HH:mm:ss',
-                                      )
-                                    : moment(
-                                        listItem.showValue,
-                                        'YYYY-MM-DD HH:mm:ss',
-                                      )
-                                  : listItem.showValue
-                                  ? listItem.showValue
-                                  : listItem.value
-                              }
+                              initialValue={handleValue(listItem)}
                             >
                               <Temp
                                 s_type={listItem.baseControlType}
@@ -253,16 +266,7 @@ export default props => {
                     <Form.Item
                       style={{ width: '100%' }}
                       name={groupItem.id}
-                      initialValue={
-                        groupItem.baseControlType === 'datetime' ||
-                        groupItem.baseControlType === 'date'
-                          ? groupItem.showValue
-                            ? moment(groupItem.value, 'YYYY-MM-DD HH:mm:ss')
-                            : moment(groupItem.showValue, 'YYYY-MM-DD HH:mm:ss')
-                          : groupItem.showValue
-                          ? groupItem.showValue
-                          : groupItem.value
-                      }
+                      initialValue={handleValue(groupItem)}
                       rules={[
                         {
                           required: groupItem.isRequired,
@@ -290,6 +294,8 @@ export default props => {
 
   const submitData = (type: number): void => {
     form.validateFields().then(async fromSubData => {
+      console.log('fromSubData');
+      console.log(fromSubData);
       let subList: any = [];
       idItemList.map(item => {
         let showArr: any = [];
@@ -342,8 +348,8 @@ export default props => {
             subList.push({
               id: item.id,
               multipleNumber: 1,
-              showValue: valueArr.join(','),
-              value: valueArr.join(','),
+              showValue: valueArr.join(',').split('-$-')[1],
+              value: valueArr.join(',').split('-$-')[0],
             });
           } else {
             subList.push({
@@ -396,8 +402,10 @@ export default props => {
 
   const btnRender = useMemo(() => {
     return mount ? (
-      <Form.Item name="remark">
-        <TextArea rows={3} placeholder="签字意见" />
+      <div style={{ position: 'relative' }}>
+        <Form.Item name="remark">
+          <TextArea rows={3} placeholder="签字意见" />
+        </Form.Item>
         <div style={{ position: 'absolute', bottom: '10px', right: 20 }}>
           {btnObj?.approver ? (
             <Button
@@ -419,7 +427,7 @@ export default props => {
           ) : null}
           {btnObj?.applicant ? <Button onClick={cancel}>撤销</Button> : null}
         </div>
-      </Form.Item>
+      </div>
     ) : null;
   }, [btnObj, mount]);
 
