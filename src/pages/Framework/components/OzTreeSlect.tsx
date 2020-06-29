@@ -19,10 +19,20 @@ export default (props: tsProps) => {
   const [values, setValues] = useState<string[]>([]);
   const [treeExpandedKeys, setTreeExpandedKeys] = useState<any[]>([]);
   const [expandAll, setExpandAll] = useState<boolean>(false);
+  const [once, setOnce] = useState<boolean>(false);
 
   useEffect(() => {
     getJson();
   }, []);
+
+  useEffect(() => {
+    console.log(props);
+    if (props?.value) {
+      if (!once) {
+        setValues([props?.value?.split('-$-')[0]]);
+      }
+    }
+  }, [props?.value, once]);
 
   async function getJson() {
     let organizationJson: GlobalResParams<tsListItem[]> = await getOrganization();
@@ -175,6 +185,7 @@ export default (props: tsProps) => {
   };
 
   const onChange = value => {
+    setOnce(true);
     console.log(value);
     console.log('value');
     if (onlySelect) {
@@ -212,10 +223,10 @@ export default (props: tsProps) => {
               }
             });
             arr.push(item);
-            setValues(arr);
-            props.onChange(formArr);
           }
         });
+        setValues(arr);
+        props.onChange(formArr);
       } else {
         handleCheckKey(value, value[value.length - 1]);
       }
@@ -264,6 +275,7 @@ export default (props: tsProps) => {
   return (
     <TreeSelect
       {...props}
+      value={values}
       placeholder="请选择"
       showSearch={true}
       treeData={loop(dataList)}
@@ -273,7 +285,6 @@ export default (props: tsProps) => {
       onSearch={searchChange}
       multiple={!onlySelect}
       onChange={onChange}
-      value={values}
     />
   );
 };

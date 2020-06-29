@@ -180,6 +180,7 @@ export default props => {
                               initialValue={handleValue(listItem)}
                             >
                               <Temp
+                                isMultiplechoice={listItem.isMultiplechoice}
                                 s_type={listItem.baseControlType}
                                 disabled={listItem.isLocked}
                                 list={listItem.itemList || []}
@@ -216,6 +217,7 @@ export default props => {
                       ]}
                     >
                       <Temp
+                        isMultiplechoice={groupItem.isMultiplechoice}
                         s_type={groupItem.baseControlType}
                         disabled={groupItem.isLocked}
                         list={groupItem.itemList || []}
@@ -282,7 +284,13 @@ export default props => {
             item.baseControlType === 'areatext' ||
             item.baseControlType === 'number' ||
             item.baseControlType === 'money' ||
-            item.baseControlType === 'remark'
+            item.baseControlType === 'remark' ||
+            item.baseControlType === 'currDate' ||
+            item.baseControlType === 'currDatetime' ||
+            item.baseControlType === 'currCompany' ||
+            item.baseControlType === 'currBusiness' ||
+            item.baseControlType === 'currDepartment' ||
+            item.baseControlType === 'currUser'
           ) {
             subList.push({
               id: item.id,

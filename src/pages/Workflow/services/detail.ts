@@ -15,16 +15,20 @@ export interface tsDetail {
 }
 
 export interface tsLog {
+  apprTime: string;
   apprRemark: string;
   apprStatus: number;
   apprUserCode: string | null;
   apprUserTruename: string;
   departmentName: string;
+  businessName: string;
   groupName: string | null;
   nextStepUserCodes: string | null;
   nextStepUserNames: string | null;
   taskApprStepId: number;
   key: number;
+  stepName: string;
+  stepNumber: number;
 }
 
 // 工作流撤回接口

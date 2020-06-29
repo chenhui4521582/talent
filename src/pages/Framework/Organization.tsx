@@ -74,6 +74,7 @@ export default props => {
   const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
   const [selectUserkeys, setSelectUserkeys] = useState<string[]>([]);
   const [selectUserParent, setSelectUserParent] = useState<string[]>([]);
+  const [selectUserAll, setSelectUserAll] = useState<string[]>([]);
   //所有的列表item
   const [keyTitleList, setKeyTitleList] = useState<tsSlectGroup[]>([]);
   // 选择组下面人的对象
@@ -256,7 +257,6 @@ export default props => {
   const newKey = keyTitle => {
     keyTitle.map(item => {
       if (item.key === selectedKeys[0]) {
-        console.log(item);
         setSelectGroup(item);
       }
     });
@@ -272,8 +272,14 @@ export default props => {
 
     if (userListObj[e]) {
       setCurrentUserList(userListObj[e]);
+      let arr: any = [];
+      userListObj[e].map(item => {
+        arr.push(item.key);
+      });
+      setSelectUserAll(arr);
     } else {
       setCurrentUserList([]);
+      setSelectUserAll([]);
     }
   };
 
@@ -322,6 +328,11 @@ export default props => {
               <p
                 onClick={e => {
                   setFlag(!flag);
+                  selectGroup.memberList?.map(item => {
+                    if (item.userType === 2) {
+                      setSelectUserParent([item.code]);
+                    }
+                  });
                   setSuperiorVisible(true);
                 }}
               >
@@ -474,12 +485,6 @@ export default props => {
 
   const rowSelection = {
     onChange: (selectedRowKeys, selectedRows) => {
-      let arr: any = [];
-      console.log(selectedRows);
-      selectedRows.map(item => {
-        arr.push(item.parentCode);
-      });
-      setSelectUserParent(arr);
       setSelectUserkeys(selectedRowKeys);
     },
     onSelect: (record, selected, selectedRows) => {},
@@ -538,7 +543,6 @@ export default props => {
       }
     });
   };
-
   // 从其他部门移入人员
   const moveInOk = async () => {
     // moveInUser
@@ -564,7 +568,7 @@ export default props => {
       });
     }
   };
-
+  // 删除人员
   const deleteUser = async () => {
     let json: GlobalResParams<string> = await deleteUserApi(
       selectUserkeys.join(','),
@@ -621,7 +625,7 @@ export default props => {
     values.leaderCode = arr.join(',');
     values.status = 1;
     let json: GlobalResParams<string> = await setDepartLeader(
-      arr[0],
+      arr[0] || '',
       selectGroup.key,
     );
     if (json.status === 200) {
@@ -654,7 +658,7 @@ export default props => {
     let json: GlobalResParams<string> = await setUserParent(
       selectGroup.key,
       selectUserkeys.join(','),
-      arr[0],
+      arr[0] || '',
     );
     if (json.status === 200) {
       notification['success']({
@@ -711,6 +715,15 @@ export default props => {
           {selectGroup.memberList ? (
             <span
               onClick={() => {
+                let arr: any = [];
+                selectGroup.memberList?.map(item => {
+                  if (selectUserkeys.indexOf(item.code) > -1) {
+                    console.log(item);
+                    arr.push(item.parentCode);
+                  }
+                });
+
+                setSelectUserParent(arr);
                 setReportToVisible(true);
               }}
             >
@@ -764,6 +777,11 @@ export default props => {
             {selectGroup.memberList ? (
               <span
                 onClick={() => {
+                  selectGroup.memberList?.map(item => {
+                    if (item.userType === 2) {
+                      setSelectUserParent([item.code]);
+                    }
+                  });
                   setSuperiorVisible(true);
                 }}
               >
@@ -793,7 +811,7 @@ export default props => {
         <div className="right-box">{selectGroup.title ? groupTitle : null}</div>
       );
     }
-  }, [currentUserList, dataList, selectGroup.memberList]);
+  }, [currentUserList, dataList, selectGroup.memberList, selectUserkeys]);
   return dataList.length ? (
     <Card title="组织架构">
       <div style={{ width: '20%', float: 'left' }}>
@@ -901,6 +919,8 @@ export default props => {
           onlySelectUser={true}
           ref={formRef}
           renderDefault={true}
+          selectKeys={selectUserAll}
+          isLockedPropskey={true}
         />
       </Modal>
       {/* 设置所在部门 */}
@@ -936,7 +956,7 @@ export default props => {
           onlySelect={true}
           onlySelectUser={true}
           ref={formRef}
-          // propsData={selectGroup.memberList}
+          selectKeys={selectUserParent.length ? [selectUserParent[0]] : []}
         />
       </Modal>
       {/* 删除分组 */}

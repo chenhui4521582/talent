@@ -24,6 +24,7 @@ interface tsProps {
   propsData?: any[];
   renderDefault?: boolean;
   selectKeys?: string[];
+  isLockedPropskey?: boolean;
 }
 
 function Organization(props: tsProps, formRef) {
@@ -35,6 +36,7 @@ function Organization(props: tsProps, formRef) {
     propsData,
     renderDefault,
     selectKeys,
+    isLockedPropskey,
   } = props;
   const [dataList, setDataList] = useState<any>([]);
   const [searchValue, setSearchValue] = useState<string>('');
@@ -50,30 +52,6 @@ function Organization(props: tsProps, formRef) {
     console.log('selectKeys');
     console.log(selectKeys);
   }, []);
-
-  // useEffect(() => {
-  //   console.log("selectKeys")
-  //   console.log(selectKeys)
-  //   if(selectKeys?.length&&selectKeys){
-  //     let expandedKey = keyTitleList
-  //     .map(item => {
-  //       if (selectKeys.indexOf(item.key) > -1) {
-  //         return getParentKey(item.key, dataList);
-  //       }
-  //       return null;
-  //     })
-  //     .filter((item, i, self) => item && self.indexOf(item) === i);
-  //     setCheckedKeys(selectKeys);
-  //     console.log(expandedKey)
-  //     console.log("expandedKey")
-  //     console.log(keyTitleList)
-  //     console.log("keyTitleList")
-  //     setExpandedKeys(expandedKey);
-  //     setAutoExpandParent(true);
-  //   }
-  // }, [keyTitleList, props.selectKeys]);
-  // console.log(keyTitleList)
-  // console.log("keyTitleList")
 
   async function getJson() {
     let organizationJson: GlobalResParams<tsListItem[]> = await getOrganization();
@@ -144,7 +122,15 @@ function Organization(props: tsProps, formRef) {
         if (list[i].memberList && list[i].memberList.length) {
           userList[list[i].code] = list[i].memberList;
           if (renderUser) {
-            list[i].children = list[i].memberList;
+            if (list[i].memberList) {
+              if (list[i].children) {
+                list[i].children = list[i]?.children?.concat(
+                  list[i]?.memberList,
+                );
+              } else {
+                list[i].children = list[i]?.memberList;
+              }
+            }
           }
           list[i].memberList.map(item => {
             userKeyArr.push(item.code);
@@ -295,7 +281,9 @@ function Organization(props: tsProps, formRef) {
         keyArr.splice(keyArr.indexOf(k), 1);
       }
     });
-    setCheckedKeys(keyArr);
+    setCheckedKeys(
+      isLockedPropskey ? [...new Set(selectKeys?.concat(keyArr))] : keyArr,
+    );
   };
 
   // 获取获得key
@@ -311,7 +299,11 @@ function Organization(props: tsProps, formRef) {
         handleCheckKey(keys.checked, key);
         return;
       } else {
-        setCheckedKeys(checkedKeys);
+        setCheckedKeys(
+          isLockedPropskey
+            ? [...new Set(selectKeys?.concat(checkedKeys))]
+            : checkedKeys,
+        );
         return;
       }
     }
@@ -319,21 +311,40 @@ function Organization(props: tsProps, formRef) {
     if (onlySelectUser && checked) {
       if (userKeyList.indexOf(key) > -1) {
         if (onlySelect) {
-          setCheckedKeys([keys.checked[keys.checked.length - 1]]);
+          setCheckedKeys(
+            isLockedPropskey
+              ? [
+                  ...new Set(
+                    selectKeys?.concat([keys.checked[keys.checked.length - 1]]),
+                  ),
+                ]
+              : [keys.checked[keys.checked.length - 1]],
+          );
         } else {
-          setCheckedKeys(keys.checked);
+          setCheckedKeys(
+            isLockedPropskey
+              ? [...new Set(selectKeys?.concat(keys.checked))]
+              : keys.checked,
+          );
         }
       }
     } else {
       if (checked) {
         handleCheckKey(keys.checked, key);
       } else {
-        setCheckedKeys(keys.checked);
+        setCheckedKeys(
+          isLockedPropskey
+            ? [...new Set(selectKeys?.concat(keys.checked))]
+            : keys.checked,
+        );
       }
     }
   };
 
   const removeCheck = key => {
+    if (isLockedPropskey && selectKeys?.indexOf(key) > -1) {
+      return;
+    }
     let list = JSON.parse(JSON.stringify(checkedKeys));
     list.splice(
       list.findIndex(item => item === key),

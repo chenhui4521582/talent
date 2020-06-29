@@ -420,6 +420,7 @@ export default () => {
       <Modal
         width="50vw"
         title="从其他部门移入"
+        key={moveInVisible + ''}
         visible={moveInVisible}
         okText="确认"
         cancelText="取消"
@@ -432,6 +433,7 @@ export default () => {
           ref={formRef}
           renderUser={true}
           selectKeys={userKeyList}
+          isLockedPropskey={true}
         />
       </Modal>
     </Card>

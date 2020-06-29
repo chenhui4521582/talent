@@ -29,6 +29,7 @@ const { TextArea } = Input;
 interface tsBtn {
   applicant: boolean;
   approver: boolean;
+  submit: boolean;
 }
 
 const status = {
@@ -44,31 +45,43 @@ const columns: ColumnProps<tsLog>[] = [
     key: 'apprUserTruename',
     dataIndex: 'apprUserTruename',
     align: 'center',
+    width: '16vw',
+    render: (_, item: tsLog) => (
+      <div>
+        <p>{item.apprUserTruename}</p>
+        <p>{`${item.businessName ? item.businessName + '/' : ''}${
+          item.businessName ? item.businessName + '/' : ''
+        }${item.groupName ? item.groupName : ''}`}</p>
+      </div>
+    ),
+  },
+  {
+    title: '签字意见',
+    dataIndex: 'apprRemark',
+    key: 'apprRemark',
+    align: 'left',
+    width: '40vw',
+    render: (_, item: tsLog) => (
+      <div>
+        <p>{item.apprRemark}</p>
+        <p>接收人：{item.nextStepUserNames}</p>
+      </div>
+    ),
   },
   {
     title: '时间',
     dataIndex: 'apprTime',
     key: 'apprTime ',
     align: 'center',
-  },
-  {
-    title: '审批状态',
-    dataIndex: 'apprStatus',
-    key: 'apprStatus',
-    align: 'center',
-    render: (_, item: tsLog) => <span>{status[item.apprStatus]}</span>,
-  },
-  {
-    title: '部门',
-    dataIndex: 'departmentName',
-    key: 'departmentName',
-    align: 'center',
-  },
-  {
-    title: '签字意见',
-    dataIndex: 'apprRemark',
-    key: 'apprRemark',
-    align: 'center',
+    width: '30vw',
+    render: (_, item: tsLog) => (
+      <div>
+        <p>{item.apprTime}</p>
+        <p>
+          [{item.stepNumber + item.stepName + `/` + status[item.apprStatus]}]
+        </p>
+      </div>
+    ),
   },
 ];
 
@@ -110,7 +123,7 @@ export default props => {
             let groupItem = groupList[i];
             let list: any = [];
             for (let g = 0; g < controlList.length; g++) {
-              if (groupItem.id === controlList[g].resGroupId) {
+              if (groupItem.resFormGroupId === controlList[g].resGroupId) {
                 data[k].groupColArr.push(formChildlist[k].controlList[g].id);
                 list.push(controlList[g]);
                 groupItem.list = list;
@@ -134,8 +147,6 @@ export default props => {
           data[k].list = controlList;
         }
       }
-      console.log('idItem');
-      console.log(idItem);
       setIdItemList(idItem);
       setTitle(obj.name);
       setFormList(data);
@@ -156,6 +167,8 @@ export default props => {
   const handleValue = item => {
     const { baseControlType, value, showValue } = item;
     switch (baseControlType) {
+      case 'user':
+        return value ? value + '-$-' + showValue : showValue;
       case 'department':
         return value ? value + '-$-' + showValue : showValue;
       case 'department':
@@ -172,16 +185,18 @@ export default props => {
         return value ? value + '-$-' + showValue : showValue;
       case 'datetime':
         return showValue
-          ? moment(value, 'YYYY-MM-DD HH:mm:ss')
-          : showValue
           ? moment(showValue, 'YYYY-MM-DD HH:mm:ss')
+          : value
+          ? moment(value, 'YYYY-MM-DD HH:mm:ss')
           : '';
       case 'date':
         return showValue
-          ? moment(value, 'YYYY-MM-DD HH:mm:ss')
-          : showValue
           ? moment(showValue, 'YYYY-MM-DD HH:mm:ss')
+          : value
+          ? moment(value, 'YYYY-MM-DD HH:mm:ss')
           : '';
+      case 'select':
+        return showValue && value ? (showValue ? showValue : value) : '';
       default:
         return showValue ? showValue : value;
     }
@@ -239,6 +254,7 @@ export default props => {
                               initialValue={handleValue(listItem)}
                             >
                               <Temp
+                                isMultiplechoice={groupItem.isMultiplechoice}
                                 s_type={listItem.baseControlType}
                                 disabled={listItem.isLocked}
                                 list={listItem.itemList || []}
@@ -275,6 +291,7 @@ export default props => {
                       ]}
                     >
                       <Temp
+                        isMultiplechoice={groupItem.isMultiplechoice}
                         s_type={groupItem.baseControlType}
                         disabled={groupItem.isLocked}
                         list={groupItem.itemList || []}
@@ -318,15 +335,15 @@ export default props => {
           subList.push({
             id: item.id,
             multipleNumber: 1,
-            showValue: item.showValue,
-            value: item.value,
+            showValue: item.showValue || '',
+            value: item.value || '',
           });
         } else {
           if (item.baseControlType === 'datetime') {
             subList.push({
               id: item.id,
               multipleNumber: 1,
-              showValue: moment(valueArr.join(','))?.format(
+              showValue: moment(showArr.join(','))?.format(
                 'YYYY-MM-DD HH:mm:ss',
               ),
               value: moment(valueArr.join(','))?.format('YYYY-MM-DD HH:mm:ss'),
@@ -335,7 +352,7 @@ export default props => {
             subList.push({
               id: item.id,
               multipleNumber: 1,
-              showValue: moment(valueArr.join(','))?.format('YYYY-MM-DD'),
+              showValue: moment(showArr.join(','))?.format('YYYY-MM-DD'),
               value: moment(valueArr.join(','))?.format('YYYY-MM-DD'),
             });
           } else if (
@@ -343,12 +360,19 @@ export default props => {
             item.baseControlType === 'areatext' ||
             item.baseControlType === 'number' ||
             item.baseControlType === 'money' ||
-            item.baseControlType === 'remark'
+            item.baseControlType === 'remark' ||
+            item.baseControlType === 'currDate' ||
+            item.baseControlType === 'currDatetime' ||
+            item.baseControlType === 'currCompany' ||
+            item.baseControlType === 'currBusiness' ||
+            item.baseControlType === 'currDepartment' ||
+            item.baseControlType === 'currUser'
           ) {
+            console.log(valueArr);
             subList.push({
               id: item.id,
               multipleNumber: 1,
-              showValue: valueArr.join(',').split('-$-')[1],
+              showValue: valueArr.join(',').split('-$-')[0],
               value: valueArr.join(',').split('-$-')[0],
             });
           } else {
@@ -375,6 +399,7 @@ export default props => {
           description: '',
         });
         getData();
+        window.history.go(-1);
       } else {
         notification['error']({
           message: json.msg,
@@ -391,6 +416,7 @@ export default props => {
         message: json.msg,
         description: '',
       });
+      window.history.go(-1);
       getData();
     } else {
       notification['error']({
@@ -409,6 +435,7 @@ export default props => {
         <div style={{ position: 'absolute', bottom: '10px', right: 20 }}>
           {btnObj?.approver ? (
             <Button
+              type="primary"
               onClick={() => {
                 submitData(1);
               }}
@@ -418,6 +445,7 @@ export default props => {
           ) : null}
           {btnObj?.approver ? (
             <Button
+              style={{ margin: '0 10px' }}
               onClick={() => {
                 submitData(2);
               }}
@@ -425,6 +453,18 @@ export default props => {
               驳回
             </Button>
           ) : null}
+          {btnObj?.submit ? (
+            <Button
+              style={{ margin: '0 10px' }}
+              type="primary"
+              onClick={() => {
+                submitData(3);
+              }}
+            >
+              提交
+            </Button>
+          ) : null}
+
           {btnObj?.applicant ? <Button onClick={cancel}>撤销</Button> : null}
         </div>
       </div>
@@ -451,6 +491,15 @@ export default props => {
         {btnRender}
       </Form>
       {renderLog}
+      <div style={{ textAlign: 'center' }}>
+        <Button
+          onClick={() => {
+            window.history.go(-1);
+          }}
+        >
+          返回
+        </Button>
+      </div>
     </Card>
   );
 };
