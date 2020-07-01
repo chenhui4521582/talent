@@ -46,8 +46,6 @@ function Organization(props: tsProps, formRef) {
   const [departList, setdepartList] = useState<any[]>([]);
   useEffect(() => {
     getJson();
-    console.log('selectKeys');
-    console.log(selectKeys);
   }, []);
 
   async function getJson() {
@@ -169,13 +167,9 @@ function Organization(props: tsProps, formRef) {
           keyTitleList.map(u => {
             if (item === u.key) {
               if (userKeyList.indexOf(u.key) > -1) {
+                arr.push(u);
                 u.type = 'user';
-              } else {
-                u.type = 'department';
               }
-              console.log('u');
-              console.log(u);
-              arr.push(u);
             }
           });
         });

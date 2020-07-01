@@ -277,8 +277,15 @@ export default () => {
         <span
           style={{ color: '#1890ff', cursor: 'pointer' }}
           onClick={() => {
-            setRemoveType('user');
-            setRemoveLableVisible(true);
+            if (selectUser?.length) {
+              setRemoveType('user');
+              setRemoveLableVisible(true);
+            } else {
+              notification['error']({
+                message: '请选择需要设置的人员',
+                description: '',
+              });
+            }
           }}
         >
           移出
@@ -299,14 +306,17 @@ export default () => {
         />
       </div>
     ) : null;
-  }, [userList, selectItem]);
+  }, [userList, selectItem, selectUser]);
 
   const moveIn = async () => {
-    let values: any = [];
-
-    let list: any = formRef?.current?.getvalue();
-    list.map(item => {
-      values.id = selectItem?.id;
+    interface tsValue {
+      labelId?: number;
+      memberType: number;
+      departmentCode?: string;
+      userCode?: string;
+    }
+    let values: tsValue[] = [];
+    formRef?.current?.getvalue().map(item => {
       if (item.type === 'user') {
         values.push({
           labelId: selectItem?.id,
@@ -429,6 +439,7 @@ export default () => {
           renderUser={true}
           selectKeys={userKeyList}
           isLockedPropskey={true}
+          renderDefault={true}
         />
       </Modal>
     </Card>

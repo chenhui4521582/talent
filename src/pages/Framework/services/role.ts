@@ -69,12 +69,13 @@ export async function deleteBatchLabelmember(param: tsUser[]) {
 
 // 批量新增 1:用户;2:部门
 interface tsNewMember {
-  labelId: number;
+  labelId?: number;
   memberType: number;
   userCode?: string;
   departmentCode?: string;
 }
-export async function newBatchLabelmember(param: tsNewMember) {
+
+export async function newBatchLabelmember(param: tsNewMember[]) {
   return request(`/api/talent/wfresapprlabelmember/saveBatch`, {
     method: 'POST',
     data: param,

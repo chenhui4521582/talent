@@ -49,8 +49,6 @@ function Organization(props: tsProps, formRef) {
   const [departList, setdepartList] = useState<any[]>([]);
   useEffect(() => {
     getJson();
-    console.log('selectKeys');
-    console.log(selectKeys);
   }, []);
 
   async function getJson() {
@@ -295,8 +293,8 @@ function Organization(props: tsProps, formRef) {
 
     if (onlyDepart) {
       if (departList.indexOf(key) > -1) {
-        // setCheckedKeys([keys.checked[keys.checked.length - 1]]);
-        handleCheckKey(keys.checked, key);
+        setCheckedKeys([keys.checked[keys.checked.length - 1]]);
+        // handleCheckKey(keys.checked, key);
         return;
       } else {
         setCheckedKeys(

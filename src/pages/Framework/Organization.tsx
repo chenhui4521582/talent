@@ -278,7 +278,7 @@ export default props => {
 
     if (userListObj[e]) {
       setCurrentUserList(userListObj[e]);
-      let arr: any = [];
+      let arr: string[] = [];
       userListObj[e].map(item => {
         arr.push(item.key);
       });
@@ -551,8 +551,7 @@ export default props => {
   };
   // 从其他部门移入人员
   const moveInOk = async () => {
-    // moveInUser
-    let arr: any = [];
+    let arr: string[] = [];
     formRef.current?.getvalue().map(item => {
       arr.push(item.key);
     });
@@ -566,6 +565,7 @@ export default props => {
         description: '',
       });
       getJson();
+      setSelectUserkeys([]);
       setMoveInVisible(false);
     } else {
       notification['error']({
@@ -595,7 +595,7 @@ export default props => {
   };
   // 从本部门移出
   const moveOther = async () => {
-    let arr: any = [];
+    let arr: string[] = [];
     formRef.current?.getvalue().map(item => {
       arr.push(item.key);
     });
@@ -609,6 +609,8 @@ export default props => {
         description: '',
       });
       getJson();
+      setSelectUserkeys([]);
+
       setDepartmentVisible(false);
     } else {
       notification['error']({
@@ -619,17 +621,10 @@ export default props => {
   };
   // 设置部门负责人
   const superior = async () => {
-    let arr: any = [];
+    let arr: string[] = [];
     formRef.current?.getvalue().map(item => {
       arr.push(item.key);
     });
-
-    let values: any = {};
-    values.id = selectGroup.id;
-    values.code = selectGroup.key;
-    values.parentCode = selectGroup.parentCode;
-    values.leaderCode = arr.join(',');
-    values.status = 1;
     let json: GlobalResParams<string> = await setDepartLeader(
       arr[0] || '',
       selectGroup.key,
@@ -650,17 +645,11 @@ export default props => {
   };
   // 设置直属上级
   const reportTo = async () => {
-    let arr: any = [];
+    let arr: string[] = [];
     formRef.current?.getvalue().map(item => {
       arr.push(item.key);
     });
 
-    let values: any = {};
-    values.id = selectGroup.id;
-    values.code = selectGroup.key;
-    values.parentCode = selectGroup.parentCode;
-    values.leaderCode = arr.join(',');
-    values.status = 1;
     let json: GlobalResParams<string> = await setUserParent(
       selectGroup.key,
       selectUserkeys.join(','),
@@ -704,6 +693,13 @@ export default props => {
         <div className="table-title">
           <span
             onClick={() => {
+              let arr: any[] = [];
+              let list = selectGroup.memberList || [];
+              list?.map(item => {
+                arr.push(item?.code);
+              });
+
+              setSelectUserAll(arr);
               setMoveInVisible(true);
             }}
           >
@@ -729,7 +725,7 @@ export default props => {
             <span
               onClick={() => {
                 if (selectGroup.memberList && selectUserkeys.length) {
-                  let arr: any = [];
+                  let arr: any[] = [];
                   let list = selectGroup.memberList || [];
                   list?.map(item => {
                     if (selectUserkeys.indexOf(item.code) > -1) {
@@ -822,6 +818,7 @@ export default props => {
         <div className="right-box">
           {selectGroup.title ? groupTitle : null}
           <Table
+            key={selectGroup.memberList?.length}
             title={() => {
               return tableTitle;
             }}
@@ -961,7 +958,7 @@ export default props => {
         okText="保存"
         cancelText="取消"
       >
-        <Organization onlyDepart={true} ref={formRef} />
+        <Organization onlyDepart={true} ref={formRef} onlySelect={true} />
       </Modal>
       {/* 设置部门负责人 */}
       <Modal
@@ -1040,6 +1037,7 @@ export default props => {
         <Organization
           renderUser={true}
           onlySelectUser={true}
+          renderDefault={true}
           ref={formRef}
           onlySelect={true}
           selectKeys={selectUserParent.length ? [selectUserParent[0]] : []}
