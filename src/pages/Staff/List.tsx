@@ -3,7 +3,18 @@ import { Link } from 'umi';
 import { useTable } from '@/components/GlobalTable/useTable';
 import { ColumnProps } from 'antd/es/table';
 import { listByConditionsRoster } from './services/staff';
-import { Card, Form, Input, Select, Row, Col, Button, Divider, Modal, Checkbox } from 'antd';
+import {
+  Card,
+  Form,
+  Input,
+  Select,
+  Row,
+  Col,
+  Button,
+  Divider,
+  Modal,
+  Checkbox,
+} from 'antd';
 import { useBusiness } from '@/models/global';
 import { serialize } from '@/utils/serialize';
 import { useJob } from '@/models/global';
@@ -57,9 +68,9 @@ export default () => {
     rankName: '职级',
     titleName: '职位',
     roles: '角色',
-    workPlace: '工作地'
-  }
-  useEffect(() =>{
+    workPlace: '工作地',
+  };
+  useEffect(() => {
     let newArr: string[] = [];
     Object.keys(exportName).map(item => {
       newArr.push(item);
@@ -150,7 +161,7 @@ export default () => {
     rowKeyName: 'employeeId',
   });
 
-  const changeCheck = (checkedValues) => {
+  const changeCheck = checkedValues => {
     setChecked(checkedValues);
   };
 
@@ -160,7 +171,13 @@ export default () => {
 
   const handleOk = () => {
     const value = checked.join(',');
-    window.open(serialize(`/api/talent/employeeRoster/export?includ=${value}`, searchForm.getFieldsValue()));
+
+    window.open(
+      serialize(
+        `/api/talent/employeeRoster/export?includ=${value}`,
+        searchForm.getFieldsValue(),
+      ),
+    );
     handleCancel();
   };
 
@@ -172,10 +189,7 @@ export default () => {
           <Button type="primary">
             <Link to={`edit`}>新增员工</Link>
           </Button>
-          <Button
-            onClick={_ => setVisible(true)}
-            style={{ marginLeft: 10 }}
-          >
+          <Button onClick={_ => setVisible(true)} style={{ marginLeft: 10 }}>
             导出
           </Button>
         </div>
@@ -231,17 +245,15 @@ export default () => {
         onOk={handleOk}
         onCancel={handleCancel}
       >
-        <div style={{height: 200, overflowY: 'scroll'}}>
+        <div style={{ height: 200, overflowY: 'scroll' }}>
           <Checkbox.Group value={checked} onChange={changeCheck}>
-            {
-              Object.keys(exportName)?.map(item => {
-                return (
-                  <div key={item}>
-                    <Checkbox value={item}>{exportName[item]}</Checkbox>
-                  </div>
-                )
-              })
-            }
+            {Object.keys(exportName)?.map(item => {
+              return (
+                <div key={item}>
+                  <Checkbox value={item}>{exportName[item]}</Checkbox>
+                </div>
+              );
+            })}
           </Checkbox.Group>
         </div>
       </Modal>

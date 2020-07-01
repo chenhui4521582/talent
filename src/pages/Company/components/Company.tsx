@@ -1,11 +1,6 @@
-import React, {
-  useState,
-  useEffect,
-  useImperativeHandle,
-  forwardRef,
-} from 'react';
+import React, { useEffect, useImperativeHandle, forwardRef } from 'react';
 import { Input, Form } from 'antd';
-import { IResumeCompany, tsCompany } from '../services/company';
+import { tsCompany } from '../services/company';
 
 function Company(props: tsCompany, formRef) {
   const [form] = Form.useForm();

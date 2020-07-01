@@ -200,6 +200,54 @@ export default defineConfig({
           path: '/talent/company/labourmanage',
           component: '@/pages/Company/Labourmanage',
         },
+        {
+          path: '/talent/workflow/home',
+          component: '@/pages/Workflow/Home',
+        },
+        {
+          path: '/talent/workflow/homedetail/:id',
+          component: '@/pages/Workflow/HomeDetail',
+        },
+        {
+          path: '/talent/workflow/mylist',
+          component: '@/pages/Workflow/MyList',
+        },
+        {
+          path: '/talent/workflow/complete',
+          component: '@/pages/Workflow/Complete',
+        },
+        {
+          path: '/talent/workflow/todo',
+          component: '@/pages/Workflow/ToDo',
+        },
+        {
+          path: '/talent/workflow/detail/:id',
+          component: '@/pages/Workflow/Detail',
+        },
+        {
+          path: '/talent/framework/organization',
+          component: '@/pages/Framework/Organization',
+        },
+        {
+          path: '/talent/framework/rolelabel',
+          component: '@/pages/Framework/RoleLabel',
+        },
+        {
+          path: '/talent/framework/systemLabel',
+          component: '@/pages/Framework/systemlabel',
+        },
+        {
+          path: '/talent/wfmanage/list',
+          component: '@/pages/WFmanage/List',
+        },
+        {
+          path: '/talent/wfmanage/category',
+          component: '@/pages/WFmanage/Category',
+        },
+        {
+          path: '/talent/wftemplate/list',
+          component: '@/pages/WFtemplate/list',
+        },
       ],
     },
   ],
