@@ -171,12 +171,14 @@ export default () => {
 
   const handleOk = () => {
     const value = checked.join(',');
+
     window.open(
       serialize(
         `/api/talent/employeeRoster/export?includ=${value}`,
         searchForm.getFieldsValue(),
       ),
     );
+
     handleCancel();
   };
 
