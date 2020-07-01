@@ -6,6 +6,7 @@ import {
   deleteLable,
   newLable,
   editLable,
+  tsLableItem,
 } from './services/system';
 import { GlobalResParams } from '@/types/ITypes';
 import {
@@ -26,10 +27,6 @@ interface tsRolrLable {
   labelName: string;
   status: number;
   updatedBy: string | null;
-}
-
-interface tsId {
-  id: Number;
 }
 
 export default () => {
@@ -64,8 +61,8 @@ export default () => {
     setSearchValue(value);
   };
 
-  const handleSelectRole = async (id?: number) => {
-    let json: GlobalResParams<any> = await getLableMemberList(id);
+  const handleSelectRole = async (id: number | undefined) => {
+    let json: GlobalResParams<tsLableItem> = await getLableMemberList(id);
     if (json.status === 200) {
       setDetail(json.obj);
     }
@@ -91,7 +88,6 @@ export default () => {
 
   const editOk = async () => {
     editForm.validateFields().then(async values => {
-      console.log(values);
       values.id = selectItem?.id;
       let json: GlobalResParams<string> = await editLable(values);
       if (json.status === 200) {
@@ -226,8 +222,6 @@ export default () => {
   ]);
 
   const renderRight = useMemo(() => {
-    console.log(detail);
-    console.log('detail');
     return detail?.id ? (
       <div className="role-right" style={{ width: '70%', marginLeft: 60 }}>
         <div className="table-title">

@@ -14,8 +14,8 @@ export interface IMyDemand {
 }
 // hr被分配的需求
 export async function queryMyDemand(params) {
-  return request('/api/talent/demand/listMyDemand', {
+  return request('/api/talent/demand/listMyUploadDemand', {
     method: 'POST',
-    data: params
+    data: params,
   });
 }

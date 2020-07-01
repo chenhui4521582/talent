@@ -23,7 +23,7 @@ const { TextArea } = Input;
 const { TreeNode } = TreeSelect;
 
 export default props => {
-  const { s_type, isMultiplechoice } = props;
+  const { s_type, ismultiplechoice } = props;
 
   switch (s_type) {
     //单行文本
@@ -91,13 +91,13 @@ export default props => {
         <OzTreeSlect
           renderUser={true}
           onlySelectUser={true}
-          onlySelect={isMultiplechoice === 0}
+          onlySelect={ismultiplechoice === 0}
           {...props}
         />
       );
     //department 部门 走组织架构
     case 'department':
-      return <OzTreeSlect onlySelect={isMultiplechoice === 0} {...props} />;
+      return <OzTreeSlect onlySelect={ismultiplechoice === 0} {...props} />;
     //业务线 business
     case 'business':
       return <BusinessTemplate {...props} placeholder="请选择" />;

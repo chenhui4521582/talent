@@ -27,11 +27,14 @@ export interface tsUserItem {
   name: string;
   key?: string;
   title?: string;
+  userType?: string | number;
+  parentCode?: string | null;
 }
 
 export interface tsDeleteItem {
   trueName: string;
   userCode: string;
+  parentCode?: string | null;
 }
 
 export interface tsDefaultItem {
@@ -46,6 +49,14 @@ export interface tsNewParam {
   status: number;
   parentCode?: string;
   leaderCode?: string;
+}
+export interface refItem {
+  type: string;
+  key: string;
+  title: string;
+}
+export interface tsRefs {
+  getvalue: () => refItem[];
 }
 
 // 获取组织架构主体

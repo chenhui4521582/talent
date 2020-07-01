@@ -38,6 +38,7 @@ export interface tsGroupList {
   updateTime: string | null;
   updatedBy: string | null;
   list?: tsControlList[];
+  resFormGroupId: string;
 }
 
 export interface tsControlList {
@@ -66,7 +67,7 @@ export interface tsControlList {
   sort: number | null;
   updateTime: string | null;
   updatedBy: string | null;
-  resGroupId: number;
+  resGroupId: string;
   isGroups?: number;
 }
 

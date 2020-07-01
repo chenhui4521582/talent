@@ -17,8 +17,14 @@ export async function deleteLable(id?: number) {
   });
 }
 
+export interface tsLableItem {
+  remark: string;
+  param: string;
+  url: string;
+}
+
 // 获取工作流系统标签详情
-export async function getLableMemberList(labelId: number) {
+export async function getLableMemberList(labelId?: number) {
   return request(`/api/talent/wfresapprsyslabel/get`, {
     method: 'POST',
     data: {

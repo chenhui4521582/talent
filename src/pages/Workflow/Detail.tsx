@@ -252,7 +252,7 @@ export default props => {
                               initialValue={handleValue(listItem)}
                             >
                               <Temp
-                                isMultiplechoice={groupItem.isMultiplechoice}
+                                ismultiplechoice={groupItem.isMultiplechoice}
                                 s_type={listItem.baseControlType}
                                 disabled={listItem.isLocked}
                                 list={listItem.itemList || []}
@@ -265,6 +265,8 @@ export default props => {
                   </Descriptions.Item>
                 );
               } else {
+                let width =
+                  groupItem.baseControlType === 'user' ? '400px' : '100%';
                 return (
                   <Descriptions.Item
                     key={groupItem.id}
@@ -276,9 +278,15 @@ export default props => {
                       </span>
                     }
                     span={groupItem.colspan}
+                    style={{ maxWidth: '200px' }}
                   >
                     <Form.Item
-                      style={{ width: '100%' }}
+                      style={{
+                        width: '100%',
+                        marginBottom: 0,
+                        marginTop: 0,
+                        maxWidth: width,
+                      }}
                       name={groupItem.id}
                       initialValue={handleValue(groupItem)}
                       rules={[
@@ -289,7 +297,7 @@ export default props => {
                       ]}
                     >
                       <Temp
-                        isMultiplechoice={groupItem.isMultiplechoice}
+                        ismultiplechoice={groupItem.isMultiplechoice}
                         s_type={groupItem.baseControlType}
                         disabled={groupItem.isLocked}
                         list={groupItem.itemList || []}

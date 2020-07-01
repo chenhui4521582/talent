@@ -27,16 +27,17 @@ import {
   tsDefaultItem,
   tsSlectGroup,
   tsUserItem,
-  tsNewParam,
+  tsRefs,
 } from './services/organization';
 import Organization from './components/Organization';
 import MoveInOz from './components/MoveInOz';
 import OzTreeSlect from './components/OzTreeSlect';
 import { GlobalResParams } from '@/types/ITypes';
+import { ColumnProps } from 'antd/es/table';
 import './style/organization.less';
 const { Search } = Input;
 
-const columns: any = [
+const columns: ColumnProps<tsUserItem>[] = [
   {
     title: '姓名',
     dataIndex: 'name',
@@ -67,10 +68,10 @@ const columns: any = [
 ];
 
 export default props => {
-  const formRef = useRef();
+  const formRef = useRef<tsRefs>();
   const [newGropForm] = Form.useForm();
   const [changeForm] = Form.useForm();
-  const [dataList, setDataList] = useState<any>([]);
+  const [dataList, setDataList] = useState<tsListItem[]>([]);
   const [searchValue, setSearchValue] = useState<string>('');
   const [expandedKeys, setExpandedKeys] = useState<string[]>(['奖多多集团']);
   const [autoExpandParent, setAutoExpandParent] = useState<boolean>(true);
@@ -83,13 +84,14 @@ export default props => {
   // 选择组下面人的对象
   const [userListObj, setUserList] = useState<any>({});
   // 当前的选准的组对象下面的人
-  const [currentUserList, setCurrentUserList] = useState<any[]>([]);
+  const [currentUserList, setCurrentUserList] = useState<tsUserItem[]>([]);
   // 点击选准的treeitem
   const [selectGroup, setSelectGroup] = useState<tsSlectGroup>({
     title: '',
     key: '',
     id: 0,
     parentCode: '',
+    memberList: [],
   });
   // 因为新建子部门跟，修改部门名称是同一个   modal
   const [newChildGropVisible, setNewChildGropVisible] = useState<boolean>(
@@ -137,6 +139,7 @@ export default props => {
           code: deleteGroupJson.obj[i].userCode,
           groupCode: '已删除组',
           name: deleteGroupJson.obj[i].trueName,
+          parentCode: deleteGroupJson.obj[i].parentCode,
         });
       }
       let deleteGroupObj: tsListItem = {
@@ -727,10 +730,10 @@ export default props => {
               onClick={() => {
                 if (selectGroup.memberList && selectUserkeys.length) {
                   let arr: any = [];
-                  selectGroup.memberList?.map(item => {
+                  let list = selectGroup.memberList || [];
+                  list?.map(item => {
                     if (selectUserkeys.indexOf(item.code) > -1) {
-                      console.log(item);
-                      arr.push(item.parentCode);
+                      arr.push(item?.parentCode);
                     }
                   });
                   setSelectUserParent(arr);
@@ -755,7 +758,7 @@ export default props => {
                     setRemoveUserVisible(true);
                   } else {
                     notification['error']({
-                      message: '请选择需要设置的人员',
+                      message: '请选择需要删除的人员',
                       description: '',
                     });
                   }
@@ -824,7 +827,7 @@ export default props => {
             }}
             style={{ width: '100%' }}
             columns={columns}
-            dataSource={selectGroup.memberList}
+            dataSource={selectGroup.memberList || []}
             rowSelection={rowSelection}
           />
         </div>
@@ -858,7 +861,7 @@ export default props => {
       {renderRight}
       {/* 根目录下新建（+） */}
       <Modal
-        key={'' + newVisible}
+        key={'newVisible' + newVisible}
         title="新建部门"
         visible={newVisible}
         onCancel={() => {
@@ -887,7 +890,7 @@ export default props => {
       </Modal>
       {/* 修改部门名称，新建子部门 */}
       <Modal
-        key={'' + newChildGropVisible}
+        key={'newChildGropVisible' + newChildGropVisible}
         title={changeOrNewType}
         visible={newChildGropVisible}
         onCancel={() => {
@@ -911,7 +914,7 @@ export default props => {
       </Modal>
       {/* 删除成员 */}
       <Modal
-        key={'' + removeUserVisible}
+        key={'removeUserVisible' + removeUserVisible}
         title="删除成员"
         visible={removeUserVisible}
         onCancel={() => {
@@ -925,7 +928,7 @@ export default props => {
       </Modal>
       {/* 从其他部门移入 */}
       <Modal
-        key={'' + moveInVisible}
+        key={'moveInVisible' + moveInVisible}
         width="50vw"
         title="从其他部门移入"
         visible={moveInVisible}
@@ -947,7 +950,7 @@ export default props => {
       </Modal>
       {/* 设置所在部门 */}
       <Modal
-        key={'' + departmentVisible}
+        key={'departmentVisible' + departmentVisible}
         width="50vw"
         title="移入其他部门"
         visible={departmentVisible}
@@ -962,7 +965,7 @@ export default props => {
       </Modal>
       {/* 设置部门负责人 */}
       <Modal
-        key={'' + superiorVisible}
+        key={'superiorVisible' + superiorVisible}
         width="40vw"
         title="设置部门负责人"
         visible={superiorVisible}
@@ -983,7 +986,7 @@ export default props => {
       </Modal>
       {/* 删除分组 */}
       <Modal
-        key={'' + removeGroupVisible}
+        key={'removeGroupVisible' + removeGroupVisible}
         title="删除部门"
         visible={removeGroupVisible}
         onCancel={() => {
@@ -1023,7 +1026,7 @@ export default props => {
         )}
       </Modal>
       <Modal
-        key={reportToVisible + ''}
+        key={reportToVisible + 'reportToVisible'}
         width="50vw"
         title="设置直属上级"
         visible={reportToVisible}

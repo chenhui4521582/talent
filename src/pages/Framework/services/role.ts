@@ -39,7 +39,7 @@ export async function editLable(param: tsEditLable) {
 }
 
 // 获取标签下的成员
-export async function getLableMemberList(labelId: number) {
+export async function getLableMemberList(labelId?: number) {
   return request(`/api/talent/wfresapprlabelmember/list`, {
     method: 'POST',
     data: {

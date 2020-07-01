@@ -284,14 +284,14 @@ function Organization(props: tsProps, formRef) {
               return (
                 <div key={key} style={{ display: 'flex', cursor: 'pointer' }}>
                   <span>{obj.title}</span>
-                  <span
+                  {/* <span
                     onClick={() => {
                       removeCheck(key);
                     }}
                     style={{ marginLeft: 10 }}
                   >
                     x
-                  </span>
+                  </span> */}
                 </div>
               );
             }

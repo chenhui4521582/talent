@@ -20,6 +20,7 @@ import {
   Form,
   notification,
 } from 'antd';
+import { tsRefs } from './services/organization';
 import { ColumnProps } from 'antd/es/table';
 import Organization from './components/Organization';
 import './style/role.less';
@@ -52,10 +53,10 @@ interface tsId {
 
 export default () => {
   const [newForm] = Form.useForm();
-  const formRef = useRef();
+  const formRef = useRef<tsRefs>();
   const [dataList, setDataList] = useState<tsRolrLable[]>([]);
   const [mount, setMount] = useState<boolean>(false);
-  const [selectItem, setSelectItem] = useState<tsRolrLable>({});
+  const [selectItem, setSelectItem] = useState<tsRolrLable>();
   const [removeLableVisible, setRemoveLableVisible] = useState<boolean>(false);
   const [changeLableVisible, setChangeLableVisible] = useState<boolean>(false);
   const [changeOrAdd, setChangeOrAdd] = useState<'add' | 'change'>();
@@ -85,7 +86,7 @@ export default () => {
     setSearchValue(value);
   };
 
-  const handleSelectRole = async (id: number) => {
+  const handleSelectRole = async (id: number | undefined) => {
     setSelectUser([]);
     let arr: any = [];
     let json: GlobalResParams<tsUser[]> = await getLableMemberList(id);
@@ -94,7 +95,6 @@ export default () => {
         arr.push(item.departmentCode ? item.departmentCode : item.userCode);
         item.key = item.id;
       });
-      console.log(arr);
       setUserKeyList(arr);
       setUserList(json.obj);
     }
@@ -258,12 +258,8 @@ export default () => {
     onChange: (selectedRowKeys, selectedRows) => {
       setSelectUser(selectedRows);
     },
-    onSelect: (record, selected, selectedRows) => {
-      console.log(record, selected, selectedRows);
-    },
-    onSelectAll: (selected, selectedRows, changeRows) => {
-      console.log(selected, selectedRows, changeRows);
-    },
+    onSelect: (record, selected, selectedRows) => {},
+    onSelectAll: (selected, selectedRows, changeRows) => {},
   };
 
   const renderRight = useMemo(() => {
@@ -310,7 +306,6 @@ export default () => {
 
     let list: any = formRef?.current?.getvalue();
     list.map(item => {
-      console.log(item);
       values.id = selectItem?.id;
       if (item.type === 'user') {
         values.push({
