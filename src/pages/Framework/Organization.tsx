@@ -30,6 +30,7 @@ import {
   tsNewParam,
 } from './services/organization';
 import Organization from './components/Organization';
+import MoveInOz from './components/MoveInOz';
 import OzTreeSlect from './components/OzTreeSlect';
 import { GlobalResParams } from '@/types/ITypes';
 import './style/organization.less';
@@ -59,7 +60,9 @@ const columns: any = [
     dataIndex: 'groupCode',
     key: 'groupCode',
     align: 'center',
-    render: (_, record) => <span>{record.userType === 1 ? '否' : '是'}</span>,
+    render: (_, record) => (
+      <span>{record.userType === 1 || !record.userType ? '否' : '是'}</span>
+    ),
   },
 ];
 
@@ -706,7 +709,14 @@ export default props => {
           <Divider type="vertical" />
           <span
             onClick={() => {
-              setDepartmentVisible(true);
+              if (selectGroup.memberList && selectUserkeys.length) {
+                setDepartmentVisible(true);
+              } else {
+                notification['error']({
+                  message: '请选择需要设置的人员',
+                  description: '',
+                });
+              }
             }}
           >
             设置所在部门
@@ -715,16 +725,22 @@ export default props => {
           {selectGroup.memberList ? (
             <span
               onClick={() => {
-                let arr: any = [];
-                selectGroup.memberList?.map(item => {
-                  if (selectUserkeys.indexOf(item.code) > -1) {
-                    console.log(item);
-                    arr.push(item.parentCode);
-                  }
-                });
-
-                setSelectUserParent(arr);
-                setReportToVisible(true);
+                if (selectGroup.memberList && selectUserkeys.length) {
+                  let arr: any = [];
+                  selectGroup.memberList?.map(item => {
+                    if (selectUserkeys.indexOf(item.code) > -1) {
+                      console.log(item);
+                      arr.push(item.parentCode);
+                    }
+                  });
+                  setSelectUserParent(arr);
+                  setReportToVisible(true);
+                } else {
+                  notification['error']({
+                    message: '请选择需要设置的人员',
+                    description: '',
+                  });
+                }
               }}
             >
               设置直属上级
@@ -735,7 +751,14 @@ export default props => {
               <Divider type="vertical" />
               <span
                 onClick={() => {
-                  setRemoveUserVisible(true);
+                  if (selectGroup.memberList && selectUserkeys.length) {
+                    setRemoveUserVisible(true);
+                  } else {
+                    notification['error']({
+                      message: '请选择需要设置的人员',
+                      description: '',
+                    });
+                  }
                 }}
               >
                 删除
@@ -913,8 +936,7 @@ export default props => {
         okText="保存"
         cancelText="取消"
       >
-        <Organization
-          key={moveInVisible + ''}
+        <MoveInOz
           renderUser={true}
           onlySelectUser={true}
           ref={formRef}

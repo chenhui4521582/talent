@@ -171,8 +171,6 @@ export default props => {
         return value ? value + '-$-' + showValue : showValue;
       case 'department':
         return value ? value + '-$-' + showValue : showValue;
-      case 'department':
-        return value ? value + '-$-' + showValue : showValue;
       case 'business':
         return value ? value + '-$-' + showValue : showValue;
       case 'company':
@@ -310,6 +308,7 @@ export default props => {
   }, [formList, mount]);
 
   const submitData = (type: number): void => {
+    console.log(idItemList);
     form.validateFields().then(async fromSubData => {
       console.log('fromSubData');
       console.log(fromSubData);
@@ -333,7 +332,7 @@ export default props => {
         }
         if (item.isLocked) {
           subList.push({
-            id: item.id,
+            resFormControlId: item.resFormControlId,
             multipleNumber: 1,
             showValue: item.showValue || '',
             value: item.value || '',
@@ -341,18 +340,18 @@ export default props => {
         } else {
           if (item.baseControlType === 'datetime') {
             subList.push({
-              id: item.id,
+              resFormControlId: item.resFormControlId,
               multipleNumber: 1,
-              showValue: moment(showArr.join(','))?.format(
+              showValue: moment(valueArr.join(','))?.format(
                 'YYYY-MM-DD HH:mm:ss',
               ),
               value: moment(valueArr.join(','))?.format('YYYY-MM-DD HH:mm:ss'),
             });
           } else if (item.baseControlType === 'date') {
             subList.push({
-              id: item.id,
+              resFormControlId: item.resFormControlId,
               multipleNumber: 1,
-              showValue: moment(showArr.join(','))?.format('YYYY-MM-DD'),
+              showValue: moment(valueArr.join(','))?.format('YYYY-MM-DD'),
               value: moment(valueArr.join(','))?.format('YYYY-MM-DD'),
             });
           } else if (
@@ -370,14 +369,14 @@ export default props => {
           ) {
             console.log(valueArr);
             subList.push({
-              id: item.id,
+              resFormControlId: item.resFormControlId,
               multipleNumber: 1,
               showValue: valueArr.join(',').split('-$-')[0],
               value: valueArr.join(',').split('-$-')[0],
             });
           } else {
             subList.push({
-              id: item.id,
+              resFormControlId: item.resFormControlId,
               multipleNumber: 1,
               showValue: showArr.join(','),
               value: valueArr.join(','),
@@ -389,7 +388,7 @@ export default props => {
         remark: fromSubData.remark,
         taskFormId: formId,
         type: type,
-        wfResFormSaveItemCrudParamList: subList,
+        wfResFormUpdateItemCrudParamList: subList,
         wfTaskFormFilesCrudParamList: [],
       });
 

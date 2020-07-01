@@ -30,9 +30,6 @@ interface tsProps {
 function Organization(props: tsProps, formRef) {
   const {
     renderUser,
-    onlySelectUser,
-    onlyDepart,
-    onlySelect,
     propsData,
     renderDefault,
     selectKeys,
@@ -224,133 +221,29 @@ function Organization(props: tsProps, formRef) {
     setExpandedKeys(expandedKeys);
     setAutoExpandParent(false);
   };
-
-  // 查找选择后取消祖父节点跟曾子节点的选准状态
-  const handleCheckKey = (keys, key) => {
-    let fatherArr: string[] = [];
-    let childrenArr: string[] = [];
-
-    const handleFater = code => {
-      fatherArr.push(code);
-      newData.map(item => {
-        if (item.parentCode) {
-          handleFater(item.parentCode);
-        } else {
-          return;
-        }
-      });
-    };
-
-    const handleChildren = list => {
-      list.map(item => {
-        childrenArr.push(item.code);
-        if (item.children) {
-          handleChildren(item.children);
-        } else {
-          return;
-        }
-      });
-    };
-
-    const handleItem = list => {
-      for (let i = 0; i < list.length; i++) {
-        let item = list[i];
-
-        if (key === item.code) {
-          if (item.parentCode) {
-            handleFater(item.parentCode);
-          }
-          if (item.children) {
-            handleChildren(item.children);
-          }
-          break;
-        }
-        if (item.children) {
-          handleItem(item.children);
-        }
-      }
-    };
-
-    let newData = JSON.parse(JSON.stringify(dataList));
-    handleItem(newData);
-    let newList = fatherArr.concat(childrenArr);
-    let keyArr = JSON.parse(JSON.stringify(keys));
-
-    newList.map(k => {
-      if (keyArr.indexOf(k) > -1) {
-        keyArr.splice(keyArr.indexOf(k), 1);
-      }
-    });
-    setCheckedKeys(
-      isLockedPropskey ? [...new Set(selectKeys?.concat(keyArr))] : keyArr,
-    );
-  };
-
   // 获取获得key
   const onCheck = (keys, e) => {
-    const {
-      checked,
-      node: { key },
-    } = e;
-
-    if (onlyDepart) {
-      if (departList.indexOf(key) > -1) {
-        // setCheckedKeys([keys.checked[keys.checked.length - 1]]);
-        handleCheckKey(keys.checked, key);
-        return;
-      } else {
-        setCheckedKeys(
-          isLockedPropskey
-            ? [...new Set(selectKeys?.concat(checkedKeys))]
-            : checkedKeys,
-        );
-        return;
-      }
-    }
-
-    if (onlySelectUser && checked) {
-      if (userKeyList.indexOf(key) > -1) {
-        if (onlySelect) {
-          setCheckedKeys(
-            isLockedPropskey
-              ? [
-                  ...new Set(
-                    selectKeys?.concat([keys.checked[keys.checked.length - 1]]),
-                  ),
-                ]
-              : [keys.checked[keys.checked.length - 1]],
-          );
-        } else {
-          setCheckedKeys(
-            isLockedPropskey
-              ? [...new Set(selectKeys?.concat(keys.checked))]
-              : keys.checked,
-          );
-        }
-      }
+    const { checked, node } = e;
+    if (checked) {
+      setCheckedKeys([...new Set(keys?.concat(selectKeys))]);
     } else {
-      if (checked) {
-        handleCheckKey(keys.checked, key);
-      } else {
-        setCheckedKeys(
-          isLockedPropskey
-            ? [...new Set(selectKeys?.concat(keys.checked))]
-            : keys.checked,
-        );
+      let list = JSON.parse(JSON.stringify(keys));
+      if (list.indexOf(node.key) > -1) {
+        list.splice(list.indexOf(node.key), 1);
       }
+      setCheckedKeys([...new Set(list?.concat(selectKeys))]);
     }
   };
 
   const removeCheck = key => {
-    if (isLockedPropskey && selectKeys?.indexOf(key) > -1) {
+    if (selectKeys?.indexOf(key) > -1) {
       return;
     }
     let list = JSON.parse(JSON.stringify(checkedKeys));
-    list.splice(
-      list.findIndex(item => item === key),
-      1,
-    );
-    setCheckedKeys(list);
+    if (list.indexOf(key) > -1) {
+      list.splice(list.indexOf(key), 1);
+    }
+    setCheckedKeys([...new Set(list?.concat(selectKeys))]);
   };
 
   const Loop = data => {
@@ -383,22 +276,26 @@ function Organization(props: tsProps, formRef) {
   };
 
   const renderSelect = () => {
-    return keyTitleList.map(item => {
+    return userKeyList.map(item => {
       return checkedKeys.map(key => {
-        if (item.key === key) {
-          return (
-            <div key={key} style={{ display: 'flex', cursor: 'pointer' }}>
-              <span>{item.title}</span>
-              <span
-                onClick={() => {
-                  removeCheck(key);
-                }}
-                style={{ marginLeft: 10 }}
-              >
-                x
-              </span>
-            </div>
-          );
+        if (item === key) {
+          return keyTitleList.map(obj => {
+            if (obj.key === item) {
+              return (
+                <div key={key} style={{ display: 'flex', cursor: 'pointer' }}>
+                  <span>{obj.title}</span>
+                  <span
+                    onClick={() => {
+                      removeCheck(key);
+                    }}
+                    style={{ marginLeft: 10 }}
+                  >
+                    x
+                  </span>
+                </div>
+              );
+            }
+          });
         }
       });
     });
@@ -428,7 +325,6 @@ function Organization(props: tsProps, formRef) {
           autoExpandParent={autoExpandParent}
           onCheck={onCheck}
           checkable={true}
-          checkStrictly={true}
         />
       </div>
       <Divider

@@ -29,6 +29,12 @@ export default () => {
       render: (_, record: tsList) => <span>{status[record.status]}</span>,
     },
     {
+      title: '当前节点',
+      dataIndex: 'currStepStr',
+      key: 'currStepStr',
+      align: 'center',
+    },
+    {
       title: '未操作者',
       dataIndex: 'dealUser',
       key: 'dealUser',

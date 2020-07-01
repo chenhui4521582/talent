@@ -20,6 +20,7 @@ export default (props: tsProps) => {
   const [treeExpandedKeys, setTreeExpandedKeys] = useState<any[]>([]);
   const [expandAll, setExpandAll] = useState<boolean>(false);
   const [once, setOnce] = useState<boolean>(false);
+  const [mount, setMount] = useState<boolean>(false);
 
   useEffect(() => {
     getJson();
@@ -29,7 +30,7 @@ export default (props: tsProps) => {
     console.log(props);
     if (props?.value) {
       if (!once) {
-        setValues([props?.value?.split('-$-')[0]]);
+        setValues(props?.value?.split('-$-')[1].split(','));
       }
     }
   }, [props?.value, once]);
@@ -38,6 +39,7 @@ export default (props: tsProps) => {
     let organizationJson: GlobalResParams<tsListItem[]> = await getOrganization();
     if (organizationJson.status === 200) {
       let list = organizationJson.obj;
+      setMount(true);
       handleList(list);
     }
   }
@@ -233,36 +235,6 @@ export default (props: tsProps) => {
     }
   };
 
-  const getParentKey = keys => {
-    let parentKey: string[] = [];
-    let newData = JSON.parse(JSON.stringify(dataList));
-
-    const handleItem = (list, key) => {
-      for (let i = 0; i < list.length; i++) {
-        let item = list[i];
-        if (key === item.code) {
-          if (item.parentCode) {
-            parentKey.push(item.parentCode);
-            handleItem(newData, item.parentCode);
-            // break;
-          }
-
-          if (item.groupCode) {
-            parentKey.push(item.groupCode);
-            handleItem(newData, item.groupCode);
-            // break;
-          }
-        }
-        if (item.children) {
-          handleItem(item.children, key);
-        }
-      }
-    };
-    handleItem(newData, keys);
-    console.log(parentKey);
-    return parentKey;
-  };
-
   const searchChange = (e): void => {
     setExpandAll(true);
     setSearchValue(e);
@@ -272,6 +244,7 @@ export default (props: tsProps) => {
     setExpandAll(false);
     setTreeExpandedKeys(expandedKeys);
   };
+
   return (
     <TreeSelect
       {...props}

@@ -83,10 +83,6 @@ export default props => {
         return defaultValue
           ? defaultValue + '-$-' + defaultShowValue
           : defaultShowValue;
-      case 'department':
-        return defaultValue
-          ? defaultValue + '-$-' + defaultShowValue
-          : defaultShowValue;
       case 'business':
         return defaultValue
           ? defaultValue + '-$-' + defaultShowValue
