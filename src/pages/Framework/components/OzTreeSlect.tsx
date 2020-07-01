@@ -1,6 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { TreeSelect } from 'antd';
-import { getOrganization, tsListItem } from '../services/organization';
+import {
+  getOrganization,
+  tsListItem,
+  tsDeleteItem,
+  tsDefaultItem,
+  getDeleteGroup,
+  getDefaultGroup,
+} from '../services/organization';
 import { GlobalResParams } from '@/types/ITypes';
 
 interface tsProps {
@@ -17,7 +24,6 @@ export default (props: tsProps) => {
   const [userKeyList, setUserKeyList] = useState<any[]>([]);
   const [searchValue, setSearchValue] = useState<string>('');
   const [values, setValues] = useState<string[]>([]);
-  const [treeExpandedKeys, setTreeExpandedKeys] = useState<any[]>([]);
   const [expandAll, setExpandAll] = useState<boolean>(false);
   const [once, setOnce] = useState<boolean>(false);
   const [mount, setMount] = useState<boolean>(false);
@@ -29,18 +35,69 @@ export default (props: tsProps) => {
   useEffect(() => {
     console.log(props);
     if (props?.value) {
-      if (!once) {
-        setValues(props?.value?.split('-$-')[1].split(','));
+      if (!once && mount) {
+        setValues(props?.value?.split('-$-')[0].split(','));
       }
     }
-  }, [props?.value, once]);
+  }, [props?.value, once, mount]);
 
   async function getJson() {
     let organizationJson: GlobalResParams<tsListItem[]> = await getOrganization();
-    if (organizationJson.status === 200) {
+    let deleteGroupJson: GlobalResParams<tsDeleteItem[]> = await getDeleteGroup();
+    let defaultGroupJson: GlobalResParams<tsDefaultItem[]> = await getDefaultGroup();
+    if (
+      organizationJson.status === 200 &&
+      deleteGroupJson.status === 200 &&
+      defaultGroupJson.status === 200
+    ) {
       let list = organizationJson.obj;
-      setMount(true);
+      let deleteGroupList: tsUserItem[] = [];
+      for (let i = 0; i < deleteGroupJson.obj.length; i++) {
+        deleteGroupList.push({
+          key: deleteGroupJson.obj[i].userCode,
+          title: deleteGroupJson.obj[i].trueName,
+          code: deleteGroupJson.obj[i].userCode,
+          groupCode: '已删除组',
+          name: deleteGroupJson.obj[i].trueName,
+        });
+      }
+      let deleteGroupObj: tsListItem = {
+        id: -1,
+        code: '已删除组',
+        name: '已删除组',
+        parentCode: '奖多多集团',
+        key: '已删除组',
+        title: '已删除组',
+        memberList: deleteGroupList,
+      };
+
+      list.push(deleteGroupObj);
+
+      let defaulGroupList: tsUserItem[] = [];
+      for (let i = 0; i < defaultGroupJson.obj.length; i++) {
+        defaulGroupList.push({
+          key: defaultGroupJson.obj[i].userCode,
+          title: defaultGroupJson.obj[i].trueName,
+          code: defaultGroupJson.obj[i].userCode,
+          groupCode: '默认分组',
+          name: defaultGroupJson.obj[i].trueName,
+        });
+      }
+
+      let defaultGroupObj: tsListItem = {
+        id: -2,
+        code: '默认分组',
+        name: '默认分组',
+        parentCode: '奖多多集团',
+        key: '默认分组',
+        title: '默认分组',
+        memberList: defaulGroupList,
+      };
+
+      list.push(defaultGroupObj);
+
       handleList(list);
+      setMount(true);
     }
   }
 
@@ -94,7 +151,7 @@ export default (props: tsProps) => {
 
     const handleItem = list => {
       for (let i = 0; i < list.length; i++) {
-        list[i].key = list[i].code;
+        list[i].key = list[i].code + '';
         if (searchValue.length && list[i].title.indexOf(searchValue) > -1) {
           const index = list[i].title.indexOf(searchValue);
           const beforeStr = list[i].title.substr(0, index);
@@ -227,6 +284,7 @@ export default (props: tsProps) => {
             arr.push(item);
           }
         });
+
         setValues(arr);
         props.onChange(formArr);
       } else {
@@ -242,9 +300,7 @@ export default (props: tsProps) => {
 
   const onTreeExpand = expandedKeys => {
     setExpandAll(false);
-    setTreeExpandedKeys(expandedKeys);
   };
-
   return (
     <TreeSelect
       {...props}
