@@ -12,7 +12,7 @@ import {
   useRank,
   useTitle,
   useJob,
-  useCompany,
+  useLabor,
   useDepartment,
 } from '@/models/global';
 
@@ -153,9 +153,8 @@ const SelectTemplate = props => {
   if (Object.prototype.toString.call(list) === '[object String]') {
     data = list.split('|');
   }
-  console.log(props.disabled);
   return (
-    <Select {...props} placeholder="请选择" style={{ width: '100%' }}>
+    <Select {...props} placeholder="请选择">
       {data.map((item, index) => {
         return (
           <Option key={index} value={item + '-$-' + item}>
@@ -194,9 +193,9 @@ const BusinessTemplate = props => {
   );
 };
 
-// 公司单选框
+// 劳动关系
 const CompanyTemplate = props => {
-  const { companyList } = useCompany();
+  const { laborList } = useLabor();
   return (
     <Select
       {...props}
@@ -205,15 +204,15 @@ const CompanyTemplate = props => {
       filterOption={(input, option) =>
         option?.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
       }
-      placeholder="请选择公司"
+      placeholder="请选择劳动关系"
     >
-      {companyList?.map(item => {
+      {laborList?.map(item => {
         return (
           <Option
-            key={item.companyId + '-$-' + item.companyName}
-            value={item.companyId + '-$-' + item.companyName}
+            key={item.id + '-$-' + item.id}
+            value={item.id + '-$-' + item.laborRelationName}
           >
-            {item.companyName}
+            {item.laborRelationName}
           </Option>
         );
       })}

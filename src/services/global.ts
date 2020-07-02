@@ -133,7 +133,7 @@ export async function listUserByBusinessCode(businessId: number) {
   });
 }
 
-// 部门下拉 1: 业务线  2: 部门  3:小组
+// 部门下拉 1: 一级业务线  2: 二级业务线  3:部门  4:组别
 export async function listDepartment(level: number) {
   return request(`/api/talent/employeeRoster/listDepartment`, {
     method: 'POST',

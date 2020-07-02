@@ -35,8 +35,11 @@ export default props => {
   const [form] = Form.useForm();
   const { businessList } = useBusiness();
   const { jobList } = useJob();
-  const { departmentList } = useDepartment(2);
-  const { departmentList: groupList } = useDepartment(3);
+  const { departmentList: firstBusiness } = useDepartment(1);
+  const { departmentList: secondBusiness } = useDepartment(2);
+  const { departmentList } = useDepartment(3);
+  const { departmentList: groupList } = useDepartment(4);
+
   const { rankList } = useRank();
   const { titleList } = useTitle();
   const { costList } = useCost();
@@ -147,14 +150,14 @@ export default props => {
           <Col span={6} offset={2}>
             <Form.Item
               label="一级业务线"
-              name="businessCode"
+              name="firstBusinessCode"
               rules={[{ required: true, message: '请选择所属业务线' }]}
             >
               <Select showSearch optionFilterProp="children">
-                {businessList?.map(item => {
+                {firstBusiness?.map(item => {
                   return (
-                    <Option value={item.businessCode} key={item.businessCode}>
-                      {item.businessLineName}
+                    <Option value={item.code} key={item.code}>
+                      {item.name}
                     </Option>
                   );
                 })}
@@ -164,10 +167,18 @@ export default props => {
           <Col span={6} offset={2}>
             <Form.Item
               label="二级业务线"
-              name="secondBusinessName"
+              name="businessCode"
               rules={[{ required: true, message: '请输入二级业务线' }]}
             >
-              <Input placeholder="请输入二级业务线" />
+              <Select showSearch optionFilterProp="children">
+                {secondBusiness?.map(item => {
+                  return (
+                    <Option value={item.code} key={item.code}>
+                      {item.name}
+                    </Option>
+                  );
+                })}
+              </Select>
             </Form.Item>
           </Col>
         </Row>
@@ -280,9 +291,9 @@ export default props => {
           </Col>
           <Col span={6} offset={2}>
             <Form.Item
-              label="职级"
+              label="技术职级"
               name="rankId"
-              rules={[{ required: true, message: '请选择职级' }]}
+              rules={[{ required: true, message: '请选择技术职级' }]}
             >
               <Select showSearch optionFilterProp="children">
                 {rankList?.map(item => {
@@ -295,7 +306,28 @@ export default props => {
               </Select>
             </Form.Item>
           </Col>
+
           <Col span={6} offset={2}>
+            <Form.Item
+              label="管理职级"
+              name="manageRankId"
+              rules={[{ required: true, message: '请选择管理职级' }]}
+            >
+              <Select showSearch optionFilterProp="children">
+                {rankList?.map(item => {
+                  return (
+                    <Option value={item.rankId} key={item.rankId}>
+                      {item.rankName}
+                    </Option>
+                  );
+                })}
+              </Select>
+            </Form.Item>
+          </Col>
+        </Row>
+
+        <Row>
+          <Col span={6}>
             <Form.Item
               label="职位"
               name="titleId"
@@ -312,10 +344,7 @@ export default props => {
               </Select>
             </Form.Item>
           </Col>
-        </Row>
-
-        <Row>
-          <Col span={6}>
+          <Col span={6} offset={2}>
             <Form.Item
               label="角色"
               name="roles"
@@ -336,15 +365,6 @@ export default props => {
               </Select>
             </Form.Item>
           </Col>
-          <Col span={6} offset={2}>
-            <Form.Item
-              label="工作地"
-              name="workPlace"
-              rules={[{ required: true, message: '请输入工作地' }]}
-            >
-              <Input />
-            </Form.Item>
-          </Col>
         </Row>
         <Row>
           <Col span={6}>
@@ -362,6 +382,15 @@ export default props => {
                   );
                 })}
               </Select>
+            </Form.Item>
+          </Col>
+          <Col span={6} offset={2}>
+            <Form.Item
+              label="工作地"
+              name="workPlace"
+              rules={[{ required: true, message: '请输入工作地' }]}
+            >
+              <Input />
             </Form.Item>
           </Col>
         </Row>

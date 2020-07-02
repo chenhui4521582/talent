@@ -56,10 +56,10 @@ export default props => {
                 {sexHash[detail?.sex]}
               </Descriptions.Item>
               <Descriptions.Item label="一级业务线">
-                {detail?.businessName}
+                {detail?.firstBusinessName}
               </Descriptions.Item>
               <Descriptions.Item label="二级业务线">
-                {detail?.secondBusinessName}
+                {detail?.businessName}
               </Descriptions.Item>
               <Descriptions.Item label="部门">
                 {detail?.departmentName}
@@ -83,8 +83,11 @@ export default props => {
               <Descriptions.Item label="上级姓名">
                 {detail?.superiorsName}
               </Descriptions.Item>
-              <Descriptions.Item label="职级">
+              <Descriptions.Item label="技术职级">
                 {detail?.rankName}
+              </Descriptions.Item>
+              <Descriptions.Item label="管理职级">
+                {detail?.manageRankName}
               </Descriptions.Item>
               <Descriptions.Item label="职位">
                 {detail?.titleName}

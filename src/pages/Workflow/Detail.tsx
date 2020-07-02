@@ -219,6 +219,7 @@ export default props => {
                     key={groupItem.id}
                     label={groupItem.name}
                     span={groupItem.colspan}
+                    style={{ maxWidth: '300px' }}
                   >
                     {groupItem.list.map(listItem => {
                       return (
@@ -228,7 +229,6 @@ export default props => {
                             display: 'flex',
                             flex: 1,
                             flexDirection: 'row',
-                            // margin: '10px',
                           }}
                         >
                           <div
@@ -265,8 +265,6 @@ export default props => {
                   </Descriptions.Item>
                 );
               } else {
-                let width =
-                  groupItem.baseControlType === 'user' ? '400px' : '100%';
                 return (
                   <Descriptions.Item
                     key={groupItem.id}
@@ -285,7 +283,6 @@ export default props => {
                         width: '100%',
                         marginBottom: 0,
                         marginTop: 0,
-                        maxWidth: width,
                       }}
                       name={groupItem.id}
                       initialValue={handleValue(groupItem)}

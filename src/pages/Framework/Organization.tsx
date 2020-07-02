@@ -32,6 +32,7 @@ import {
 import Organization from './components/Organization';
 import MoveInOz from './components/MoveInOz';
 import OzTreeSlect from './components/OzTreeSlect';
+import { StarOutlined } from '@ant-design/icons';
 import { GlobalResParams } from '@/types/ITypes';
 import { ColumnProps } from 'antd/es/table';
 import './style/organization.less';
@@ -43,6 +44,22 @@ const columns: ColumnProps<tsUserItem>[] = [
     dataIndex: 'name',
     key: 'name',
     align: 'center',
+    render: (_, record) => (
+      <div
+        style={{
+          color:
+            record.userType === 2 || !record.userType
+              ? 'blue'
+              : 'rgba(0, 0, 0, 0.65)',
+          fontWeight:
+            record.userType === 2 || !record.userType ? 'bold' : 'normal',
+          minHeight: '1.5em',
+        }}
+      >
+        {record.userType === 2 || !record.userType ? <StarOutlined /> : null}
+        {record.name}
+      </div>
+    ),
   },
   {
     title: 'code',
@@ -636,6 +653,7 @@ export default props => {
       });
       getJson();
       setSuperiorVisible(false);
+      setSelectUserParent([]);
     } else {
       notification['error']({
         message: json.msg,
@@ -804,6 +822,7 @@ export default props => {
                       setSelectUserParent([item.code]);
                     }
                   });
+
                   setSuperiorVisible(true);
                 }}
               >

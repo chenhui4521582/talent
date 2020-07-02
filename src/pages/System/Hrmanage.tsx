@@ -1,6 +1,15 @@
 import React, { useState } from 'react';
 import {
-  Card, Form, Row, Col, Select, Switch, notification, Modal, Button, Radio
+  Card,
+  Form,
+  Row,
+  Col,
+  Select,
+  Switch,
+  notification,
+  Modal,
+  Button,
+  Radio,
 } from 'antd';
 import { useTable } from '@/components/GlobalTable/useTable';
 import { ColumnProps } from 'antd/es/table';
@@ -34,21 +43,26 @@ export default () => {
     {
       title: '邮箱',
       key: 'email',
-      dataIndex: 'email'
+      dataIndex: 'email',
     },
     {
       title: '状态',
       key: 'status',
       dataIndex: 'status',
       render: (text, record) => {
-        return <Switch checked={text === '1' ? true : false} onClick={e => changeStatus(record)} />
-      }
+        return (
+          <Switch
+            checked={text === '1' ? true : false}
+            onClick={e => changeStatus(record)}
+          />
+        );
+      },
     },
   ];
-  const changeStatus = async (record) => {
+  const changeStatus = async record => {
     let status;
     if (record.status === '0') {
-      status = '1'
+      status = '1';
     } else {
       status = '0';
     }
@@ -69,23 +83,25 @@ export default () => {
   const { TableContent, refresh } = useTable({
     queryMethod: getRoleList,
     columns,
-    rowKeyName: 'userName'
+    rowKeyName: 'userName',
   });
 
   const showModal = () => {
     setVisible(true);
-  }
+  };
   const cancelModal = () => {
     setVisible(false);
     form.resetFields();
-  }
-  const changeBusiness = async (value) => {
+  };
+  const changeBusiness = async value => {
     let data = JSON.parse(value);
-    let res: GlobalResParams<IBusinessPerson[]> = await listUserByBusinessCode(data.businessCode);
+    let res: GlobalResParams<IBusinessPerson[]> = await listUserByBusinessCode(
+      data.businessCode,
+    );
     setPersons(res.obj);
-  }
+  };
 
-  const handleAdd = async (values) => {
+  const handleAdd = async values => {
     let businessData = JSON.parse(values.businessCode);
     let userData = JSON.parse(values.userCode);
     values.userCode = userData.userCode;
@@ -94,29 +110,26 @@ export default () => {
     values.businessLineName = businessData.businessLineName;
     values.businessCode = businessData.businessCode;
     let res: GlobalResParams<string> = await addRole(values);
-    if(res.status === 200) {
+    if (res.status === 200) {
       cancelModal();
       refresh();
       notification['success']({
         message: res.msg,
         description: '',
       });
-    }else {
+    } else {
       notification['error']({
         message: res.msg,
         description: '',
       });
     }
-  }
+  };
   return (
-    <Card title="人员管理" extra={<Button type="primary" onClick={showModal}>新增人员</Button>}>
+    <Card title="人员管理">
       <TableContent>
         <Row>
           <Col span={6}>
-            <Form.Item
-              label="角色"
-              name="type"
-            >
+            <Form.Item label="角色" name="type">
               <Select>
                 <Option value={1}>人事专员</Option>
                 <Option value={2}>面试官</Option>
@@ -127,27 +140,30 @@ export default () => {
       </TableContent>
       <Modal
         visible={visible}
-        title='新增人员'
+        title="新增人员"
         okText="确定"
         cancelText="取消"
         onCancel={cancelModal}
         onOk={e => form.submit()}
       >
-        <Form
-          form={form}
-          onFinish={handleAdd}
-        >
+        <Form form={form} onFinish={handleAdd}>
           <Form.Item
             label="选择业务线"
             name="businessCode"
             rules={[{ required: true, message: '请选择业务线' }]}
           >
-            <Select placeholder="请选择业务线" allowClear onChange={changeBusiness}>
-              {
-                businessList?.map(item => {
-                  return <Option key={item.businessCode} value={JSON.stringify(item)}>{item.businessLineName}</Option>
-                })
-              }
+            <Select
+              placeholder="请选择业务线"
+              allowClear
+              onChange={changeBusiness}
+            >
+              {businessList?.map(item => {
+                return (
+                  <Option key={item.businessCode} value={JSON.stringify(item)}>
+                    {item.businessLineName}
+                  </Option>
+                );
+              })}
             </Select>
           </Form.Item>
 
@@ -157,11 +173,13 @@ export default () => {
             rules={[{ required: true, message: '请选择相关人员' }]}
           >
             <Select placeholder="请选择相关人员">
-              {
-                persons?.map(item => {
-                  return <Option key={item.userCode} value={JSON.stringify(item)}>{item.userName}</Option>
-                })
-              }
+              {persons?.map(item => {
+                return (
+                  <Option key={item.userCode} value={JSON.stringify(item)}>
+                    {item.userName}
+                  </Option>
+                );
+              })}
             </Select>
           </Form.Item>
 
@@ -178,5 +196,5 @@ export default () => {
         </Form>
       </Modal>
     </Card>
-  )
-}
+  );
+};
