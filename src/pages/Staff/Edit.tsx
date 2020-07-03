@@ -27,6 +27,7 @@ import {
   updateEmployeeInfo,
 } from './services/staff';
 import { GlobalResParams } from '@/types/ITypes';
+import OzTreeSlect from '@/pages/Framework/components/OzTreeSlect';
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -74,6 +75,7 @@ export default props => {
     if (employeeId) getDetail();
   }, []);
   const handleSubmit = async values => {
+    console.log(values);
     let actionMethod;
     values.contractStart = moment(values.contractStart).format('YYYY/MM/DD');
     values.contractEnd = moment(values.contractEnd).format('YYYY/MM/DD');
@@ -116,7 +118,7 @@ export default props => {
               name="name"
               rules={[{ required: true, message: '请输入姓名' }]}
             >
-              <Input />
+              <Input disabled={employeeId} />
             </Form.Item>
           </Col>
           <Col span={6} offset={2}>
@@ -220,6 +222,9 @@ export default props => {
                 <Option value={4} key={4}>
                   兼职
                 </Option>
+                <Option value={5} key={5}>
+                  代缴
+                </Option>
               </Select>
             </Form.Item>
           </Col>
@@ -229,7 +234,7 @@ export default props => {
               name="departmentCode"
               rules={[{ required: true, message: '请选择部门' }]}
             >
-              <Select showSearch optionFilterProp="children">
+              {/* <Select showSearch optionFilterProp="children">
                 {departmentList?.map(item => {
                   return (
                     <Option value={item.code} key={item.code}>
@@ -237,7 +242,8 @@ export default props => {
                     </Option>
                   );
                 })}
-              </Select>
+              </Select> */}
+              <OzTreeSlect {...props} onlySelect={true} onlySelectLevel={3} />
             </Form.Item>
           </Col>
         </Row>
@@ -297,11 +303,15 @@ export default props => {
             >
               <Select showSearch optionFilterProp="children">
                 {rankList?.map(item => {
-                  return (
-                    <Option value={item.rankId} key={item.rankId}>
-                      {item.rankName}
-                    </Option>
-                  );
+                  if (item.rankName.indexOf('P') > -1) {
+                    return (
+                      <Option value={item.rankId} key={item.rankId}>
+                        {item.rankName}
+                      </Option>
+                    );
+                  } else {
+                    return null;
+                  }
                 })}
               </Select>
             </Form.Item>
@@ -315,11 +325,15 @@ export default props => {
             >
               <Select showSearch optionFilterProp="children">
                 {rankList?.map(item => {
-                  return (
-                    <Option value={item.rankId} key={item.rankId}>
-                      {item.rankName}
-                    </Option>
-                  );
+                  if (item.rankName.indexOf('M') > -1) {
+                    return (
+                      <Option value={item.rankId} key={item.rankId}>
+                        {item.rankName}
+                      </Option>
+                    );
+                  } else {
+                    return null;
+                  }
                 })}
               </Select>
             </Form.Item>
@@ -348,9 +362,12 @@ export default props => {
             <Form.Item
               label="角色"
               name="roles"
-              rules={[{ required: true, message: '请输入角色' }]}
+              rules={[{ required: true, message: '请选择角色' }]}
             >
-              <Input />
+              <Select placeholder="请选择角色">
+                <Option value="专业">专业</Option>
+                <Option value="管理">管理</Option>
+              </Select>
             </Form.Item>
           </Col>
           <Col span={6} offset={2}>
@@ -611,7 +628,7 @@ export default props => {
               name="idCard"
               rules={[{ required: true, message: '请输入身份证号' }]}
             >
-              <Input />
+              <Input disabled={employeeId} />
             </Form.Item>
           </Col>
         </Row>

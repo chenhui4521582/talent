@@ -14,10 +14,12 @@ interface tsProps {
   renderUser?: boolean;
   onlySelectUser?: boolean;
   onlySelect?: boolean;
+  onlySelectLevel?: number;
+  onChange?: any;
 }
 
 export default (props: tsProps) => {
-  const { renderUser, onlySelectUser, onlySelect } = props;
+  const { renderUser, onlySelectUser, onlySelect, onlySelectLevel } = props;
   const [dataList, setDataList] = useState<any>([]);
   const [keyTitleList, setKeyTitleList] = useState<any[]>([]);
   const [userListObj, setUserList] = useState<any>({});
@@ -27,13 +29,13 @@ export default (props: tsProps) => {
   const [expandAll, setExpandAll] = useState<boolean>(false);
   const [once, setOnce] = useState<boolean>(false);
   const [mount, setMount] = useState<boolean>(false);
+  const [levelKeys, setLevelKeys] = useState<string[]>([]);
 
   useEffect(() => {
     getJson();
   }, []);
 
   useEffect(() => {
-    console.log(props);
     if (props?.value) {
       if (!once && mount) {
         setValues(props?.value?.split('-$-')[0].split(','));
@@ -105,6 +107,7 @@ export default (props: tsProps) => {
     let keyTitle = keyTitleList;
     let userList = userListObj;
     let userKeyArr = userKeyList;
+    let levelKeysArr = levelKeys;
     const handleItem = list => {
       for (let i = 0; i < list.length; i++) {
         list[i].key = list[i].code;
@@ -131,14 +134,17 @@ export default (props: tsProps) => {
             userKeyArr.push(item.code);
           });
         }
+        if (onlySelectLevel && onlySelectLevel === list[i].level) {
+          levelKeysArr.push(list[i].code);
+          list[i].children = [];
+        }
         if (list[i].children) {
           handleItem(list[i].children);
         }
       }
     };
 
-    console.log('data');
-    console.log(data);
+    setLevelKeys(levelKeysArr);
     setUserKeyList(userKeyArr);
     handleItem(data);
     setDataList(data);
@@ -225,13 +231,11 @@ export default (props: tsProps) => {
     handleItem(newData);
     let newList = fatherArr.concat(childrenArr);
     let keyArr = JSON.parse(JSON.stringify(keys));
-    console.log(keyArr);
     newList.map(k => {
       if (keyArr.indexOf(k) > -1) {
         keyArr.splice(keyArr.indexOf(k), 1);
       }
     });
-    console.log(keyArr);
     setValues(keyArr);
     let formArr: any = [];
     keyTitleList.map(item => {
@@ -245,8 +249,6 @@ export default (props: tsProps) => {
 
   const onChange = value => {
     setOnce(true);
-    console.log(value);
-    console.log('value');
     if (onlySelect) {
       if (onlySelectUser) {
         if (userKeyList.indexOf(value) > -1) {
@@ -260,6 +262,11 @@ export default (props: tsProps) => {
         } else {
           props.onChange([]);
           setValues([]);
+        }
+      } else if (onlySelectLevel) {
+        if (levelKeys.indexOf(value) > -1) {
+          setValues(value);
+          props.onChange(value);
         }
       } else {
         setValues(value);
