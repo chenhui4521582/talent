@@ -44,8 +44,9 @@ export default props => {
       <Tabs>
         <TabPane tab="花名册" key="1">
           <div>
-            <Descriptions bordered>
-              <Descriptions.Item label="员工编号">
+            <h2>基本信息</h2>
+            <Descriptions bordered column={4}>
+              <Descriptions.Item label="员工编号" style={{ maxWidth: '25%' }}>
                 {detail?.employeeId}
               </Descriptions.Item>
               <Descriptions.Item label="姓名">{detail?.name}</Descriptions.Item>
@@ -55,7 +56,7 @@ export default props => {
               <Descriptions.Item label="性别">
                 {sexHash[detail?.sex]}
               </Descriptions.Item>
-              <Descriptions.Item label="一级业务线">
+              <Descriptions.Item label="一级业务线" style={{ maxWidth: '25%' }}>
                 {detail?.firstBusinessName}
               </Descriptions.Item>
               <Descriptions.Item label="二级业务线">
@@ -67,7 +68,10 @@ export default props => {
               <Descriptions.Item label="成本中心">
                 {detail?.businessCostCenter}
               </Descriptions.Item>
-              <Descriptions.Item label="实际劳动关系">
+              <Descriptions.Item
+                label="实际劳动关系"
+                style={{ maxWidth: '25%' }}
+              >
                 {detail?.businessLaborRelations}
               </Descriptions.Item>
               <Descriptions.Item label="用工类型">
@@ -77,7 +81,7 @@ export default props => {
                 {computeHash[detail?.useComputer]}
               </Descriptions.Item>
               <Descriptions.Item label="HRBP">{detail?.hrbp}</Descriptions.Item>
-              <Descriptions.Item label="上级编号">
+              <Descriptions.Item label="上级编号" style={{ maxWidth: '25%' }}>
                 {detail?.superiorsNo}
               </Descriptions.Item>
               <Descriptions.Item label="上级姓名">
@@ -89,7 +93,7 @@ export default props => {
               <Descriptions.Item label="管理职级">
                 {detail?.manageRankName}
               </Descriptions.Item>
-              <Descriptions.Item label="职位">
+              <Descriptions.Item label="职位" style={{ maxWidth: '25%' }}>
                 {detail?.titleName}
               </Descriptions.Item>
               <Descriptions.Item label="角色">
@@ -103,7 +107,8 @@ export default props => {
               </Descriptions.Item>
             </Descriptions>
             <div style={{ marginTop: 20 }}>
-              <Descriptions bordered>
+              <h2>职位信息</h2>
+              <Descriptions bordered column={4}>
                 <Descriptions.Item label="合同起始日期">
                   {detail?.contractStart}
                 </Descriptions.Item>
@@ -134,7 +139,8 @@ export default props => {
               </Descriptions>
             </div>
             <div style={{ marginTop: 20 }}>
-              <Descriptions bordered>
+              <h2>合同信息</h2>
+              <Descriptions bordered column={4}>
                 <Descriptions.Item label="岗位">
                   {detail?.postName}
                 </Descriptions.Item>
@@ -175,7 +181,8 @@ export default props => {
               </Descriptions>
             </div>
             <div style={{ marginTop: 20 }}>
-              <Descriptions bordered>
+              <h2>银行、家庭信息</h2>
+              <Descriptions bordered column={4}>
                 <Descriptions.Item label="文化程度">
                   {eduHash[detail?.educationalLevel]}
                 </Descriptions.Item>
@@ -203,7 +210,8 @@ export default props => {
               </Descriptions>
             </div>
             <div style={{ marginTop: 20 }}>
-              <Descriptions bordered>
+              <h2>财务信息</h2>
+              <Descriptions bordered column={4}>
                 <Descriptions.Item label="备注">
                   {detail?.remark}
                 </Descriptions.Item>
