@@ -5,14 +5,12 @@ import React, {
   forwardRef,
 } from 'react';
 import { Tree, Input, Divider } from 'antd';
+import { tsListItem, tsUserItem } from '../services/organization';
 import {
-  getOrganization,
-  tsListItem,
-  getDefaultGroup,
-  tsDefaultItem,
-  tsUserItem,
-} from '../services/organization';
-import { GlobalResParams } from '@/types/ITypes';
+  useOrganization,
+  usetDeleteOrganization,
+  usetDefaultOrganization,
+} from '@/models/global';
 
 const { Search } = Input;
 interface tsProps {
@@ -47,48 +45,47 @@ function Organization(props: tsProps, formRef) {
   const [userKeyList, setUserKeyList] = useState<any[]>([]);
   const [checkedKeys, setCheckedKeys] = useState<any[]>([]);
   const [departList, setdepartList] = useState<any[]>([]);
+  const { organizationJson } = useOrganization();
+  const { deleteGroupJson } = usetDeleteOrganization();
+  const { defaultGroupJson } = usetDefaultOrganization();
   useEffect(() => {
     getJson();
-  }, []);
+  }, [organizationJson]);
 
   async function getJson() {
-    let organizationJson: GlobalResParams<tsListItem[]> = await getOrganization();
-    let defaultGroupJson: GlobalResParams<tsDefaultItem[]> = await getDefaultGroup();
-    if (organizationJson.status === 200 && defaultGroupJson.status === 200) {
-      let list = organizationJson.obj;
-      let defaulGroupList: tsUserItem[] = [];
-      for (let i = 0; i < defaultGroupJson.obj.length; i++) {
-        defaulGroupList.push({
-          key: defaultGroupJson.obj[i].userCode,
-          title: defaultGroupJson.obj[i].trueName,
-          code: defaultGroupJson.obj[i].userCode,
-          groupCode: '默认分组',
-          name: defaultGroupJson.obj[i].trueName,
-        });
-      }
-      if (renderDefault) {
-        let defaultGroupObj: tsListItem = {
-          id: -2,
-          code: '默认分组',
-          name: '默认分组',
-          parentCode: '奖多多集团',
-          key: '默认分组',
-          title: '默认分组',
-          memberList: defaulGroupList,
-        };
-        list.push(defaultGroupObj);
-      }
-
-      let newObj: tsListItem = {
-        id: 0,
-        key: '奖多多集团',
-        title: '奖多多集团',
-        code: '奖多多集团',
-        name: '奖多多集团',
-        children: list,
-      };
-      handleList([newObj]);
+    let list = organizationJson;
+    let defaulGroupList: tsUserItem[] = [];
+    for (let i = 0; i < defaultGroupJson.length; i++) {
+      defaulGroupList.push({
+        key: defaultGroupJson[i].userCode,
+        title: defaultGroupJson[i].trueName,
+        code: defaultGroupJson[i].userCode,
+        groupCode: '默认分组',
+        name: defaultGroupJson[i].trueName,
+      });
     }
+    if (renderDefault) {
+      let defaultGroupObj: tsListItem = {
+        id: -2,
+        code: '默认分组',
+        name: '默认分组',
+        parentCode: '奖多多集团',
+        key: '默认分组',
+        title: '默认分组',
+        memberList: defaulGroupList,
+      };
+      list.push(defaultGroupObj);
+    }
+
+    let newObj: tsListItem = {
+      id: 0,
+      key: '奖多多集团',
+      title: '奖多多集团',
+      code: '奖多多集团',
+      name: '奖多多集团',
+      children: list,
+    };
+    handleList([newObj]);
   }
 
   const handleList = data => {

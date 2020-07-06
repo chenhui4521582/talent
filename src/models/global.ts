@@ -18,6 +18,12 @@ import {
   ILabor,
   listCompany,
   IResumeCompany,
+  getOrganization,
+  getDeleteGroup,
+  getDefaultGroup,
+  tsListItem,
+  tsDeleteItem,
+  tsDefaultItem,
 } from '@/services/global';
 
 export const useBusiness = () => {
@@ -127,4 +133,42 @@ export const useCompany = () => {
     fetchLabor();
   }, []);
   return { companyList };
+};
+
+// 组织架构主体
+export const useOrganization = () => {
+  const [organizationJson, setOrganizationJson] = useState<tsListItem[]>([]);
+  useEffect(() => {
+    async function fetchOrganization() {
+      let res: GlobalResParams<tsListItem[]> = await getOrganization();
+      setOrganizationJson(res.obj);
+    }
+    fetchOrganization();
+  }, []);
+  return { organizationJson };
+};
+// 组织结构默认分组
+export const usetDeleteOrganization = () => {
+  const [deleteGroupJson, setDeleteGroupJson] = useState<tsDeleteItem[]>([]);
+  useEffect(() => {
+    async function fetchOrganization() {
+      let res: GlobalResParams<tsDeleteItem[]> = await getDeleteGroup();
+      setDeleteGroupJson(res.obj);
+    }
+    fetchOrganization();
+  }, []);
+  return { deleteGroupJson };
+};
+
+// 组织架构已删除人员
+export const usetDefaultOrganization = () => {
+  const [defaultGroupJson, setdefaultGroupJson] = useState<tsDefaultItem[]>([]);
+  useEffect(() => {
+    async function fetchOrganization() {
+      let res: GlobalResParams<tsDefaultItem[]> = await getDefaultGroup();
+      setdefaultGroupJson(res.obj);
+    }
+    fetchOrganization();
+  }, []);
+  return { defaultGroupJson };
 };

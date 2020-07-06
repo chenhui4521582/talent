@@ -78,6 +78,39 @@ export interface IResumeCompany {
   updateTime: string | null;
 }
 
+export interface tsListItem {
+  code: string;
+  key?: string;
+  title?: string;
+  id: number;
+  level?: number;
+  memberList?: tsUserItem[];
+  name: string;
+  parentCode?: string | null;
+  children?: tsListItem[];
+}
+
+export interface tsUserItem {
+  code: string;
+  groupCode: string;
+  name: string;
+  key?: string;
+  title?: string;
+  userType?: string | number;
+  parentCode?: string | null;
+}
+
+export interface tsDeleteItem {
+  trueName: string;
+  userCode: string;
+  parentCode?: string | null;
+}
+
+export interface tsDefaultItem {
+  trueName: string;
+  userCode: string;
+}
+
 export async function queryMenus(data: MenusReqParams) {
   return request('/api/odsApi/resource/listMenuByRoleCode', {
     method: 'post',
@@ -176,6 +209,27 @@ export async function listLabor() {
 // 公司列表
 export async function listCompany() {
   return request(`/api/talent/company/listCompanyOption`, {
+    method: 'POST',
+  });
+}
+
+// 获取组织架构主体
+export async function getOrganization() {
+  return request(`/api/talent/department/listOrganization`, {
+    method: 'POST',
+  });
+}
+
+// 获取已删除分组
+export async function getDeleteGroup() {
+  return request(`/api/talent/departmentUser/listDeletedDepartmentUser`, {
+    method: 'POST',
+  });
+}
+
+// 获取默认分组
+export async function getDefaultGroup() {
+  return request(`/api/talent/departmentUser/listDefaultGroupMember`, {
     method: 'POST',
   });
 }
