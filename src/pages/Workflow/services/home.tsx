@@ -27,7 +27,7 @@ export interface tsFormChildlist {
 }
 
 export interface tsGroupList {
-  id: number;
+  id: string;
   allowMultiple: number;
   createTime: string | null;
   createdBy: string | null;
@@ -67,7 +67,7 @@ export interface tsControlList {
   sort: number | null;
   updateTime: string | null;
   updatedBy: string | null;
-  resGroupId: number;
+  resGroupId: string;
   isGroups?: number;
 }
 
