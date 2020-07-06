@@ -6,11 +6,7 @@ import React, {
 } from 'react';
 import { Tree, Input, Divider } from 'antd';
 import { tsListItem, tsUserItem } from '../services/organization';
-import {
-  useOrganization,
-  usetDeleteOrganization,
-  usetDefaultOrganization,
-} from '@/models/global';
+import { useOrganization, usetDefaultOrganization } from '@/models/global';
 
 const { Search } = Input;
 interface tsProps {
@@ -46,7 +42,6 @@ function Organization(props: tsProps, formRef) {
   const [checkedKeys, setCheckedKeys] = useState<any[]>([]);
   const [departList, setdepartList] = useState<any[]>([]);
   const { organizationJson } = useOrganization();
-  const { deleteGroupJson } = usetDeleteOrganization();
   const { defaultGroupJson } = usetDefaultOrganization();
   useEffect(() => {
     getJson();
@@ -55,7 +50,7 @@ function Organization(props: tsProps, formRef) {
   async function getJson() {
     let list = organizationJson;
     let defaulGroupList: tsUserItem[] = [];
-    for (let i = 0; i < defaultGroupJson.length; i++) {
+    for (let i = 0; i < defaultGroupJson?.length; i++) {
       defaulGroupList.push({
         key: defaultGroupJson[i].userCode,
         title: defaultGroupJson[i].trueName,
@@ -337,7 +332,7 @@ function Organization(props: tsProps, formRef) {
   };
 
   const removeCheck = key => {
-    if (isLockedPropskey && selectKeys?.indexOf(key) > -1) {
+    if (isLockedPropskey && selectKeys && selectKeys?.indexOf(key) > -1) {
       return;
     }
     let list = JSON.parse(JSON.stringify(checkedKeys));

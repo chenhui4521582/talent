@@ -167,7 +167,7 @@ export default props => {
     list.push(deleteGroupObj);
 
     let defaulGroupList: tsUserItem[] = [];
-    for (let i = 0; i < defaultGroupJson.length; i++) {
+    for (let i = 0; i < defaultGroupJson?.length; i++) {
       defaulGroupList.push({
         key: defaultGroupJson[i].userCode,
         title: defaultGroupJson[i].trueName,

@@ -67,7 +67,7 @@ export interface tsControlList {
   sort: number | null;
   updateTime: string | null;
   updatedBy: string | null;
-  resGroupId: string;
+  resGroupId: number;
   isGroups?: number;
 }
 

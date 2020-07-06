@@ -41,7 +41,7 @@ function Organization(props: tsProps, formRef) {
   async function getJson() {
     let list = organizationJson;
     let defaulGroupList: tsUserItem[] = [];
-    for (let i = 0; i < defaultGroupJson.length; i++) {
+    for (let i = 0; i < defaultGroupJson?.length; i++) {
       defaulGroupList.push({
         key: defaultGroupJson[i].userCode,
         title: defaultGroupJson[i].trueName,
@@ -213,17 +213,6 @@ function Organization(props: tsProps, formRef) {
       }
       setCheckedKeys([...new Set(list?.concat(selectKeys))]);
     }
-  };
-
-  const removeCheck = key => {
-    if (selectKeys?.indexOf(key) > -1) {
-      return;
-    }
-    let list = JSON.parse(JSON.stringify(checkedKeys));
-    if (list.indexOf(key) > -1) {
-      list.splice(list.indexOf(key), 1);
-    }
-    setCheckedKeys([...new Set(list?.concat(selectKeys))]);
   };
 
   const Loop = data => {
