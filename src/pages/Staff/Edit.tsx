@@ -318,11 +318,7 @@ export default props => {
           </Col>
 
           <Col span={6} offset={2}>
-            <Form.Item
-              label="管理职级"
-              name="manageRankId"
-              rules={[{ required: true, message: '请选择管理职级' }]}
-            >
+            <Form.Item label="管理职级" name="manageRankId">
               <Select showSearch optionFilterProp="children">
                 {rankList?.map(item => {
                   if (item.rankName.indexOf('M') > -1) {
@@ -507,11 +503,7 @@ export default props => {
         </Row>
         <Row>
           <Col span={16}>
-            <Form.Item
-              label="合同变更记录"
-              name="contractChangeRecord"
-              rules={[{ required: true, message: '请输入合同变更记录' }]}
-            >
+            <Form.Item label="合同变更记录" name="contractChangeRecord">
               <Input />
             </Form.Item>
           </Col>

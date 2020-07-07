@@ -46,177 +46,226 @@ export default props => {
           <div>
             <h2>基本信息</h2>
             <Descriptions bordered column={4}>
-              <Descriptions.Item label="员工编号" style={{ maxWidth: '25%' }}>
+              <Descriptions.Item label="员工编号" style={{ maxWidth: '100px' }}>
                 {detail?.employeeId}
               </Descriptions.Item>
-              <Descriptions.Item label="姓名">{detail?.name}</Descriptions.Item>
-              <Descriptions.Item label="英文名">
+              <Descriptions.Item label="姓名" style={{ maxWidth: '100px' }}>
+                {detail?.name}
+              </Descriptions.Item>
+              <Descriptions.Item label="英文名" style={{ maxWidth: '100px' }}>
                 {detail?.englishName}
               </Descriptions.Item>
-              <Descriptions.Item label="性别">
+              <Descriptions.Item label="入职日期" style={{ maxWidth: '100px' }}>
+                {detail?.onboardingDate}
+              </Descriptions.Item>
+
+              <Descriptions.Item label="性别" style={{ maxWidth: '100px' }}>
                 {sexHash[detail?.sex]}
               </Descriptions.Item>
-              <Descriptions.Item label="一级业务线" style={{ maxWidth: '25%' }}>
-                {detail?.firstBusinessName}
+              <Descriptions.Item label="民族" style={{ maxWidth: '100px' }}>
+                {detail?.nationCode}
               </Descriptions.Item>
-              <Descriptions.Item label="二级业务线">
-                {detail?.businessName}
+              <Descriptions.Item label="联系电话" style={{ maxWidth: '100px' }}>
+                {detail?.mobile}
               </Descriptions.Item>
-              <Descriptions.Item label="部门">
-                {detail?.departmentName}
+              <Descriptions.Item label="类别" style={{ maxWidth: '100px' }}>
+                {detail?.category}
               </Descriptions.Item>
-              <Descriptions.Item label="成本中心">
-                {detail?.businessCostCenter}
+
+              <Descriptions.Item label="HRBP" style={{ maxWidth: '100px' }}>
+                {detail?.hrbp}
+              </Descriptions.Item>
+            </Descriptions>
+          </div>
+          <div style={{ marginTop: 20 }}>
+            <h2>职位信息</h2>
+            <Descriptions bordered column={4}>
+              <Descriptions.Item
+                style={{ maxWidth: '100px' }}
+                label="一级业务线"
+              >
+                {detail?.firstBusinessName || '暂无'}
               </Descriptions.Item>
               <Descriptions.Item
-                label="实际劳动关系"
-                style={{ maxWidth: '25%' }}
+                style={{ maxWidth: '100px' }}
+                label="二级业务线"
               >
-                {detail?.businessLaborRelations}
+                {detail?.businessName}
               </Descriptions.Item>
-              <Descriptions.Item label="用工类型">
-                {emHash[detail?.employmentType]}
+              <Descriptions.Item style={{ maxWidth: '100px' }} label="部门">
+                {detail?.departmentName}
               </Descriptions.Item>
-              <Descriptions.Item label="是否用公司电脑">
-                {computeHash[detail?.useComputer]}
+              <Descriptions.Item style={{ maxWidth: '100px' }} label="组别">
+                {detail?.groupName}
               </Descriptions.Item>
-              <Descriptions.Item label="HRBP">{detail?.hrbp}</Descriptions.Item>
-              <Descriptions.Item label="上级编号" style={{ maxWidth: '25%' }}>
-                {detail?.superiorsNo}
+
+              <Descriptions.Item style={{ maxWidth: '100px' }} label="技术岗位">
+                {detail?.postName}
               </Descriptions.Item>
-              <Descriptions.Item label="上级姓名">
-                {detail?.superiorsName}
-              </Descriptions.Item>
-              <Descriptions.Item label="技术职级">
-                {detail?.rankName}
-              </Descriptions.Item>
-              <Descriptions.Item label="管理职级">
-                {detail?.manageRankName}
-              </Descriptions.Item>
-              <Descriptions.Item label="职位" style={{ maxWidth: '25%' }}>
+              <Descriptions.Item style={{ maxWidth: '100px' }} label="职位">
                 {detail?.titleName}
               </Descriptions.Item>
-              <Descriptions.Item label="角色">
+              <Descriptions.Item style={{ maxWidth: '100px' }} label="管理职级">
+                {detail?.manageRankName}
+              </Descriptions.Item>
+              <Descriptions.Item style={{ maxWidth: '100px' }} label="技术职级">
+                {detail?.rankName}
+              </Descriptions.Item>
+
+              <Descriptions.Item style={{ maxWidth: '100px' }} label="上级编号">
+                {detail?.superiorsNo}
+              </Descriptions.Item>
+              <Descriptions.Item style={{ maxWidth: '100px' }} label="上级姓名">
+                {detail?.superiorsName}
+              </Descriptions.Item>
+              <Descriptions.Item style={{ maxWidth: '100px' }} label="角色">
                 {detail?.roles}
               </Descriptions.Item>
-              <Descriptions.Item label="是否在职">
+            </Descriptions>
+          </div>
+          <div style={{ marginTop: 20 }}>
+            <h2>合同信息</h2>
+            <Descriptions bordered column={4}>
+              <Descriptions.Item
+                style={{ maxWidth: '100px' }}
+                label="合同起始日期"
+              >
+                {detail?.contractStart}
+              </Descriptions.Item>
+              <Descriptions.Item
+                style={{ maxWidth: '100px' }}
+                label="合同结束日期"
+              >
+                {detail?.contractEnd}
+              </Descriptions.Item>
+              <Descriptions.Item
+                style={{ maxWidth: '100px' }}
+                label="试用期截止日期"
+              >
+                {detail?.probationEnd}
+              </Descriptions.Item>
+              <Descriptions.Item
+                style={{ maxWidth: '100px' }}
+                label="试用期到期提醒"
+              >
+                {deadlineHash[detail?.probationRemind]}
+              </Descriptions.Item>
+
+              <Descriptions.Item
+                style={{ maxWidth: '100px' }}
+                label="合同到期提醒"
+              >
+                {deadlineHash[detail?.contractRemind]}
+              </Descriptions.Item>
+              <Descriptions.Item
+                style={{ maxWidth: '100px' }}
+                label="合同变更记录"
+              >
+                {detail?.contractChangeRecord}
+              </Descriptions.Item>
+              <Descriptions.Item
+                style={{ maxWidth: '100px' }}
+                label="开始工作时间"
+              >
+                {detail?.workStart}
+              </Descriptions.Item>
+              <Descriptions.Item
+                style={{ maxWidth: '100px' }}
+                label="上份合同开始时间"
+              >
+                {detail?.exWorkStart}
+              </Descriptions.Item>
+
+              <Descriptions.Item
+                style={{ maxWidth: '100px' }}
+                label="实际劳动关系"
+              >
+                {' '}
+                {detail?.businessLaborRelations}
+              </Descriptions.Item>
+              <Descriptions.Item style={{ maxWidth: '100px' }} label="用工类型">
+                {emHash[detail?.employmentType]}
+              </Descriptions.Item>
+              <Descriptions.Item style={{ maxWidth: '100px' }} label="是否在职">
                 {positionHash[detail?.currentPosition]}
               </Descriptions.Item>
-              <Descriptions.Item label="工作地">
+              <Descriptions.Item style={{ maxWidth: '100px' }} label="工作地">
                 {detail?.workPlace}
               </Descriptions.Item>
             </Descriptions>
-            <div style={{ marginTop: 20 }}>
-              <h2>职位信息</h2>
-              <Descriptions bordered column={4}>
-                <Descriptions.Item label="合同起始日期">
-                  {detail?.contractStart}
-                </Descriptions.Item>
-                <Descriptions.Item label="合同结束日期">
-                  {detail?.contractEnd}
-                </Descriptions.Item>
-                <Descriptions.Item label="合同到期提醒">
-                  {deadlineHash[detail?.contractRemind]}
-                </Descriptions.Item>
-                <Descriptions.Item label="试用期到期提醒">
-                  {deadlineHash[detail?.probationRemind]}
-                </Descriptions.Item>
-                <Descriptions.Item label="入职日期">
-                  {detail?.onboardingDate}
-                </Descriptions.Item>
-                <Descriptions.Item label="试用期截止日期">
-                  {detail?.probationEnd}
-                </Descriptions.Item>
-                <Descriptions.Item label="开始工作时间">
-                  {detail?.workStart}
-                </Descriptions.Item>
-                <Descriptions.Item label="上份合同开始时间" span={2}>
-                  {detail?.exWorkStart}
-                </Descriptions.Item>
-                <Descriptions.Item label="合同变更记录" span={3}>
-                  {detail?.contractChangeRecord}
-                </Descriptions.Item>
-              </Descriptions>
-            </div>
-            <div style={{ marginTop: 20 }}>
-              <h2>合同信息</h2>
-              <Descriptions bordered column={4}>
-                <Descriptions.Item label="岗位">
-                  {detail?.postName}
-                </Descriptions.Item>
-                <Descriptions.Item label="类别">
-                  {detail?.category}
-                </Descriptions.Item>
-                <Descriptions.Item label="组别">
-                  {detail?.groupName}
-                </Descriptions.Item>
-                <Descriptions.Item label="其他">
-                  {detail?.other}
-                </Descriptions.Item>
-                <Descriptions.Item label="婚姻状况">
-                  {marrigeHash[detail?.maritalStatus]}
-                </Descriptions.Item>
-                <Descriptions.Item label="生育状况">
-                  {bearHash[detail?.fertilityStatus]}
-                </Descriptions.Item>
+          </div>
 
-                <Descriptions.Item label="民族">
-                  {detail?.nationCode}
-                </Descriptions.Item>
-                <Descriptions.Item label="联系电话">
-                  {detail?.mobile}
-                </Descriptions.Item>
-                <Descriptions.Item label="身份证号">
-                  {detail?.idCard}
-                </Descriptions.Item>
-                <Descriptions.Item label="微信号">
-                  {detail?.wx}
-                </Descriptions.Item>
-                <Descriptions.Item label="登记银行">
-                  {detail?.bankName}
-                </Descriptions.Item>
-                <Descriptions.Item label="银行卡号">
-                  {detail?.bankCardNo}
-                </Descriptions.Item>
-              </Descriptions>
-            </div>
-            <div style={{ marginTop: 20 }}>
-              <h2>银行、家庭信息</h2>
-              <Descriptions bordered column={4}>
-                <Descriptions.Item label="文化程度">
-                  {eduHash[detail?.educationalLevel]}
-                </Descriptions.Item>
-                <Descriptions.Item label="毕业院校">
-                  {detail?.graduatedSchool}
-                </Descriptions.Item>
-                <Descriptions.Item label="专业">
-                  {detail?.major}
-                </Descriptions.Item>
+          <div style={{ marginTop: 20 }}>
+            <h2>银行、家庭信息</h2>
+            <Descriptions bordered column={4}>
+              <Descriptions.Item style={{ maxWidth: '100px' }} label="银行名称">
+                {detail?.bankName}
+              </Descriptions.Item>
+              <Descriptions.Item style={{ maxWidth: '100px' }} label="银行卡号">
+                {detail?.bankCardNo}
+              </Descriptions.Item>
+              <Descriptions.Item style={{ maxWidth: '100px' }} label="身份证号">
+                {detail?.idCard}
+              </Descriptions.Item>
+              <Descriptions.Item style={{ maxWidth: '100px' }} label="出生日期">
+                {detail?.birthDate}
+              </Descriptions.Item>
 
-                <Descriptions.Item label="毕业日期">
-                  {detail?.graduationDate}
-                </Descriptions.Item>
+              <Descriptions.Item style={{ maxWidth: '100px' }} label="毕业院校">
+                {detail?.graduatedSchool}
+              </Descriptions.Item>
+              <Descriptions.Item style={{ maxWidth: '100px' }} label="专业">
+                {detail?.major}
+              </Descriptions.Item>
+              <Descriptions.Item style={{ maxWidth: '100px' }} label="毕业日期">
+                {detail?.graduationDate}
+              </Descriptions.Item>
+              <Descriptions.Item style={{ maxWidth: '100px' }} label="文化程度">
+                {eduHash[detail?.educationalLevel]}
+              </Descriptions.Item>
 
-                <Descriptions.Item label="紧急联系人">
-                  {detail?.emergencyContact}
-                </Descriptions.Item>
+              <Descriptions.Item style={{ maxWidth: '100px' }} label="婚姻状况">
+                {marrigeHash[detail?.maritalStatus]}
+              </Descriptions.Item>
+              <Descriptions.Item style={{ maxWidth: '100px' }} label="生育状况">
+                {bearHash[detail?.fertilityStatus]}
+              </Descriptions.Item>
+              <Descriptions.Item style={{ maxWidth: '100px' }} label="微信号">
+                {detail?.wx}
+              </Descriptions.Item>
+              <Descriptions.Item
+                style={{ maxWidth: '100px' }}
+                label="是否用公司电脑"
+              >
+                {computeHash[detail?.useComputer]}
+              </Descriptions.Item>
 
-                <Descriptions.Item label="户籍地址">
-                  {detail?.residenceAddress}
-                </Descriptions.Item>
-                <Descriptions.Item label="现居住地址">
-                  {detail?.habitation}
-                </Descriptions.Item>
-              </Descriptions>
-            </div>
-            <div style={{ marginTop: 20 }}>
-              <h2>财务信息</h2>
-              <Descriptions bordered column={4}>
-                <Descriptions.Item label="备注">
-                  {detail?.remark}
-                </Descriptions.Item>
-              </Descriptions>
-            </div>
+              <Descriptions.Item style={{ maxWidth: '100px' }} label="户籍地址">
+                {detail?.residenceAddress}
+              </Descriptions.Item>
+              <Descriptions.Item
+                style={{ maxWidth: '100px' }}
+                label="现居住地址"
+              >
+                {detail?.habitation}
+              </Descriptions.Item>
+              <Descriptions.Item
+                style={{ maxWidth: '100px' }}
+                label="紧急联系人"
+              >
+                {detail?.emergencyContact}
+              </Descriptions.Item>
+              <Descriptions.Item
+                style={{ maxWidth: '100px' }}
+                label="紧急联系电话"
+              >
+                {detail?.other}
+              </Descriptions.Item>
+
+              <Descriptions.Item style={{ maxWidth: '100px' }} label="备注">
+                {detail?.remark}
+              </Descriptions.Item>
+            </Descriptions>
           </div>
         </TabPane>
         <TabPane tab="员工登记表" key="2">

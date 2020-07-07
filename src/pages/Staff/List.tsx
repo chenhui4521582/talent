@@ -19,6 +19,7 @@ import { useBusiness } from '@/models/global';
 import { serialize } from '@/utils/serialize';
 import { useJob } from '@/models/global';
 
+const sexHash = { 1: '男', 2: '女' };
 const { Option } = Select;
 export default () => {
   const { businessList } = useBusiness();
@@ -99,49 +100,54 @@ export default () => {
       align: 'center',
     },
     {
-      title: '所属业务线',
+      title: '一级业务',
+      dataIndex: 'firstBusinessName',
+      key: 'firstBusinessName',
+      align: 'center',
+    },
+    {
+      title: '二级业务',
       dataIndex: 'businessName',
       key: 'businessName',
       align: 'center',
     },
     {
-      title: '成本中心',
-      dataIndex: 'businessCostCenter',
-      key: 'businessCostCenter',
+      title: '部门',
+      dataIndex: 'departmentName',
+      key: 'departmentName',
       align: 'center',
     },
     {
-      title: '岗位',
+      title: '组别',
+      dataIndex: 'groupName',
+      key: 'groupName',
+      align: 'center',
+    },
+    {
+      title: '技术岗位',
       dataIndex: 'postName',
       key: 'postName',
       align: 'center',
     },
     {
-      title: '用工类型',
-      dataIndex: 'employmentType',
-      key: 'employmentType',
+      title: '职位',
+      dataIndex: 'titleName',
+      key: 'titleName',
       align: 'center',
-      render: text => {
-        const data = { 1: '正式', 2: '实习', 3: '外聘', 4: '兼职' };
-        return <span>{data[text]}</span>;
+    },
+    {
+      title: '入职日期',
+      dataIndex: 'onboardingDate',
+      key: 'onboardingDate',
+      align: 'center',
+      render: (_, record) => {
+        return <span>{sexHash[record.detail?.sex]}</span>;
       },
     },
     {
-      title: '身份证号',
-      dataIndex: 'idCard',
-      key: 'idCard',
-      align: 'center',
-    },
-    {
-      title: '合同起始日期',
-      dataIndex: 'contractStart',
-      key: 'contractStart',
-      align: 'center',
-    },
-    {
-      title: '合同结束日期',
-      dataIndex: 'contractEnd',
-      key: 'contractEnd',
+      title: '性别',
+      dataIndex: 'postName',
+      key: 'postName',
       align: 'center',
     },
     {

@@ -9,7 +9,7 @@ const { TabPane } = Tabs;
 
 interface TabDataParams {
   name: string;
-  value: string
+  value: string;
 }
 
 interface useTablesParams {
@@ -19,25 +19,34 @@ interface useTablesParams {
   defaultValue: string;
   tabData: TabDataParams[];
   rowKeyName: string;
-};
+}
 
 export const useTabTable = ({
-  queryMethod, columns, paramName, defaultValue, tabData, rowKeyName
+  queryMethod,
+  columns,
+  paramName,
+  defaultValue,
+  tabData,
+  rowKeyName,
 }: useTablesParams) => {
   const [searchForm] = Form.useForm();
   const [curKey, setCurKey] = useState(defaultValue);
-  const { tableProps, refresh, search } = useFormTable(async ({ current, pageSize }: PaginationTableParams) => {
-    const data = searchForm.getFieldsValue();
-    data[paramName] = curKey;
-    let response = await queryMethod({pageNum: current, pageSize, ...data});
-    return {
-      total: response.obj?.total,
-      list: response.obj?.list
-    };
-  }, {
-    defaultPageSize: 10,
-    form: searchForm
-  });
+  const { tableProps, refresh, search } = useFormTable(
+    async ({ current, pageSize }: PaginationTableParams) => {
+      const data = searchForm.getFieldsValue();
+      data[paramName] = curKey;
+      let response = await queryMethod({ pageNum: current, pageSize, ...data });
+      return {
+        total: response.obj?.total,
+        list: response.obj?.list,
+      };
+    },
+    {
+      defaultPageSize: 10,
+      form: searchForm,
+      cacheKey: queryMethod.toString(),
+    },
+  );
 
   const { reset, submit } = search;
 
@@ -51,13 +60,15 @@ export const useTabTable = ({
   };
 
   const TableContent = ({ children }) => {
-    return(
+    return (
       <div>
         <div>
           <Form form={searchForm}>
             {children}
             <Row>
-              <Form.Item style={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <Form.Item
+                style={{ display: 'flex', justifyContent: 'flex-end' }}
+              >
                 <Button type="primary" onClick={submit}>
                   查询
                 </Button>
@@ -69,23 +80,26 @@ export const useTabTable = ({
           </Form>
         </div>
         <Tabs activeKey={curKey} onChange={tabChange} animated type="card">
-          {
-            tabData.map(item => {
-              return (
-                <TabPane tab={item.name} key={item.value}>
-                  <Table size="small" columns={columns} rowKey={rowKeyName} {...tableProps} />
-                </TabPane>
-              )
-            })
-          }
+          {tabData.map(item => {
+            return (
+              <TabPane tab={item.name} key={item.value}>
+                <Table
+                  size="small"
+                  columns={columns}
+                  rowKey={rowKeyName}
+                  {...tableProps}
+                />
+              </TabPane>
+            );
+          })}
         </Tabs>
       </div>
-    )
+    );
   };
 
   return {
     TableContent,
     refresh,
-    curKey
+    curKey,
   };
-}
+};

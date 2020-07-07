@@ -22,6 +22,7 @@ export const useTable = ({
   const [searchForm] = Form.useForm();
   const { tableProps, refresh, search } = useFormTable(
     async ({ current, pageSize }: PaginationTableParams) => {
+      console.log(queryMethod.toString());
       const data = searchForm.getFieldsValue();
       if (paramName) data[paramName] = paramValue;
       let response = await queryMethod({ pageNum: current, pageSize, ...data });
@@ -33,6 +34,7 @@ export const useTable = ({
     {
       defaultPageSize: 10,
       form: searchForm,
+      cacheKey: queryMethod.toString(),
     },
   );
 

@@ -118,18 +118,33 @@ export default props => {
             })}
           </Select>
         </Form.Item>
-        <Form.Item
-          label="职级"
-          name="rankId"
-          rules={[{ required: true, message: '请选择职级' }]}
-        >
-          <Select showSearch placeholder="请选择职级">
+        <Form.Item label="技术职级" name="rankId">
+          <Select showSearch optionFilterProp="children">
             {rankList?.map(item => {
-              return (
-                <Option key={item.rankId} value={item.rankId}>
-                  {item.rankName}
-                </Option>
-              );
+              if (item.rankName.indexOf('P') > -1) {
+                return (
+                  <Option value={item.rankId} key={item.rankId}>
+                    {item.rankName}
+                  </Option>
+                );
+              } else {
+                return null;
+              }
+            })}
+          </Select>
+        </Form.Item>
+        <Form.Item label="管理职级" name="manageRankId">
+          <Select showSearch optionFilterProp="children">
+            {rankList?.map(item => {
+              if (item.rankName.indexOf('M') > -1) {
+                return (
+                  <Option value={item.rankId} key={item.rankId}>
+                    {item.rankName}
+                  </Option>
+                );
+              } else {
+                return null;
+              }
             })}
           </Select>
         </Form.Item>
