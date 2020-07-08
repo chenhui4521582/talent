@@ -71,7 +71,7 @@ export default () => {
     rowKeyName: 'id',
     paramName: 'type',
     paramValue: 1,
-    cacheKey: 'record/listSmsRecord',
+    cacheKey: 'record/listSmsRecord1',
   });
 
   const handleResend = async (id: number) => {
