@@ -123,6 +123,7 @@ export default props => {
       },
     ],
     rowKeyName: 'resumeId',
+    cacheKey: props.queryMethod ? '简历1' : '简历2',
   });
 
   const handleClick = (record: IResumeTable) => {

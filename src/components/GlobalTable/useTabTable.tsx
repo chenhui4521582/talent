@@ -19,6 +19,7 @@ interface useTablesParams {
   defaultValue: string;
   tabData: TabDataParams[];
   rowKeyName: string;
+  cacheKey: string;
 }
 
 export const useTabTable = ({
@@ -28,6 +29,7 @@ export const useTabTable = ({
   defaultValue,
   tabData,
   rowKeyName,
+  cacheKey,
 }: useTablesParams) => {
   const [searchForm] = Form.useForm();
   const [curKey, setCurKey] = useState(defaultValue);
@@ -44,7 +46,7 @@ export const useTabTable = ({
     {
       defaultPageSize: 10,
       form: searchForm,
-      cacheKey: queryMethod.toString(),
+      cacheKey: cacheKey,
     },
   );
 

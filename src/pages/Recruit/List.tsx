@@ -156,6 +156,7 @@ export default () => {
       },
     ],
     rowKeyName: 'demandId',
+    cacheKey: 'demand/listAllDemand',
   });
   return (
     <Card title="需求列表">

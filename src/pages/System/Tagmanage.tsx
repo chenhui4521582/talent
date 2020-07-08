@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
-import {
-  Card, Form, notification, Modal, Button, Input, Divider
-} from 'antd';
+import { Card, Form, notification, Modal, Button, Input, Divider } from 'antd';
 import { useReq } from '@/components/GlobalTable/useReq';
 import { ColumnProps } from 'antd/es/table';
 import { listJobPage, saveJob, updateJob, removeJob } from './services/job';
@@ -16,7 +14,7 @@ export default () => {
     {
       title: '编号',
       key: 'jobId',
-      dataIndex: 'jobId'
+      dataIndex: 'jobId',
     },
     {
       title: '岗位名称',
@@ -28,9 +26,7 @@ export default () => {
       key: 'action',
       render: (_, record) => (
         <span>
-          <a onClick={e => showModal('edit', record)}>
-            修改
-          </a>
+          <a onClick={e => showModal('edit', record)}>修改</a>
           <Divider type="vertical" />
           <a onClick={e => handleDelete(record)}>删除</a>
         </span>
@@ -41,22 +37,23 @@ export default () => {
   const { TableContent, refresh } = useReq({
     queryMethod: listJobPage,
     columns,
-    rowKeyName: 'jobId'
+    rowKeyName: 'jobId',
+    cacheKey: 'job/listJobPage',
   });
 
   const showModal = (type, record) => {
     setJobId(record?.jobId);
     setAction(type);
     form.setFieldsValue({ positionName: record?.jobName });
-  }
+  };
 
   const cancelModal = () => {
     setJobId(undefined);
     setAction('');
     form.resetFields();
-  }
+  };
 
-  const handleDelete = (record) => {
+  const handleDelete = record => {
     Modal.confirm({
       title: '确定删除该岗位?',
       okText: '确定',
@@ -77,11 +74,11 @@ export default () => {
             description: '',
           });
         }
-      }
+      },
     });
-  }
+  };
 
-  const handleAdd = async (values) => {
+  const handleAdd = async values => {
     let actionMethod;
     if (action === 'add') {
       actionMethod = saveJob;
@@ -90,22 +87,29 @@ export default () => {
       values.positionId = jobId;
     }
     let res: GlobalResParams<string> = await actionMethod(values);
-    if(res.status === 200) {
+    if (res.status === 200) {
       cancelModal();
       refresh();
       notification['success']({
         message: res.msg,
         description: '',
       });
-    }else {
+    } else {
       notification['error']({
         message: res.msg,
         description: '',
       });
     }
-  }
+  };
   return (
-    <Card title="岗位管理" extra={<Button type="primary" onClick={e => showModal('add', undefined)}>新增岗位</Button>}>
+    <Card
+      title="岗位管理"
+      extra={
+        <Button type="primary" onClick={e => showModal('add', undefined)}>
+          新增岗位
+        </Button>
+      }
+    >
       <TableContent />
       <Modal
         visible={!!action}
@@ -115,10 +119,7 @@ export default () => {
         onCancel={cancelModal}
         onOk={e => form.submit()}
       >
-        <Form
-          form={form}
-          onFinish={handleAdd}
-        >
+        <Form form={form} onFinish={handleAdd}>
           <Form.Item
             label="岗位名称"
             name="positionName"
@@ -129,5 +130,5 @@ export default () => {
         </Form>
       </Modal>
     </Card>
-  )
-}
+  );
+};

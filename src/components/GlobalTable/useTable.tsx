@@ -10,6 +10,7 @@ interface useTablesParams {
   rowKeyName: any;
   paramName?: string;
   paramValue?: string | number;
+  cacheKey: string;
 }
 
 export const useTable = ({
@@ -18,6 +19,7 @@ export const useTable = ({
   rowKeyName,
   paramName,
   paramValue,
+  cacheKey,
 }: useTablesParams) => {
   const [searchForm] = Form.useForm();
   const { tableProps, refresh, search } = useFormTable(
@@ -34,7 +36,7 @@ export const useTable = ({
     {
       defaultPageSize: 10,
       form: searchForm,
-      cacheKey: queryMethod.toString(),
+      cacheKey: cacheKey,
     },
   );
 

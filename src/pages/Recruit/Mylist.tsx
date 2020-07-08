@@ -101,6 +101,7 @@ export default () => {
     queryMethod: queryMyDemand,
     columns,
     rowKeyName: 'demandId',
+    cacheKey: 'demand/listMyUploadDemand',
   });
   return (
     <Card title="我的需求">

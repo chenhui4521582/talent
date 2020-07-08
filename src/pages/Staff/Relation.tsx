@@ -45,30 +45,13 @@ export default () => {
           align: 'center',
         },
       ],
-      // }, {
-      //   title: '子女信息',
-      //   children: [{
-      //     title: '姓名',
-      //     dataIndex: 'name',
-      //     key: 'name',
-      //     align: 'center'
-      //   }, {
-      //     title: '性别',
-      //     dataIndex: 'name',
-      //     key: 'name',
-      //     align: 'center'
-      //   }, {
-      //     title: '出生日期',
-      //     dataIndex: 'name',
-      //     key: 'name',
-      //     align: 'center'
-      //   }]
     },
   ];
   const { TableContent, searchForm } = useTable({
     queryMethod: listFamily,
     columns: columns as any,
     rowKeyName: 'employeeId',
+    cacheKey: 'employeeRoster/listFamily',
   });
 
   return (

@@ -61,6 +61,7 @@ export default () => {
     queryMethod: myListPage,
     columns,
     rowKeyName: 'id',
+    cacheKey: 'wftaskform/listMyFormPage',
   });
 
   return (

@@ -173,6 +173,7 @@ export default () => {
     queryMethod: listByConditionsRoster,
     columns,
     rowKeyName: 'employeeId',
+    cacheKey: 'employeeRoster/listByConditionsRoster',
   });
 
   const changeCheck = checkedValues => {

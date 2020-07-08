@@ -57,6 +57,7 @@ export default () => {
     queryMethod: listPage,
     columns,
     rowKeyName: 'id',
+    cacheKey: 'laborRelation/list',
   });
 
   const showModal = (

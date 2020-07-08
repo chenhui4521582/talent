@@ -125,6 +125,7 @@ export default () => {
     queryMethod: queryHrList,
     columns,
     rowKeyName: 'nId',
+    cacheKey: 'evaluation/listInterviewByHr',
   });
 
   const showBack = (record, type: string) => {

@@ -58,6 +58,7 @@ export default () => {
     queryMethod: listPage,
     columns,
     rowKeyName: 'id',
+    cacheKey: 'costCenter/list',
   });
 
   const showModal = (type: string, record: tsCostColItem | undefined): void => {

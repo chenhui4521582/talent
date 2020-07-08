@@ -84,6 +84,7 @@ export default () => {
     queryMethod: getRoleList,
     columns,
     rowKeyName: 'userName',
+    cacheKey: 'talent/role/listRole',
   });
 
   const showModal = () => {

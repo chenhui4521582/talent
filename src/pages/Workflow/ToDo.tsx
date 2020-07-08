@@ -53,6 +53,7 @@ export default () => {
     queryMethod: myToDoListPage,
     columns,
     rowKeyName: 'id',
+    cacheKey: 'wftaskform/listTodoFormPage',
   });
 
   return (
