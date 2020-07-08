@@ -54,7 +54,7 @@ export default props => {
         return (
           <span>
             <Link
-              to={`/talent/resume/cvdetails?resumeId=${record.resumeId}&resumeStatus=${record.status}`}
+              to={`/talent/resume/print?resumeId=${record.resumeId}&resumeStatus=${record.status}`}
             >
               查看简历
             </Link>

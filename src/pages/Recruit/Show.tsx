@@ -153,6 +153,17 @@ export default props => {
               {' '}
               删除
             </Button>
+            <Button
+              type="primary"
+              danger
+              style={{ marginRight: 20 }}
+              onClick={() => {
+                alert(1);
+              }}
+            >
+              {' '}
+              撤回
+            </Button>
           </>
         ) : null}
         <Button onClick={e => history.goBack()}> 返回</Button>

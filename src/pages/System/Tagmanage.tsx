@@ -1,14 +1,38 @@
-import React, { useState } from 'react';
-import { Card, Form, notification, Modal, Button, Input, Divider } from 'antd';
+import React, { useState, useEffect } from 'react';
+import {
+  Card,
+  Form,
+  notification,
+  Modal,
+  Button,
+  Input,
+  Divider,
+  Select,
+} from 'antd';
 import { useReq } from '@/components/GlobalTable/useReq';
 import { ColumnProps } from 'antd/es/table';
 import { listJobPage, saveJob, updateJob, removeJob } from './services/job';
 import { GlobalResParams } from '@/types/ITypes';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 
+const { Option } = Select;
+interface tsParams {
+  pageNum: number;
+  pageSize: number;
+  pages: number;
+  total: number;
+  list: tsList[];
+}
+interface tsList {
+  jobId: number;
+  jobName: string;
+}
+
 export default () => {
   const [jobId, setJobId] = useState<number>();
   const [action, setAction] = useState<string>('');
+  const [deleteAction, setDeleteAction] = useState<boolean>(false);
+  const [list, setList] = useState<tsList[]>([]);
   const [form] = Form.useForm();
   const columns: ColumnProps<any>[] = [
     {
@@ -34,6 +58,17 @@ export default () => {
     },
   ];
 
+  useEffect(() => {
+    getList();
+  }, [deleteAction]);
+
+  const getList = async () => {
+    let res: GlobalResParams<tsParams> = await listJobPage({});
+    if (res.status === 200) {
+      setList(res.obj.list);
+    }
+  };
+
   const { TableContent, refresh } = useReq({
     queryMethod: listJobPage,
     columns,
@@ -54,28 +89,31 @@ export default () => {
   };
 
   const handleDelete = record => {
-    Modal.confirm({
-      title: '确定删除该岗位?',
-      okText: '确定',
-      icon: <ExclamationCircleOutlined />,
-      okType: 'danger' as any,
-      cancelText: '取消',
-      onOk: async () => {
-        let res: GlobalResParams<string> = await removeJob(record.jobId);
-        if (res.status === 200) {
-          refresh();
-          notification['success']({
-            message: res.msg,
-            description: '',
-          });
-        } else {
-          notification['error']({
-            message: res.msg,
-            description: '',
-          });
-        }
-      },
-    });
+    setJobId(record.jobId);
+    setDeleteAction(true);
+
+    // Modal.confirm({
+    //   title: '确定删除该岗位?',
+    //   okText: '确定',
+    //   icon: <ExclamationCircleOutlined />,
+    //   okType: 'danger' as any,
+    //   cancelText: '取消',
+    //   onOk: async () => {
+    //     let res: GlobalResParams<string> = await removeJob(record.jobId);
+    //     if (res.status === 200) {
+    //       refresh();
+    //       notification['success']({
+    //         message: res.msg,
+    //         description: '',
+    //       });
+    //     } else {
+    //       notification['error']({
+    //         message: res.msg,
+    //         description: '',
+    //       });
+    //     }
+    //   },
+    // });
   };
 
   const handleAdd = async values => {
@@ -126,6 +164,34 @@ export default () => {
             rules={[{ required: true, message: '请输入岗位名称' }]}
           >
             <Input placeholder="请输入岗位名称" />
+          </Form.Item>
+        </Form>
+      </Modal>
+      <Modal
+        visible={deleteAction}
+        title="删除"
+        okText="确定"
+        cancelText="取消"
+        onCancel={() => {
+          setDeleteAction(false);
+        }}
+        onOk={e => form.submit()}
+      >
+        <Form>
+          <Form.Item
+            label="请选择替代岗位"
+            rules={[{ required: true, message: '请选择替代岗位' }]}
+            name="name"
+          >
+            <Select placeholder="请选择替代岗位">
+              {list.map(item => {
+                return jobId !== item.jobId ? (
+                  <Option key={item.jobId} value={item.jobId}>
+                    {item.jobName}
+                  </Option>
+                ) : null;
+              })}
+            </Select>
           </Form.Item>
         </Form>
       </Modal>

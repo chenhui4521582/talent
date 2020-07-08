@@ -36,14 +36,17 @@ import {
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 
 const { Option } = Select;
+const { TextArea } = Input;
 export default props => {
   const [jobs, setJobs] = useState<IJobParams[]>();
   const [modalName, setModalName] = useState('');
   const [curRecord, setCurRecord] = useState<IResumeTable>();
   const [changeForm] = Form.useForm();
+  const [noteForm] = Form.useForm();
   const [demands, setDemands] = useState<IDemandParams[]>();
   const [changeRecords, setChangeRecords] = useState<IChangeRecords[]>([]);
   const [curStatus, setCurStatus] = useState<number>();
+  const [noteAction, setNoteAction] = useState<boolean>(false);
   useEffect(() => {
     async function fetchJob() {
       let response: GlobalResParams<IJobParams[]> = await selectJob();
@@ -103,10 +106,19 @@ export default props => {
           ) : null}
           <Divider type="vertical" />
           <a onClick={e => handleDelete(record)}>删除</a>
+          <Divider type="vertical" />
+          <a
+            onClick={e => {
+              setNoteAction(true);
+            }}
+          >
+            便签
+          </a>
         </span>
       ),
     },
   ];
+
   const { TableContent, refresh, curKey } = useTabTable({
     queryMethod: props.queryMethod ? props.queryMethod : queryMyResume,
     columns,
@@ -375,6 +387,20 @@ export default props => {
             <p>暂无记录</p>
           )}
         </div>
+      </Modal>
+      <Modal
+        visible={noteAction}
+        title="我的便签"
+        okText="确定"
+        cancelText="取消"
+        onCancel={() => setNoteAction(false)}
+        onOk={() => setNoteAction(true)}
+      >
+        <Form form={noteForm}>
+          <Form.Item label="便签" name="interviewTime">
+            <TextArea rows={4} placeholder="请填写标签" />
+          </Form.Item>
+        </Form>
       </Modal>
     </Card>
   );
