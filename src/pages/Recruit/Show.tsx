@@ -14,6 +14,7 @@ import {
   IDemandDetail,
   deleteDemand,
   giveDemand,
+  revoke,
 } from './services/list';
 import { GlobalResParams } from '@/types/ITypes';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
@@ -44,6 +45,33 @@ export default props => {
       cancelText: '取消',
       onOk: async () => {
         let res: GlobalResParams<string> = await deleteDemand(demandId);
+        if (res.status === 200) {
+          history.push(`/talent/recruit/list`);
+          notification['success']({
+            message: res.msg,
+            description: '',
+          });
+        } else {
+          notification['error']({
+            message: res.msg,
+            description: '',
+          });
+        }
+      },
+    });
+  };
+
+  const onRevoke = () => {
+    Modal.confirm({
+      title: '你确定要撤回此需求吗?',
+      okText: '确定',
+      icon: <ExclamationCircleOutlined />,
+      okType: 'danger' as any,
+      cancelText: '取消',
+      onOk: async () => {
+        let res: GlobalResParams<string> = await revoke({
+          evaluationId: demandId,
+        });
         if (res.status === 200) {
           history.push(`/talent/recruit/list`);
           notification['success']({
@@ -157,9 +185,7 @@ export default props => {
               type="primary"
               danger
               style={{ marginRight: 20 }}
-              onClick={() => {
-                alert(1);
-              }}
+              onClick={onRevoke}
             >
               {' '}
               撤回

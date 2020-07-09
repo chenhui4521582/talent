@@ -313,10 +313,7 @@ export default props => {
   }, [formList, mount]);
 
   const submitData = (type: number): void => {
-    console.log(idItemList);
     form.validateFields().then(async fromSubData => {
-      console.log('fromSubData');
-      console.log(fromSubData);
       let subList: any = [];
       idItemList.map(item => {
         let showArr: any = [];

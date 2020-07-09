@@ -119,7 +119,11 @@ export default props => {
           </Select>
         </Form.Item>
         <Form.Item label="技术职级" name="rankId">
-          <Select showSearch optionFilterProp="children">
+          <Select
+            placeholder="请选择技术职级"
+            showSearch
+            optionFilterProp="children"
+          >
             {rankList?.map(item => {
               if (item.rankName.indexOf('P') > -1) {
                 return (
@@ -134,7 +138,11 @@ export default props => {
           </Select>
         </Form.Item>
         <Form.Item label="管理职级" name="manageRankId">
-          <Select showSearch optionFilterProp="children">
+          <Select
+            placeholder="请选择管理职级"
+            showSearch
+            optionFilterProp="children"
+          >
             {rankList?.map(item => {
               if (item.rankName.indexOf('M') > -1) {
                 return (

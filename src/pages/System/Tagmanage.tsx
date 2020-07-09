@@ -34,6 +34,7 @@ export default () => {
   const [deleteAction, setDeleteAction] = useState<boolean>(false);
   const [list, setList] = useState<tsList[]>([]);
   const [form] = Form.useForm();
+  const [deleteForm] = Form.useForm();
   const columns: ColumnProps<any>[] = [
     {
       title: '编号',
@@ -88,32 +89,28 @@ export default () => {
     form.resetFields();
   };
 
-  const handleDelete = record => {
-    setJobId(record.jobId);
+  const handleDelete = async record => {
     setDeleteAction(true);
-
-    // Modal.confirm({
-    //   title: '确定删除该岗位?',
-    //   okText: '确定',
-    //   icon: <ExclamationCircleOutlined />,
-    //   okType: 'danger' as any,
-    //   cancelText: '取消',
-    //   onOk: async () => {
-    //     let res: GlobalResParams<string> = await removeJob(record.jobId);
-    //     if (res.status === 200) {
-    //       refresh();
-    //       notification['success']({
-    //         message: res.msg,
-    //         description: '',
-    //       });
-    //     } else {
-    //       notification['error']({
-    //         message: res.msg,
-    //         description: '',
-    //       });
-    //     }
-    //   },
-    // });
+    setJobId(record.jobId);
+    deleteForm.validateFields().then(async fromSubData => {
+      let res: GlobalResParams<string> = await removeJob(
+        record.jobId,
+        fromSubData.replaceId,
+      );
+      if (res.status === 200) {
+        refresh();
+        setDeleteAction(true);
+        notification['success']({
+          message: res.msg,
+          description: '',
+        });
+      } else {
+        notification['error']({
+          message: res.msg,
+          description: '',
+        });
+      }
+    });
   };
 
   const handleAdd = async values => {
@@ -173,15 +170,16 @@ export default () => {
         okText="确定"
         cancelText="取消"
         onCancel={() => {
+          deleteForm.resetFields();
           setDeleteAction(false);
         }}
-        onOk={e => form.submit()}
+        onOk={handleDelete}
       >
-        <Form>
+        <Form form={deleteForm}>
           <Form.Item
             label="请选择替代岗位"
             rules={[{ required: true, message: '请选择替代岗位' }]}
-            name="name"
+            name="replaceId"
           >
             <Select placeholder="请选择替代岗位">
               {list.map(item => {

@@ -31,21 +31,21 @@ export interface IDemandDetail {
 }
 
 export interface INewDemandParams {
-  amount: number
+  amount: number;
   businessCode: string;
-  description: string
-  emergencyDegree: number
-  entryDate: string
-  interviewCode: string
-  positionId: number
-  rank: string
+  description: string;
+  emergencyDegree: number;
+  entryDate: string;
+  interviewCode: string;
+  positionId: number;
+  rank: string;
 }
 
 //新增需求
 export async function createDemand(params: INewDemandParams) {
   return request('/api/talent/demand/saveDemand', {
     method: 'POST',
-    data: params
+    data: params,
   });
 }
 
@@ -53,7 +53,7 @@ export async function createDemand(params: INewDemandParams) {
 export async function updateDemand(params) {
   return request('/api/talent/demand/updateDemand', {
     method: 'POST',
-    data: params
+    data: params,
   });
 }
 
@@ -61,36 +61,44 @@ export async function updateDemand(params) {
 export async function queryDemand(params) {
   return request('/api/talent/demand/listAllDemand', {
     method: 'POST',
-    data: params
+    data: params,
   });
-};
+}
 
 // 关闭需求
 export async function closeDemand(demandId: number) {
   return request('/api/talent/demand/closeDemand', {
     method: 'POST',
-    data: { demandId }
+    data: { demandId },
   });
-};
+}
 
 // 需求详情
 export async function demandDetail(demandId: number) {
   return request('/api/talent/demand/getDemandDetail', {
     method: 'POST',
-    data: { demandId }
+    data: { demandId },
   });
 }
 
 export async function deleteDemand(demandId: number) {
   return request('/api/talent/demand/removeDemand', {
     method: 'POST',
-    data: { demandId }
+    data: { demandId },
   });
-};
+}
 
 export async function giveDemand(params) {
   return request('/api/talent/demand/distributeDemand', {
     method: 'POST',
-    data: params
+    data: params,
+  });
+}
+
+// 撤销简历
+export async function revoke(params) {
+  return request('/api/talent/evaluation/deleteEvaluation', {
+    method: 'POST',
+    data: params,
   });
 }

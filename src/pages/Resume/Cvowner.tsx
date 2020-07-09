@@ -24,6 +24,7 @@ import {
   IChangeRecords,
   updateResumeStatus,
   IUpdateResume,
+  addNote,
 } from './services/cvowner';
 import { selectJob, IJobParams } from './services/cvupload';
 import { ColumnProps } from 'antd/es/table';
@@ -110,6 +111,8 @@ export default props => {
           <a
             onClick={e => {
               setNoteAction(true);
+              setCurRecord(record);
+              noteForm.setFieldsValue({ note: record.note });
             }}
           >
             便签
@@ -166,6 +169,29 @@ export default props => {
     setCurRecord(record);
     setModalName(type);
   };
+
+  const changeNote = () => {
+    noteForm.validateFields().then(async fromSubData => {
+      fromSubData.resumeId = curRecord?.resumeId;
+      console.log(fromSubData);
+      let res: GlobalResParams<string> = await addNote(fromSubData);
+      if (res.status === 200) {
+        refresh();
+        modalCancel();
+        setNoteAction(false);
+        notification['success']({
+          message: res.msg,
+          description: '',
+        });
+      } else {
+        notification['error']({
+          message: res.msg,
+          description: '',
+        });
+      }
+    });
+  };
+
   const handleDelete = (record: IResumeTable) => {
     // 删除简历
     Modal.confirm({
@@ -393,11 +419,15 @@ export default props => {
         title="我的便签"
         okText="确定"
         cancelText="取消"
-        onCancel={() => setNoteAction(false)}
-        onOk={() => setNoteAction(true)}
+        onCancel={() => {
+          noteForm.resetFields();
+          setCurRecord(undefined);
+          setNoteAction(false);
+        }}
+        onOk={() => changeNote()}
       >
         <Form form={noteForm}>
-          <Form.Item label="便签" name="interviewTime">
+          <Form.Item label="便签" name="note">
             <TextArea rows={4} placeholder="请填写标签" />
           </Form.Item>
         </Form>
