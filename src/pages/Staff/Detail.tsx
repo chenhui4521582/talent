@@ -68,8 +68,8 @@ export default props => {
               <Descriptions.Item label="联系电话" style={{ maxWidth: '100px' }}>
                 {detail?.mobile}
               </Descriptions.Item>
-              <Descriptions.Item label="类别" style={{ maxWidth: '100px' }}>
-                {detail?.category}
+              <Descriptions.Item label="邮箱" style={{ maxWidth: '100px' }}>
+                {detail?.email}
               </Descriptions.Item>
 
               <Descriptions.Item label="HRBP" style={{ maxWidth: '100px' }}>
@@ -253,13 +253,13 @@ export default props => {
                 style={{ maxWidth: '100px' }}
                 label="紧急联系人"
               >
-                {detail?.emergencyContact}
+                {detail?.relationshipName}
               </Descriptions.Item>
               <Descriptions.Item
                 style={{ maxWidth: '100px' }}
                 label="紧急联系电话"
               >
-                {detail?.other}
+                {detail?.emergencyContact}
               </Descriptions.Item>
 
               <Descriptions.Item style={{ maxWidth: '100px' }} label="备注">

@@ -69,13 +69,13 @@ export default props => {
         values.graduationDate
           ? (values.graduationDate = moment(values.graduationDate))
           : '';
+        values.birthDate ? (values.birthDate = moment(values.birthDate)) : '';
       }
       form.setFieldsValue(res?.obj);
     }
     if (employeeId) getDetail();
   }, []);
   const handleSubmit = async values => {
-    console.log(values);
     let actionMethod;
     values.contractStart = moment(values.contractStart).format('YYYY/MM/DD');
     values.contractEnd = moment(values.contractEnd).format('YYYY/MM/DD');
@@ -84,6 +84,7 @@ export default props => {
     values.workStart = moment(values.workStart).format('YYYY/MM/DD');
     values.exWorkStart = moment(values.exWorkStart).format('YYYY/MM/DD');
     values.graduationDate = moment(values.graduationDate).format('YYYY/MM/DD');
+    values.birthDate = moment(values.birthDate).format('YYYY/MM/DD');
     if (employeeId) {
       actionMethod = updateEmployeeInfo;
     } else {
@@ -106,13 +107,14 @@ export default props => {
   return (
     <Card title={employeeId ? '编辑员工' : '新增员工'}>
       <Form form={form} onFinish={handleSubmit}>
+        <h2>基本类型</h2>
         <Row>
-          <Col span={6}>
+          <Col span={5}>
             <Form.Item label="员工编号" name="employeeId">
               <Input placeholder="系统默认生成" disabled />
             </Form.Item>
           </Col>
-          <Col span={6} offset={2}>
+          <Col span={5} offset={1}>
             <Form.Item
               label="姓名"
               name="name"
@@ -121,7 +123,7 @@ export default props => {
               <Input disabled={employeeId} />
             </Form.Item>
           </Col>
-          <Col span={6} offset={2}>
+          <Col span={5} offset={1}>
             <Form.Item
               label="英文名"
               name="englishName"
@@ -130,10 +132,18 @@ export default props => {
               <Input />
             </Form.Item>
           </Col>
+          <Col span={5} offset={1}>
+            <Form.Item
+              label="入职日期"
+              name="onboardingDate"
+              rules={[{ required: true, message: '请选择入职日期' }]}
+            >
+              <DatePicker />
+            </Form.Item>
+          </Col>
         </Row>
-
         <Row>
-          <Col span={6}>
+          <Col span={5}>
             <Form.Item
               label="性别"
               name="sex"
@@ -149,7 +159,48 @@ export default props => {
               </Select>
             </Form.Item>
           </Col>
-          <Col span={6} offset={2}>
+          <Col span={5} offset={1}>
+            <Form.Item
+              label="民族"
+              name="nationCode"
+              rules={[{ required: true, message: '请输入民族' }]}
+            >
+              <Input />
+            </Form.Item>
+          </Col>
+          <Col span={5} offset={1}>
+            <Form.Item
+              label="联系电话"
+              name="mobile"
+              rules={[{ required: true, message: '请输入联系电话' }]}
+            >
+              <Input />
+            </Form.Item>
+          </Col>
+          <Col span={5} offset={1}>
+            <Form.Item
+              label="邮箱"
+              name="email"
+              rules={[{ required: true, message: '请输入类别' }]}
+            >
+              <Input />
+            </Form.Item>
+          </Col>
+        </Row>
+        <Row>
+          <Col span={5}>
+            <Form.Item
+              label="HRBP"
+              name="hrbp"
+              rules={[{ required: true, message: '请输入HRBP' }]}
+            >
+              <Input />
+            </Form.Item>
+          </Col>
+        </Row>
+        <h2 style={{ margin: '10px 0 5px 0' }}>职位信息</h2>
+        <Row>
+          <Col span={5}>
             <Form.Item
               label="一级业务线"
               name="firstBusinessCode"
@@ -166,7 +217,7 @@ export default props => {
               </Select>
             </Form.Item>
           </Col>
-          <Col span={6} offset={2}>
+          <Col span={5} offset={1}>
             <Form.Item
               label="二级业务线"
               name="businessCode"
@@ -183,14 +234,232 @@ export default props => {
               </Select>
             </Form.Item>
           </Col>
-        </Row>
-
-        <Row>
-          <Col span={6}>
+          <Col span={5} offset={1}>
             <Form.Item
-              label="劳动关系"
+              label="部门"
+              name="departmentCode"
+              rules={[{ required: true, message: '请选择部门' }]}
+            >
+              <OzTreeSlect {...props} onlySelect={true} onlySelectLevel={3} />
+            </Form.Item>
+          </Col>
+          <Col span={5} offset={1}>
+            <Form.Item
+              label="组别"
+              name="groupCode"
+              rules={[{ required: true, message: '请选择组别' }]}
+            >
+              <Select showSearch optionFilterProp="children">
+                {groupList?.map(item => {
+                  return (
+                    <Option value={item.code} key={item.code}>
+                      {item.name}
+                    </Option>
+                  );
+                })}
+              </Select>
+            </Form.Item>
+          </Col>
+        </Row>
+        <Row>
+          <Col span={5}>
+            <Form.Item
+              label="技术岗位"
+              name="postId"
+              rules={[{ required: true, message: '请选择岗位' }]}
+            >
+              <Select showSearch optionFilterProp="children">
+                {jobList?.map(item => {
+                  return (
+                    <Option value={item.jobId} key={item.jobId}>
+                      {item.jobName}
+                    </Option>
+                  );
+                })}
+              </Select>
+            </Form.Item>
+          </Col>
+          <Col span={5} offset={1}>
+            <Form.Item
+              label="职位"
+              name="titleId"
+              rules={[{ required: true, message: '请选择职位' }]}
+            >
+              <Select showSearch optionFilterProp="children">
+                {titleList?.map(item => {
+                  return (
+                    <Option value={item.titleId} key={item.titleId}>
+                      {item.titleName}
+                    </Option>
+                  );
+                })}
+              </Select>
+            </Form.Item>
+          </Col>
+          <Col span={5} offset={1}>
+            <Form.Item label="管理职级" name="manageRankId">
+              <Select showSearch optionFilterProp="children">
+                {rankList?.map(item => {
+                  if (item.rankName.indexOf('M') > -1) {
+                    return (
+                      <Option value={item.rankId} key={item.rankId}>
+                        {item.rankName}
+                      </Option>
+                    );
+                  } else {
+                    return null;
+                  }
+                })}
+              </Select>
+            </Form.Item>
+          </Col>
+          <Col span={5} offset={1}>
+            <Form.Item
+              label="技术职级"
+              name="rankId"
+              rules={[{ required: true, message: '请选择技术职级' }]}
+            >
+              <Select showSearch optionFilterProp="children">
+                {rankList?.map(item => {
+                  if (item.rankName.indexOf('P') > -1) {
+                    return (
+                      <Option value={item.rankId} key={item.rankId}>
+                        {item.rankName}
+                      </Option>
+                    );
+                  } else {
+                    return null;
+                  }
+                })}
+              </Select>
+            </Form.Item>
+          </Col>
+        </Row>
+        <Row>
+          <Col span={5}>
+            <Form.Item
+              label="上级编号"
+              name="superiorsNo"
+              rules={[{ required: true, message: '请输入上级编号' }]}
+            >
+              <Input />
+            </Form.Item>
+          </Col>
+          <Col span={5} offset={1}>
+            <Form.Item
+              label="上级姓名"
+              name="superiorsName"
+              rules={[{ required: true, message: '请输入上级姓名' }]}
+            >
+              <Input />
+            </Form.Item>
+          </Col>
+          <Col span={5} offset={1}>
+            <Form.Item
+              label="角色"
+              name="roles"
+              rules={[{ required: true, message: '请选择角色' }]}
+            >
+              <Select placeholder="请选择角色">
+                <Option value="专业">专业</Option>
+                <Option value="管理">管理</Option>
+              </Select>
+            </Form.Item>
+          </Col>
+        </Row>
+        <h2 style={{ margin: '10px 0 5px 0' }}>合同信息</h2>
+        <Row>
+          <Col span={5}>
+            <Form.Item
+              label="合同起始日期"
+              name="contractStart"
+              rules={[{ required: true, message: '请选择合同起始日期' }]}
+            >
+              <DatePicker />
+            </Form.Item>
+          </Col>
+          <Col span={5} offset={1}>
+            <Form.Item
+              label="合同结束日期"
+              name="contractEnd"
+              rules={[{ required: true, message: '请选择合同结束日期' }]}
+            >
+              <DatePicker />
+            </Form.Item>
+          </Col>
+          <Col span={5} offset={1}>
+            <Form.Item
+              label="试用期到期提醒"
+              name="probationRemind"
+              rules={[{ required: true, message: '请选择试用期到期提醒' }]}
+            >
+              <Select>
+                <Option value={0} key={0}>
+                  未提醒
+                </Option>
+                <Option value={1} key={1}>
+                  已提醒
+                </Option>
+              </Select>
+            </Form.Item>
+          </Col>
+          <Col span={5} offset={1}>
+            <Form.Item
+              label="试用期到期日期"
+              name="probationEnd"
+              rules={[{ required: true, message: '请选择试用期到期日期' }]}
+            >
+              <DatePicker />
+            </Form.Item>
+          </Col>
+        </Row>
+        <Row>
+          <Col span={5}>
+            <Form.Item
+              label="合同到期提醒"
+              name="contractRemind"
+              rules={[{ required: true, message: '请选择合同到期提醒' }]}
+            >
+              <Select>
+                <Option value={0} key={0}>
+                  未提醒
+                </Option>
+                <Option value={1} key={1}>
+                  已提醒
+                </Option>
+              </Select>
+            </Form.Item>
+          </Col>
+          <Col span={5} offset={1}>
+            <Form.Item label="合同变更记录" name="contractChangeRecord">
+              <Input />
+            </Form.Item>
+          </Col>
+          <Col span={5} offset={1}>
+            <Form.Item
+              label="开始工作时间"
+              name="workStart"
+              rules={[{ required: true, message: '请选择开始工作时间' }]}
+            >
+              <DatePicker />
+            </Form.Item>
+          </Col>
+          <Col span={5} offset={1}>
+            <Form.Item
+              label="上份合同开始时间"
+              name="exWorkStart"
+              rules={[{ required: true, message: '请选择上份合同开始时间' }]}
+            >
+              <DatePicker />
+            </Form.Item>
+          </Col>
+        </Row>
+        <Row>
+          <Col span={5}>
+            <Form.Item
+              label="实际劳动关系"
               name="laborId"
-              rules={[{ required: true, message: '请选择劳动关系' }]}
+              rules={[{ required: true, message: '请选择实际劳动关系' }]}
             >
               <Select showSearch optionFilterProp="children">
                 {laborList?.map(item => {
@@ -203,7 +472,7 @@ export default props => {
               </Select>
             </Form.Item>
           </Col>
-          <Col span={6} offset={2}>
+          <Col span={5} offset={1}>
             <Form.Item
               label="用工类型"
               name="employmentType"
@@ -228,145 +497,7 @@ export default props => {
               </Select>
             </Form.Item>
           </Col>
-          <Col span={6} offset={2}>
-            <Form.Item
-              label="部门"
-              name="departmentCode"
-              rules={[{ required: true, message: '请选择部门' }]}
-            >
-              {/* <Select showSearch optionFilterProp="children">
-                {departmentList?.map(item => {
-                  return (
-                    <Option value={item.code} key={item.code}>
-                      {item.name}
-                    </Option>
-                  );
-                })}
-              </Select> */}
-              <OzTreeSlect {...props} onlySelect={true} onlySelectLevel={3} />
-            </Form.Item>
-          </Col>
-        </Row>
-
-        <Row>
-          <Col span={6}>
-            <Form.Item
-              label="是否用公司电脑"
-              name="useComputer"
-              rules={[{ required: true, message: '请选择是否用公司电脑' }]}
-            >
-              <Select>
-                <Option value={0} key={0}>
-                  否
-                </Option>
-                <Option value={1} key={1}>
-                  是
-                </Option>
-              </Select>
-            </Form.Item>
-          </Col>
-          <Col span={6} offset={2}>
-            <Form.Item
-              label="HRBP"
-              name="hrbp"
-              rules={[{ required: true, message: '请输入HRBP' }]}
-            >
-              <Input />
-            </Form.Item>
-          </Col>
-          <Col span={6} offset={2}>
-            <Form.Item
-              label="上级编号"
-              name="superiorsNo"
-              rules={[{ required: true, message: '请输入上级编号' }]}
-            >
-              <Input />
-            </Form.Item>
-          </Col>
-        </Row>
-
-        <Row>
-          <Col span={6}>
-            <Form.Item
-              label="上级姓名"
-              name="superiorsName"
-              rules={[{ required: true, message: '请输入上级姓名' }]}
-            >
-              <Input />
-            </Form.Item>
-          </Col>
-          <Col span={6} offset={2}>
-            <Form.Item
-              label="技术职级"
-              name="rankId"
-              rules={[{ required: true, message: '请选择技术职级' }]}
-            >
-              <Select showSearch optionFilterProp="children">
-                {rankList?.map(item => {
-                  if (item.rankName.indexOf('P') > -1) {
-                    return (
-                      <Option value={item.rankId} key={item.rankId}>
-                        {item.rankName}
-                      </Option>
-                    );
-                  } else {
-                    return null;
-                  }
-                })}
-              </Select>
-            </Form.Item>
-          </Col>
-
-          <Col span={6} offset={2}>
-            <Form.Item label="管理职级" name="manageRankId">
-              <Select showSearch optionFilterProp="children">
-                {rankList?.map(item => {
-                  if (item.rankName.indexOf('M') > -1) {
-                    return (
-                      <Option value={item.rankId} key={item.rankId}>
-                        {item.rankName}
-                      </Option>
-                    );
-                  } else {
-                    return null;
-                  }
-                })}
-              </Select>
-            </Form.Item>
-          </Col>
-        </Row>
-
-        <Row>
-          <Col span={6}>
-            <Form.Item
-              label="职位"
-              name="titleId"
-              rules={[{ required: true, message: '请选择职位' }]}
-            >
-              <Select showSearch optionFilterProp="children">
-                {titleList?.map(item => {
-                  return (
-                    <Option value={item.titleId} key={item.titleId}>
-                      {item.titleName}
-                    </Option>
-                  );
-                })}
-              </Select>
-            </Form.Item>
-          </Col>
-          <Col span={6} offset={2}>
-            <Form.Item
-              label="角色"
-              name="roles"
-              rules={[{ required: true, message: '请选择角色' }]}
-            >
-              <Select placeholder="请选择角色">
-                <Option value="专业">专业</Option>
-                <Option value="管理">管理</Option>
-              </Select>
-            </Form.Item>
-          </Col>
-          <Col span={6} offset={2}>
+          <Col span={5} offset={1}>
             <Form.Item
               label="是否在职"
               name="currentPosition"
@@ -378,26 +509,7 @@ export default props => {
               </Select>
             </Form.Item>
           </Col>
-        </Row>
-        <Row>
-          <Col span={6}>
-            <Form.Item
-              label="成本中心"
-              name="costId"
-              rules={[{ required: true, message: '请输入英文名' }]}
-            >
-              <Select showSearch optionFilterProp="children">
-                {costList?.map(item => {
-                  return (
-                    <Option value={item.id} key={item.id}>
-                      {item.costCenterName}
-                    </Option>
-                  );
-                })}
-              </Select>
-            </Form.Item>
-          </Col>
-          <Col span={6} offset={2}>
+          <Col span={5} offset={1}>
             <Form.Item
               label="工作地"
               name="workPlace"
@@ -407,240 +519,18 @@ export default props => {
             </Form.Item>
           </Col>
         </Row>
-        <Row style={{ marginTop: 20 }}>
-          <Col span={6}>
-            <Form.Item
-              label="合同起始日期"
-              name="contractStart"
-              rules={[{ required: true, message: '请选择合同起始日期' }]}
-            >
-              <DatePicker />
-            </Form.Item>
-          </Col>
-          <Col span={6} offset={2}>
-            <Form.Item
-              label="合同结束日期"
-              name="contractEnd"
-              rules={[{ required: true, message: '请选择合同结束日期' }]}
-            >
-              <DatePicker />
-            </Form.Item>
-          </Col>
-          <Col span={6} offset={2}>
-            <Form.Item
-              label="合同到期提醒"
-              name="contractRemind"
-              rules={[{ required: true, message: '请选择合同到期提醒' }]}
-            >
-              <Select>
-                <Option value={0} key={0}>
-                  未提醒
-                </Option>
-                <Option value={1} key={1}>
-                  已提醒
-                </Option>
-              </Select>
-            </Form.Item>
-          </Col>
-        </Row>
-
+        <h2 style={{ margin: '10px 0 5px 0' }}>银行、家庭信息</h2>
         <Row>
-          <Col span={6}>
+          <Col span={5}>
             <Form.Item
-              label="试用期到期提醒"
-              name="probationRemind"
-              rules={[{ required: true, message: '请选择试用期到期提醒' }]}
-            >
-              <Select>
-                <Option value={0} key={0}>
-                  未提醒
-                </Option>
-                <Option value={1} key={1}>
-                  已提醒
-                </Option>
-              </Select>
-            </Form.Item>
-          </Col>
-          <Col span={6} offset={2}>
-            <Form.Item
-              label="入职日期"
-              name="onboardingDate"
-              rules={[{ required: true, message: '请选择入职日期' }]}
-            >
-              <DatePicker />
-            </Form.Item>
-          </Col>
-          <Col span={6} offset={2}>
-            <Form.Item
-              label="试用期截止日期"
-              name="probationEnd"
-              rules={[{ required: true, message: '请选择试用期截止日期' }]}
-            >
-              <DatePicker />
-            </Form.Item>
-          </Col>
-        </Row>
-
-        <Row>
-          <Col span={6}>
-            <Form.Item
-              label="开始工作时间"
-              name="workStart"
-              rules={[{ required: true, message: '请选择开始工作时间' }]}
-            >
-              <DatePicker />
-            </Form.Item>
-          </Col>
-          <Col span={6} offset={2}>
-            <Form.Item
-              label="上份合同开始时间"
-              name="exWorkStart"
-              rules={[{ required: true, message: '请选择上份合同开始时间' }]}
-            >
-              <DatePicker />
-            </Form.Item>
-          </Col>
-        </Row>
-        <Row>
-          <Col span={16}>
-            <Form.Item label="合同变更记录" name="contractChangeRecord">
-              <Input />
-            </Form.Item>
-          </Col>
-        </Row>
-        {/* next */}
-        <Row style={{ marginTop: 20 }}>
-          <Col span={6}>
-            <Form.Item
-              label="岗位"
-              name="postId"
-              rules={[{ required: true, message: '请选择岗位' }]}
-            >
-              <Select showSearch optionFilterProp="children">
-                {jobList?.map(item => {
-                  return (
-                    <Option value={item.jobId} key={item.jobId}>
-                      {item.jobName}
-                    </Option>
-                  );
-                })}
-              </Select>
-            </Form.Item>
-          </Col>
-          <Col span={6} offset={2}>
-            <Form.Item
-              label="类别"
-              name="category"
-              rules={[{ required: true, message: '请输入类别' }]}
-            >
-              <Input />
-            </Form.Item>
-          </Col>
-          <Col span={6} offset={2}>
-            <Form.Item
-              label="组别"
-              name="groupCode"
-              rules={[{ required: true, message: '请选择组别' }]}
-            >
-              <Select showSearch optionFilterProp="children">
-                {groupList?.map(item => {
-                  return (
-                    <Option value={item.code} key={item.code}>
-                      {item.name}
-                    </Option>
-                  );
-                })}
-              </Select>
-            </Form.Item>
-          </Col>
-        </Row>
-
-        <Row>
-          <Col span={6}>
-            <Form.Item label="其他" name="other">
-              <Input placeholder="请输入其他" />
-            </Form.Item>
-          </Col>
-          <Col span={6} offset={2}>
-            <Form.Item
-              label="婚姻状况"
-              name="maritalStatus"
-              rules={[{ required: true, message: '请选择婚姻状况' }]}
-            >
-              <Select>
-                <Option value={2} key={2}>
-                  已婚
-                </Option>
-                <Option value={1} key={1}>
-                  未婚
-                </Option>
-              </Select>
-            </Form.Item>
-          </Col>
-          <Col span={6} offset={2}>
-            <Form.Item
-              label="生育状况"
-              name="fertilityStatus"
-              rules={[{ required: true, message: '请选择生育状况' }]}
-            >
-              <Select>
-                <Option value={0} key={0}>
-                  未育
-                </Option>
-                <Option value={1} key={1}>
-                  已育
-                </Option>
-              </Select>
-            </Form.Item>
-          </Col>
-        </Row>
-
-        <Row>
-          <Col span={6}>
-            <Form.Item
-              label="民族"
-              name="nationCode"
-              rules={[{ required: true, message: '请输入民族' }]}
-            >
-              <Input />
-            </Form.Item>
-          </Col>
-          <Col span={6} offset={2}>
-            <Form.Item
-              label="联系电话"
-              name="mobile"
-              rules={[{ required: true, message: '请输入联系电话' }]}
-            >
-              <Input />
-            </Form.Item>
-          </Col>
-          <Col span={6} offset={2}>
-            <Form.Item
-              label="身份证号"
-              name="idCard"
-              rules={[{ required: true, message: '请输入身份证号' }]}
-            >
-              <Input disabled={employeeId} />
-            </Form.Item>
-          </Col>
-        </Row>
-
-        <Row>
-          <Col span={6}>
-            <Form.Item label="微信号" name="wx">
-              <Input />
-            </Form.Item>
-          </Col>
-          <Col span={6} offset={2}>
-            <Form.Item
-              label="登记银行"
+              label="银行名称"
               name="bankName"
               rules={[{ required: true, message: '请输入登记银行' }]}
             >
               <Input />
             </Form.Item>
           </Col>
-          <Col span={6} offset={2}>
+          <Col span={5} offset={1}>
             <Form.Item
               label="银行卡号"
               name="bankCardNo"
@@ -649,10 +539,54 @@ export default props => {
               <Input />
             </Form.Item>
           </Col>
+          <Col span={5} offset={1}>
+            <Form.Item
+              label="身份证号"
+              name="idCard"
+              rules={[{ required: true, message: '请输入身份证号' }]}
+            >
+              <Input disabled={employeeId} />
+            </Form.Item>
+          </Col>
+          <Col span={5} offset={1}>
+            <Form.Item
+              label="出生日期"
+              name="birthDate"
+              rules={[{ required: true, message: '请输入身份证号' }]}
+            >
+              <DatePicker />
+            </Form.Item>
+          </Col>
         </Row>
-
-        <Row style={{ marginTop: 20 }}>
-          <Col span={6}>
+        <Row>
+          <Col span={5}>
+            <Form.Item
+              label="毕业院校"
+              name="graduatedSchool"
+              rules={[{ required: true, message: '请输入毕业院校' }]}
+            >
+              <Input />
+            </Form.Item>
+          </Col>
+          <Col span={5} offset={1}>
+            <Form.Item
+              label="专业"
+              name="major"
+              rules={[{ required: true, message: '请输入专业' }]}
+            >
+              <Input />
+            </Form.Item>
+          </Col>
+          <Col span={5} offset={1}>
+            <Form.Item
+              label="毕业日期"
+              name="graduationDate"
+              rules={[{ required: true, message: '请选择毕业日期' }]}
+            >
+              <DatePicker />
+            </Form.Item>
+          </Col>
+          <Col span={5} offset={1}>
             <Form.Item
               label="文化程度"
               name="educationalLevel"
@@ -689,46 +623,64 @@ export default props => {
               </Select>
             </Form.Item>
           </Col>
-          <Col span={6} offset={2}>
+        </Row>
+        <Row>
+          <Col span={5}>
             <Form.Item
-              label="毕业院校"
-              name="graduatedSchool"
-              rules={[{ required: true, message: '请输入毕业院校' }]}
+              label="婚姻状况"
+              name="maritalStatus"
+              rules={[{ required: true, message: '请选择婚姻状况' }]}
             >
+              <Select>
+                <Option value={2} key={2}>
+                  已婚
+                </Option>
+                <Option value={1} key={1}>
+                  未婚
+                </Option>
+              </Select>
+            </Form.Item>
+          </Col>
+          <Col span={5} offset={1}>
+            <Form.Item
+              label="生育状况"
+              name="fertilityStatus"
+              rules={[{ required: true, message: '请选择生育状况' }]}
+            >
+              <Select>
+                <Option value={0} key={0}>
+                  未育
+                </Option>
+                <Option value={1} key={1}>
+                  已育
+                </Option>
+              </Select>
+            </Form.Item>
+          </Col>
+          <Col span={5} offset={1}>
+            <Form.Item label="微信号" name="wx">
               <Input />
             </Form.Item>
           </Col>
-          <Col span={6} offset={2}>
+          <Col span={5} offset={1}>
             <Form.Item
-              label="专业"
-              name="major"
-              rules={[{ required: true, message: '请输入专业' }]}
+              label="是否用公司电脑"
+              name="useComputer"
+              rules={[{ required: true, message: '请选择是否用公司电脑' }]}
             >
-              <Input />
+              <Select>
+                <Option value={0} key={0}>
+                  否
+                </Option>
+                <Option value={1} key={1}>
+                  是
+                </Option>
+              </Select>
             </Form.Item>
           </Col>
         </Row>
-
         <Row>
-          <Col span={6}>
-            <Form.Item
-              label="毕业日期"
-              name="graduationDate"
-              rules={[{ required: true, message: '请选择毕业日期' }]}
-            >
-              <DatePicker />
-            </Form.Item>
-          </Col>
-          <Col span={6} offset={2}>
-            <Form.Item
-              label="紧急联系人"
-              name="emergencyContact"
-              rules={[{ required: true, message: '请输入紧急联系人' }]}
-            >
-              <Input />
-            </Form.Item>
-          </Col>
-          <Col span={6} offset={2}>
+          <Col span={5}>
             <Form.Item
               label="户籍地址"
               name="residenceAddress"
@@ -737,10 +689,7 @@ export default props => {
               <Input />
             </Form.Item>
           </Col>
-        </Row>
-
-        <Row>
-          <Col span={16}>
+          <Col span={5} offset={1}>
             <Form.Item
               label="现居住地址"
               name="habitation"
@@ -749,16 +698,60 @@ export default props => {
               <Input />
             </Form.Item>
           </Col>
-        </Row>
-
-        <Row style={{ marginTop: 20 }}>
-          <Col span={16}>
-            <Form.Item label="备注" name="remark">
-              <TextArea rows={4}></TextArea>
+          <Col span={5} offset={1}>
+            <Form.Item
+              label="紧急联系人"
+              name="relationshipName"
+              rules={[{ required: true, message: '请输入紧急联系人' }]}
+            >
+              <Input />
+            </Form.Item>
+          </Col>
+          <Col span={5} offset={1}>
+            <Form.Item
+              label="紧急联系人电话"
+              name="emergencyContact"
+              rules={[{ required: true, message: '请输入紧急联系人' }]}
+            >
+              <Input />
             </Form.Item>
           </Col>
         </Row>
-
+        <h2 style={{ margin: '10px 0 5px 0' }}>财务信息</h2>
+        <Row>
+          <Col span={5}>
+            <Form.Item label="部门（财务）" name="financeDepartment">
+              <Input placeholder="请输入部门（财务）" />
+            </Form.Item>
+          </Col>
+          <Col span={5} offset={1}>
+            <Form.Item label="组别（财务）" name="financeGroup">
+              <Input placeholder="请输入组别（财务）" />
+            </Form.Item>
+          </Col>
+          <Col span={5} offset={1}>
+            <Form.Item
+              label="成本中心"
+              name="costId"
+              rules={[{ required: true, message: '请输入英文名' }]}
+            >
+              <Select showSearch optionFilterProp="children">
+                {costList?.map(item => {
+                  return (
+                    <Option value={item.id} key={item.id}>
+                      {item.costCenterName}
+                    </Option>
+                  );
+                })}
+              </Select>
+            </Form.Item>
+          </Col>
+          <Col span={5} offset={1}>
+            <Form.Item label="备注" name="remark">
+              <TextArea rows={1}></TextArea>
+            </Form.Item>
+          </Col>
+        </Row>
         <Form.Item wrapperCol={{ span: 12, offset: 10 }}>
           <Button
             type="primary"
