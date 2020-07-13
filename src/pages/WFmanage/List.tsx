@@ -89,7 +89,7 @@ export default () => {
   });
   const handlePrint = (id: string) => {
     Modal.confirm({
-      title: '确定删除?',
+      title: '该审批流程的所有记录将被删除，且不可恢复，确认删除？',
       okText: '确定',
       icon: <ExclamationCircleOutlined />,
       okType: 'danger' as any,
