@@ -47,6 +47,10 @@ export default (props: tsProps) => {
 
   async function getJson() {
     let list = organizationJson;
+    if (organizationJson && organizationJson.length) {
+      setMount(true);
+    }
+
     let deleteGroupList: tsUserItem[] = [];
     for (let i = 0; i < deleteGroupJson.length; i++) {
       deleteGroupList.push({
@@ -93,7 +97,6 @@ export default (props: tsProps) => {
     list.push(defaultGroupObj);
 
     handleList(list);
-    setMount(true);
   }
 
   const handleList = data => {

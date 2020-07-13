@@ -22,7 +22,7 @@ export const useReq = ({
       let response = await queryMethod({ pageNum: current, pageSize });
       return {
         total: response.obj?.total,
-        list: response.obj?.list,
+        list: response.obj?.list || response.obj,
       };
     },
     {

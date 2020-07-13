@@ -1,28 +1,15 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Button, Card } from 'antd';
 import { Link } from 'umi';
-import { homeList } from './services/home';
+import { homeList, tsCategory } from './services/home';
 import { GlobalResParams } from '@/types/ITypes';
 import './style/home.less';
 
-interface tsList {
-  id: number;
-  name: string;
-  sort: number;
-  listForm: tsListItem[];
-}
-
-interface tsListItem {
-  id: number;
-  icon: string | null;
-  name: string;
-}
-
 export default () => {
-  const [list, setList] = useState<tsList[]>([]);
+  const [list, setList] = useState<tsCategory[]>([]);
   useEffect(() => {
     async function getList() {
-      let json: GlobalResParams<tsList[]> = await homeList();
+      let json: GlobalResParams<tsCategory[]> = await homeList();
       if (json.status === 200) {
         setList(json.obj);
       }

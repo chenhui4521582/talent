@@ -77,10 +77,6 @@ export interface PaginationTableParams {
   [propName: string]: any;
 }
 
-// export interface tsSaveTaskForm<T> {
-//   T
-// }
-
 export interface tsFormSaveItem {
   id: number;
   multipleNumber?: number;
@@ -104,6 +100,19 @@ export interface tsList {
   createTime: string;
   status: string;
   currStepName: string;
+}
+
+export interface tsCategory {
+  id: number;
+  name: string;
+  sort: number;
+  listForm: tsCategoryItem[];
+}
+
+export interface tsCategoryItem {
+  id: number;
+  icon: string | null;
+  name: string;
 }
 
 //工作流动态表单详情
