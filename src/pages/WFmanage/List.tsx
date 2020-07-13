@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Card,
   Modal,
@@ -15,6 +15,7 @@ import { useTable } from '@/components/GlobalTable/useTable';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { GlobalResParams } from '@/types/ITypes';
 import { historyList, deleteHistory, tsList } from './services/history';
+import { categoryList } from './services/category';
 import { ColumnProps } from 'antd/es/table';
 
 const { Option } = Select;
@@ -26,7 +27,14 @@ const status = {
   '3': '已驳回',
 };
 
+interface tsCategory {
+  id: 1;
+  name: '人事类';
+}
+
 export default () => {
+  const [cList, setCategoryList] = useState<tsCategory[]>([]);
+
   const columns: ColumnProps<tsList>[] = [
     {
       title: '审批编号',
@@ -81,6 +89,17 @@ export default () => {
     },
   ];
 
+  useEffect(() => {
+    getList();
+  }, []);
+
+  const getList = async () => {
+    let res: GlobalResParams<tsCategory[]> = await categoryList();
+    if (res.status === 200) {
+      setCategoryList(res.obj);
+    }
+  };
+
   const { TableContent, refresh } = useTable({
     queryMethod: historyList,
     columns,
@@ -112,22 +131,26 @@ export default () => {
     });
   };
   return (
-    <Card title="应聘登记表">
+    <Card title="工作流列表/声请记录">
       <TableContent>
         <Row>
           <Col span={5}>
             <Form.Item label="开始时间" name="startDate">
-              <DatePicker format="YYYY-MM-DD" placeholder="" />
+              <DatePicker format="YYYY-MM-DD" placeholder="请选择" />
             </Form.Item>
           </Col>
           <Col span={5} offset={1}>
             <Form.Item label="结束时间" name="endDate">
-              <DatePicker format="YYYY-MM-DD" placeholder="" />
+              <DatePicker format="YYYY-MM-DD" placeholder="请选择" />
             </Form.Item>
           </Col>
           <Col span={5} offset={1}>
             <Form.Item label="工作流类别" name="taskType">
-              <Input />
+              <Select placeholder="请选择">
+                {cList.map(item => {
+                  return <Option value={item.id}>{item.name}</Option>;
+                })}
+              </Select>
             </Form.Item>
           </Col>
           <Col span={5} offset={1}>
@@ -139,7 +162,7 @@ export default () => {
         <Row>
           <Col span={5}>
             <Form.Item label="审批状态" name="status">
-              <Select>
+              <Select placeholder="请选择">
                 <Option value="-1">删除</Option>
                 <Option value="0">已撤销</Option>
                 <Option value="1">审批中</Option>
@@ -150,12 +173,12 @@ export default () => {
           </Col>
           <Col span={5} offset={1}>
             <Form.Item label="审批编号" name="formNumber">
-              <Input />
+              <Input placeholder="请输入" />
             </Form.Item>
           </Col>
           <Col span={5} offset={1}>
             <Form.Item label="申请人" name="applicant">
-              <Input />
+              <Input placeholder="请输入" />
             </Form.Item>
           </Col>
         </Row>

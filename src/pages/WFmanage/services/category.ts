@@ -13,7 +13,7 @@ export interface tsCategoryItem {
 }
 
 export async function categoryList() {
-  return request(`/api/talent/wfresform/list`, {
+  return request(`/api/talent/wfResFormCategory/getCategoryList`, {
     method: 'POST',
   });
 }
