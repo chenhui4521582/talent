@@ -28,7 +28,7 @@ const status = {
 };
 
 interface tsCategory {
-  id: 1;
+  id: number;
   name: string;
 }
 

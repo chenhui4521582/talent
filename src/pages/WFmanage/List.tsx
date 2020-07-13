@@ -7,7 +7,7 @@ import { historyList } from './services/history';
 import { ColumnProps } from 'antd/es/table';
 
 interface tsList {
-  id: 1;
+  id: number;
   name: string;
   status: number;
 }
