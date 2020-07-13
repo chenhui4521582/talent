@@ -241,6 +241,22 @@ export default defineConfig({
           component: '@/pages/WFmanage/List',
         },
         {
+          path: '/talent/wfmanage/applicationrecord/:id',
+          component: '@/pages/WFmanage/ApplicationRecord',
+        },
+        {
+          path: '/talent/wfmanage/editRule/:id',
+          component: '@/pages/WFmanage/EditRule',
+        },
+        {
+          path: '/talent/wfmanage/new',
+          component: '@/pages/WFmanage/New',
+        },
+        {
+          path: '/talent/wfmanage/editForm/:id',
+          component: '@/pages/WFmanage/EditForm',
+        },
+        {
           path: '/talent/wfmanage/category',
           component: '@/pages/WFmanage/Category',
         },
