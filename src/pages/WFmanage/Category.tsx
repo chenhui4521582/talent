@@ -41,7 +41,7 @@ export default () => {
           <span>
             <a
               onClick={() => {
-                setAction('change');
+                handAction(record, 'change');
               }}
             >
               修改
@@ -61,6 +61,7 @@ export default () => {
   ];
   const [action, setAction] = useState<'add' | 'change'>();
   const [form] = Form.useForm();
+  const [selectId, setSelectId] = useState<string>();
   const { TableContent, refresh } = useReq({
     queryMethod: categoryList,
     columns,
@@ -70,6 +71,13 @@ export default () => {
 
   const handAction = (record: tsList, type: 'add' | 'change') => {
     setAction(type);
+    setSelectId(record.id);
+    form.setFieldsValue(record);
+  };
+
+  const handleCancel = () => {
+    setAction(undefined);
+    setSelectId(undefined);
   };
 
   const handleDelete = (id: string) => {
@@ -97,12 +105,37 @@ export default () => {
     });
   };
 
+  const handSubmit = () => {
+    form.validateFields().then(async value => {
+      let submitApi = saveCategory;
+      if (action === 'change') {
+        submitApi = updateCategory;
+        value.id = selectId;
+      }
+      let res: GlobalResParams<string> = await submitApi(value);
+      if (res.status === 200) {
+        refresh();
+        notification['success']({
+          message: res.msg,
+          description: '',
+        });
+        handleCancel();
+      } else {
+        notification['error']({
+          message: res.msg,
+          description: '',
+        });
+      }
+    });
+  };
+
   return (
     <Card
       title="工作流类别管理"
       extra={
         <Button
           onClick={() => {
+            form.setFieldsValue({ name: '', remark: '' });
             setAction('add');
           }}
           type="primary"
@@ -115,11 +148,9 @@ export default () => {
         visible={!!action}
         okText="确认"
         cancelText="取消"
-        onCancel={() => {
-          setAction(undefined);
-        }}
+        onCancel={handleCancel}
         onOk={() => {
-          setAction(undefined);
+          handSubmit();
         }}
       >
         <Form form={form}>

@@ -26,16 +26,16 @@ export async function deleteCategory(id: string) {
   });
 }
 // 新增
-export async function saveCategory(name: string, remark: string) {
+export async function saveCategory(params) {
   return request(`/api/talent/wfResFormCategory/save`, {
     method: 'POST',
-    data: { name, remark },
+    data: params,
   });
 }
 // 修改
-export async function updateCategory(id: string, name: string, remark: string) {
+export async function updateCategory(params) {
   return request(`/api/talent/wfResFormCategory/update`, {
     method: 'POST',
-    data: { name, remark, id },
+    data: params,
   });
 }
