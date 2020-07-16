@@ -713,9 +713,9 @@ export default props => {
           </Col>
           <Col span={5} offset={1}>
             <Form.Item
-              label="紧急联系人电话"
+              label="紧急联系电话"
               name="emergencyContact"
-              rules={[{ required: true, message: '请输入紧急联系人' }]}
+              rules={[{ required: true, message: '请输入紧急联系电话' }]}
             >
               <Input />
             </Form.Item>
