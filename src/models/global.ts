@@ -138,37 +138,49 @@ export const useCompany = () => {
 // 组织架构主体
 export const useOrganization = () => {
   const [organizationJson, setOrganizationJson] = useState<tsListItem[]>([]);
+  const [refresh, setRefresh] = useState<boolean>(false);
+  const refreshs = () => {
+    setRefresh(!refresh);
+  };
   useEffect(() => {
     async function fetchOrganization() {
       let res: GlobalResParams<tsListItem[]> = await getOrganization();
       setOrganizationJson(res.obj);
     }
     fetchOrganization();
-  }, []);
-  return { organizationJson };
+  }, [refresh]);
+  return { organizationJson, refresh: refreshs };
 };
 // 组织结构默认分组
 export const usetDeleteOrganization = () => {
   const [deleteGroupJson, setDeleteGroupJson] = useState<tsDeleteItem[]>([]);
+  const [refresh, setRefresh] = useState<boolean>(false);
+  const refreshs = () => {
+    setRefresh(!refresh);
+  };
   useEffect(() => {
     async function fetchOrganization() {
       let res: GlobalResParams<tsDeleteItem[]> = await getDeleteGroup();
       setDeleteGroupJson(res.obj);
     }
     fetchOrganization();
-  }, []);
-  return { deleteGroupJson };
+  }, [refresh]);
+  return { deleteGroupJson, refreshDel: refreshs };
 };
 
 // 组织架构已删除人员
 export const usetDefaultOrganization = () => {
   const [defaultGroupJson, setdefaultGroupJson] = useState<tsDefaultItem[]>([]);
+  const [refresh, setRefresh] = useState<boolean>(false);
+  const refreshs = () => {
+    setRefresh(!refresh);
+  };
   useEffect(() => {
     async function fetchOrganization() {
       let res: GlobalResParams<tsDefaultItem[]> = await getDefaultGroup();
       setdefaultGroupJson(res.obj);
     }
     fetchOrganization();
-  }, []);
-  return { defaultGroupJson };
+  }, [refresh]);
+  return { defaultGroupJson, refreshDef: refreshs };
 };
