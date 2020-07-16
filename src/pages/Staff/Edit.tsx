@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Card,
   Select,
@@ -28,6 +28,7 @@ import {
 } from './services/staff';
 import { GlobalResParams } from '@/types/ITypes';
 import OzTreeSlect from '@/pages/Framework/components/OzTreeSlect';
+import LevelOr from '@/components/GlobalTable/levelOr';
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -40,6 +41,9 @@ export default props => {
   const { departmentList: secondBusiness } = useDepartment(2);
   const { departmentList } = useDepartment(3);
   const { departmentList: groupList } = useDepartment(4);
+  const [twoLevel, setTwoLevel] = useState<string>('');
+  const [threeLevel, setThreeLevel] = useState<string>('');
+  const [fourLevel, setFourLevel] = useState<string>('');
 
   const { rankList } = useRank();
   const { titleList } = useTitle();
@@ -71,6 +75,10 @@ export default props => {
           : '';
         values.birthDate ? (values.birthDate = moment(values.birthDate)) : '';
       }
+      setTwoLevel(values.firstBusinessCode);
+      setThreeLevel(values.businessCode);
+      setFourLevel(values.departmentCode);
+
       form.setFieldsValue(res?.obj);
     }
     if (employeeId) getDetail();
@@ -104,9 +112,28 @@ export default props => {
       });
     }
   };
+  const handleFormChange = changedValues => {
+    if (changedValues.firstBusinessCode) {
+      setTwoLevel(changedValues.firstBusinessCode);
+      form.setFieldsValue({ businessCode: '' });
+      form.setFieldsValue({ departmentCode: '' });
+      form.setFieldsValue({ groupCode: '' });
+    } else if (changedValues.businessCode) {
+      setThreeLevel(changedValues.businessCode);
+      form.setFieldsValue({ departmentCode: '' });
+      form.setFieldsValue({ groupCode: '' });
+    } else if (changedValues.departmentCode) {
+      setFourLevel(changedValues.departmentCode);
+      form.setFieldsValue({ groupCode: '' });
+    }
+  };
   return (
     <Card title={employeeId ? '编辑员工' : '新增员工'}>
-      <Form form={form} onFinish={handleSubmit}>
+      <Form
+        form={form}
+        onFinish={handleSubmit}
+        onValuesChange={handleFormChange}
+      >
         <h2>基本类型</h2>
         <Row>
           <Col span={5}>
@@ -206,15 +233,7 @@ export default props => {
               name="firstBusinessCode"
               rules={[{ required: true, message: '请选择所属业务线' }]}
             >
-              <Select showSearch optionFilterProp="children">
-                {firstBusiness?.map(item => {
-                  return (
-                    <Option value={item.code} key={item.code}>
-                      {item.name}
-                    </Option>
-                  );
-                })}
-              </Select>
+              <LevelOr code="" />
             </Form.Item>
           </Col>
           <Col span={5} offset={1}>
@@ -223,15 +242,7 @@ export default props => {
               name="businessCode"
               rules={[{ required: true, message: '请输入二级业务线' }]}
             >
-              <Select showSearch optionFilterProp="children">
-                {secondBusiness?.map(item => {
-                  return (
-                    <Option value={item.code} key={item.code}>
-                      {item.name}
-                    </Option>
-                  );
-                })}
-              </Select>
+              <LevelOr code={twoLevel} key={twoLevel} />
             </Form.Item>
           </Col>
           <Col span={5} offset={1}>
@@ -240,7 +251,7 @@ export default props => {
               name="departmentCode"
               rules={[{ required: true, message: '请选择部门' }]}
             >
-              <OzTreeSlect {...props} onlySelect={true} onlySelectLevel={3} />
+              <LevelOr code={threeLevel} key={threeLevel} />
             </Form.Item>
           </Col>
           <Col span={5} offset={1}>
@@ -248,16 +259,9 @@ export default props => {
               label="组别"
               name="groupCode"
               rules={[{ required: true, message: '请选择组别' }]}
+              shouldUpdate
             >
-              <Select showSearch optionFilterProp="children">
-                {groupList?.map(item => {
-                  return (
-                    <Option value={item.code} key={item.code}>
-                      {item.name}
-                    </Option>
-                  );
-                })}
-              </Select>
+              <LevelOr code={fourLevel} key={fourLevel} />
             </Form.Item>
           </Col>
         </Row>

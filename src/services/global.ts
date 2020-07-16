@@ -233,3 +233,11 @@ export async function getDefaultGroup() {
     method: 'POST',
   });
 }
+
+// 分批次获取组织架构（组件组）
+export async function getlevelOr(parentCode: string) {
+  return request(`/api/talent/department/listChildrenByParentCode`, {
+    method: 'POST',
+    data: { parentCode },
+  });
+}
