@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   Card,
   Button,
@@ -11,6 +11,7 @@ import {
   Select,
 } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
+import { roluList, roluFormList } from './services/rule';
 import MoveInOz from '@/pages/Framework/components/MoveInOz';
 
 import GridLayout from 'react-grid-layout';
@@ -35,7 +36,15 @@ interface tsLayout {
   isResizable?: boolean;
 }
 
-export default () => {
+export default props => {
+  useEffect(() => {
+    const id = props.match.params.id;
+    async function getDetail() {
+      let res = await roluFormList(id);
+    }
+    getDetail();
+  }, []);
+
   const levelList = [
     '直接上级',
     '第二上级',

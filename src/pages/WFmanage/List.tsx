@@ -38,9 +38,9 @@ export default () => {
           <span>
             <Link to={`applicationrecord/id=${record.id}`}>申请记录</Link>
             <Divider type="vertical" />
-            <Link to={`editForm/id=${record.id}`}>表单设置</Link>
+            <Link to={`editForm/${record.id}`}>表单设置</Link>
             <Divider type="vertical" />
-            <Link to={`editRule/id=${record.id}`}>规则设置</Link>
+            <Link to={`editRule/${record.id}`}>规则设置</Link>
           </span>
         );
       },
