@@ -94,11 +94,3 @@ export async function giveDemand(params) {
     data: params,
   });
 }
-
-// 撤销简历
-export async function revoke(params) {
-  return request('/api/talent/evaluation/deleteEvaluation', {
-    method: 'POST',
-    data: params,
-  });
-}

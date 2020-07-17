@@ -146,9 +146,12 @@ export default () => {
     },
     {
       title: '性别',
-      dataIndex: 'postName',
-      key: 'postName',
+      dataIndex: 'sex',
+      key: 'sex',
       align: 'center',
+      render: (_, record) => {
+        return <span>{sexHash[record.sex]}</span>;
+      },
     },
     {
       title: '操作',
