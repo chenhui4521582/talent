@@ -94,7 +94,10 @@ export default props => {
           {demand?.businessLineName}
         </Descriptions.Item>
         <Descriptions.Item label="岗位">{demand?.jobName}</Descriptions.Item>
-        <Descriptions.Item label="职级">{demand?.rank}</Descriptions.Item>
+        <Descriptions.Item label="技术职级">{demand?.rank}</Descriptions.Item>
+        <Descriptions.Item label="管理职级">
+          {demand?.manageRank}
+        </Descriptions.Item>
         <Descriptions.Item label="数量">
           {demand?.actualAmount}/{demand?.amount}
         </Descriptions.Item>

@@ -28,6 +28,7 @@ export interface IDemandDetail {
   interview: string;
   entryName: string;
   description: string;
+  manageRank: string;
 }
 
 export interface INewDemandParams {

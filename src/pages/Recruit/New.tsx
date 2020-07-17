@@ -24,17 +24,24 @@ const { Option } = Select;
 const { TextArea } = Input;
 export default props => {
   const { demandId, name, updateDemand } = props;
+  const { rankList } = useRank();
   const [form] = Form.useForm();
   const { businessList } = useBusiness();
   const { jobList } = useJob();
   const { roleList } = useRole(2);
-  const { rankList } = useRank();
+
   useEffect(() => {
     if (demandId) {
       async function fetchDemand() {
         let res: GlobalResParams<any> = await demandDetail(demandId);
         const values = res.obj;
         values.entryDate = moment(values.entryDate);
+        values.rankId
+          ? (values.rankId = values.rankId.toString())
+          : (values.rankId = undefined);
+        values.manageRankId
+          ? (values.manageRankId = values?.manageRankId.toString())
+          : (values.manageRankId = undefined);
         form.setFieldsValue(values);
       }
       fetchDemand();
@@ -123,11 +130,12 @@ export default props => {
             placeholder="请选择技术职级"
             showSearch
             optionFilterProp="children"
+            allowClear
           >
             {rankList?.map(item => {
               if (item.rankName.indexOf('P') > -1) {
                 return (
-                  <Option value={item.rankId} key={item.rankId}>
+                  <Option value={item.rankId.toString()} key={item.rankId + ''}>
                     {item.rankName}
                   </Option>
                 );
@@ -142,11 +150,12 @@ export default props => {
             placeholder="请选择管理职级"
             showSearch
             optionFilterProp="children"
+            allowClear
           >
             {rankList?.map(item => {
               if (item.rankName.indexOf('M') > -1) {
                 return (
-                  <Option value={item.rankId} key={item.rankId}>
+                  <Option value={item.rankId.toString()} key={item.rankId + ''}>
                     {item.rankName}
                   </Option>
                 );

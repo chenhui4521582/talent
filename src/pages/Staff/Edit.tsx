@@ -302,7 +302,7 @@ export default props => {
           </Col>
           <Col span={5} offset={1}>
             <Form.Item label="管理职级" name="manageRankId">
-              <Select showSearch optionFilterProp="children">
+              <Select showSearch optionFilterProp="children" allowClear>
                 {rankList?.map(item => {
                   if (item.rankName.indexOf('M') > -1) {
                     return (
@@ -323,7 +323,7 @@ export default props => {
               name="rankId"
               rules={[{ required: true, message: '请选择技术职级' }]}
             >
-              <Select showSearch optionFilterProp="children">
+              <Select showSearch optionFilterProp="children" allowClear>
                 {rankList?.map(item => {
                   if (item.rankName.indexOf('P') > -1) {
                     return (

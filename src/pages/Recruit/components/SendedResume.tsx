@@ -205,7 +205,7 @@ export default props => {
     }
   };
   return (
-    <Card title="未下载简历">
+    <Card title="已推送简历">
       <TableContent>
         <Row>
           <Col span={6}>

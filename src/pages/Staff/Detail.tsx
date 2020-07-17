@@ -56,7 +56,7 @@ export default props => {
                 {detail?.englishName}
               </Descriptions.Item>
               <Descriptions.Item label="入职日期" style={{ maxWidth: '100px' }}>
-                {detail?.onboardingDate}
+                {detail?.onboardingDate || ''}
               </Descriptions.Item>
 
               <Descriptions.Item label="性别" style={{ maxWidth: '100px' }}>
@@ -69,7 +69,7 @@ export default props => {
                 {detail?.mobile}
               </Descriptions.Item>
               <Descriptions.Item label="邮箱" style={{ maxWidth: '100px' }}>
-                {detail?.email}
+                {detail?.email || '  '}
               </Descriptions.Item>
 
               <Descriptions.Item label="HRBP" style={{ maxWidth: '100px' }}>

@@ -141,7 +141,7 @@ export default () => {
       key: 'onboardingDate',
       align: 'center',
       render: (_, record) => {
-        return <span>{sexHash[record.detail?.sex]}</span>;
+        return <span>{record.onboardingDate || '暂未填写'}</span>;
       },
     },
     {
