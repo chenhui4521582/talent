@@ -43,7 +43,7 @@ export default props => {
       let res = await roluFormList(id);
     }
     getDetail();
-  }, []);
+  }, [props.match.params.id]);
 
   const levelList = [
     '直接上级',
