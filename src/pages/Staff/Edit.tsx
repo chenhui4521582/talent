@@ -465,7 +465,11 @@ export default props => {
               name="laborId"
               rules={[{ required: true, message: '请选择实际劳动关系' }]}
             >
-              <Select showSearch optionFilterProp="children">
+              <Select
+                showSearch
+                optionFilterProp="children"
+                style={{ maxWidth: '11vw' }}
+              >
                 {laborList?.map(item => {
                   return (
                     <Option value={item.id} key={item.id}>
