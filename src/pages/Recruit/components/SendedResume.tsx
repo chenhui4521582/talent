@@ -93,7 +93,7 @@ export default props => {
               <a onClick={e => handleRefuse(record.nId)}>放弃面试</a>
             </span>
           );
-        } else if (record.pushStatus === 2) {
+        } else if (record.pushStatus === 8) {
           return (
             <a
               onClick={() => {

@@ -60,6 +60,14 @@ export default props => {
     const interviewArray: any = roleList?.filter(
       item => item.userCode === values.interviewCode,
     );
+
+    values.rankId
+      ? (values.rankId = values.rankId.toString())
+      : (values.rankId = '');
+    values.manageRankId
+      ? (values.manageRankId = values?.manageRankId.toString())
+      : (values.manageRankId = '');
+
     values.interview = interviewArray[0]['userName'];
     let actionMethod;
     if (demandId) {

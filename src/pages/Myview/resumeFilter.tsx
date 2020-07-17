@@ -48,7 +48,7 @@ export default () => {
       render: (_, record) => (
         <span>
           <Link
-            to={`/talent/resume/print&resumeId=${record.resumeId}?resumeStatus=${record.downStatus}`}
+            to={`/talent/resume/print?resumeId=${record.resumeId}&resumeStatus=${record.downStatus}`}
           >
             查看
           </Link>
