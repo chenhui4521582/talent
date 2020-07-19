@@ -11,9 +11,12 @@ import {
   Select,
 } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
-import { roluList, roluFormList } from '../services/rule';
+import { roluList, roluFormList, listSimple } from '../services/rule';
+import { getLableList } from '@/pages/Framework/services/role';
 import MoveInOz from '@/pages/Framework/components/MoveInOz';
 import GridLayout from 'react-grid-layout';
+import Assembly from './Assembly';
+import SystemLabel from './SystemLabel';
 
 import '../../../../node_modules/react-grid-layout/css/styles.css';
 import '../../../../node_modules/react-resizable/css/styles.css';
@@ -203,7 +206,7 @@ export default (props: tsProps) => {
           </>
         );
       case 2:
-        return 2;
+        return <Assembly apiList={getLableList} header="标签" />;
       case 3:
         return (
           <>
@@ -219,11 +222,11 @@ export default (props: tsProps) => {
       case 4:
         return null;
       case 5:
-        return 5;
+        return <SystemLabel />;
       default:
         return rendType1();
     }
-  }, [list]);
+  }, [ruleType]);
 
   return (
     <>
@@ -277,6 +280,11 @@ export default (props: tsProps) => {
         </Form.Item>
         <Divider />
         {renderModalBottom}
+        <Divider />
+        <Assembly
+          apiList={listSimple}
+          header="表单控件可编辑权限设置（支持多选）"
+        />
       </Modal>
     </>
   );
