@@ -40,3 +40,10 @@ export async function updateRolu(params) {
     data: params,
   });
 }
+
+// 获取基础控件名称列表
+export async function listSimple() {
+  return request(`/api/talent/wfresbasecontrol/listSimple`, {
+    method: 'POST',
+  });
+}

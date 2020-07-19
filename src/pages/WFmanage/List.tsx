@@ -12,10 +12,30 @@ interface tsList {
   status: number;
 }
 
+const status = {
+  '-1': '删除',
+  '0': '已撤销',
+  '1': '审批中',
+  '2': '已通过',
+  '3': '已驳回',
+};
+
 export default () => {
   const columns: ColumnProps<tsList>[] = [
     {
       title: '工作流名称',
+      dataIndex: 'name',
+      key: 'name',
+      align: 'center',
+    },
+    {
+      title: '申请部门',
+      dataIndex: 'applyDepartmentName',
+      key: 'applyDepartmentName',
+      align: 'center',
+    },
+    {
+      title: '申请人',
       dataIndex: 'applyTruename',
       key: 'applyTruename',
       align: 'center',
@@ -30,13 +50,19 @@ export default () => {
       },
     },
     {
+      title: '申请时间',
+      dataIndex: 'createTime',
+      key: 'createTime',
+      align: 'center',
+    },
+    {
       title: '操作',
       key: 'action',
       align: 'center',
       render: (_, record) => {
         return (
           <span>
-            <Link to={`applicationrecord/id=${record.id}`}>申请记录</Link>
+            <Link to={`applicationrecord/${record.id}`}>申请记录</Link>
             <Divider type="vertical" />
             <Link to={`editForm/${record.id}`}>表单设置</Link>
             <Divider type="vertical" />
