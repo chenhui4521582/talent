@@ -129,7 +129,7 @@ export default props => {
       onOk: async () => {
         let res: GlobalResParams<string> = await revoke(demandId);
         if (res.status === 200) {
-          history.push(`/talent/recruit/list`);
+          refresh();
           notification['success']({
             message: res.msg,
             description: '',
