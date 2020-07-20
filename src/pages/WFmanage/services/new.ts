@@ -13,10 +13,17 @@ export interface tsCategoryItem {
   name: string;
 }
 
-// 发起流程列表 /wfresform/list
-
+// 获取工作流列表
 export async function homeList() {
-  return request(`/api/talent/wfresform/list`, {
+  return request(`/api/talent/wfresform/getList`, {
     method: 'POST',
+  });
+}
+
+// 工作流状态
+export async function changeState(id) {
+  return request(`/api/talent/wfresform/updateStatus`, {
+    method: 'POST',
+    data: { id },
   });
 }

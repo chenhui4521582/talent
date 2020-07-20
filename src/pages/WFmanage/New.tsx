@@ -19,44 +19,19 @@ export default () => {
 
   const renderList = useMemo(() => {
     return list.map(item => {
-      const listForm = item.listForm;
-      const id = item.id;
       return (
-        <div className="type" key={id}>
-          {listForm.map(u => {
-            return (
-              <Button key={u.id} style={{ marginRight: 20, marginBottom: 20 }}>
-                <Link to={`homedetail/${u.id}`}>{u.name}</Link>
-              </Button>
-            );
-          })}
-        </div>
+        <Button key={item.id} style={{ marginRight: 20, marginBottom: 20 }}>
+          <Link to={`newform/${item.id}`}>{item.name}</Link>
+        </Button>
       );
     });
   }, [list]);
 
   return (
-    <Card title="新增工作流">
-      <div style={{ marginBottom: 20 }}>
-        <a
-          style={{ marginRight: 20 }}
-          onClick={() => {
-            setType('recommend');
-          }}
-        >
-          {' '}
-          从推荐模板添加
-        </a>
-        <a
-          onClick={() => {
-            setType('recommend');
-          }}
-        >
-          {' '}
-          从已有工作流复制
-        </a>
-      </div>
-
+    <Card
+      title="新增工作流"
+      extra={<Button type="primary">新增自定义工作流</Button>}
+    >
       {renderList}
     </Card>
   );

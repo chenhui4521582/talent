@@ -10,12 +10,13 @@ import {
   Form,
   Select,
 } from 'antd';
-import { roluList, roluFormList } from './services/rule';
+import { getStepId, roluList, roluFormList } from './services/rule';
 import GridLayout from './components/GridLayout';
 
 export default props => {
   useEffect(() => {
     const id = props.match.params.id;
+    getStepId(parseInt(id));
     async function getDetail() {
       let res = await roluFormList(id);
     }

@@ -55,3 +55,11 @@ export async function getFormSimple(resFormId: string) {
     data: { resFormId },
   });
 }
+
+// 换取审批流程的id
+export async function getStepId(formId: number) {
+  return request(`/api/talent/wfresapproval/list`, {
+    method: 'POST',
+    data: { formId },
+  });
+}
