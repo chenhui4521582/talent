@@ -35,14 +35,14 @@ export default props => {
         <Row>
           <Col>默认审批人</Col>
           <Col span={18} offset={1}>
-            <GridLayout />
+            <GridLayout {...props} />
           </Col>
         </Row>
 
         <Row>
           <Col>默认抄送人</Col>
           <Col span={18} offset={1}>
-            <GridLayout />
+            <GridLayout {...props} />
           </Col>
         </Row>
         <Divider />

@@ -2,6 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { Collapse, Select, Radio, Divider, Row, Col } from 'antd';
 import { ColumnProps } from 'antd/es/table';
 import { getLableList } from '@/pages/Framework/services/system';
+import { getFormSimple } from '../services/rule';
 import { GlobalResParams } from '@/types/ITypes';
 
 const { Panel } = Collapse;
@@ -14,15 +15,6 @@ interface tsRolrLable {
   updatedBy: string | null;
 }
 
-const columns: ColumnProps<tsRolrLable>[] = [
-  {
-    title: '系统标签',
-    dataIndex: 'labelName',
-    key: 'labelName',
-    align: 'center',
-  },
-];
-
 // interface tsProps{
 //   apiList: () => Promise<any>
 
@@ -32,14 +24,21 @@ export default props => {
   // const { apiList } = props;
   const [list, setList] = useState<tsRolrLable[]>([]);
   const [selectId, setSelectId] = useState<string[]>([]);
+  const [optionList, setOptionList] = useState<any>([]);
   useEffect(() => {
     getList();
   }, []);
 
   const getList = async () => {
+    console.log(props);
+    const id = props.match.params.id;
     let res: GlobalResParams<tsRolrLable[]> = await getLableList();
     if (res.status === 200) {
       setList(res.obj);
+    }
+    let res1: GlobalResParams<any[]> = await getFormSimple(id);
+    if (res.status === 200) {
+      setOptionList(res.obj);
     }
   };
 

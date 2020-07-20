@@ -47,3 +47,11 @@ export async function listSimple() {
     method: 'POST',
   });
 }
+
+//获取工作流表单的所有控件
+export async function getFormSimple(resFormId: string) {
+  return request(`/api/talent/wfresformcontrol/listByFormId`, {
+    method: 'POST',
+    data: { resFormId },
+  });
+}

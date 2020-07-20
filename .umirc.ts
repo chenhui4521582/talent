@@ -245,6 +245,10 @@ export default defineConfig({
           component: '@/pages/WFmanage/ApplicationRecord',
         },
         {
+          path: '/talent/wfmanage/newform/:id',
+          component: '@/pages/WFmanage/NewForm',
+        },
+        {
           path: '/talent/wfmanage/editRule/:id',
           component: '@/pages/WFmanage/EditRule',
         },

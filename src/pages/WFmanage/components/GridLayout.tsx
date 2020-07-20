@@ -222,7 +222,7 @@ export default (props: tsProps) => {
       case 4:
         return null;
       case 5:
-        return <SystemLabel />;
+        return <SystemLabel {...props} />;
       default:
         return rendType1();
     }
