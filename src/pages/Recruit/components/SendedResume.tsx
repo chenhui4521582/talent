@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTable } from '@/components/GlobalTable/useTable';
 import {
   querySendedResume,
@@ -83,7 +83,7 @@ export default props => {
           return (
             <span>
               <Link
-                to={`/talent/resume/cvdetails?resumeId=${record.resumeId}&resumeStatus=${record.downStatus}`}
+                to={`/talent/resume/print?resumeId=${record.resumeId}&resumeStatus=${record.downStatus}`}
               >
                 查看简历
               </Link>
@@ -112,6 +112,7 @@ export default props => {
       },
     },
   ];
+
   const { TableContent, refresh } = useTable({
     queryMethod: querySendedResume,
     columns,
