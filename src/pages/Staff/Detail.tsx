@@ -261,9 +261,29 @@ export default props => {
               >
                 {detail?.emergencyContact || '  '}
               </Descriptions.Item>
+            </Descriptions>
+          </div>
 
+          <div style={{ marginTop: 20 }}>
+            <h2>银行、家庭信息</h2>
+            <Descriptions bordered column={4}>
+              <Descriptions.Item
+                style={{ maxWidth: '100px' }}
+                label="部门（财务）"
+              >
+                {detail?.financeDepartment || '  '}
+              </Descriptions.Item>
+              <Descriptions.Item
+                style={{ maxWidth: '100px' }}
+                label="组别（财务）"
+              >
+                {detail?.financeGroup || '  '}
+              </Descriptions.Item>
+              <Descriptions.Item style={{ maxWidth: '100px' }} label="成本中心">
+                {detail?.businessCostCenter || '  '}
+              </Descriptions.Item>
               <Descriptions.Item style={{ maxWidth: '100px' }} label="备注">
-                {detail?.remark || '  '}
+                {detail?.costName || '  '}
               </Descriptions.Item>
             </Descriptions>
           </div>
