@@ -265,8 +265,8 @@ export default props => {
           </div>
 
           <div style={{ marginTop: 20 }}>
-            <h2>银行、家庭信息</h2>
-            <Descriptions bordered column={4}>
+            <h2>财务信息</h2>
+            <Descriptions bordered column={3}>
               <Descriptions.Item
                 style={{ maxWidth: '100px' }}
                 label="部门（财务）"
@@ -282,7 +282,7 @@ export default props => {
               <Descriptions.Item style={{ maxWidth: '100px' }} label="成本中心">
                 {detail?.businessCostCenter || '  '}
               </Descriptions.Item>
-              <Descriptions.Item style={{ maxWidth: '100px' }} label="备注">
+              <Descriptions.Item span={3} label="备注">
                 {detail?.costName || '  '}
               </Descriptions.Item>
             </Descriptions>
