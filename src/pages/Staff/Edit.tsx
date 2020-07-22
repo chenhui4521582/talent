@@ -205,11 +205,7 @@ export default props => {
             </Form.Item>
           </Col>
           <Col span={5} offset={1}>
-            <Form.Item
-              label="邮箱"
-              name="email"
-              rules={[{ required: true, message: '请输入类别' }]}
-            >
+            <Form.Item label="邮箱" name="email">
               <Input />
             </Form.Item>
           </Col>
@@ -449,11 +445,7 @@ export default props => {
             </Form.Item>
           </Col>
           <Col span={5} offset={1}>
-            <Form.Item
-              label="上份合同开始时间"
-              name="exWorkStart"
-              rules={[{ required: true, message: '请选择上份合同开始时间' }]}
-            >
+            <Form.Item label="上份合同开始时间" name="exWorkStart">
               <DatePicker />
             </Form.Item>
           </Col>
@@ -560,7 +552,7 @@ export default props => {
             <Form.Item
               label="出生日期"
               name="birthDate"
-              rules={[{ required: true, message: '请输入身份证号' }]}
+              rules={[{ required: true, message: '请填写出生日期' }]}
             >
               <DatePicker />
             </Form.Item>

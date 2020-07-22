@@ -42,7 +42,7 @@ export default props => {
   return (
     <Card title="员工详情">
       <Tabs>
-        <TabPane tab="花名册" key="1">
+        <TabPane tab="花名册" key="1" style={{ wordBreak: 'break-all' }}>
           <div>
             <h2>基本信息</h2>
             <Descriptions bordered column={4}>
@@ -235,7 +235,7 @@ export default props => {
               </Descriptions.Item>
               <Descriptions.Item
                 style={{ maxWidth: '100px' }}
-                label="是否用公司电脑"
+                label="是否使用公司电脑"
               >
                 {computeHash[detail?.useComputer] || '  '}
               </Descriptions.Item>
