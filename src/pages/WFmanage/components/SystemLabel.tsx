@@ -1,6 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { Collapse, Select, Radio, Divider, Row, Col } from 'antd';
-import { ColumnProps } from 'antd/es/table';
 import { getLableList } from '@/pages/Framework/services/system';
 import { getFormSimple } from '../services/rule';
 import { GlobalResParams } from '@/types/ITypes';
@@ -15,30 +14,25 @@ interface tsRolrLable {
   updatedBy: string | null;
 }
 
-// interface tsProps{
-//   apiList: () => Promise<any>
-
-// }
-
 export default props => {
-  // const { apiList } = props;
+  // props.change
   const [list, setList] = useState<tsRolrLable[]>([]);
-  const [selectId, setSelectId] = useState<string[]>([]);
+  const [selectI, setSelectI] = useState<string>();
+  const [selectA, setSelectA] = useState<string>();
   const [optionList, setOptionList] = useState<any>([]);
   useEffect(() => {
     getList();
   }, []);
 
   const getList = async () => {
-    console.log(props);
     const id = props.match.params.id;
     let res: GlobalResParams<tsRolrLable[]> = await getLableList();
     if (res.status === 200) {
       setList(res.obj);
     }
     let res1: GlobalResParams<any[]> = await getFormSimple(id);
-    if (res.status === 200) {
-      setOptionList(res.obj);
+    if (res1.status === 200) {
+      setOptionList(res1.obj);
     }
   };
 
@@ -47,6 +41,12 @@ export default props => {
       <Radio.Group
         style={{ height: 300, width: '20vw', overflowY: 'auto' }}
         onChange={e => {
+          const { target } = e;
+          setSelectA(target.value);
+          props.change({
+            audo: target.value,
+            input: selectI,
+          });
           console.log(e);
         }}
       >
@@ -67,11 +67,23 @@ export default props => {
 
   const renderRight = useMemo(() => {
     return (
-      <Select placeholder="请选择控件名称" style={{ minWidth: '17vh' }}>
-        <Option value="1">1</Option>
+      <Select
+        placeholder="请选择控件名称"
+        style={{ minWidth: '20vh' }}
+        onChange={value => {
+          setSelectI(value.toString());
+          props.change({
+            audo: selectA,
+            input: value.toString(),
+          });
+        }}
+      >
+        {optionList.map(item => {
+          return <Option value={item.id}>{item.name}</Option>;
+        })}
       </Select>
     );
-  }, []);
+  }, [optionList]);
 
   return (
     <>

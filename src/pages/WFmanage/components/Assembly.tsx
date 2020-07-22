@@ -16,11 +16,15 @@ interface listItem {
 
 interface tsProps {
   header: string;
-  apiList: () => Promise<any>;
+  match?: any;
+  apiList: (any) => Promise<any>;
+  change: any;
+  selectKeys: any[];
 }
 
 export default (props: tsProps) => {
-  const { header, apiList } = props;
+  const id = props.match.params.id;
+  const { header, apiList, change } = props;
   const [list, setList] = useState<listItem[]>([]);
   const [keyList, setKeyList] = useState<string[]>([]);
   useEffect(() => {
@@ -28,7 +32,7 @@ export default (props: tsProps) => {
   }, []);
 
   const getList = async () => {
-    let res: GlobalResParams<listItem[]> = await apiList();
+    let res: GlobalResParams<listItem[]> = await apiList(id);
     if (res.status === 200) {
       let obj: listItem[] = JSON.parse(JSON.stringify(res.obj));
       for (let i = 0; i < obj.length; i++) {
@@ -42,31 +46,30 @@ export default (props: tsProps) => {
 
   const handleChange = targetKeys => {
     setKeyList(targetKeys);
+    change(targetKeys);
   };
 
   return (
-    <>
-      <Collapse>
-        <Panel header={header} key={header}>
-          <Transfer
-            dataSource={list}
-            titles={['全部', '已选']}
-            showSearch
-            targetKeys={keyList}
-            locale={{
-              itemUnit: '项',
-              itemsUnit: '项',
-              searchPlaceholder: '请输入搜索内容',
-            }}
-            onChange={handleChange}
-            render={item => item?.title || ''}
-            listStyle={{
-              height: '350px',
-              width: '24vw',
-            }}
-          />
-        </Panel>
-      </Collapse>
-    </>
+    <Collapse>
+      <Panel header={header} key={header}>
+        <Transfer
+          dataSource={list}
+          titles={['全部', '已选']}
+          showSearch
+          targetKeys={keyList}
+          locale={{
+            itemUnit: '项',
+            itemsUnit: '项',
+            searchPlaceholder: '请输入搜索内容',
+          }}
+          onChange={handleChange}
+          render={item => item?.title || ''}
+          listStyle={{
+            height: '350px',
+            width: '24vw',
+          }}
+        />
+      </Panel>
+    </Collapse>
   );
 };

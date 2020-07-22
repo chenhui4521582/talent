@@ -19,10 +19,11 @@ interface tsProps {
   renderDefault?: boolean;
   selectKeys?: string[];
   isLockedPropskey?: boolean;
+  change?: any;
 }
 
 function Organization(props: tsProps, formRef) {
-  const { renderUser, propsData, renderDefault, selectKeys } = props;
+  const { renderUser, propsData, renderDefault, selectKeys, change } = props;
   const [dataList, setDataList] = useState<any>([]);
   const [searchValue, setSearchValue] = useState<string>('');
   const [expandedKeys, setExpandedKeys] = useState<string[]>(['奖多多集团']);
@@ -37,6 +38,10 @@ function Organization(props: tsProps, formRef) {
   useEffect(() => {
     getJson();
   }, [organizationJson]);
+
+  useEffect(() => {
+    change(checkedKeys);
+  }, [checkedKeys]);
 
   async function getJson() {
     let list = organizationJson;

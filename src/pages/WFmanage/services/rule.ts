@@ -1,6 +1,24 @@
 import request from '@/utils/request';
 export interface tsList {}
 
+export interface tsStepObj {
+  noticeStatus: 1 | 2 | 3;
+  stepModelList: tsStep[];
+}
+export interface tsStep {
+  id: string;
+  stepName: string;
+  stepType: number;
+  type: number;
+  nodeType: string;
+  userCodeList: string;
+  stepNumber: string;
+  signType: number;
+  labelId: number;
+  resFormControlIds?: number[];
+  sysLabelId?: string;
+}
+
 // 获取工作流步骤
 export async function roluList(id) {
   return request(`/api/talent/wfresapprstep/get`, {
@@ -10,7 +28,7 @@ export async function roluList(id) {
 }
 
 // 获取同一表单的审批工作流步骤 resApprovalId（表单id）
-export async function roluFormList(resApprovalId) {
+export async function roluFormList(resApprovalId: number) {
   return request(`/api/talent/wfresapprstep/list`, {
     method: 'POST',
     data: { resApprovalId },
