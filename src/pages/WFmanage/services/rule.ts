@@ -17,6 +17,7 @@ export interface tsStep {
   labelId: number;
   resFormControlIds?: number[];
   sysLabelId?: string;
+  relationResFormControlId?: string;
 }
 
 // 获取工作流步骤

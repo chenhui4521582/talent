@@ -1,5 +1,14 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { Divider, Collapse, Input, Modal, Radio, Form, Select } from 'antd';
+import {
+  Divider,
+  Collapse,
+  Input,
+  Modal,
+  Radio,
+  Form,
+  Select,
+  message,
+} from 'antd';
 import { PlusOutlined, CloseOutlined, EditOutlined } from '@ant-design/icons';
 import { getFormSimple, tsStep } from '../services/rule';
 import { GlobalResParams } from '@/types/ITypes';
@@ -91,9 +100,9 @@ export default (props: tsProps) => {
   const [form] = Form.useForm();
   const [nameForm] = Form.useForm();
 
-  let userkeyList = '';
-  let controlId = [];
-  let systemObj = {};
+  let userkeyList;
+  let controlId;
+  let systemObj;
 
   useEffect(() => {
     async function getLable() {
@@ -121,7 +130,7 @@ export default (props: tsProps) => {
     // userkeyList
   };
   // 获取组件id列表
-  const handleGetControlIds = value => {
+  const handleGetControlIds = (value: any): void => {
     controlId = value;
     console.log('controlId');
     console.log(value);
@@ -218,21 +227,42 @@ export default (props: tsProps) => {
       obj.id = (jsonList.length - 1).toString() + 'add';
       jsonObj.push(obj);
       setList([...jsonList]);
-      setListObj(jsonObj);
+      setListObj(jsonObj as any);
     }
-
-    handleHiddleModal();
+    if (handleEdit()) {
+      handleHiddleModal();
+    }
   };
 
-  const handleEdit = () => {
-    console.log('form.getFieldsValue()');
-    console.log(form.getFieldsValue());
+  const handleEdit = (): Boolean => {
+    let value = form.getFieldsValue();
+    value.resFormControlIds = handleGetControlIds;
     switch (type) {
       case 1:
+        return true;
       case 2:
+        return true;
       case 3:
+        if (userkeyList && userkeyList.length) {
+          value.userCodeList = userkeyList.join(',');
+          return true;
+        } else {
+          message.warning('请选择指定成员');
+          return false;
+        }
       case 4:
+        return true;
       case 5:
+        if (systemObj?.input && systemObj?.audo) {
+          value.relationResFormControlId = systemObj?.input;
+          value.sysLabelId = systemObj?.audo;
+          return true;
+        } else {
+          message.warning('请选择动态标签以及标签参数');
+          return false;
+        }
+      default:
+        return true;
     }
   };
 
@@ -391,7 +421,7 @@ export default (props: tsProps) => {
       case 2:
         return (
           <Form.Item
-            name="signType"
+            name="labelId"
             style={{ marginTop: 4 }}
             label="标签"
             rules={[
@@ -401,7 +431,7 @@ export default (props: tsProps) => {
             <Select placeholder="请选择标签">
               {labelList?.map(item => {
                 return (
-                  <Option key={item.id} value={item.id}>
+                  <Option key={item.id} value={item.id.toString()}>
                     {item.labelName}
                   </Option>
                 );

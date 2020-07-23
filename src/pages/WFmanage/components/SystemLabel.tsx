@@ -47,7 +47,6 @@ export default props => {
             audo: target.value,
             input: selectI,
           });
-          console.log(e);
         }}
       >
         {' '}
@@ -63,7 +62,7 @@ export default props => {
         })}
       </Radio.Group>
     );
-  }, [list]);
+  }, [list, selectI]);
 
   const renderRight = useMemo(() => {
     return (
@@ -83,7 +82,7 @@ export default props => {
         })}
       </Select>
     );
-  }, [optionList]);
+  }, [optionList, selectA]);
 
   return (
     <>

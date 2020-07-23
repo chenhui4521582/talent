@@ -18,18 +18,22 @@ interface tsProps {
   header: string;
   match?: any;
   apiList: (any) => Promise<any>;
-  change: any;
+  change: (value: any) => void;
   selectKeys: any[];
 }
 
 export default (props: tsProps) => {
   const id = props.match.params.id;
-  const { header, apiList, change } = props;
+  const { header, apiList, change, selectKeys } = props;
   const [list, setList] = useState<listItem[]>([]);
   const [keyList, setKeyList] = useState<string[]>([]);
   useEffect(() => {
     getList();
   }, []);
+
+  useEffect(() => {
+    setKeyList(selectKeys);
+  }, [selectKeys]);
 
   const getList = async () => {
     let res: GlobalResParams<listItem[]> = await apiList(id);
