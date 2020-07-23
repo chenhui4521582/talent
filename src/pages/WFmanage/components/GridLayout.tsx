@@ -234,34 +234,57 @@ export default (props: tsProps) => {
     }
   };
 
+  const handleObjList = value => {
+    let newList: tsStep[] = [];
+    listObj?.map(item => {
+      if (item.id + '' === selectItem?.i + '') {
+        console.log('item');
+        console.log(item);
+        Object.assign(item, value);
+        console.log(item);
+        console.log('itemend');
+        newList.push(item);
+      } else {
+        newList.push(item);
+      }
+    });
+    setListObj(newList);
+  };
+
   const handleEdit = (): Boolean => {
     let value = form.getFieldsValue();
-    value.resFormControlIds = handleGetControlIds;
+    value.resFormControlIds = controlId;
     switch (type) {
       case 1:
+        handleObjList(value);
         return true;
       case 2:
+        handleObjList(value);
         return true;
       case 3:
         if (userkeyList && userkeyList.length) {
           value.userCodeList = userkeyList.join(',');
+          handleObjList(value);
           return true;
         } else {
           message.warning('请选择指定成员');
           return false;
         }
       case 4:
+        handleObjList(value);
         return true;
       case 5:
         if (systemObj?.input && systemObj?.audo) {
           value.relationResFormControlId = systemObj?.input;
           value.sysLabelId = systemObj?.audo;
+          handleObjList(value);
           return true;
         } else {
           message.warning('请选择动态标签以及标签参数');
           return false;
         }
       default:
+        handleObjList(value);
         return true;
     }
   };
@@ -332,7 +355,6 @@ export default (props: tsProps) => {
               e.preventDefault();
               handleShowModal(item.i);
               setSelectItem(item);
-              setEdit(false);
             }}
           >
             编辑
@@ -491,6 +513,9 @@ export default (props: tsProps) => {
         return rendType1();
     }
   }, [type]);
+
+  console.log('listObj');
+  console.log(listObj);
 
   return (
     <>

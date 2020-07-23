@@ -31,10 +31,6 @@ export default (props: tsProps) => {
     getList();
   }, []);
 
-  useEffect(() => {
-    setKeyList(selectKeys);
-  }, [selectKeys]);
-
   const getList = async () => {
     let res: GlobalResParams<listItem[]> = await apiList(id);
     if (res.status === 200) {
@@ -47,6 +43,12 @@ export default (props: tsProps) => {
       setList(obj);
     }
   };
+
+  useEffect(() => {
+    console.log('selectKeys');
+    console.log(selectKeys);
+    setKeyList(selectKeys);
+  }, [selectKeys]);
 
   const handleChange = targetKeys => {
     setKeyList(targetKeys);

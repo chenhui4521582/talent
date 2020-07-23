@@ -1,15 +1,5 @@
-import React, { useState, useMemo, useEffect } from 'react';
-import {
-  Card,
-  Button,
-  Divider,
-  Row,
-  Col,
-  Modal,
-  Radio,
-  Form,
-  Select,
-} from 'antd';
+import React, { useState, useEffect } from 'react';
+import { Card, Button, Divider, Row, Col, Radio, notification } from 'antd';
 import {
   updateRolu,
   saveRolu,
@@ -32,7 +22,7 @@ export default props => {
   const [stepType, setStepType] = useState<1 | 2 | 3>(1);
   const [fromName, setFromName] = useState<string>('审批流程');
   const [addOrChange, setAddOrChange] = useState<'add' | 'change'>('change');
-
+  const [formId, setFormId] = useState<string>();
   let data1 = [];
   let data2 = [];
 
@@ -43,11 +33,12 @@ export default props => {
       if (idRes.status === 200) {
         if (idRes.obj.length) {
           setFromName(idRes.obj[0].name);
+          setFormId(idRes.obj[0].id);
           let res: GlobalResParams<tsStepObj> = await roluFormList(
             parseInt(idRes.obj[0].id),
           );
           if (res.status === 200) {
-            setStepType(res.obj.noticeStatus);
+            setStepType(res.obj.noticeStatus || 1);
             handleList(res.obj.stepModelList);
           }
         } else {
@@ -71,19 +62,34 @@ export default props => {
     setListOne(list1);
     setListTwo(list2);
   };
-  const submitData = () => {
-    let obj = {};
+  const submitData = async () => {
     let data: any = {};
     data.noticeStatus = stepType;
-    data.WfResApprStepCrudParam = data1.concat(data2);
+    data.crudParam = data1.concat(data2);
 
     let api = updateRolu;
     if (addOrChange === 'add') {
       api = saveRolu;
+      console.log('add');
+      console.log(data);
+    } else {
+      data.id = formId;
+      console.log('change');
+      console.log(data);
     }
 
-    console.log(data1);
-    console.log(data2);
+    let res: GlobalResParams<string> = await api(data);
+    if (res.status === 200) {
+      notification['success']({
+        message: res.msg,
+        description: '',
+      });
+    } else {
+      notification['error']({
+        message: res.msg,
+        description: '',
+      });
+    }
   };
 
   const getdata1 = value => {
