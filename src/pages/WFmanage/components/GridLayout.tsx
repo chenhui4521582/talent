@@ -144,10 +144,23 @@ export default (props: tsProps) => {
     // systemObj
   };
 
+  const handleObjX = newList => {
+    let newlistObj = JSON.parse(JSON.stringify(listObj));
+    newlistObj?.map(item => {
+      newList.map(item1 => {
+        if (item1.i + '' === item.id + '') {
+          item.stepNumber = item1.x + 1;
+        }
+      });
+    });
+    setListObj(newlistObj);
+  };
+
   const handleHiddleModal = () => {
     userkeyList = '';
     controlId = [];
     systemObj = {};
+    setSelectObj(undefined);
     form.setFieldsValue({ type: 1, specifiedLevel: 1 });
     setType(undefined);
     setVisible(false);
@@ -176,7 +189,7 @@ export default (props: tsProps) => {
   const handleShowModal = (id: string) => {
     let obj: tsStep | undefined;
     listObj?.map(item => {
-      if (item.id.toString() === id) {
+      if ((item.id + '').toString() === id) {
         obj = item;
         if (levelList.indexOf(obj?.type.toString())) {
           setType(obj?.type || undefined);
@@ -226,6 +239,22 @@ export default (props: tsProps) => {
         let obj: any = form.getFieldsValue();
         obj.stepName = typeObj[type || 1];
         obj.id = (jsonList.length - 1).toString() + 'add';
+        obj.resFormControlIds = controlId;
+        if (type === 3) {
+          if (userkeyList && userkeyList.length) {
+            obj.userCodeList = userkeyList.join(',');
+          } else {
+            message.warning('请选择指定成员');
+          }
+        } else if (type === 5) {
+          if (systemObj?.input && systemObj?.audo) {
+            obj.relationResFormControlId = systemObj?.input;
+            obj.sysLabelId = systemObj?.audo;
+          } else {
+            message.warning('请选择动态标签以及标签参数');
+          }
+        }
+
         jsonObj.push(obj);
         setList([...jsonList]);
         setListObj(jsonObj as any);
@@ -238,12 +267,7 @@ export default (props: tsProps) => {
     let newList: tsStep[] = [];
     listObj?.map(item => {
       if (item.id + '' === selectItem?.i + '') {
-        console.log('item');
-        console.log(item);
         Object.assign(item, value);
-        console.log(item);
-        console.log('itemend');
-        newList.push(item);
       } else {
         newList.push(item);
       }
@@ -254,6 +278,7 @@ export default (props: tsProps) => {
   const handleEdit = (): Boolean => {
     let value = form.getFieldsValue();
     value.resFormControlIds = controlId;
+    handleObjList(value);
     switch (type) {
       case 1:
         handleObjList(value);
@@ -293,7 +318,7 @@ export default (props: tsProps) => {
     nameForm.validateFields().then(fromSubData => {
       let newListObj: tsStep[] = JSON.parse(JSON.stringify(listObj));
       newListObj?.map(item => {
-        if (selectItem?.i === item.id.toString()) {
+        if (selectItem?.i + '' === item.id.toString()) {
           item.stepName = fromSubData.name;
         }
       });
@@ -312,12 +337,13 @@ export default (props: tsProps) => {
       });
     });
     setList(newList);
+    handleObjX(newList);
   };
 
   const getName = (id: string) => {
     let nameString = '';
     listObj?.map(item => {
-      if (item.id.toString() === id.toString()) {
+      if ((item.id + '').toString() === id.toString()) {
         nameString = item.stepName;
       }
     });

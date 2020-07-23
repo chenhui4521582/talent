@@ -40,9 +40,10 @@ export default props => {
           if (res.status === 200) {
             setStepType(res.obj.noticeStatus || 1);
             handleList(res.obj.stepModelList);
+            if (res.obj.stepModelList.length === 0) {
+              setAddOrChange('add');
+            }
           }
-        } else {
-          setAddOrChange('add');
         }
       }
     }
@@ -64,18 +65,32 @@ export default props => {
   };
   const submitData = async () => {
     let data: any = {};
+    let list1: any = [];
+    let list2: any = [];
+    console.log(data2);
+    console.log(data1);
+    data1.map((item: any) => {
+      item.stepType = 1;
+      if ((item.id + '')?.indexOf('add') > -1) {
+        delete item.id;
+      }
+      item.resApprovalId = formId;
+      list1.push(item);
+    });
+    data2.map((item: any) => {
+      item.stepType = 2;
+      if ((item.id + '').indexOf('add') > -1) {
+        delete item.id;
+      }
+      item.resApprovalId = formId;
+      list2.push(item);
+    });
     data.noticeStatus = stepType;
-    data.crudParam = data1.concat(data2);
+    data.crudParam = list1.concat(list2);
 
     let api = updateRolu;
     if (addOrChange === 'add') {
       api = saveRolu;
-      console.log('add');
-      console.log(data);
-    } else {
-      data.id = formId;
-      console.log('change');
-      console.log(data);
     }
 
     let res: GlobalResParams<string> = await api(data);

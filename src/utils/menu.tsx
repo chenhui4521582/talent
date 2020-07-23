@@ -17,12 +17,12 @@ function formatter(data, parentPath: string) {
   return data?.map(item => {
     let { path, icon } = item;
     if (!isUrl(path)) {
-      path = parentPath + item.path;
+      path = item.path;
     }
     const result = {
       ...item,
       icon: icon && IconMap[icon as string],
-      path
+      path,
     };
     if (item.children) {
       result.children = formatter(item.children, `${parentPath}${item.path}/`);
@@ -31,4 +31,5 @@ function formatter(data, parentPath: string) {
   });
 }
 
-export const getMenuData = (menu: MenuDataItem[], path: string) => formatter(menu, path + '/');
+export const getMenuData = (menu: MenuDataItem[], path: string) =>
+  formatter(menu, path + '/');

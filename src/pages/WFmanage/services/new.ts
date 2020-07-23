@@ -27,3 +27,19 @@ export async function changeState(id) {
     data: { id },
   });
 }
+
+// 新增工作流
+export async function save(params: tsCategoryItem) {
+  return request(`/api/talent/wfresform/save`, {
+    method: 'POST',
+    data: params,
+  });
+}
+
+// 修改工作流
+export async function changeWf(params: tsCategoryItem) {
+  return request(`/api/talent/wfresform/update`, {
+    method: 'POST',
+    data: params,
+  });
+}
