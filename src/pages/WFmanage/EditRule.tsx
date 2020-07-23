@@ -72,6 +72,16 @@ export default props => {
     setListTwo(list2);
   };
   const submitData = () => {
+    let obj = {};
+    let data: any = {};
+    data.noticeStatus = stepType;
+    data.WfResApprStepCrudParam = data1.concat(data2);
+
+    let api = updateRolu;
+    if (addOrChange === 'add') {
+      api = saveRolu;
+    }
+
     console.log(data1);
     console.log(data2);
   };
