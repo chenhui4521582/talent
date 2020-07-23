@@ -198,38 +198,38 @@ export default (props: tsProps) => {
   const handleOkModal = () => {
     let jsonList: tsLayout[] = JSON.parse(JSON.stringify(list));
     let jsonObj: tsLabel[] = JSON.parse(JSON.stringify(listObj));
-    if (!edit) {
-      if (jsonList.length > 11) {
-        return null;
-      }
-      jsonList.splice(jsonList.length, 0, {
-        i: 'add',
-        x: 0,
-        y: 0,
-        w: 1,
-        h: 1,
-        isDraggable: true,
-        isResizable: false,
-      });
-
-      jsonList.map((item, index) => {
-        if (item.i === '+') {
-          jsonList[index].x = jsonList.length - 1;
-        } else {
-          if (jsonList[index].i === 'add') {
-            jsonList[index].x = index - 1;
-            jsonList[index].i = index.toString() + 'add';
-          }
-        }
-      });
-      let obj: any = form.getFieldsValue();
-      obj.stepName = typeObj[type || 1];
-      obj.id = (jsonList.length - 1).toString() + 'add';
-      jsonObj.push(obj);
-      setList([...jsonList]);
-      setListObj(jsonObj as any);
-    }
     if (handleEdit()) {
+      if (!edit) {
+        if (jsonList.length > 11) {
+          return null;
+        }
+        jsonList.splice(jsonList.length, 0, {
+          i: 'add',
+          x: 0,
+          y: 0,
+          w: 1,
+          h: 1,
+          isDraggable: true,
+          isResizable: false,
+        });
+
+        jsonList.map((item, index) => {
+          if (item.i === '+') {
+            jsonList[index].x = jsonList.length - 1;
+          } else {
+            if (jsonList[index].i === 'add') {
+              jsonList[index].x = index - 1;
+              jsonList[index].i = index.toString() + 'add';
+            }
+          }
+        });
+        let obj: any = form.getFieldsValue();
+        obj.stepName = typeObj[type || 1];
+        obj.id = (jsonList.length - 1).toString() + 'add';
+        jsonObj.push(obj);
+        setList([...jsonList]);
+        setListObj(jsonObj as any);
+      }
       handleHiddleModal();
     }
   };

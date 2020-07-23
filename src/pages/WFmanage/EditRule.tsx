@@ -38,15 +38,16 @@ export default props => {
     const id = props.match.params.id;
     async function getDetail() {
       let idRes: GlobalResParams<tsGetId[]> = await getStepId(parseInt(id));
-
       if (idRes.status === 200) {
-        setFromName(idRes.obj[0].name);
-        let res: GlobalResParams<tsStepObj> = await roluFormList(
-          parseInt(idRes.obj[0].id),
-        );
-        if (res.status === 200) {
-          setStepType(res.obj.noticeStatus);
-          handleList(res.obj.stepModelList);
+        if (idRes.obj.length) {
+          setFromName(idRes.obj[0].name);
+          let res: GlobalResParams<tsStepObj> = await roluFormList(
+            parseInt(idRes.obj[0].id),
+          );
+          if (res.status === 200) {
+            setStepType(res.obj.noticeStatus);
+            handleList(res.obj.stepModelList);
+          }
         }
       }
     }
