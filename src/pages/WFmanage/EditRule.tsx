@@ -12,6 +12,7 @@ import {
 } from 'antd';
 import {
   updateRolu,
+  saveRolu,
   getStepId,
   roluFormList,
   tsStep,
@@ -30,6 +31,7 @@ export default props => {
   const [listTwo, setListTwo] = useState<tsStep[]>([]);
   const [stepType, setStepType] = useState<1 | 2 | 3>(1);
   const [fromName, setFromName] = useState<string>('审批流程');
+  const [addOrChange, setAddOrChange] = useState<'add' | 'change'>('change');
 
   let data1 = [];
   let data2 = [];
@@ -48,6 +50,8 @@ export default props => {
             setStepType(res.obj.noticeStatus);
             handleList(res.obj.stepModelList);
           }
+        } else {
+          setAddOrChange('add');
         }
       }
     }
