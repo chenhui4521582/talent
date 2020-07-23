@@ -69,16 +69,18 @@ export default () => {
     bankName: '银行名称',
     wx: '微信号',
     englishName: '英文名',
-    other: '其他',
     contractChangeRecord: '合同变更记录',
     exWorkStart: '上一份合同开始日期',
     useComputer: '是否用公司电脑',
-    trainingAgreement: '培训协议',
     hrbp: 'HRBP',
     financeDepartment: '部门（财务）',
     financeGroup: '组别（财务）',
     businessCostCenter: '成本中心',
     remark: '备注',
+    email: '邮箱',
+    currentPosition: '是否在职',
+    trainingAgreement: '培训协议',
+    other: '其他',
   };
   useEffect(() => {
     let newArr: string[] = [];
