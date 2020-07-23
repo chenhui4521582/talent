@@ -664,9 +664,9 @@ export default props => {
           </Col>
           <Col span={5} offset={1}>
             <Form.Item
-              label="是否用公司电脑"
+              label="是否使用公司电脑"
               name="useComputer"
-              rules={[{ required: true, message: '请选择是否用公司电脑' }]}
+              rules={[{ required: true, message: '请选择是否使用公司电脑' }]}
             >
               <Select>
                 <Option value={0} key={0}>
@@ -733,7 +733,7 @@ export default props => {
             <Form.Item
               label="成本中心"
               name="costId"
-              rules={[{ required: true, message: '请输入英文名' }]}
+              rules={[{ required: true, message: '请选择成本中心' }]}
             >
               <Select showSearch optionFilterProp="children">
                 {costList?.map(item => {
