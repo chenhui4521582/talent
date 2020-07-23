@@ -1,9 +1,18 @@
-import React from 'react';
-import { Card, Button, Divider, Switch, notification } from 'antd';
+import React, { useState } from 'react';
+import {
+  Card,
+  Button,
+  Divider,
+  Switch,
+  notification,
+  Form,
+  Input,
+  Modal,
+} from 'antd';
 import { Link } from 'umi';
 
 import { useReq } from '@/components/GlobalTable/useReq';
-import { homeList, changeState } from './services/new';
+import { homeList, changeState, save } from './services/new';
 import { ColumnProps } from 'antd/es/table';
 import { GlobalResParams } from '@/types/ITypes';
 
@@ -55,6 +64,9 @@ export default () => {
     },
   ];
 
+  const [type, setType] = useState<'add' | 'change'>();
+  const [form] = Form.useForm();
+
   const onChange = async id => {
     let res: GlobalResParams<string> = await changeState(id);
     if (res.status === 200) {
@@ -76,16 +88,58 @@ export default () => {
     rowKeyName: 'id',
     cacheKey: '/wfresform/getList',
   });
+
+  const handleOk = () => {
+    form.validateFields().then(async value => {
+      let json: GlobalResParams<string> = await save(value);
+      if (json.status === 200) {
+        refresh();
+        setType(undefined);
+        notification['success']({
+          message: json.msg,
+          description: '',
+        });
+      } else {
+        notification['error']({
+          message: json.msg,
+          description: '',
+        });
+      }
+    });
+  };
+
   return (
     <Card
       title="工作流列表"
       extra={
-        <Link to="/talent/wfmanage/new">
-          <Button type="primary">{`新增工作流`}</Button>
-        </Link>
+        <Button
+          type="primary"
+          onClick={() => {
+            setType('add');
+          }}
+        >{`新增工作流`}</Button>
       }
     >
       <TableContent />
+      <Modal
+        title={type === 'add' ? '新增工作流' : '修改工作流'}
+        visible={!!type}
+        okText="确定"
+        cancelText="取消"
+        key={type + ''}
+        onCancel={() => {}}
+        onOk={handleOk}
+      >
+        <Form form={form}>
+          <Form.Item
+            label="工作流名称"
+            name="name"
+            rules={[{ required: true, message: '请输入工作流名称!' }]}
+          >
+            <Input placeholder="请输入用户名称" />
+          </Form.Item>
+        </Form>
+      </Modal>
     </Card>
   );
 };

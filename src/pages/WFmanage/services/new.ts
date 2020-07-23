@@ -29,7 +29,7 @@ export async function changeState(id) {
 }
 
 // 新增工作流
-export async function save(params: tsCategoryItem) {
+export async function save(params) {
   return request(`/api/talent/wfresform/save`, {
     method: 'POST',
     data: params,
