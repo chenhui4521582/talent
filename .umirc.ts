@@ -268,6 +268,10 @@ export default defineConfig({
           path: '/talent/wftemplate/list',
           component: '@/pages/WFtemplate/list',
         },
+        {
+          path: '/talent/systemm/list',
+          component: '@/pages/SystemM/List',
+        },
       ],
     },
   ],
