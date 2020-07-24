@@ -15,31 +15,31 @@ export default () => {
       title: '简历编号',
       dataIndex: 'resumeId',
       key: 'resumeId',
-      align: 'center'
+      align: 'center',
     },
     {
       title: '姓名',
       dataIndex: 'name',
       key: 'name',
-      align: 'center'
+      align: 'center',
     },
     {
       title: '岗位',
       key: 'jobName',
       dataIndex: 'jobName',
-      align: 'center'
+      align: 'center',
     },
     {
       title: '职级',
       key: 'rank',
       dataIndex: 'rank',
-      align: 'center'
+      align: 'center',
     },
     {
       title: '推送时间',
       key: 'createTime',
       dataIndex: 'createTime',
-      align: 'center'
+      align: 'center',
     },
     {
       title: '操作',
@@ -47,14 +47,18 @@ export default () => {
       align: 'center',
       render: (_, record) => (
         <span>
-          <Link to={`/talent/Resume/Cvdetails?resumeId=${record.resumeId}&resumeStatus=${record.downStatus}`}>查看</Link>
+          <Link
+            to={`/talent/resume/print?resumeId=${record.resumeId}&resumeStatus=${record.downStatus}`}
+          >
+            查看
+          </Link>
           <Divider type="vertical" />
           <a onClick={e => handlePass(record)}>通过</a>
           <Divider type="vertical" />
-          <a onClick= { e => showModal(record)}>驳回</a>
+          <a onClick={e => showModal(record)}>驳回</a>
         </span>
       ),
-    }
+    },
   ];
 
   const screenedColumns: ColumnProps<any>[] = [
@@ -62,25 +66,25 @@ export default () => {
       title: '简历编号',
       dataIndex: 'resumeId',
       key: 'resumeId',
-      align: 'center'
+      align: 'center',
     },
     {
       title: '姓名',
       dataIndex: 'name',
       key: 'name',
-      align: 'center'
+      align: 'center',
     },
     {
       title: '岗位',
       key: 'jobName',
       dataIndex: 'jobName',
-      align: 'center'
+      align: 'center',
     },
     {
       title: '职级',
       key: 'rank',
       dataIndex: 'rank',
-      align: 'center'
+      align: 'center',
     },
     {
       title: '筛选结果',
@@ -89,45 +93,46 @@ export default () => {
       align: 'center',
       render: (_, record) => {
         if (record.pushStatus === 9) {
-          return(
+          return (
             <>
-              <span style={{color: 'red'}}> 驳回</span>
+              <span style={{ color: 'red' }}> 驳回</span>
               <Tooltip title={record.rejectReason}>
                 <a> 查看理由</a>
               </Tooltip>
             </>
-          )
+          );
         } else {
-          return(
-            <span> 通过</span>
-          )
+          return <span> 通过</span>;
         }
-      }
+      },
     },
     {
       title: '推送时间',
       key: 'createTime',
       dataIndex: 'createTime',
-      align: 'center'
+      align: 'center',
     },
   ];
   const { TableContent, refresh } = useTab({
     queryMethod: listEvaByInterviewer,
     paramName: 'deal',
     defaultValue: '0',
-    tabData: [{
-      name: '待筛选简历',
-      value: '0',
-      columns: screeningColumns
-    }, {
-      name: '已筛选简历',
-      value: '1',
-      columns: screenedColumns
-    }],
-    rowKeyName: 'nId'
+    tabData: [
+      {
+        name: '待筛选简历',
+        value: '0',
+        columns: screeningColumns,
+      },
+      {
+        name: '已筛选简历',
+        value: '1',
+        columns: screenedColumns,
+      },
+    ],
+    rowKeyName: 'nId',
   });
 
-  const handlePass = (record) => {
+  const handlePass = record => {
     Modal.confirm({
       title: '您确定通过此简历吗?',
       okText: '确定',
@@ -138,7 +143,7 @@ export default () => {
           nId: record.nId,
           resumeId: record.resumeId,
           status: 1,
-          interviewFlag: record.downStatus
+          interviewFlag: record.downStatus,
         });
         if (res.status === 200) {
           refresh();
@@ -152,11 +157,11 @@ export default () => {
             description: '',
           });
         }
-      }
+      },
     });
   };
 
-  const showModal = (record) => {
+  const showModal = record => {
     setCurRecord(record);
   };
 
@@ -165,13 +170,13 @@ export default () => {
     form.resetFields();
   };
 
-  const handleRefuse = async (values) => {
+  const handleRefuse = async values => {
     let res: GlobalResParams<string> = await updateEvaluation({
       nId: curRecord.nId,
       resumeId: curRecord.resumeId,
       status: 0,
       interviewFlag: curRecord.downStatus,
-      ...values
+      ...values,
     });
     if (res.status === 200) {
       refresh();
@@ -186,7 +191,7 @@ export default () => {
         description: '',
       });
     }
-  }
+  };
   return (
     <Card title="简历筛选">
       <TableContent />
@@ -198,12 +203,9 @@ export default () => {
         okText="确定"
         cancelText="取消"
       >
-        <Form
-          form={form}
-          onFinish={handleRefuse}
-        >
+        <Form form={form} onFinish={handleRefuse}>
           <Form.Item
-            label='驳回理由'
+            label="驳回理由"
             name="evaluation"
             rules={[{ required: true, message: '请填写驳回理由' }]}
           >
@@ -212,5 +214,5 @@ export default () => {
         </Form>
       </Modal>
     </Card>
-  )
-}
+  );
+};

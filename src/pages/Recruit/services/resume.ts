@@ -11,7 +11,7 @@ export async function queryDemandResume(params) {
   params.demandId = Number(window.location.pathname.split('/')[4]);
   return request('/api/talent/resume/listMyDemandResume', {
     method: 'POST',
-    data: params
+    data: params,
   });
 }
 
@@ -19,7 +19,7 @@ export async function queryDemandResume(params) {
 export async function sendResume(params: ISendResumeParams) {
   return request('/api/talent/evaluation/insertEvaluation', {
     method: 'POST',
-    data: params
+    data: params,
   });
 }
 
@@ -28,7 +28,7 @@ export async function querySendedResume(params) {
   params.demandId = Number(window.location.pathname.split('/')[4]);
   return request('/api/talent/evaluation/listEvaluationByHr', {
     method: 'POST',
-    data: params
+    data: params,
   });
 }
 
@@ -36,7 +36,7 @@ export async function querySendedResume(params) {
 export async function refuseEva(nId) {
   return request('/api/talent/evaluation/updateEva', {
     method: 'POST',
-    data: { nId }
+    data: { nId },
   });
 }
 
@@ -44,6 +44,14 @@ export async function refuseEva(nId) {
 export async function setInterview(params) {
   return request('/api/talent/evaluation/insertInterview', {
     method: 'POST',
-    data: params
+    data: params,
+  });
+}
+
+// 撤销简历
+export async function revoke(evaluationId: number) {
+  return request('/api/talent/evaluation/deleteEvaluation', {
+    method: 'POST',
+    data: { evaluationId },
   });
 }

@@ -1,6 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTable } from '@/components/GlobalTable/useTable';
-import { querySendedResume, refuseEva, setInterview } from '../services/resume';
+import {
+  querySendedResume,
+  refuseEva,
+  setInterview,
+  revoke,
+} from '../services/resume';
 import {
   Card,
   Divider,
@@ -13,6 +18,7 @@ import {
   Col,
   Input,
 } from 'antd';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { ColumnProps } from 'antd/es/table';
 import { Link, history } from 'umi';
 import { GlobalResParams } from '@/types/ITypes';
@@ -77,7 +83,7 @@ export default props => {
           return (
             <span>
               <Link
-                to={`/talent/resume/cvdetails?resumeId=${record.resumeId}&resumeStatus=${record.downStatus}`}
+                to={`/talent/resume/print?resumeId=${record.resumeId}&resumeStatus=${record.downStatus}`}
               >
                 查看简历
               </Link>
@@ -87,8 +93,17 @@ export default props => {
               <a onClick={e => handleRefuse(record.nId)}>放弃面试</a>
             </span>
           );
-        } else if (record.pushStatus === 2) {
-          return <span> 已发起</span>;
+        } else if (record.pushStatus === 8) {
+          return (
+            <a
+              onClick={() => {
+                onRevoke(record.nId);
+              }}
+            >
+              {' '}
+              撤回
+            </a>
+          );
         } else if (record.pushStatus === 10) {
           return <span style={{ color: 'red' }}> 放弃面试</span>;
         } else {
@@ -97,12 +112,38 @@ export default props => {
       },
     },
   ];
+
   const { TableContent, refresh } = useTable({
     queryMethod: querySendedResume,
     columns,
     rowKeyName: 'resumeId',
     cacheKey: 'evaluation/listEvaluationByHr',
   });
+
+  const onRevoke = demandId => {
+    Modal.confirm({
+      title: '你确定要撤回此简历吗?',
+      okText: '确定',
+      icon: <ExclamationCircleOutlined />,
+      okType: 'danger' as any,
+      cancelText: '取消',
+      onOk: async () => {
+        let res: GlobalResParams<string> = await revoke(demandId);
+        if (res.status === 200) {
+          refresh();
+          notification['success']({
+            message: res.msg,
+            description: '',
+          });
+        } else {
+          notification['error']({
+            message: res.msg,
+            description: '',
+          });
+        }
+      },
+    });
+  };
   const handleRefuse = async (nId: number) => {
     Modal.confirm({
       title: '你确定此人放弃面试吗?',
@@ -165,7 +206,7 @@ export default props => {
     }
   };
   return (
-    <Card title="未下载简历">
+    <Card title="已推送简历">
       <TableContent>
         <Row>
           <Col span={6}>

@@ -35,8 +35,8 @@ export default () => {
     groupName: '组别',
     postName: '岗位',
     titleName: '职位',
-    manageRankName: '管理职级',
     rankName: '技术职级',
+    manageRankName: '管理职级',
     onboardingDate: '入职日期',
     sex: '性别',
     roles: '角色',
@@ -49,11 +49,12 @@ export default () => {
     contractEnd: '合同结束日期',
     contractRemind: '合同到期提醒',
     probationEnd: '试用期截止日期',
+    probationRemind: '试用期到期提醒',
     idCard: '身份证号码',
     birthDate: '出生日期',
     residenceAddress: '户籍地址',
     habitation: '现居住地址',
-    relationshipName: '关系/姓名',
+    relationshipName: '紧急联系人',
     emergencyPhone: '紧急联系电话',
     educationalLevel: '文化程度',
     graduatedSchool: '毕业学校',
@@ -68,16 +69,18 @@ export default () => {
     bankName: '银行名称',
     wx: '微信号',
     englishName: '英文名',
-    other: '其他',
     contractChangeRecord: '合同变更记录',
     exWorkStart: '上一份合同开始日期',
-    useComputer: '是否用公司电脑',
-    trainingAgreement: '培训协议',
+    useComputer: '是否使用公司电脑',
     hrbp: 'HRBP',
     financeDepartment: '部门（财务）',
     financeGroup: '组别（财务）',
     businessCostCenter: '成本中心',
     remark: '备注',
+    email: '邮箱',
+    currentPosition: '是否在职',
+    trainingAgreement: '培训协议',
+    other: '其他',
   };
   useEffect(() => {
     let newArr: string[] = [];
@@ -141,14 +144,17 @@ export default () => {
       key: 'onboardingDate',
       align: 'center',
       render: (_, record) => {
-        return <span>{sexHash[record.detail?.sex]}</span>;
+        return <span>{record.onboardingDate || '暂未填写'}</span>;
       },
     },
     {
       title: '性别',
-      dataIndex: 'postName',
-      key: 'postName',
+      dataIndex: 'sex',
+      key: 'sex',
       align: 'center',
+      render: (_, record) => {
+        return <span>{sexHash[record.sex]}</span>;
+      },
     },
     {
       title: '操作',

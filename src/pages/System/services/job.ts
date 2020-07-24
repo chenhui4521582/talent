@@ -23,7 +23,7 @@ export async function updateJob(params) {
   });
 }
 
-export async function removeJob(positionId: number, replaceId: number) {
+export async function removeJob(replaceId: number, positionId?: number) {
   // 删除岗位
   return request(`/api/talent/job/removeJob`, {
     method: 'POST',

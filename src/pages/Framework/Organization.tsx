@@ -134,9 +134,10 @@ export default props => {
   const [removeGroupVisible, setRemoveGroupVisible] = useState<boolean>(false);
   // 设置直属上级
   const [reportToVisible, setReportToVisible] = useState<boolean>(false);
-  const { organizationJson } = useOrganization();
-  const { deleteGroupJson } = usetDeleteOrganization();
-  const { defaultGroupJson } = usetDefaultOrganization();
+  const { organizationJson, refresh } = useOrganization();
+  const { deleteGroupJson, refreshDel } = usetDeleteOrganization();
+  const { defaultGroupJson, refreshDef } = usetDefaultOrganization();
+
   useEffect(() => {
     getJson();
   }, [organizationJson]);
@@ -516,7 +517,9 @@ export default props => {
         message: json.msg,
         description: '',
       });
-      getJson();
+      refresh();
+      refreshDel();
+      refreshDef();
       setRemoveGroupVisible(false);
     } else {
       notification['error']({
@@ -539,9 +542,13 @@ export default props => {
       if (changeOrNewType === '修改名称') {
         values.id = selectGroup.id;
         values.code = selectGroup.key;
-        values.parentCode = selectGroup.parentCode;
       } else {
         values.parentCode = selectGroup.key;
+        if (selectGroup.key === '奖多多集团') {
+          values.parentCode = '';
+        } else {
+          values.parentCode = selectGroup.key;
+        }
       }
       values.status = 1;
       let json: GlobalResParams<string> = await submit(values);
@@ -550,7 +557,9 @@ export default props => {
           message: json.msg,
           description: '',
         });
-        getJson();
+        refresh();
+        refreshDel();
+        refreshDef();
         setNewChildGropVisible(false);
       } else {
         notification['error']({
@@ -575,7 +584,9 @@ export default props => {
         message: json.msg,
         description: '',
       });
-      getJson();
+      refresh();
+      refreshDel();
+      refreshDef();
       setSelectUserkeys([]);
       setMoveInVisible(false);
     } else {
@@ -595,7 +606,9 @@ export default props => {
         message: json.msg,
         description: '',
       });
-      getJson();
+      refresh();
+      refreshDel();
+      refreshDef();
       setRemoveUserVisible(false);
     } else {
       notification['error']({
@@ -619,7 +632,9 @@ export default props => {
         message: json.msg,
         description: '',
       });
-      getJson();
+      refresh();
+      refreshDel();
+      refreshDef();
       setSelectUserkeys([]);
 
       setDepartmentVisible(false);
@@ -645,7 +660,9 @@ export default props => {
         message: json.msg,
         description: '',
       });
-      getJson();
+      refresh();
+      refreshDel();
+      refreshDef();
       setSuperiorVisible(false);
       setSelectUserParent([]);
     } else {
@@ -672,7 +689,9 @@ export default props => {
         message: json.msg,
         description: '',
       });
-      getJson();
+      refresh();
+      refreshDel();
+      refreshDef();
       setReportToVisible(false);
     } else {
       notification['error']({
@@ -692,7 +711,9 @@ export default props => {
 
       let res: GlobalResParams<string> = await newGroup(data);
       if (res.status === 200) {
-        getJson();
+        refresh();
+        refreshDel();
+        refreshDef();
         setNewVisible(false);
       }
     });

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Card,
   Select,
@@ -28,6 +28,7 @@ import {
 } from './services/staff';
 import { GlobalResParams } from '@/types/ITypes';
 import OzTreeSlect from '@/pages/Framework/components/OzTreeSlect';
+import LevelOr from '@/components/GlobalTable/levelOr';
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -40,6 +41,9 @@ export default props => {
   const { departmentList: secondBusiness } = useDepartment(2);
   const { departmentList } = useDepartment(3);
   const { departmentList: groupList } = useDepartment(4);
+  const [twoLevel, setTwoLevel] = useState<string>('');
+  const [threeLevel, setThreeLevel] = useState<string>('');
+  const [fourLevel, setFourLevel] = useState<string>('');
 
   const { rankList } = useRank();
   const { titleList } = useTitle();
@@ -71,6 +75,10 @@ export default props => {
           : '';
         values.birthDate ? (values.birthDate = moment(values.birthDate)) : '';
       }
+      setTwoLevel(values.firstBusinessCode);
+      setThreeLevel(values.businessCode);
+      setFourLevel(values.departmentCode);
+
       form.setFieldsValue(res?.obj);
     }
     if (employeeId) getDetail();
@@ -82,7 +90,9 @@ export default props => {
     values.onboardingDate = moment(values.onboardingDate).format('YYYY/MM/DD');
     values.probationEnd = moment(values.probationEnd).format('YYYY/MM/DD');
     values.workStart = moment(values.workStart).format('YYYY/MM/DD');
-    values.exWorkStart = moment(values.exWorkStart).format('YYYY/MM/DD');
+    values.exWorkStart
+      ? (values.exWorkStart = moment(values.exWorkStart).format('YYYY/MM/DD'))
+      : null;
     values.graduationDate = moment(values.graduationDate).format('YYYY/MM/DD');
     values.birthDate = moment(values.birthDate).format('YYYY/MM/DD');
     if (employeeId) {
@@ -104,9 +114,31 @@ export default props => {
       });
     }
   };
+  const handleFormChange = changedValues => {
+    if (changedValues.firstBusinessCode) {
+      setTwoLevel(changedValues.firstBusinessCode);
+      setThreeLevel('none');
+      setFourLevel('none');
+      form.setFieldsValue({ businessCode: '' });
+      form.setFieldsValue({ departmentCode: '' });
+      form.setFieldsValue({ groupCode: '' });
+    } else if (changedValues.businessCode) {
+      setThreeLevel(changedValues.businessCode);
+      setFourLevel('none');
+      form.setFieldsValue({ departmentCode: '' });
+      form.setFieldsValue({ groupCode: '' });
+    } else if (changedValues.departmentCode) {
+      setFourLevel(changedValues.departmentCode);
+      form.setFieldsValue({ groupCode: '' });
+    }
+  };
   return (
     <Card title={employeeId ? '编辑员工' : '新增员工'}>
-      <Form form={form} onFinish={handleSubmit}>
+      <Form
+        form={form}
+        onFinish={handleSubmit}
+        onValuesChange={handleFormChange}
+      >
         <h2>基本类型</h2>
         <Row>
           <Col span={5}>
@@ -178,11 +210,7 @@ export default props => {
             </Form.Item>
           </Col>
           <Col span={5} offset={1}>
-            <Form.Item
-              label="邮箱"
-              name="email"
-              rules={[{ required: true, message: '请输入类别' }]}
-            >
+            <Form.Item label="邮箱" name="email">
               <Input />
             </Form.Item>
           </Col>
@@ -206,15 +234,7 @@ export default props => {
               name="firstBusinessCode"
               rules={[{ required: true, message: '请选择所属业务线' }]}
             >
-              <Select showSearch optionFilterProp="children">
-                {firstBusiness?.map(item => {
-                  return (
-                    <Option value={item.code} key={item.code}>
-                      {item.name}
-                    </Option>
-                  );
-                })}
-              </Select>
+              <LevelOr code="" />
             </Form.Item>
           </Col>
           <Col span={5} offset={1}>
@@ -223,15 +243,7 @@ export default props => {
               name="businessCode"
               rules={[{ required: true, message: '请输入二级业务线' }]}
             >
-              <Select showSearch optionFilterProp="children">
-                {secondBusiness?.map(item => {
-                  return (
-                    <Option value={item.code} key={item.code}>
-                      {item.name}
-                    </Option>
-                  );
-                })}
-              </Select>
+              <LevelOr code={twoLevel} key={twoLevel} />
             </Form.Item>
           </Col>
           <Col span={5} offset={1}>
@@ -240,7 +252,7 @@ export default props => {
               name="departmentCode"
               rules={[{ required: true, message: '请选择部门' }]}
             >
-              <OzTreeSlect {...props} onlySelect={true} onlySelectLevel={3} />
+              <LevelOr code={threeLevel} key={twoLevel + threeLevel} />
             </Form.Item>
           </Col>
           <Col span={5} offset={1}>
@@ -248,16 +260,12 @@ export default props => {
               label="组别"
               name="groupCode"
               rules={[{ required: true, message: '请选择组别' }]}
+              shouldUpdate
             >
-              <Select showSearch optionFilterProp="children">
-                {groupList?.map(item => {
-                  return (
-                    <Option value={item.code} key={item.code}>
-                      {item.name}
-                    </Option>
-                  );
-                })}
-              </Select>
+              <LevelOr
+                code={fourLevel}
+                key={twoLevel + threeLevel + fourLevel}
+              />
             </Form.Item>
           </Col>
         </Row>
@@ -298,7 +306,7 @@ export default props => {
           </Col>
           <Col span={5} offset={1}>
             <Form.Item label="管理职级" name="manageRankId">
-              <Select showSearch optionFilterProp="children">
+              <Select showSearch optionFilterProp="children" allowClear>
                 {rankList?.map(item => {
                   if (item.rankName.indexOf('M') > -1) {
                     return (
@@ -319,7 +327,7 @@ export default props => {
               name="rankId"
               rules={[{ required: true, message: '请选择技术职级' }]}
             >
-              <Select showSearch optionFilterProp="children">
+              <Select showSearch optionFilterProp="children" allowClear>
                 {rankList?.map(item => {
                   if (item.rankName.indexOf('P') > -1) {
                     return (
@@ -445,11 +453,7 @@ export default props => {
             </Form.Item>
           </Col>
           <Col span={5} offset={1}>
-            <Form.Item
-              label="上份合同开始时间"
-              name="exWorkStart"
-              rules={[{ required: true, message: '请选择上份合同开始时间' }]}
-            >
+            <Form.Item label="上份合同开始时间" name="exWorkStart">
               <DatePicker />
             </Form.Item>
           </Col>
@@ -461,7 +465,11 @@ export default props => {
               name="laborId"
               rules={[{ required: true, message: '请选择实际劳动关系' }]}
             >
-              <Select showSearch optionFilterProp="children">
+              <Select
+                showSearch
+                optionFilterProp="children"
+                style={{ maxWidth: '8.7vw' }}
+              >
                 {laborList?.map(item => {
                   return (
                     <Option value={item.id} key={item.id}>
@@ -552,7 +560,7 @@ export default props => {
             <Form.Item
               label="出生日期"
               name="birthDate"
-              rules={[{ required: true, message: '请输入身份证号' }]}
+              rules={[{ required: true, message: '请填写出生日期' }]}
             >
               <DatePicker />
             </Form.Item>
@@ -664,9 +672,9 @@ export default props => {
           </Col>
           <Col span={5} offset={1}>
             <Form.Item
-              label="是否用公司电脑"
+              label="是否使用公司电脑"
               name="useComputer"
-              rules={[{ required: true, message: '请选择是否用公司电脑' }]}
+              rules={[{ required: true, message: '请选择是否使用公司电脑' }]}
             >
               <Select>
                 <Option value={0} key={0}>
@@ -709,9 +717,9 @@ export default props => {
           </Col>
           <Col span={5} offset={1}>
             <Form.Item
-              label="紧急联系人电话"
+              label="紧急联系电话"
               name="emergencyContact"
-              rules={[{ required: true, message: '请输入紧急联系人' }]}
+              rules={[{ required: true, message: '请输入紧急联系电话' }]}
             >
               <Input />
             </Form.Item>
@@ -733,7 +741,7 @@ export default props => {
             <Form.Item
               label="成本中心"
               name="costId"
-              rules={[{ required: true, message: '请输入英文名' }]}
+              rules={[{ required: true, message: '请选择成本中心' }]}
             >
               <Select showSearch optionFilterProp="children">
                 {costList?.map(item => {
@@ -753,6 +761,14 @@ export default props => {
           </Col>
         </Row>
         <Form.Item wrapperCol={{ span: 12, offset: 10 }}>
+          <Button
+            style={{ marginRight: 20, marginTop: 20 }}
+            onClick={() => {
+              history.goBack();
+            }}
+          >
+            返回
+          </Button>
           <Button
             type="primary"
             htmlType="submit"

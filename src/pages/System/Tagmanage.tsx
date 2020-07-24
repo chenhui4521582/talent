@@ -53,7 +53,14 @@ export default () => {
         <span>
           <a onClick={e => showModal('edit', record)}>修改</a>
           <Divider type="vertical" />
-          <a onClick={e => handleDelete(record)}>删除</a>
+          <a
+            onClick={e => {
+              setDeleteAction(true);
+              setJobId(record.jobId);
+            }}
+          >
+            删除
+          </a>
         </span>
       ),
     },
@@ -90,16 +97,16 @@ export default () => {
   };
 
   const handleDelete = async record => {
-    setDeleteAction(true);
-    setJobId(record.jobId);
     deleteForm.validateFields().then(async fromSubData => {
       let res: GlobalResParams<string> = await removeJob(
-        record.jobId,
         fromSubData.replaceId,
+        jobId,
       );
       if (res.status === 200) {
+        setDeleteAction(false);
+        deleteForm.resetFields();
+        setJobId(undefined);
         refresh();
-        setDeleteAction(true);
         notification['success']({
           message: res.msg,
           description: '',
@@ -170,8 +177,9 @@ export default () => {
         okText="确定"
         cancelText="取消"
         onCancel={() => {
-          deleteForm.resetFields();
           setDeleteAction(false);
+          deleteForm.resetFields();
+          setJobId(undefined);
         }}
         onOk={handleDelete}
       >

@@ -28,6 +28,7 @@ export interface IDemandDetail {
   interview: string;
   entryName: string;
   description: string;
+  manageRank: string;
 }
 
 export interface INewDemandParams {
@@ -90,14 +91,6 @@ export async function deleteDemand(demandId: number) {
 
 export async function giveDemand(params) {
   return request('/api/talent/demand/distributeDemand', {
-    method: 'POST',
-    data: params,
-  });
-}
-
-// 撤销简历
-export async function revoke(params) {
-  return request('/api/talent/evaluation/deleteEvaluation', {
     method: 'POST',
     data: params,
   });

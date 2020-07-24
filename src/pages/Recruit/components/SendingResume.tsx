@@ -118,6 +118,7 @@ export default props => {
       },
     });
   };
+
   return (
     <Card title="待推送简历">
       <TableContent>
