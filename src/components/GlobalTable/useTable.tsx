@@ -66,6 +66,7 @@ export const useTable = ({
           columns={columns}
           rowKey={rowKeyName}
           {...tableProps}
+          rowSelection={{ type: 'checkbox' }}
         />
       </div>
     );

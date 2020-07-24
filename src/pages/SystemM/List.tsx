@@ -1,12 +1,16 @@
-import React, { useState } from 'react';
-import { Card, Table, Button, Form, Row, Col } from 'antd';
+import React, { useState, useEffect } from 'react';
+import { Card, Table, Button, Input, Form, Row, Col } from 'antd';
+import { useTable } from '@/components/GlobalTable/useTable';
 import { ColumnProps } from 'antd/es/table';
-import { Link } from 'umi';
+import { list, roleList, updata, tsItem } from './servers/list';
+import { GlobalResParams } from '@/types/ITypes';
+
+import LevelOr from '@/components/GlobalTable/levelOr';
 
 const sexHash = { 1: '男', 2: '女' };
 
 export default () => {
-  const columns: ColumnProps<any>[] = [
+  const columns: ColumnProps<tsItem>[] = [
     {
       title: '工号',
       dataIndex: 'employeeId',
@@ -60,27 +64,61 @@ export default () => {
     },
     {
       title: '角色名称',
-      key: 'action',
+      dataIndex: 'roleName',
+      key: 'roleName',
       align: 'center',
     },
   ];
 
-  const [form] = Form.useForm();
+  const { TableContent, searchForm } = useTable({
+    queryMethod: list,
+    columns,
+    rowKeyName: 'employeeId',
+    cacheKey: 'talent/role/listUserRole',
+  });
+
+  // const getRoleList = async ()=>{
+  //   let json = await roleList()
+  // }
 
   return (
     <Card title="用户角色管理">
-      <Form form={form}>
+      <TableContent>
         <Row>
-          <Form.Item label="一级业务"></Form.Item>
-          <Form.Item label="二级业务"></Form.Item>
-          <Form.Item label="部门"></Form.Item>
-          <Form.Item label="组别"></Form.Item>
+          <Col span={5}>
+            <Form.Item label="一级业务">
+              <LevelOr code="" />
+            </Form.Item>
+          </Col>
+          <Col span={5} offset={1}>
+            <Form.Item label="二级业务">
+              <LevelOr code="" />
+            </Form.Item>
+          </Col>
+          <Col span={5} offset={1}>
+            <Form.Item label="部门">
+              <LevelOr code="" />
+            </Form.Item>
+          </Col>
+          <Col span={5} offset={1}>
+            <Form.Item label="组别">
+              <LevelOr code="" />
+            </Form.Item>
+          </Col>
         </Row>
         <Row>
-          <Form.Item label="工号"></Form.Item>
-          <Form.Item label="姓名"></Form.Item>
+          <Col span={5}>
+            <Form.Item label="工号">
+              <Input placeholder="输入工号" />
+            </Form.Item>
+          </Col>
+          <Col span={5} offset={1}>
+            <Form.Item label="姓名" name="name">
+              <Input placeholder="输入姓名" />
+            </Form.Item>
+          </Col>
         </Row>
-      </Form>
+      </TableContent>
     </Card>
   );
 };
