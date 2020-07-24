@@ -71,7 +71,7 @@ export default () => {
     englishName: '英文名',
     contractChangeRecord: '合同变更记录',
     exWorkStart: '上一份合同开始日期',
-    useComputer: '是否用公司电脑',
+    useComputer: '是否使用公司电脑',
     hrbp: 'HRBP',
     financeDepartment: '部门（财务）',
     financeGroup: '组别（财务）',

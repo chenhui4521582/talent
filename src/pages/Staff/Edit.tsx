@@ -90,7 +90,9 @@ export default props => {
     values.onboardingDate = moment(values.onboardingDate).format('YYYY/MM/DD');
     values.probationEnd = moment(values.probationEnd).format('YYYY/MM/DD');
     values.workStart = moment(values.workStart).format('YYYY/MM/DD');
-    values.exWorkStart = moment(values.exWorkStart).format('YYYY/MM/DD');
+    values.exWorkStart
+      ? (values.exWorkStart = moment(values.exWorkStart).format('YYYY/MM/DD'))
+      : null;
     values.graduationDate = moment(values.graduationDate).format('YYYY/MM/DD');
     values.birthDate = moment(values.birthDate).format('YYYY/MM/DD');
     if (employeeId) {
@@ -115,11 +117,14 @@ export default props => {
   const handleFormChange = changedValues => {
     if (changedValues.firstBusinessCode) {
       setTwoLevel(changedValues.firstBusinessCode);
+      setThreeLevel('none');
+      setFourLevel('none');
       form.setFieldsValue({ businessCode: '' });
       form.setFieldsValue({ departmentCode: '' });
       form.setFieldsValue({ groupCode: '' });
     } else if (changedValues.businessCode) {
       setThreeLevel(changedValues.businessCode);
+      setFourLevel('none');
       form.setFieldsValue({ departmentCode: '' });
       form.setFieldsValue({ groupCode: '' });
     } else if (changedValues.departmentCode) {
@@ -247,7 +252,7 @@ export default props => {
               name="departmentCode"
               rules={[{ required: true, message: '请选择部门' }]}
             >
-              <LevelOr code={threeLevel} key={threeLevel} />
+              <LevelOr code={threeLevel} key={twoLevel + threeLevel} />
             </Form.Item>
           </Col>
           <Col span={5} offset={1}>
@@ -257,7 +262,10 @@ export default props => {
               rules={[{ required: true, message: '请选择组别' }]}
               shouldUpdate
             >
-              <LevelOr code={fourLevel} key={fourLevel} />
+              <LevelOr
+                code={fourLevel}
+                key={twoLevel + threeLevel + fourLevel}
+              />
             </Form.Item>
           </Col>
         </Row>
@@ -460,7 +468,7 @@ export default props => {
               <Select
                 showSearch
                 optionFilterProp="children"
-                style={{ maxWidth: '11vw' }}
+                style={{ maxWidth: '8.7vw' }}
               >
                 {laborList?.map(item => {
                   return (
@@ -753,6 +761,14 @@ export default props => {
           </Col>
         </Row>
         <Form.Item wrapperCol={{ span: 12, offset: 10 }}>
+          <Button
+            style={{ marginRight: 20, marginTop: 20 }}
+            onClick={() => {
+              history.goBack();
+            }}
+          >
+            返回
+          </Button>
           <Button
             type="primary"
             htmlType="submit"

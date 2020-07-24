@@ -542,9 +542,13 @@ export default props => {
       if (changeOrNewType === '修改名称') {
         values.id = selectGroup.id;
         values.code = selectGroup.key;
-        values.parentCode = selectGroup.parentCode;
       } else {
         values.parentCode = selectGroup.key;
+        if (selectGroup.key === '奖多多集团') {
+          values.parentCode = '';
+        } else {
+          values.parentCode = selectGroup.key;
+        }
       }
       values.status = 1;
       let json: GlobalResParams<string> = await submit(values);

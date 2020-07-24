@@ -10,19 +10,27 @@ export default props => {
   const [detail, setDetail] = useState<any>({});
   const [isEmpty, setIsEmpty] = useState<boolean>(false);
   const { resumeId, employeeId } = props.location.query;
+  const [url, setUrl] = useState<string>();
+  const [activeKey, setActiveKey] = useState<String>();
   useEffect(() => {
     async function getDetail() {
       let res: GlobalResParams<any> = await commonDetail(employeeId);
       setDetail(res?.obj);
       if (res.obj?.resumeUrl) {
-        let url = res.obj.resumeUrl.split(':')[1];
-        PDFObject.embed(url, '#pdf', options);
+        setUrl(res.obj.resumeUrl.split(':')[1]);
       } else {
         setIsEmpty(true);
       }
     }
     getDetail();
   }, []);
+
+  useEffect(() => {
+    if (activeKey) {
+      PDFObject.embed(url, '#pdf1', options);
+    }
+  }, [activeKey]);
+
   const sexHash = { 1: '男', 2: '女' };
   const emHash = { 1: '正式', 2: '实习', 3: '外聘', 4: '兼职' };
   const deadlineHash = { 0: '未提醒', 1: '已提醒' };
@@ -41,7 +49,11 @@ export default props => {
   };
   return (
     <Card title="员工详情">
-      <Tabs>
+      <Tabs
+        onChange={e => {
+          setActiveKey(e);
+        }}
+      >
         <TabPane tab="花名册" key="1" style={{ wordBreak: 'break-all' }}>
           <div>
             <h2>基本信息</h2>
@@ -305,7 +317,7 @@ export default props => {
               简历暂时无法预览，请通过修改进行查看
             </p>
           ) : (
-            <div id="pdf" style={{ minHeight: '800px' }}></div>
+            <div id="pdf1" style={{ minHeight: '800px' }}></div>
           )}
         </TabPane>
       </Tabs>

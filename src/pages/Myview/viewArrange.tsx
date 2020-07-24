@@ -93,7 +93,7 @@ export default () => {
           return (
             <span>
               <Link
-                to={`/talent/Resume/Cvdetails?resumeId=${record.resumeId}&resumeStatus=${record.status}`}
+                to={`/talent/Resume/print?resumeId=${record.resumeId}&resumeStatus=${record.status}`}
               >
                 {' '}
                 查看简历
@@ -106,7 +106,7 @@ export default () => {
           return (
             <span>
               <Link
-                to={`/talent/Resume/Cvdetails?resumeId=${record.resumeId}&resumeStatus=${record.status}`}
+                to={`/talent/Resume/print?resumeId=${record.resumeId}&resumeStatus=${record.status}`}
               >
                 {' '}
                 查看简历
