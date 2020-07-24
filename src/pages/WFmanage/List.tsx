@@ -127,7 +127,9 @@ export default () => {
         okText="确定"
         cancelText="取消"
         key={type + ''}
-        onCancel={() => {}}
+        onCancel={() => {
+          setType(undefined);
+        }}
         onOk={handleOk}
       >
         <Form form={form}>
