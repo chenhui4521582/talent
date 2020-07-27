@@ -60,15 +60,28 @@ export default props => {
         list2.push(item);
       }
     });
-    setListOne(list1);
-    setListTwo(list2);
+    setListOne(list1.sort(compare('stepNumber')));
+    setListTwo(list2.sort(compare('stepNumber')));
   };
+
+  const compare = (name: string) => {
+    return (a, b) => {
+      let v1 = a[name];
+      let v2 = b[name];
+      if (v2 > v1) {
+        return 1;
+      } else if (v2 < v1) {
+        return -1;
+      } else {
+        return 0;
+      }
+    };
+  };
+
   const submitData = async () => {
     let data: any = {};
     let list1: any = [];
     let list2: any = [];
-    console.log(data2);
-    console.log(data1);
     data1.map((item: any) => {
       item.stepType = 1;
       if ((item.id + '')?.indexOf('add') > -1) {
