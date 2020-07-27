@@ -38,6 +38,11 @@ export async function roleList() {
   });
 }
 
+interface tsUpParams {
+  roleCode: string;
+  userCodes: string;
+}
+
 // 授权
 export async function updata(params) {
   return request('/api/talent/role/authorize', {

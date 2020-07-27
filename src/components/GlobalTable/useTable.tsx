@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Table, Button, Form, Row } from 'antd';
 import { useFormTable } from '@umijs/hooks';
 import { PaginationTableParams } from '@/types/ITypes';
@@ -11,8 +11,9 @@ interface useTablesParams {
   paramName?: string;
   paramValue?: string | number;
   cacheKey: string;
+  showCheck?: boolean | undefined;
 }
-
+const selectedType = 'checkbox';
 export const useTable = ({
   queryMethod,
   columns,
@@ -20,6 +21,7 @@ export const useTable = ({
   paramName,
   paramValue,
   cacheKey,
+  showCheck,
 }: useTablesParams) => {
   const [searchForm] = Form.useForm();
   const { tableProps, refresh, search } = useFormTable(
@@ -38,6 +40,28 @@ export const useTable = ({
       cacheKey: cacheKey,
     },
   );
+
+  const [selectPageObj, setSelectPageObj] = useState<any>({});
+
+  const selectedRowKeys = () => {
+    let arr = [];
+    for (let key in selectPageObj) {
+      arr = arr.concat(selectPageObj[key]);
+    }
+    return arr;
+  };
+
+  const rowSelection = {
+    selectedType,
+    onChange: (selectedRowKeys, selectedRows) => {
+      let page = tableProps.pagination.current || 'none';
+      let obj: any = JSON.parse(JSON.stringify(selectPageObj));
+      obj[page] = selectedRowKeys;
+      setSelectPageObj(obj);
+      console.log(selectedRowKeys, selectedRows);
+    },
+    selectedRowKeys: selectedRowKeys(),
+  };
 
   const { reset, submit } = search;
 
@@ -66,7 +90,7 @@ export const useTable = ({
           columns={columns}
           rowKey={rowKeyName}
           {...tableProps}
-          rowSelection={{ type: 'checkbox' }}
+          rowSelection={showCheck ? rowSelection : undefined}
         />
       </div>
     );
@@ -76,5 +100,6 @@ export const useTable = ({
     TableContent,
     refresh,
     searchForm,
+    selectKeys: selectedRowKeys(),
   };
 };
