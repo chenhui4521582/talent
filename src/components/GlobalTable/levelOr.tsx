@@ -29,7 +29,7 @@ export default (props: tsProps) => {
   }, []);
   return (
     <Select
-      placeholder="请选择"
+      // placeholder="请选择"
       style={{ maxWidth: '12vw', minWidth: '8vw' }}
       optionFilterProp="children"
       showSearch

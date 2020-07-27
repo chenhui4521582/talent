@@ -24,6 +24,8 @@ import {
   tsListItem,
   tsDeleteItem,
   tsDefaultItem,
+  getlevelOr,
+  tsLevelOr,
 } from '@/services/global';
 
 export const useBusiness = () => {
@@ -183,4 +185,17 @@ export const usetDefaultOrganization = () => {
     fetchOrganization();
   }, [refresh]);
   return { defaultGroupJson, refreshDef: refreshs };
+};
+
+// 分层级获取组织架构 code:'' 标识一级业务线
+export const useLevelOr = code => {
+  const [list, setList] = useState<tsLevelOr[]>();
+  useEffect(() => {
+    async function fetchLabor() {
+      let res: GlobalResParams<tsLevelOr[]> = await getlevelOr(code);
+      setList(res.obj);
+    }
+    fetchLabor();
+  }, []);
+  return { list };
 };

@@ -15,7 +15,7 @@ import { useTable } from '@/components/GlobalTable/useTable';
 import { ColumnProps } from 'antd/es/table';
 import { list, roleList, updata, tsItem } from './servers/list';
 import { GlobalResParams } from '@/types/ITypes';
-
+import { useLevelOr } from '@/models/global';
 import LevelOr from '@/components/GlobalTable/levelOr';
 
 const sexHash = { 1: '男', 2: '女' };
@@ -97,6 +97,7 @@ export default () => {
   const [form] = Form.useForm();
   const [roles, setRoles] = useState<tsRoles[]>();
   const [visible, setVisible] = useState<boolean>(false);
+  const { list: firstList } = useLevelOr('');
 
   useEffect(() => {
     async function getRolesApi() {
@@ -154,12 +155,24 @@ export default () => {
       <TableContent>
         <Row>
           <Col span={5}>
-            <Form.Item label="一级业务">
-              <LevelOr code="" />
+            <Form.Item label="一级业务" name="businessCode">
+              <Select
+                showSearch
+                optionFilterProp="children"
+                placeholder="请选择一级业务线"
+              >
+                {firstList?.map(item => {
+                  return (
+                    <Option value={item.code} key={item.code}>
+                      {item.name}
+                    </Option>
+                  );
+                })}
+              </Select>
             </Form.Item>
           </Col>
           <Col span={5} offset={1}>
-            <Form.Item label="工号">
+            <Form.Item label="工号" name="employeeId">
               <Input placeholder="输入工号" />
             </Form.Item>
           </Col>
@@ -168,21 +181,6 @@ export default () => {
               <Input placeholder="输入姓名" />
             </Form.Item>
           </Col>
-          {/* <Col span={5} offset={1}>
-            <Form.Item label="二级业务">
-              <LevelOr code="" />
-            </Form.Item>
-          </Col>
-          <Col span={5} offset={1}>
-            <Form.Item label="部门">
-              <LevelOr code="" />
-            </Form.Item>
-          </Col>
-          <Col span={5} offset={1}>
-            <Form.Item label="组别">
-              <LevelOr code="" />
-            </Form.Item>
-          </Col> */}
         </Row>
       </TableContent>
       <Modal

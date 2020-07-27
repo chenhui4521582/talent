@@ -111,6 +111,11 @@ export interface tsDefaultItem {
   userCode: string;
 }
 
+export interface tsLevelOr {
+  code: string;
+  name: string;
+}
+
 export async function queryMenus(data: MenusReqParams) {
   return request('/api/odsApi/resource/listMenuByRoleCode', {
     method: 'post',
