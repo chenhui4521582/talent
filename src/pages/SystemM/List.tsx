@@ -16,8 +16,8 @@ import { ColumnProps } from 'antd/es/table';
 import { list, roleList, updata, tsItem } from './servers/list';
 import { GlobalResParams } from '@/types/ITypes';
 import { useLevelOr } from '@/models/global';
-import LevelOr from '@/components/GlobalTable/levelOr';
-
+import { useBusiness } from '@/models/global';
+import { useJob } from '@/models/global';
 const sexHash = { 1: '男', 2: '女' };
 const { Option } = Select;
 
@@ -86,18 +86,19 @@ export default () => {
       align: 'center',
     },
   ];
-
   const { TableContent, searchForm, selectKeys, refresh } = useTable({
     queryMethod: list,
     columns,
-    rowKeyName: 'employeeId',
+    rowKeyName: 'userCode',
     cacheKey: 'talent/role/listUserRole',
     showCheck: true,
   });
   const [form] = Form.useForm();
   const [roles, setRoles] = useState<tsRoles[]>();
   const [visible, setVisible] = useState<boolean>(false);
-  const { list: firstList } = useLevelOr('');
+  const { jobList } = useJob();
+  const { businessList } = useBusiness();
+  useBusiness;
 
   useEffect(() => {
     async function getRolesApi() {
@@ -154,31 +155,42 @@ export default () => {
     >
       <TableContent>
         <Row>
-          <Col span={5}>
-            <Form.Item label="一级业务" name="businessCode">
-              <Select
-                showSearch
-                optionFilterProp="children"
-                placeholder="请选择一级业务线"
-              >
-                {firstList?.map(item => {
+          <Col span={6}>
+            <Form.Item label="岗位" name="postId">
+              <Select showSearch optionFilterProp="children">
+                {jobList?.map(item => {
                   return (
-                    <Option value={item.code} key={item.code}>
-                      {item.name}
+                    <Option key={item.jobId} value={item.jobId}>
+                      {item.jobName}
                     </Option>
                   );
                 })}
               </Select>
             </Form.Item>
           </Col>
-          <Col span={5} offset={1}>
-            <Form.Item label="工号" name="employeeId">
-              <Input placeholder="输入工号" />
+          <Col span={6} offset={2}>
+            <Form.Item label="员工编号" name="employeeId">
+              <Input />
             </Form.Item>
           </Col>
-          <Col span={5} offset={1}>
+          <Col span={6} offset={2}>
             <Form.Item label="姓名" name="name">
-              <Input placeholder="输入姓名" />
+              <Input />
+            </Form.Item>
+          </Col>
+        </Row>
+        <Row>
+          <Col span={6}>
+            <Form.Item label="业务线" name="businessCode">
+              <Select showSearch optionFilterProp="children">
+                {businessList?.map(item => {
+                  return (
+                    <Option key={item.businessCode} value={item.businessCode}>
+                      {item.businessLineName}
+                    </Option>
+                  );
+                })}
+              </Select>
             </Form.Item>
           </Col>
         </Row>

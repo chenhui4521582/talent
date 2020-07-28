@@ -36,6 +36,17 @@ export default props => {
     }
   };
 
+  useEffect(() => {
+    console.log('props.selectObj');
+    console.log(props.selectObj);
+    props.selectObj?.relationResFormControlId
+      ? setSelectI(props.selectObj?.relationResFormControlId + '')
+      : '';
+    props.selectObj?.sysLabelId
+      ? setSelectA(props.selectObj?.sysLabelId + '')
+      : '';
+  }, [props.selectObj, optionList, list]);
+
   const renderList = useMemo(() => {
     return (
       <Radio.Group
@@ -48,12 +59,12 @@ export default props => {
             input: selectI,
           });
         }}
+        value={selectA}
       >
-        {' '}
         {list.map(item => {
           return (
             <>
-              <Radio style={{ marginTop: 6 }} value={item.id}>
+              <Radio style={{ marginTop: 6 }} value={item.id.toString()}>
                 {item.labelName}
               </Radio>{' '}
               <br />
@@ -62,7 +73,7 @@ export default props => {
         })}
       </Radio.Group>
     );
-  }, [list, selectI]);
+  }, [optionList, selectA, list, selectI]);
 
   const renderRight = useMemo(() => {
     return (
@@ -76,13 +87,14 @@ export default props => {
             input: value.toString(),
           });
         }}
+        value={selectI}
       >
         {optionList.map(item => {
-          return <Option value={item.id}>{item.name}</Option>;
+          return <Option value={item.id.toString()}>{item.name}</Option>;
         })}
       </Select>
     );
-  }, [optionList, selectA]);
+  }, [optionList, selectA, list, selectI]);
 
   return (
     <>

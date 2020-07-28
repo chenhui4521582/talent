@@ -20,6 +20,10 @@ export interface tsStep {
   relationResFormControlId?: string;
 }
 
+export enum ItemTypes {
+  Card = 'card',
+}
+
 // 获取工作流步骤
 export async function roluList(id) {
   return request(`/api/talent/wfresapprstep/get`, {

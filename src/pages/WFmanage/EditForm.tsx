@@ -1,31 +1,61 @@
-import React, { useState } from 'react';
-import GridLayout from 'react-grid-layout';
-import '../../../node_modules/react-grid-layout/css/styles.css';
-import '../../../node_modules/react-resizable/css/styles.css';
+import React from 'react';
+import styles from './index.less';
+import { useDrop, useDrag, DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
 
-export default () => {
-  const layout = [
-    { i: 'a', x: 0, y: 0, w: 1, h: 2, static: true },
-    { i: 'b', x: 1, y: 0, w: 3, h: 2, minW: 2, maxW: 4 },
-    { i: 'c', x: 4, y: 0, w: 1, h: 2 },
-  ];
+const ItemTypes = {
+  APP: 'demo-app',
+};
+
+const Child = () => {
+  const [{ isDragging }, drag] = useDrag({
+    item: { type: ItemTypes.APP },
+    collect: monitor => ({
+      isDragging: monitor.isDragging(),
+    }),
+  });
+
   return (
-    <GridLayout
-      className="layout"
-      layout={layout}
-      cols={12}
-      rowHeight={30}
-      width={1200}
+    <div
+      className={styles.child}
+      style={{ opacity: isDragging ? 0.5 : 1 }}
+      ref={drag}
     >
-      <div style={{ background: 'red' }} key="a">
-        a
-      </div>
-      <div style={{ background: 'red' }} key="b">
-        b
-      </div>
-      <div style={{ background: 'red' }} key="c">
-        c
-      </div>
-    </GridLayout>
+      Child
+    </div>
   );
 };
+
+const Container = () => {
+  const [{ isOver }, drag] = useDrop({
+    accept: ItemTypes.APP,
+    collect: monitor => ({
+      isOver: monitor.isOver(),
+    }),
+  });
+
+  return (
+    <div
+      className={styles.container}
+      ref={drag}
+      style={{ background: isOver ? '#FFAA00' : '#FFFFFF' }}
+    >
+      Container
+    </div>
+  );
+};
+
+export default () => {
+  return (
+    <DndProvider backend={HTML5Backend}>
+      <div className={styles.app}>
+        <Container />
+        <Child />
+      </div>
+    </DndProvider>
+  );
+};
+
+// useDrag  让元素可以拖拽
+
+//useDrop  可以让一个元素放置其他元素(容器)

@@ -9,6 +9,8 @@ import {
   tsStepObj,
 } from './services/rule';
 import { GlobalResParams } from '@/types/ITypes';
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
 import GridLayout from './components/GridLayout';
 interface tsGetId {
   id: string;
@@ -27,28 +29,31 @@ export default props => {
   let data2 = [];
 
   useEffect(() => {
+    getDetail();
+  }, [props.match.params.id]);
+
+  async function getDetail() {
+    data2 = [];
+    data1 = [];
     const id = props.match.params.id;
-    async function getDetail() {
-      let idRes: GlobalResParams<tsGetId[]> = await getStepId(parseInt(id));
-      if (idRes.status === 200) {
-        if (idRes.obj.length) {
-          setFromName(idRes.obj[0].name);
-          setFormId(idRes.obj[0].id);
-          let res: GlobalResParams<tsStepObj> = await roluFormList(
-            parseInt(idRes.obj[0].id),
-          );
-          if (res.status === 200) {
-            setStepType(res.obj.noticeStatus || 1);
-            handleList(res.obj.stepModelList);
-            if (res.obj.stepModelList.length === 0) {
-              setAddOrChange('add');
-            }
+    let idRes: GlobalResParams<tsGetId[]> = await getStepId(parseInt(id));
+    if (idRes.status === 200) {
+      if (idRes.obj.length) {
+        setFromName(idRes.obj[0].name);
+        setFormId(idRes.obj[0].id);
+        let res: GlobalResParams<tsStepObj> = await roluFormList(
+          parseInt(idRes.obj[0].id),
+        );
+        if (res.status === 200) {
+          setStepType(res.obj.noticeStatus || 1);
+          handleList(res.obj.stepModelList);
+          if (res.obj.stepModelList.length === 0) {
+            setAddOrChange('add');
           }
         }
       }
     }
-    getDetail();
-  }, [props.match.params.id]);
+  }
 
   const handleList = data => {
     let list1: tsStep[] = [];
@@ -69,9 +74,9 @@ export default props => {
       let v1 = a[name];
       let v2 = b[name];
       if (v2 > v1) {
-        return 1;
-      } else if (v2 < v1) {
         return -1;
+      } else if (v2 < v1) {
+        return 1;
       } else {
         return 0;
       }
@@ -98,6 +103,11 @@ export default props => {
       item.resApprovalId = formId;
       list2.push(item);
     });
+    list1 = list1.concat(list2);
+    console.log(list1);
+    list1.map((item, index) => {
+      item.stepNumber = index + 1;
+    });
     data.noticeStatus = stepType;
     data.crudParam = list1.concat(list2);
 
@@ -108,6 +118,8 @@ export default props => {
 
     let res: GlobalResParams<string> = await api(data);
     if (res.status === 200) {
+      getDetail();
+
       notification['success']({
         message: res.msg,
         description: '',
@@ -121,58 +133,64 @@ export default props => {
   };
 
   const getdata1 = value => {
+    console.log('list1');
+    console.log(value);
     data1 = value;
   };
 
   const getdata2 = value => {
+    console.log('list2');
+    console.log(value);
     data2 = value;
   };
 
   // 模态框下面主体
   return (
-    <Card
-      title="工作流列表/招聘/规则设置"
-      extra={<Button type="primary" onClick={submitData}>{`保存`}</Button>}
-    >
-      <h4 style={{ margin: '15px 0' }}>{fromName}</h4>
-      <Divider />
-      <Row>
-        <Col>默认审批人</Col>
-        <Col span={18} offset={1}>
-          <GridLayout {...props} ruleList={listOne} change={getdata1} />
-        </Col>
-      </Row>
+    <DndProvider backend={HTML5Backend}>
+      <Card
+        title="工作流列表/招聘/规则设置"
+        extra={<Button type="primary" onClick={submitData}>{`保存`}</Button>}
+      >
+        <h4 style={{ margin: '15px 0' }}>{fromName}</h4>
+        <Divider />
+        <Row>
+          <Col>默认审批人</Col>
+          <Col span={18} offset={1}>
+            <GridLayout {...props} ruleList={listOne} change={getdata1} />
+          </Col>
+        </Row>
 
-      <Row>
-        <Col>默认抄送人</Col>
-        <Col span={18} offset={1}>
-          <GridLayout {...props} ruleList={listTwo} change={getdata2} />
-        </Col>
-      </Row>
-      <Divider />
+        <Row>
+          <Col>默认抄送人</Col>
+          <Col span={18} offset={1}>
+            <GridLayout {...props} ruleList={listTwo} change={getdata2} />
+          </Col>
+        </Row>
+        <Divider />
 
-      <Row style={{ marginTop: 20 }}>
-        <Col>抄送通知</Col>
-        <Col style={{ marginLeft: 20 }}>
-          <Radio.Group
-            onChange={e => {
-              const { value } = e.target;
-              setStepType(value);
-            }}
-            value={stepType}
-          >
-            <Radio value={1}>提交申请时抄送</Radio>
-            <br />
-            <Radio style={{ marginTop: 5 }} value={2}>
-              审批通过后抄送
-            </Radio>{' '}
-            <br />
-            <Radio style={{ marginTop: 5 }} value={3}>
-              提交申请时和审批通过后都抄送
-            </Radio>
-          </Radio.Group>
-        </Col>
-      </Row>
-    </Card>
+        <Row style={{ marginTop: 20 }}>
+          <Col>抄送通知</Col>
+          <Col style={{ marginLeft: 20 }}>
+            <Radio.Group
+              onChange={e => {
+                const { value } = e.target;
+                setStepType(value);
+              }}
+              value={stepType}
+            >
+              <Radio value={1}>提交申请时抄送</Radio>
+              <br />
+              <Radio style={{ marginTop: 5 }} value={2}>
+                审批通过后抄送
+              </Radio>{' '}
+              <br />
+              <Radio style={{ marginTop: 5 }} value={3}>
+                提交申请时和审批通过后都抄送
+              </Radio>
+            </Radio.Group>
+          </Col>
+        </Row>
+      </Card>
+    </DndProvider>
   );
 };
