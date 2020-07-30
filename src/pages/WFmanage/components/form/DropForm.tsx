@@ -1,5 +1,5 @@
-import React, { useRef, useState } from 'react';
-import { Card, Modal, Button, Descriptions, Form } from 'antd';
+import React, { useRef, useState, useEffect } from 'react';
+import { Card, Modal, Button, Descriptions } from 'antd';
 import { IForm, ItemTypes } from '../../services/form';
 import { XYCoord } from 'dnd-core';
 import {
@@ -9,8 +9,9 @@ import {
   useDrop,
 } from 'react-dnd';
 
-import dropGroup from './DropGroup';
-import dropItem from './DropItem';
+import DropGroup from './DropGroup';
+import DropItem from './DropItem';
+import update from 'immutability-helper';
 
 interface Iprops {
   fromItem: IForm;
@@ -19,27 +20,79 @@ interface Iprops {
 }
 
 export default (props: Iprops) => {
-  const { fromItem, index, moveIndex } = props;
+  const { fromItem } = props;
+  const [formDetail, setFormDetail] = useState<IForm>();
+
+  const [, drop] = useDrop({
+    accept: fromItem.id + 'form',
+  });
+
+  useEffect(() => {
+    setFormDetail(fromItem);
+  }, [fromItem]);
+
+  const moveIndex = (dragIndex: number, hoverIndex: number) => {
+    const dragCard = fromItem.list[dragIndex];
+    fromItem.list = update(fromItem.list, {
+      $splice: [
+        [dragIndex, 1],
+        [hoverIndex, 0, dragCard],
+      ],
+    });
+    setFormDetail({ ...fromItem });
+  };
 
   const renderForm = () => {
     console.log('fromItem.list');
-    console.log(fromItem.list);
-    return fromItem.list.map(groupItem => {
+    console.log(formDetail?.list);
+    return formDetail?.list.map((groupItem, index) => {
       if (groupItem.list && groupItem.list.length) {
-        return dropGroup({ groupItem });
+        return (
+          <Descriptions.Item
+            label={
+              <span className={groupItem.isRequired ? 'label-required' : ''}>
+                {groupItem.name}
+              </span>
+            }
+            span={groupItem.colspan}
+          >
+            <DropGroup
+              groupItem={groupItem}
+              type={fromItem.id + 'form'}
+              index={index}
+              moveIndex={moveIndex}
+            />
+          </Descriptions.Item>
+        );
       } else {
-        return dropItem({ groupItem });
+        return (
+          <Descriptions.Item
+            label={
+              <span className={groupItem.isRequired ? 'label-required' : ''}>
+                {groupItem.name}
+              </span>
+            }
+            span={groupItem.colspan}
+          >
+            <DropItem
+              groupItem={groupItem}
+              type={fromItem.id + 'form'}
+              index={index}
+              moveIndex={moveIndex}
+            />
+          </Descriptions.Item>
+        );
       }
     });
   };
 
   return (
-    <div>
+    <div ref={drop}>
       <Descriptions
-        title={<div style={{ textAlign: 'center' }}>{fromItem.name}</div>}
-        key={fromItem.id}
+        title={<div style={{ textAlign: 'center' }}>{formDetail?.name}</div>}
+        key={formDetail?.id}
         bordered
-        column={fromItem.columnNum}
+        column={formDetail?.columnNum}
         style={{ marginBottom: 40, marginLeft: '5%', width: '80%' }}
       >
         {renderForm()}

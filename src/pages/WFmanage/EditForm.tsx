@@ -89,8 +89,6 @@ const EditForm = props => {
   const moveIndex = (dragIndex: number, hoverIndex: number) => {
     let fromList = JSON.parse(JSON.stringify(formDetail));
     const dragCard = fromList[dragIndex];
-    console.log(dragIndex, hoverIndex);
-    console.log();
     setFormDetail(
       update(fromList, {
         $splice: [
@@ -125,7 +123,7 @@ const EditForm = props => {
 
   return (
     <Card
-      title="工作流列表"
+      title="工作流表单设置"
       extra={
         <>
           <Button
@@ -143,7 +141,15 @@ const EditForm = props => {
       }
     >
       {fromContent}
-      <div ref={drop}>
+      <div
+        ref={drop}
+        style={{
+          position: 'fixed',
+          top: '20vh',
+          right: '3vw',
+          width: '8em',
+        }}
+      >
         {formDetail?.map((item, index) => {
           return (
             <DropIcon index={index} name={item.name} moveIndex={moveIndex} />

@@ -89,13 +89,11 @@ const Card: React.FC<IProps> = ({ index, moveIndex, name }) => {
   });
 
   const style: React.CSSProperties = {
-    // background: bg,
-    margin: '16px 6px',
-    // Card 为占位元素是，透明度 0.4，拖拽状态时透明度 0.2，正常情况透明度为 1
     opacity: isDragging ? 0.2 : 1,
-    padding: '20px 0px',
+    marginTop: 16,
     verticalAlign: 40,
-    width: index / 2 === 0 ? '100%' : 288,
+    background: 'red',
+    width: '8em',
   };
 
   // 使用 drag 和 drop 对 ref 进行包裹，则组件既可以进行拖拽也可以接收拖拽组件
