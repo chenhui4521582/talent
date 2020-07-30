@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Card,
   Button,
@@ -8,11 +8,13 @@ import {
   Form,
   Input,
   Modal,
+  Select,
 } from 'antd';
 import { Link } from 'umi';
 
 import { useReq } from '@/components/GlobalTable/useReq';
 import { homeList, changeState, save } from './services/new';
+import { categoryList, tsCategoryItem } from './services/category';
 import { ColumnProps } from 'antd/es/table';
 import { GlobalResParams } from '@/types/ITypes';
 
@@ -21,6 +23,8 @@ interface tsList {
   name: string;
   status: number;
 }
+
+const { Option } = Select;
 
 export default () => {
   const columns: ColumnProps<tsList>[] = [
@@ -66,6 +70,17 @@ export default () => {
 
   const [type, setType] = useState<'add' | 'change'>();
   const [form] = Form.useForm();
+  const [category, setCategory] = useState<tsCategoryItem[]>();
+
+  useEffect(() => {
+    async function getCategoryList() {
+      let json: GlobalResParams<tsCategoryItem[]> = await categoryList();
+      if (json.status === 200) {
+        setCategory(json.obj);
+      }
+    }
+    getCategoryList();
+  }, []);
 
   const onChange = async id => {
     let res: GlobalResParams<string> = await changeState(id);
@@ -139,6 +154,21 @@ export default () => {
             rules={[{ required: true, message: '请输入工作流名称!' }]}
           >
             <Input placeholder="请输入用户名称" />
+          </Form.Item>
+          <Form.Item
+            label="所属类别"
+            name="formCategoryId"
+            rules={[{ required: true, message: '请选择工作流类别!' }]}
+          >
+            <Select>
+              {category?.map(item => {
+                return (
+                  <Option key={item.id} value={item.id}>
+                    {item.name}
+                  </Option>
+                );
+              })}
+            </Select>
           </Form.Item>
         </Form>
       </Modal>

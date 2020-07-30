@@ -6,6 +6,10 @@ export interface IControls {
   name: string;
 }
 
+export enum ItemTypes {
+  FormBox = 'formBox',
+}
+
 export interface IForm {
   columnNum: number;
   list: IGroupItem[];

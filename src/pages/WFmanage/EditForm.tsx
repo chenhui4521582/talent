@@ -2,22 +2,27 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Card, Modal, Button, Descriptions, Form } from 'antd';
 
 import { useDrop, useDrag, DndProvider } from 'react-dnd';
+import update from 'immutability-helper';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import {
   getControls,
   getFormDetail,
   IControls,
   IForm,
-  IGroupItem,
+  ItemTypes,
 } from './services/form';
 import { GlobalResParams } from '@/types/ITypes';
-
 import DropForm from './components/form/DropForm';
-export default props => {
+import DropIcon from './components/form/DropIcon';
+
+const EditForm = props => {
+  const [, drop] = useDrop({
+    accept: ItemTypes.FormBox,
+  });
+
   const [controlList, setControlList] = useState<IControls[]>();
   const [formDetail, setFormDetail] = useState<IForm[]>([]);
   const [cVisible, setCvisible] = useState<boolean>(false);
-
   useEffect(() => {
     getForm();
     getC();
@@ -28,7 +33,6 @@ export default props => {
     let json = await getFormDetail(id);
     if (json.status === 200) {
       handleDetail(json.obj);
-      // setFormDetail(json.obj)
     }
   }
 
@@ -82,6 +86,21 @@ export default props => {
     setFormDetail(data);
   };
 
+  const moveIndex = (dragIndex: number, hoverIndex: number) => {
+    let fromList = JSON.parse(JSON.stringify(formDetail));
+    const dragCard = fromList[dragIndex];
+    console.log(dragIndex, hoverIndex);
+    console.log();
+    setFormDetail(
+      update(fromList, {
+        $splice: [
+          [dragIndex, 1],
+          [hoverIndex, 0, dragCard],
+        ],
+      }),
+    );
+  };
+
   const renderControl = useMemo(() => {
     return controlList?.map(item => {
       return (
@@ -94,8 +113,10 @@ export default props => {
 
   const fromContent = useMemo(() => {
     if (formDetail?.length) {
-      return formDetail?.map(fromItem => {
-        return <DropForm fromItem={fromItem} />;
+      return formDetail?.map((fromItem, index) => {
+        return (
+          <DropForm fromItem={fromItem} index={index} moveIndex={moveIndex} />
+        );
       });
     } else {
       return null;
@@ -121,7 +142,14 @@ export default props => {
         </>
       }
     >
-      <DndProvider backend={HTML5Backend}>{fromContent}</DndProvider>
+      {fromContent}
+      <div ref={drop}>
+        {formDetail?.map((item, index) => {
+          return (
+            <DropIcon index={index} name={item.name} moveIndex={moveIndex} />
+          );
+        })}
+      </div>
       <Modal
         width="40vw"
         visible={cVisible}
@@ -138,5 +166,13 @@ export default props => {
         {renderControl}
       </Modal>
     </Card>
+  );
+};
+
+export default props => {
+  return (
+    <DndProvider backend={HTML5Backend}>
+      <EditForm {...props} />
+    </DndProvider>
   );
 };

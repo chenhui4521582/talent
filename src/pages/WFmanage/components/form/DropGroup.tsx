@@ -8,7 +8,8 @@ interface Iprops {
 }
 
 const DropGroup = (props: Iprops) => {
-  alert(1);
+  const [name, setName] = useState();
+
   const { groupItem } = props;
   return (
     <Descriptions.Item

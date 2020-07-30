@@ -8,7 +8,6 @@ interface Iprops {
 
 const DropItem = (props: Iprops) => {
   const { groupItem } = props;
-  alert(2);
   return (
     <Descriptions.Item
       key={groupItem.id}
