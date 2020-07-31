@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Card, Modal, Button, Descriptions, Form } from 'antd';
+import { Card, Modal, Button, Input, Form } from 'antd';
 
 import { useDrop, useDrag, DndProvider } from 'react-dnd';
 import update from 'immutability-helper';
@@ -14,6 +14,7 @@ import {
 import { GlobalResParams } from '@/types/ITypes';
 import DropForm from './components/form/DropForm';
 import DropIcon from './components/form/DropIcon';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
 
 const EditForm = props => {
   const [, drop] = useDrop({
@@ -23,6 +24,10 @@ const EditForm = props => {
   const [controlList, setControlList] = useState<IControls[]>();
   const [formDetail, setFormDetail] = useState<IForm[]>([]);
   const [cVisible, setCvisible] = useState<boolean>(false);
+  const [addOrEdit, setAddOrEdit] = useState<'add' | 'edit'>();
+  const [name, setName] = useState<string>('');
+  const [selectFormIndex, setSelectFormIndex] = useState<number>(0);
+  const [form] = Form.useForm();
   useEffect(() => {
     getForm();
     getC();
@@ -33,6 +38,7 @@ const EditForm = props => {
     let json = await getFormDetail(id);
     if (json.status === 200) {
       handleDetail(json.obj);
+      setName(json.obj.name);
     }
   }
 
@@ -86,7 +92,7 @@ const EditForm = props => {
     setFormDetail(data);
   };
 
-  const moveIndex = (dragIndex: number, hoverIndex: number) => {
+  const handleMoveIndex = (dragIndex: number, hoverIndex: number) => {
     let fromList = JSON.parse(JSON.stringify(formDetail));
     const dragCard = fromList[dragIndex];
     setFormDetail(
@@ -97,6 +103,46 @@ const EditForm = props => {
         ],
       }),
     );
+  };
+
+  const handleRemove = (index: number) => {
+    Modal.confirm({
+      title: '确定删除?',
+      okText: '确定',
+      icon: <ExclamationCircleOutlined />,
+      okType: 'danger' as any,
+      cancelText: '取消',
+      onOk: async () => {
+        let newList = JSON.parse(JSON.stringify(formDetail));
+        newList.splice(index, 1);
+        setFormDetail(newList);
+      },
+    });
+  };
+
+  const handleEditForm = (index: number) => {
+    setSelectFormIndex(index);
+    form.setFieldsValue({ name: formDetail[index].name });
+    setAddOrEdit('edit');
+  };
+
+  const handleAddForm = () => {
+    form.validateFields().then(async value => {
+      let list = JSON.parse(JSON.stringify(formDetail));
+      if (addOrEdit === 'add') {
+        list.push({
+          name: value.name,
+          list: [],
+        });
+      } else {
+        let selectFrom = list && list[selectFormIndex];
+        selectFrom.name = value.name;
+        list[selectFormIndex] = selectFrom;
+      }
+      setFormDetail(list);
+      form.setFieldsValue({ name: '' });
+      setAddOrEdit(undefined);
+    });
   };
 
   const renderControl = useMemo(() => {
@@ -113,7 +159,12 @@ const EditForm = props => {
     if (formDetail?.length) {
       return formDetail?.map((fromItem, index) => {
         return (
-          <DropForm fromItem={fromItem} index={index} moveIndex={moveIndex} />
+          <DropForm
+            fromItem={fromItem}
+            index={index}
+            moveIndex={handleMoveIndex}
+            changeName={handleEditForm}
+          />
         );
       });
     } else {
@@ -123,16 +174,16 @@ const EditForm = props => {
 
   return (
     <Card
-      title="工作流表单设置"
+      title={`工作流-${name}-表单设置`}
       extra={
         <>
           <Button
             type="primary"
             onClick={() => {
-              setCvisible(true);
+              setAddOrEdit('add');
             }}
           >
-            添加控件
+            添加表单
           </Button>
           <Button type="primary" style={{ marginLeft: 8 }}>
             保存
@@ -152,7 +203,12 @@ const EditForm = props => {
       >
         {formDetail?.map((item, index) => {
           return (
-            <DropIcon index={index} name={item.name} moveIndex={moveIndex} />
+            <DropIcon
+              index={index}
+              name={item.name}
+              moveIndex={handleMoveIndex}
+              remove={handleRemove}
+            />
           );
         })}
       </div>
@@ -170,6 +226,29 @@ const EditForm = props => {
         }}
       >
         {renderControl}
+      </Modal>
+      <Modal
+        visible={!!addOrEdit}
+        title={addOrEdit === 'add' ? '添加' : '修改'}
+        okText="确认"
+        cancelText="取消"
+        onOk={() => {
+          handleAddForm();
+        }}
+        onCancel={() => {
+          form.setFieldsValue({ name: '' });
+          setAddOrEdit(undefined);
+        }}
+      >
+        <Form form={form}>
+          <Form.Item
+            label="表单名称"
+            name="name"
+            rules={[{ required: true, message: '请输入表单名称!' }]}
+          >
+            <Input placeholder="请输入表单名称" />
+          </Form.Item>
+        </Form>
       </Modal>
     </Card>
   );

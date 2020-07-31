@@ -1,57 +1,112 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Card, Modal, Button, Descriptions } from 'antd';
-import { IForm, ItemTypes } from '../../services/form';
-import { XYCoord } from 'dnd-core';
-import {
-  DragSourceMonitor,
-  DropTargetMonitor,
-  useDrag,
-  useDrop,
-} from 'react-dnd';
+import { Card, Modal, Button, Descriptions, Form, Input } from 'antd';
+import { IForm, IGroupItem } from '../../services/form';
+import { useDrop } from 'react-dnd';
 
 import DropGroup from './DropGroup';
 import DropItem from './DropItem';
 import update from 'immutability-helper';
+import {
+  EditOutlined,
+  ExclamationCircleOutlined,
+  DeleteOutlined,
+} from '@ant-design/icons';
 
 interface Iprops {
   fromItem: IForm;
   index: number;
   moveIndex: (dragIndex: number, hoverIndex: number) => void;
+  changeName: (index: number) => void;
 }
 
 export default (props: Iprops) => {
-  const { fromItem } = props;
-  const [formDetail, setFormDetail] = useState<IForm>();
+  const { fromItem, changeName, index } = props;
+  const [form] = Form.useForm();
+  const [formDetailList, setFormDetailList] = useState<IGroupItem[]>();
+  const [visible, setVisible] = useState<boolean>(false);
+  const [selectGroup, setSelectGroup] = useState<number>(0);
 
   const [, drop] = useDrop({
     accept: fromItem.id + 'form',
   });
 
   useEffect(() => {
-    setFormDetail(fromItem);
+    setFormDetailList(fromItem.list);
   }, [fromItem]);
 
-  const moveIndex = (dragIndex: number, hoverIndex: number) => {
-    const dragCard = fromItem.list[dragIndex];
-    fromItem.list = update(fromItem.list, {
-      $splice: [
-        [dragIndex, 1],
-        [hoverIndex, 0, dragCard],
-      ],
+  const handleMoveIndex = (dragIndex: number, hoverIndex: number) => {
+    const dragCard = formDetailList && formDetailList[dragIndex];
+    let newData = JSON.parse(JSON.stringify(formDetailList));
+    setFormDetailList(
+      update(newData, {
+        $splice: [
+          [dragIndex, 1],
+          [hoverIndex, 0, dragCard],
+        ],
+      }),
+    );
+  };
+
+  const handleRemove = (index: number) => {
+    Modal.confirm({
+      title: '确定删除?',
+      okText: '确定',
+      icon: <ExclamationCircleOutlined />,
+      okType: 'danger' as any,
+      cancelText: '取消',
+      onOk: async () => {
+        let newList = JSON.parse(JSON.stringify(formDetailList));
+        newList.splice(index, 1);
+        setFormDetailList(newList);
+      },
     });
-    setFormDetail({ ...fromItem });
+  };
+
+  const handleChangeGroupName = () => {
+    form.validateFields().then(async value => {
+      let list = JSON.parse(JSON.stringify(formDetailList));
+      let selectFrom = list && list[selectGroup];
+      selectFrom.name = value.name;
+      list[selectGroup] = selectFrom;
+      setFormDetailList(list);
+      setVisible(false);
+    });
+  };
+
+  const handleShowModal = (index: number) => {
+    setSelectGroup(index);
+    formDetailList && form.setFieldsValue({ name: formDetailList[index].name });
+    setVisible(true);
   };
 
   const renderForm = () => {
-    console.log('fromItem.list');
-    console.log(formDetail?.list);
-    return formDetail?.list.map((groupItem, index) => {
+    return formDetailList?.map((groupItem, index) => {
       if (groupItem.list && groupItem.list.length) {
         return (
           <Descriptions.Item
             label={
               <span className={groupItem.isRequired ? 'label-required' : ''}>
-                {groupItem.name}
+                <span>{groupItem.name}</span>
+                <DeleteOutlined
+                  style={{
+                    cursor: 'pointer',
+                    marginLeft: 5,
+                  }}
+                  onClick={e => {
+                    e.preventDefault();
+                    handleRemove(index);
+                  }}
+                />
+                <EditOutlined
+                  style={{
+                    cursor: 'pointer',
+                    marginLeft: 5,
+                  }}
+                  onClick={e => {
+                    e.preventDefault();
+                    handleShowModal(index);
+                  }}
+                />
               </span>
             }
             span={groupItem.colspan}
@@ -60,7 +115,7 @@ export default (props: Iprops) => {
               groupItem={groupItem}
               type={fromItem.id + 'form'}
               index={index}
-              moveIndex={moveIndex}
+              moveIndex={handleMoveIndex}
             />
           </Descriptions.Item>
         );
@@ -69,7 +124,27 @@ export default (props: Iprops) => {
           <Descriptions.Item
             label={
               <span className={groupItem.isRequired ? 'label-required' : ''}>
-                {groupItem.name}
+                <span>{groupItem.name}</span>
+                <DeleteOutlined
+                  style={{
+                    cursor: 'pointer',
+                    marginLeft: 5,
+                  }}
+                  onClick={e => {
+                    e.preventDefault();
+                    handleRemove(index);
+                  }}
+                />
+                <EditOutlined
+                  style={{
+                    cursor: 'pointer',
+                    marginLeft: 5,
+                  }}
+                  onClick={e => {
+                    e.preventDefault();
+                    handleShowModal(index);
+                  }}
+                />
               </span>
             }
             span={groupItem.colspan}
@@ -78,7 +153,7 @@ export default (props: Iprops) => {
               groupItem={groupItem}
               type={fromItem.id + 'form'}
               index={index}
-              moveIndex={moveIndex}
+              moveIndex={handleMoveIndex}
             />
           </Descriptions.Item>
         );
@@ -89,14 +164,50 @@ export default (props: Iprops) => {
   return (
     <div ref={drop}>
       <Descriptions
-        title={<div style={{ textAlign: 'center' }}>{formDetail?.name}</div>}
-        key={formDetail?.id}
+        title={
+          <div style={{ textAlign: 'center' }}>
+            <span>{fromItem?.name}</span>
+            <EditOutlined
+              style={{
+                cursor: 'pointer',
+                marginLeft: 5,
+              }}
+              onClick={e => {
+                e.preventDefault();
+                changeName(index);
+              }}
+            />
+          </div>
+        }
+        key={fromItem?.id}
         bordered
-        column={formDetail?.columnNum}
+        column={fromItem?.columnNum}
         style={{ marginBottom: 40, marginLeft: '5%', width: '80%' }}
       >
         {renderForm()}
       </Descriptions>
+      <Modal
+        visible={visible}
+        title="修改"
+        okText="确认"
+        cancelText="取消"
+        onOk={() => {
+          handleChangeGroupName();
+        }}
+        onCancel={() => {
+          setVisible(false);
+        }}
+      >
+        <Form form={form}>
+          <Form.Item
+            label="组名称"
+            name="name"
+            rules={[{ required: true, message: '请输入组名称!' }]}
+          >
+            <Input placeholder="请输入组名称" />
+          </Form.Item>
+        </Form>
+      </Modal>
     </div>
   );
 };

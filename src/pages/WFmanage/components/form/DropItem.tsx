@@ -50,16 +50,6 @@ const DropItem = (props: Iprops) => {
         (hoverBoundingRect.right - hoverBoundingRect.left) / 2;
       const hoverClientX = (clientOffset as XYCoord).x - hoverBoundingRect.left;
 
-      /**
-       * 只在鼠标越过一半物品高度时执行移动。
-       *
-       * 当向下拖动时，仅当光标低于50%时才移动。
-       * 当向上拖动时，仅当光标在50%以上时才移动。
-       *
-       * 可以防止鼠标位于元素一半高度时元素抖动的状况
-       */
-
-      // 向下拖动
       if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) {
         return;
       }
@@ -68,17 +58,6 @@ const DropItem = (props: Iprops) => {
       if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) {
         return;
       }
-
-      // if (dragIndex < hoverIndex && hoverClientX < hoverMiddleX) {
-      //   return;
-      // }
-
-      // // 向上拖动
-      // if (dragIndex > hoverIndex && hoverClientX > hoverMiddleX) {
-      //   return;
-      // }
-
-      // 执行 move 回调函数
       moveIndex(dragIndex, hoverIndex);
 
       /**
@@ -91,14 +70,17 @@ const DropItem = (props: Iprops) => {
     },
   });
 
-  const style: React.CSSProperties = {
-    opacity: isDragging ? 0.2 : 1,
-  };
-
   drag(drop(ref));
 
   return (
-    <div ref={ref} className="22222" style={style}>
+    <div
+      ref={ref}
+      style={{
+        padding: '5px 16px',
+        border: '1px dashed #444',
+        opacity: isDragging ? 0.2 : 1,
+      }}
+    >
       <Temp
         ismultiplechoice={groupItem.isMultiplechoice}
         s_type={groupItem.baseControlType}
