@@ -16,6 +16,7 @@ export interface IForm {
   name: string;
   sort: number;
   id: number;
+  formType: 'group' | 'item';
 }
 
 export interface IGroupItem {

@@ -1,36 +1,29 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Card, Modal, Button, Input, Form } from 'antd';
-
-import { useDrop, useDrag, DndProvider } from 'react-dnd';
+import { Card, Modal, Button, Input, Form, Select } from 'antd';
+import { useDrop, DndProvider } from 'react-dnd';
 import update from 'immutability-helper';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import {
-  getControls,
-  getFormDetail,
-  IControls,
-  IForm,
-  ItemTypes,
-} from './services/form';
+import { getFormDetail, IForm, ItemTypes } from './services/form';
 import { GlobalResParams } from '@/types/ITypes';
 import DropForm from './components/form/DropForm';
 import DropIcon from './components/form/DropIcon';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
+
+const { Option } = Select;
 
 const EditForm = props => {
   const [, drop] = useDrop({
     accept: ItemTypes.FormBox,
   });
 
-  const [controlList, setControlList] = useState<IControls[]>();
   const [formDetail, setFormDetail] = useState<IForm[]>([]);
-  const [cVisible, setCvisible] = useState<boolean>(false);
   const [addOrEdit, setAddOrEdit] = useState<'add' | 'edit'>();
   const [name, setName] = useState<string>('');
-  const [selectFormIndex, setSelectFormIndex] = useState<number>(0);
+  const [selectFormIndex, setSelectFormIndex] = useState<number>();
+  const [hiddenFormTyoe, setHiddenFormType] = useState<boolean>(true);
   const [form] = Form.useForm();
   useEffect(() => {
     getForm();
-    getC();
   }, []);
 
   async function getForm() {
@@ -42,13 +35,6 @@ const EditForm = props => {
     }
   }
 
-  async function getC() {
-    let json: GlobalResParams<IControls[]> = await getControls();
-    if (json.status === 200) {
-      setControlList(json.obj);
-    }
-  }
-
   const handleDetail = obj => {
     let formChildlist = obj.formChildlist || [];
     let groupList = obj.groupList || [];
@@ -56,7 +42,6 @@ const EditForm = props => {
     for (let k = 0; k < formChildlist.length; k++) {
       let fromItem = formChildlist[k];
       let controlList = fromItem.controlList;
-      // idItem = idItem.concat(controlList);
       data[k] = fromItem;
       data[k].list = [];
       data[k].arr = [];
@@ -71,6 +56,7 @@ const EditForm = props => {
               list.push(controlList[g]);
               groupItem.list = list;
               data[k].list.push(groupItem);
+              data[k].formType = 'group';
             }
             if (
               data[k].arr.indexOf(formChildlist[k].controlList[g].id) === -1 &&
@@ -81,14 +67,17 @@ const EditForm = props => {
             ) {
               data[k].arr.push(formChildlist[k].controlList[g].id);
               data[k].list.push(controlList[g]);
+              data[k].formType = 'item';
             }
           }
           data[k].list = [...new Set(data[k].list)];
         }
       } else {
+        data[k].formType = 'item';
         data[k].list = controlList;
       }
     }
+    console.log(data);
     setFormDetail(data);
   };
 
@@ -122,8 +111,12 @@ const EditForm = props => {
 
   const handleEditForm = (index: number) => {
     setSelectFormIndex(index);
-    form.setFieldsValue({ name: formDetail[index].name });
-    setAddOrEdit('edit');
+
+    form.setFieldsValue({
+      name: formDetail[index].name,
+      formType: formDetail[index].formType,
+    });
+    handleShowForm('edit', index);
   };
 
   const handleAddForm = () => {
@@ -132,28 +125,42 @@ const EditForm = props => {
       if (addOrEdit === 'add') {
         list.push({
           name: value.name,
+          columnNum: value.formType === 'group' ? 1 : 2,
+          formType: value.formType,
           list: [],
         });
       } else {
-        let selectFrom = list && list[selectFormIndex];
-        selectFrom.name = value.name;
-        list[selectFormIndex] = selectFrom;
+        if (selectFormIndex || selectFormIndex === 0) {
+          let selectFrom = list && list[selectFormIndex];
+          selectFrom.name = value.name;
+          selectFrom.columnNum = value.formType === 'group' ? 1 : 2;
+          selectFrom.formType = value.formType
+            ? value.formType
+            : selectFrom.formType;
+          if (selectFormIndex) {
+            list[selectFormIndex] = selectFrom;
+          }
+        }
       }
       setFormDetail(list);
-      form.setFieldsValue({ name: '' });
+      form.setFieldsValue({ name: undefined, formType: undefined });
       setAddOrEdit(undefined);
     });
   };
 
-  const renderControl = useMemo(() => {
-    return controlList?.map(item => {
-      return (
-        <Button key={item.id} style={{ width: 200, margin: 8 }}>
-          {item.name}
-        </Button>
-      );
-    });
-  }, [controlList]);
+  const handleShowForm = (value: 'edit' | 'add', index?: number) => {
+    if ((index || index === 0) && formDetail) {
+      let selectFrom = formDetail[index];
+      if (selectFrom?.list.length) {
+        setHiddenFormType(false);
+      } else {
+        setHiddenFormType(true);
+      }
+    } else {
+      setHiddenFormType(true);
+    }
+    setAddOrEdit(value);
+  };
 
   const fromContent = useMemo(() => {
     if (formDetail?.length) {
@@ -180,7 +187,7 @@ const EditForm = props => {
           <Button
             type="primary"
             onClick={() => {
-              setAddOrEdit('add');
+              handleShowForm('add');
             }}
           >
             添加表单
@@ -213,21 +220,6 @@ const EditForm = props => {
         })}
       </div>
       <Modal
-        width="40vw"
-        visible={cVisible}
-        title="添加控件"
-        okText="确认"
-        cancelText="取消"
-        onOk={() => {
-          setCvisible(false);
-        }}
-        onCancel={() => {
-          setCvisible(false);
-        }}
-      >
-        {renderControl}
-      </Modal>
-      <Modal
         visible={!!addOrEdit}
         title={addOrEdit === 'add' ? '添加' : '修改'}
         okText="确认"
@@ -236,7 +228,8 @@ const EditForm = props => {
           handleAddForm();
         }}
         onCancel={() => {
-          form.setFieldsValue({ name: '' });
+          setSelectFormIndex(undefined);
+          form.setFieldsValue({ name: undefined, formType: undefined });
           setAddOrEdit(undefined);
         }}
       >
@@ -248,6 +241,18 @@ const EditForm = props => {
           >
             <Input placeholder="请输入表单名称" />
           </Form.Item>
+          {hiddenFormTyoe ? (
+            <Form.Item
+              label="表单类型"
+              name="formType"
+              rules={[{ required: true, message: '请选择表单类型!' }]}
+            >
+              <Select placeholder="请选择表单类型">
+                <Option value="item">正常表单</Option>
+                <Option value="group">组表单</Option>
+              </Select>
+            </Form.Item>
+          ) : null}
         </Form>
       </Modal>
     </Card>

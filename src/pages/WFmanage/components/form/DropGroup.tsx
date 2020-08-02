@@ -14,6 +14,7 @@ import {
   EditOutlined,
   ExclamationCircleOutlined,
   DeleteOutlined,
+  PlusOutlined,
 } from '@ant-design/icons';
 
 interface Iprops {
@@ -138,7 +139,7 @@ const DropGroup = (props: Iprops) => {
       style={{
         padding: '8px 14px',
         height: '100%',
-        border: '1px dashed #444',
+        border: '1px dashed #888',
         opacity: isDragging ? 0.2 : 1,
       }}
     >
@@ -156,6 +157,19 @@ const DropGroup = (props: Iprops) => {
           );
         })}
       </div>
+      <PlusOutlined
+        style={{
+          width: 'calc(100% - 20px)',
+          marginLeft: 10,
+          padding: '8px 14px',
+          fontSize: 30,
+          border: '1px dashed #444',
+          cursor: 'pointer',
+        }}
+        onClick={e => {
+          e.preventDefault();
+        }}
+      />
       <Modal
         visible={visible}
         title="修改"
@@ -287,12 +301,6 @@ const DropGroupItem = (props: IProps) => {
             marginBottom: 6,
             marginTop: 6,
           }}
-          rules={[
-            {
-              required: listItem.isRequired,
-              message: `${listItem.name}'必填!`,
-            },
-          ]}
           name={listItem.id}
         >
           <Temp
