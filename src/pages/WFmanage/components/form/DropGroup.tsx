@@ -16,6 +16,7 @@ import {
   DeleteOutlined,
   PlusOutlined,
 } from '@ant-design/icons';
+import Edit from './Edit';
 
 interface Iprops {
   groupItem: IGroupItem;
@@ -29,8 +30,9 @@ const DropGroup = (props: Iprops) => {
   const [form] = Form.useForm();
   const ref = useRef<HTMLDivElement>(null);
   const [list, setList] = useState<IItem[]>();
-  const [visible, setVisible] = useState<boolean>(false);
+  const [visibleType, setVisibleType] = useState<'add' | 'edit'>();
   const [selectIndex, setSelectIndex] = useState<number>(0);
+  const [selectItem, setSelectItem] = useState<IItem>();
 
   useEffect(() => {
     setList(groupItem.list);
@@ -97,22 +99,55 @@ const DropGroup = (props: Iprops) => {
     );
   };
 
-  const handleShowModal = (index: number) => {
-    setSelectIndex(index);
-    list && form.setFieldsValue({ name: list[index].name });
-    setVisible(true);
+  const handleShowModal = (index: number, type: 'add' | 'edit') => {
+    if (type === 'edit') {
+      setSelectIndex(index);
+      list && setSelectItem(list[index]);
+      let itemList = {};
+      list && setSelectItem(list[index]);
+      if (list && list[index]?.itemList) {
+        let list1 = list[index]?.itemList?.split('|');
+        list1?.map((item, i) => {
+          let key = i + 1;
+          itemList['value' + key] = item;
+        });
+      }
+      list &&
+        form.setFieldsValue({ ...list[index], itemList: { ...itemList } });
+    } else {
+      form.setFieldsValue({});
+    }
+    setVisibleType(type);
   };
 
-  const handleChangeName = () => {
+  const handleOk = () => {
     form.validateFields().then(async value => {
       let newList = JSON.parse(JSON.stringify(list));
-      let selectItem = list && list[selectIndex];
-      if (selectItem) {
-        selectItem.name = value.name;
-        newList[selectIndex] = selectItem;
-        setList(list);
-        setVisible(false);
+      let selectItem = newList && newList[selectIndex];
+      if (visibleType === 'edit') {
+        if (selectItem) {
+          if (value.itemList) {
+            let itemList: string[] = [];
+            for (let key in value.itemList) {
+              itemList.push(value.itemList[key]);
+            }
+            value.itemList = itemList.join('|');
+          }
+          newList[selectIndex] = value;
+          setVisibleType(undefined);
+        }
+      } else {
+        if (value.itemList) {
+          let itemList: string[] = [];
+          for (let key in value.itemList) {
+            itemList.push(value.itemList[key]);
+          }
+          value.itemList = itemList.join('|');
+        }
+        newList.push(value);
       }
+      setList(newList);
+      setVisibleType(undefined);
     });
   };
 
@@ -167,29 +202,24 @@ const DropGroup = (props: Iprops) => {
           cursor: 'pointer',
         }}
         onClick={e => {
+          handleShowModal(0, 'add');
           e.preventDefault();
         }}
       />
       <Modal
-        visible={visible}
+        visible={!!visibleType}
         title="修改"
         okText="确认"
         cancelText="取消"
         onOk={() => {
-          handleChangeName();
+          handleOk();
         }}
         onCancel={() => {
-          setVisible(false);
+          setVisibleType(undefined);
         }}
       >
         <Form form={form}>
-          <Form.Item
-            label="组名称"
-            name="name"
-            rules={[{ required: true, message: '请输入组名称!' }]}
-          >
-            <Input placeholder="请输入组名称" />
-          </Form.Item>
+          <Edit showSpan={true} selectItem={selectItem} />
         </Form>
       </Modal>
     </div>
@@ -201,7 +231,7 @@ interface IProps {
   type: string;
   index: number;
   moveIndex: (dragIndex: number, hoverIndex: number) => void;
-  showModal: (index: number) => void;
+  showModal: (index: number, type) => void;
   remove: (index: number) => void;
 }
 
@@ -290,7 +320,7 @@ const DropGroupItem = (props: IProps) => {
           }}
           onClick={e => {
             e.preventDefault();
-            showModal(index);
+            showModal(index, 'edit');
           }}
         />
       </div>

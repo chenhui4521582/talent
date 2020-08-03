@@ -25,6 +25,7 @@ export interface IGroupItem {
   list: IItem[];
   colspan: number;
   isRequired: boolean;
+  itemList?: string;
 }
 
 export interface IItem {

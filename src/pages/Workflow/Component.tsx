@@ -166,6 +166,26 @@ const SelectTemplate = props => {
   );
 };
 
+// 多选框
+const MultipleTemplate = props => {
+  const { list } = props;
+  let data = [];
+  if (Object.prototype.toString.call(list) === '[object String]') {
+    data = list.split('|');
+  }
+  return (
+    <Select {...props} placeholder="请选择" mode="multiple">
+      {data.map((item, index) => {
+        return (
+          <Option key={index} value={item + '-$-' + item}>
+            {item}
+          </Option>
+        );
+      })}
+    </Select>
+  );
+};
+
 // 业务线单选框
 const BusinessTemplate = props => {
   const { departmentList } = useDepartment(2);
@@ -298,22 +318,5 @@ const LevelTemplate = props => {
         );
       })}
     </Select>
-  );
-};
-
-// 多选框
-const MultipleTemplate = props => {
-  return (
-    <TreeSelect placeholder="Please select 我是多选框">
-      <TreeNode value="parent 1" title="parent 1">
-        <TreeNode value="parent 1-0" title="parent 1-0">
-          <TreeNode value="leaf1" title="my leaf" />
-          <TreeNode value="leaf2" title="your leaf" />
-        </TreeNode>
-        <TreeNode value="parent 1-1" title="parent 1-1">
-          <TreeNode value="sss" title={<b style={{ color: '#08c' }}>sss</b>} />
-        </TreeNode>
-      </TreeNode>
-    </TreeSelect>
   );
 };

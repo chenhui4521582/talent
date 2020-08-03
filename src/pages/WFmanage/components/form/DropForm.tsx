@@ -16,10 +16,10 @@ import {
   DeleteOutlined,
   PlusOutlined,
 } from '@ant-design/icons';
-import { GlobalResParams } from '@/types/ITypes';
-import { getControls, IForm, IGroupItem, IControls } from '../../services/form';
+import { IForm, IGroupItem, IItem } from '../../services/form';
 import DropGroup from './DropGroup';
 import DropItem from './DropItem';
+import Edit from './Edit';
 
 const { Option } = Select;
 interface Iprops {
@@ -32,11 +32,11 @@ interface Iprops {
 export default (props: Iprops) => {
   const { fromItem, changeName, index } = props;
   const [form] = Form.useForm();
-  const [controlList, setControlList] = useState<IControls[]>();
   const [formDetailList, setFormDetailList] = useState<IGroupItem[]>();
   const [visible, setVisible] = useState<'add' | 'edit'>();
   const [selectGroup, setSelectGroup] = useState<number>(0);
-
+  const [isChangeGroupName, setIsChangeGroupName] = useState<boolean>(false);
+  const [selectItem, setSelectItem] = useState<any>();
   const [, drop] = useDrop({
     accept: fromItem.id + 'form',
   });
@@ -73,24 +73,32 @@ export default (props: Iprops) => {
     });
   };
 
-  const handleChangeGroupName = () => {
+  const handleOk = () => {
     form.validateFields().then(async value => {
       console.log(value);
       let list = JSON.parse(JSON.stringify(formDetailList));
       if (visible === 'edit') {
         let selectFrom = list && list[selectGroup];
-        selectFrom.name = value.name;
+        if (value.itemList) {
+          let itemList: string[] = [];
+          for (let key in value.itemList) {
+            itemList.push(value.itemList[key]);
+          }
+          value.itemList = itemList.join('|');
+          // .replace(/,/ig,'|')
+        }
+        selectFrom = value;
         list[selectGroup] = selectFrom;
       } else {
         if (fromItem.formType === 'group') {
           list.push({
-            name: value.name,
+            name: value.groupName,
             id: list.length + 'add',
-            list: [],
+            list: [value],
           });
         } else {
           list.push({
-            name: value.name,
+            ...value,
             id: list.length + 'add',
           });
         }
@@ -103,9 +111,22 @@ export default (props: Iprops) => {
 
   const handleShowModal = (value: 'add' | 'edit', index?: number) => {
     if (index || index === 0) {
-      setSelectGroup(index);
+      let itemList = {};
+      formDetailList && setSelectItem(formDetailList[index]);
+      if (formDetailList && formDetailList[index]?.itemList) {
+        let list = formDetailList[index]?.itemList?.split('|');
+        list?.map((item, i) => {
+          let key = i + 1;
+          itemList['value' + key] = item;
+        });
+      }
+
       formDetailList &&
-        form.setFieldsValue({ name: formDetailList[index].name });
+        form.setFieldsValue({
+          ...formDetailList[index],
+          itemList: { ...itemList },
+        });
+      setSelectGroup(index);
     }
     setVisible(value);
   };
@@ -135,6 +156,7 @@ export default (props: Iprops) => {
                   }}
                   onClick={e => {
                     e.preventDefault();
+                    setIsChangeGroupName(true);
                     handleShowModal('edit', index);
                   }}
                 />
@@ -238,91 +260,30 @@ export default (props: Iprops) => {
         okText="确认"
         cancelText="取消"
         onOk={() => {
-          handleChangeGroupName();
+          handleOk();
         }}
         onCancel={() => {
           setVisible(undefined);
+          setTimeout(() => {
+            form.setFieldsValue({});
+            setIsChangeGroupName(false);
+          }, 300);
         }}
       >
         <Form form={form} layout="vertical">
-          {/* <Form.Item
-            label="组名称"
-            name="name"
-            rules={[{ required: true, message: '请输入组名称!' }]}
-          >
-            <Input placeholder="请输入组名称" />
-          </Form.Item> */}
-          <Edit />
+          {isChangeGroupName ? (
+            <Form.Item
+              label="组名称"
+              name="name"
+              rules={[{ required: true, message: '请输入名称!' }]}
+            >
+              <Input placeholder="请输入名称" />
+            </Form.Item>
+          ) : (
+            <Edit type={fromItem.formType} selectItem={selectItem} />
+          )}
         </Form>
       </Modal>
     </div>
-  );
-};
-
-const Edit = () => {
-  const [controlList, setControlList] = useState<IControls[]>();
-
-  useEffect(() => {
-    getC();
-  }, []);
-
-  async function getC() {
-    let json: GlobalResParams<IControls[]> = await getControls();
-    if (json.status === 200) {
-      setControlList(json.obj);
-    }
-  }
-
-  const renderControl = useMemo(() => {
-    return controlList?.map(item => {
-      return (
-        <Option key={item.id} value={item.type}>
-          {item.name}
-        </Option>
-      );
-    });
-  }, [controlList]);
-
-  return (
-    <>
-      <Form.Item
-        label="组名称"
-        name="groupName"
-        rules={[{ required: true, message: '请输入组名称!' }]}
-      >
-        <Input placeholder="请输入组名称" />
-      </Form.Item>
-      <Form.Item
-        label="控件名称"
-        name="name"
-        rules={[{ required: true, message: '请输入控件名称!' }]}
-      >
-        <Input placeholder="请输入控件名称" />
-      </Form.Item>
-      <Form.Item label="控件">
-        <Select placeholder="请选择控件类型">{renderControl}</Select>
-      </Form.Item>
-      <Form.Item
-        label="是否必填"
-        name="isRequired"
-        rules={[{ required: true, message: '请选择是否必填!' }]}
-      >
-        <Select placeholder="请选择是否必填">
-          <Option value={0}>否</Option>
-          <Option value={1}>是</Option>
-        </Select>
-      </Form.Item>
-
-      <Form.Item
-        label="列宽"
-        name="colspan"
-        rules={[{ required: true, message: '请选择列宽!' }]}
-      >
-        <Select placeholder="请选择列宽">
-          <Option value={1}>1</Option>
-          <Option value={2}>2</Option>
-        </Select>
-      </Form.Item>
-    </>
   );
 };
