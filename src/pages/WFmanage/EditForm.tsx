@@ -3,7 +3,15 @@ import { Card, Modal, Button, Input, Form, Select } from 'antd';
 import { useDrop, DndProvider } from 'react-dnd';
 import update from 'immutability-helper';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import { getFormDetail, IForm, ItemTypes } from './services/form';
+import {
+  saveCForm,
+  updateCForm,
+  getCForm,
+  deleteCForm,
+  getFormDetail,
+  IForm,
+  ItemTypes,
+} from './services/form';
 import { GlobalResParams } from '@/types/ITypes';
 import DropForm from './components/form/DropForm';
 import DropIcon from './components/form/DropIcon';
@@ -58,6 +66,11 @@ const EditForm = props => {
               data[k].list.push(groupItem);
               data[k].formType = 'group';
             }
+            // else{
+            //   groupItem.list = list;
+            //   data[k].list.push(groupItem);
+            //   data[k].formType = 'group';
+            // }
             if (
               data[k].arr.indexOf(formChildlist[k].controlList[g].id) === -1 &&
               data[k].groupColArr.indexOf(
@@ -78,6 +91,7 @@ const EditForm = props => {
       }
     }
     console.log(data);
+    console.log('json.obj');
     setFormDetail(data);
   };
 
@@ -103,8 +117,14 @@ const EditForm = props => {
       cancelText: '取消',
       onOk: async () => {
         let newList = JSON.parse(JSON.stringify(formDetail));
-        newList.splice(index, 1);
-        setFormDetail(newList);
+        let deleteJson = await deleteCForm(
+          props.match.params.id,
+          newList[index].id,
+        );
+        if (deleteJson.status === 200) {
+          newList.splice(index, 1);
+          setFormDetail(newList);
+        }
       },
     });
   };
@@ -123,12 +143,16 @@ const EditForm = props => {
     form.validateFields().then(async value => {
       let list = JSON.parse(JSON.stringify(formDetail));
       if (addOrEdit === 'add') {
-        list.push({
-          name: value.name,
-          columnNum: value.formType === 'group' ? 1 : 2,
-          formType: value.formType,
-          list: [],
-        });
+        let addJson = await saveCForm(
+          props.match.params.id,
+          value.name,
+          value.columnNum,
+        );
+        if (addJson.status === 200) {
+          let getJson = await getCForm(addJson.obj);
+          getJson.list = [];
+          (getJson.formType = value.formType), (list = getJson.list = []);
+        }
       } else {
         if (selectFormIndex || selectFormIndex === 0) {
           let selectFrom = list && list[selectFormIndex];
@@ -137,14 +161,23 @@ const EditForm = props => {
           selectFrom.formType = value.formType
             ? value.formType
             : selectFrom.formType;
+          selectFrom.columnNum = value.columnNum;
           if (selectFormIndex) {
-            list[selectFormIndex] = selectFrom;
+            let updataJson = await updateCForm(
+              props.match.params.id,
+              selectFrom.id,
+              value.name,
+              value.columnNum,
+            );
+            if (updataJson.status === 200) {
+              list[selectFormIndex] = selectFrom;
+            }
           }
         }
+        setFormDetail(list);
+        setAddOrEdit(undefined);
+        form.setFieldsValue({ name: undefined, formType: undefined });
       }
-      setFormDetail(list);
-      form.setFieldsValue({ name: undefined, formType: undefined });
-      setAddOrEdit(undefined);
     });
   };
 
@@ -152,6 +185,12 @@ const EditForm = props => {
     if ((index || index === 0) && formDetail) {
       let selectFrom = formDetail[index];
       if (selectFrom?.list.length) {
+        form.setFieldsValue({
+          name: formDetail[index].name,
+          formType: formDetail[index].formType,
+          columnNum: formDetail[index].columnNum,
+        });
+
         setHiddenFormType(false);
       } else {
         setHiddenFormType(true);
@@ -162,15 +201,23 @@ const EditForm = props => {
     setAddOrEdit(value);
   };
 
+  const handleChangeForm = value => {
+    console.log('value');
+    console.log(value);
+    setFormDetail([...value]);
+  };
+
   const fromContent = useMemo(() => {
     if (formDetail?.length) {
       return formDetail?.map((fromItem, index) => {
         return (
           <DropForm
+            allData={formDetail}
             fromItem={fromItem}
             index={index}
             moveIndex={handleMoveIndex}
             changeName={handleEditForm}
+            changeData={handleChangeForm}
           />
         );
       });
@@ -240,6 +287,13 @@ const EditForm = props => {
             rules={[{ required: true, message: '请输入表单名称!' }]}
           >
             <Input placeholder="请输入表单名称" />
+          </Form.Item>
+          <Form.Item
+            label="列数"
+            name="columnNum"
+            rules={[{ required: true, message: '请填写表单列数!' }]}
+          >
+            <Input placeholder="请填写表单列数" />
           </Form.Item>
           {hiddenFormTyoe ? (
             <Form.Item

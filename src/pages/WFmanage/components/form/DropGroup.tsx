@@ -7,7 +7,7 @@ import {
   useDrop,
 } from 'react-dnd';
 import { XYCoord } from 'dnd-core';
-import { IGroupItem, IItem } from '../../services/form';
+import { IGroupItem, IItem, IForm } from '../../services/form';
 import Temp from '@/pages/Workflow/Component';
 import update from 'immutability-helper';
 import {
@@ -23,20 +23,26 @@ interface Iprops {
   type: string;
   index: number;
   moveIndex: (dragIndex: number, hoverIndex: number) => void;
+  changeData: (value: any) => void;
+  allData: IForm[];
+  formIndex: number;
 }
 
 const DropGroup = (props: Iprops) => {
-  const { groupItem, type, moveIndex, index } = props;
+  const {
+    groupItem,
+    type,
+    moveIndex,
+    index,
+    changeData,
+    allData,
+    formIndex,
+  } = props;
   const [form] = Form.useForm();
   const ref = useRef<HTMLDivElement>(null);
-  const [list, setList] = useState<IItem[]>();
   const [visibleType, setVisibleType] = useState<'add' | 'edit'>();
   const [selectIndex, setSelectIndex] = useState<number>(0);
   const [selectItem, setSelectItem] = useState<IItem>();
-
-  useEffect(() => {
-    setList(groupItem.list);
-  }, [groupItem.list]);
 
   const [{ isDragging }, drag] = useDrag({
     collect: (monitor: DragSourceMonitor) => ({
@@ -45,6 +51,7 @@ const DropGroup = (props: Iprops) => {
 
     item: { type: type, index },
   });
+  console.log(type);
 
   const [, drop] = useDrop({
     accept: type,
@@ -54,7 +61,6 @@ const DropGroup = (props: Iprops) => {
       }
       const dragIndex = item.index;
       const hoverIndex = index;
-
       if (dragIndex === hoverIndex) {
         return;
       }
@@ -87,33 +93,38 @@ const DropGroup = (props: Iprops) => {
   });
 
   const move = (dragIndex: number, hoverIndex: number) => {
-    const dragCard = list && list[dragIndex];
-    let newData = JSON.parse(JSON.stringify(list));
-    setList(
-      update(newData, {
-        $splice: [
-          [dragIndex, 1],
-          [hoverIndex, 0, dragCard],
-        ],
-      }),
-    );
+    const dragCard = groupItem.list && groupItem.list[dragIndex];
+    let newData = JSON.parse(JSON.stringify(groupItem.list));
+    let jsonAll = JSON.parse(JSON.stringify(allData));
+    console.log(groupItem.list);
+    console.log(jsonAll[formIndex].list[index].list[dragIndex]);
+    jsonAll[formIndex].list[index].list = update(newData, {
+      $splice: [
+        [dragIndex, 1],
+        [hoverIndex, 0, dragCard],
+      ],
+    });
+    changeData(jsonAll);
   };
 
   const handleShowModal = (index: number, type: 'add' | 'edit') => {
     if (type === 'edit') {
       setSelectIndex(index);
-      list && setSelectItem(list[index]);
+      groupItem.list && setSelectItem(groupItem.list[index]);
       let itemList = {};
-      list && setSelectItem(list[index]);
-      if (list && list[index]?.itemList) {
-        let list1 = list[index]?.itemList?.split('|');
+      groupItem.list && setSelectItem(groupItem.list[index]);
+      if (groupItem.list && groupItem.list[index]?.itemList) {
+        let list1 = groupItem.list[index]?.itemList?.split('|');
         list1?.map((item, i) => {
           let key = i + 1;
           itemList['value' + key] = item;
         });
       }
-      list &&
-        form.setFieldsValue({ ...list[index], itemList: { ...itemList } });
+      groupItem.list &&
+        form.setFieldsValue({
+          ...groupItem.list[index],
+          itemList: { ...itemList },
+        });
     } else {
       form.setFieldsValue({});
     }
@@ -122,7 +133,8 @@ const DropGroup = (props: Iprops) => {
 
   const handleOk = () => {
     form.validateFields().then(async value => {
-      let newList = JSON.parse(JSON.stringify(list));
+      let newList = JSON.parse(JSON.stringify(groupItem.list));
+      let jsonAll = JSON.parse(JSON.stringify(allData));
       let selectItem = newList && newList[selectIndex];
       if (visibleType === 'edit') {
         if (selectItem) {
@@ -146,12 +158,16 @@ const DropGroup = (props: Iprops) => {
         }
         newList.push(value);
       }
-      setList(newList);
+      jsonAll[formIndex].list[index].list = newList;
       setVisibleType(undefined);
     });
   };
 
-  const handleRemove = (index: number) => {
+  const handleChange = value => {
+    changeData(value);
+  };
+
+  const handleRemove = (i: number) => {
     Modal.confirm({
       title: '确定删除?',
       okText: '确定',
@@ -159,9 +175,11 @@ const DropGroup = (props: Iprops) => {
       okType: 'danger' as any,
       cancelText: '取消',
       onOk: async () => {
-        let newList = JSON.parse(JSON.stringify(list));
-        newList.splice(index, 1);
-        setList(newList);
+        let jsonAll = JSON.parse(JSON.stringify(allData));
+        let newList = JSON.parse(JSON.stringify(groupItem.list));
+        newList.splice(i, 1);
+        jsonAll[formIndex].list[index].list[i] = newList;
+        changeData(jsonAll);
       },
     });
   };
@@ -179,15 +197,18 @@ const DropGroup = (props: Iprops) => {
       }}
     >
       <div ref={gropDrop}>
-        {list?.map((listItem, index) => {
+        {groupItem.list?.map((listItem, i) => {
           return (
             <DropGroupItem
-              index={index}
+              index={i}
               listItem={listItem}
               type={groupItem.id + 'group'}
               moveIndex={move}
               showModal={handleShowModal}
               remove={handleRemove}
+              allData={allData}
+              formIndex={formIndex}
+              changeData={handleChange}
             />
           );
         })}
@@ -233,6 +254,9 @@ interface IProps {
   moveIndex: (dragIndex: number, hoverIndex: number) => void;
   showModal: (index: number, type) => void;
   remove: (index: number) => void;
+  allData: IForm[];
+  formIndex: number;
+  changeData: (value: any) => void;
 }
 
 const DropGroupItem = (props: IProps) => {
@@ -245,6 +269,9 @@ const DropGroupItem = (props: IProps) => {
 
     item: { type: type, index },
   });
+
+  console.log('type1');
+  console.log(type);
 
   const [, drop] = useDrop({
     accept: type,

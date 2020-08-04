@@ -40,7 +40,7 @@ function Organization(props: tsProps, formRef) {
   }, [organizationJson]);
 
   useEffect(() => {
-    change(checkedKeys);
+    change && change(checkedKeys);
   }, [checkedKeys]);
 
   async function getJson() {
@@ -190,7 +190,7 @@ function Organization(props: tsProps, formRef) {
     } = e;
     let expandedKey = keyTitleList
       .map(item => {
-        if (item.title.indexOf(value) > -1) {
+        if (item.title && item.title.indexOf(value) > -1) {
           return getParentKey(item.key, dataList);
         }
         return null;
@@ -226,10 +226,16 @@ function Organization(props: tsProps, formRef) {
     const handleItem = list => {
       for (let i = 0; i < list.length; i++) {
         list[i].key = list[i].code;
-        if (searchValue.length && list[i].name.indexOf(searchValue) > -1) {
-          const index = list[i].title.indexOf(searchValue);
-          const beforeStr = list[i].title.substr(0, index);
-          const afterStr = list[i].title.substr(index + searchValue.length);
+        console.log(list[i]);
+        if (
+          searchValue.length &&
+          list[i].name &&
+          list[i].name.indexOf(searchValue) > -1
+        ) {
+          const index = list[i].title && list[i].title.indexOf(searchValue);
+          const beforeStr = list[i].title && list[i].title.substr(0, index);
+          const afterStr =
+            list[i].title && list[i].title.substr(index + searchValue.length);
           list[i].title = (
             <div>
               {' '}

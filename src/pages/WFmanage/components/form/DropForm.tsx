@@ -7,6 +7,7 @@ import {
   Form,
   Input,
   Select,
+  notification,
 } from 'antd';
 import { useDrop } from 'react-dnd';
 import update from 'immutability-helper';
@@ -16,23 +17,29 @@ import {
   DeleteOutlined,
   PlusOutlined,
 } from '@ant-design/icons';
-import { IForm, IGroupItem, IItem } from '../../services/form';
+import {
+  IForm,
+  IGroupItem,
+  deleteGroup,
+  saveGroup,
+  updateGroup,
+} from '../../services/form';
 import DropGroup from './DropGroup';
 import DropItem from './DropItem';
 import Edit from './Edit';
 
-const { Option } = Select;
 interface Iprops {
   fromItem: IForm;
   index: number;
   moveIndex: (dragIndex: number, hoverIndex: number) => void;
   changeName: (index: number) => void;
+  changeData: (value: any) => void;
+  allData: IForm[];
 }
 
 export default (props: Iprops) => {
-  const { fromItem, changeName, index } = props;
+  const { fromItem, changeName, index, changeData, allData } = props;
   const [form] = Form.useForm();
-  const [formDetailList, setFormDetailList] = useState<IGroupItem[]>();
   const [visible, setVisible] = useState<'add' | 'edit'>();
   const [selectGroup, setSelectGroup] = useState<number>(0);
   const [isChangeGroupName, setIsChangeGroupName] = useState<boolean>(false);
@@ -41,21 +48,19 @@ export default (props: Iprops) => {
     accept: fromItem.id + 'form',
   });
 
-  useEffect(() => {
-    setFormDetailList(fromItem.list);
-  }, [fromItem]);
-
   const handleMoveIndex = (dragIndex: number, hoverIndex: number) => {
-    const dragCard = formDetailList && formDetailList[dragIndex];
-    let newData = JSON.parse(JSON.stringify(formDetailList));
-    setFormDetailList(
-      update(newData, {
-        $splice: [
-          [dragIndex, 1],
-          [hoverIndex, 0, dragCard],
-        ],
-      }),
-    );
+    const dragCard = fromItem.list && fromItem.list[dragIndex];
+    let jsonAll = JSON.parse(JSON.stringify(allData));
+    let newData = JSON.parse(JSON.stringify(fromItem.list));
+    console.log('list1');
+    jsonAll[index].list = update(newData, {
+      $splice: [
+        [dragIndex, 1],
+        [hoverIndex, 0, dragCard],
+      ],
+    });
+    console.log(jsonAll[index].list);
+    changeData(jsonAll);
   };
 
   const handleRemove = (index: number) => {
@@ -66,36 +71,61 @@ export default (props: Iprops) => {
       okType: 'danger' as any,
       cancelText: '取消',
       onOk: async () => {
-        let newList = JSON.parse(JSON.stringify(formDetailList));
-        newList.splice(index, 1);
-        setFormDetailList(newList);
+        let jsonAll = JSON.parse(JSON.stringify(allData));
+        let newList = JSON.parse(JSON.stringify(fromItem.list));
+        if (fromItem.formType === 'group') {
+          let json = await deleteGroup(fromItem.resFormId, newList[index].id);
+          if (json.status === 200) {
+            newList.splice(index, 1);
+            jsonAll[index].list = newList;
+            changeData(jsonAll);
+          }
+        } else {
+          newList.splice(index, 1);
+          jsonAll[index].list = newList;
+          changeData(jsonAll);
+        }
       },
     });
   };
 
   const handleOk = () => {
     form.validateFields().then(async value => {
-      console.log(value);
-      let list = JSON.parse(JSON.stringify(formDetailList));
+      let list = JSON.parse(JSON.stringify(fromItem.list));
+      let jsonAll = JSON.parse(JSON.stringify(allData));
       if (visible === 'edit') {
         let selectFrom = list && list[selectGroup];
-        if (value.itemList) {
-          let itemList: string[] = [];
-          for (let key in value.itemList) {
-            itemList.push(value.itemList[key]);
+        if (fromItem.formType === 'item') {
+          if (value.itemList) {
+            let itemList: string[] = [];
+            for (let key in value.itemList) {
+              itemList.push(value.itemList[key]);
+            }
+            value.itemList = itemList.join('|');
           }
-          value.itemList = itemList.join('|');
-          // .replace(/,/ig,'|')
+          selectFrom = value;
+          list[selectGroup] = selectFrom;
+        } else {
+          let json = await updateGroup(
+            fromItem.resFormId,
+            selectFrom.id,
+            value.name,
+          );
+          if (json.status === 200) {
+            selectFrom.name = value.name;
+            list[selectGroup] = selectFrom;
+          }
         }
-        selectFrom = value;
-        list[selectGroup] = selectFrom;
       } else {
         if (fromItem.formType === 'group') {
-          list.push({
-            name: value.groupName,
-            id: list.length + 'add',
-            list: [value],
-          });
+          let res = await saveGroup(fromItem.resFormId, value.name);
+          if (res.status === 200) {
+            list.push({
+              name: value.name,
+              id: res.obj,
+              list: [],
+            });
+          }
         } else {
           list.push({
             ...value,
@@ -104,7 +134,8 @@ export default (props: Iprops) => {
         }
       }
 
-      setFormDetailList(list);
+      jsonAll[index].list = list;
+      changeData(jsonAll);
       setVisible(undefined);
     });
   };
@@ -112,18 +143,18 @@ export default (props: Iprops) => {
   const handleShowModal = (value: 'add' | 'edit', index?: number) => {
     if (index || index === 0) {
       let itemList = {};
-      formDetailList && setSelectItem(formDetailList[index]);
-      if (formDetailList && formDetailList[index]?.itemList) {
-        let list = formDetailList[index]?.itemList?.split('|');
+      fromItem.list && setSelectItem(fromItem.list[index]);
+      if (fromItem.list && fromItem.list[index]?.itemList) {
+        let list = fromItem.list[index]?.itemList?.split('|');
         list?.map((item, i) => {
           let key = i + 1;
           itemList['value' + key] = item;
         });
       }
 
-      formDetailList &&
+      fromItem.list &&
         form.setFieldsValue({
-          ...formDetailList[index],
+          ...fromItem.list[index],
           itemList: { ...itemList },
         });
       setSelectGroup(index);
@@ -131,9 +162,13 @@ export default (props: Iprops) => {
     setVisible(value);
   };
 
+  const handleChange = value => {
+    changeData(value);
+  };
+
   const renderForm = () => {
-    return formDetailList?.map((groupItem, index) => {
-      if (groupItem.list) {
+    return fromItem.list?.map((groupItem, i) => {
+      if (groupItem && groupItem.list) {
         return (
           <Descriptions.Item
             label={
@@ -146,7 +181,7 @@ export default (props: Iprops) => {
                   }}
                   onClick={e => {
                     e.preventDefault();
-                    handleRemove(index);
+                    handleRemove(i);
                   }}
                 />
                 <EditOutlined
@@ -157,7 +192,7 @@ export default (props: Iprops) => {
                   onClick={e => {
                     e.preventDefault();
                     setIsChangeGroupName(true);
-                    handleShowModal('edit', index);
+                    handleShowModal('edit', i);
                   }}
                 />
               </span>
@@ -167,49 +202,54 @@ export default (props: Iprops) => {
             <DropGroup
               groupItem={groupItem}
               type={fromItem.id + 'form'}
-              index={index}
+              index={i}
               moveIndex={handleMoveIndex}
+              changeData={handleChange}
+              allData={allData}
+              formIndex={index}
             />
           </Descriptions.Item>
         );
       } else {
-        return (
-          <Descriptions.Item
-            label={
-              <span className={groupItem.isRequired ? 'label-required' : ''}>
-                <span>{groupItem.name}</span>
-                <DeleteOutlined
-                  style={{
-                    cursor: 'pointer',
-                    marginLeft: 5,
-                  }}
-                  onClick={e => {
-                    e.preventDefault();
-                    handleRemove(index);
-                  }}
-                />
-                <EditOutlined
-                  style={{
-                    cursor: 'pointer',
-                    marginLeft: 5,
-                  }}
-                  onClick={e => {
-                    e.preventDefault();
-                    handleShowModal('edit', index);
-                  }}
-                />
-              </span>
-            }
-            span={groupItem.colspan}
-          >
-            <DropItem
-              groupItem={groupItem}
-              type={fromItem.id + 'form'}
-              index={index}
-              moveIndex={handleMoveIndex}
-            />
-          </Descriptions.Item>
-        );
+        if (groupItem) {
+          return (
+            <Descriptions.Item
+              label={
+                <span className={groupItem.isRequired ? 'label-required' : ''}>
+                  <span>{groupItem.name}</span>
+                  <DeleteOutlined
+                    style={{
+                      cursor: 'pointer',
+                      marginLeft: 5,
+                    }}
+                    onClick={e => {
+                      e.preventDefault();
+                      handleRemove(i);
+                    }}
+                  />
+                  <EditOutlined
+                    style={{
+                      cursor: 'pointer',
+                      marginLeft: 5,
+                    }}
+                    onClick={e => {
+                      e.preventDefault();
+                      handleShowModal('edit', i);
+                    }}
+                  />
+                </span>
+              }
+              span={groupItem.colspan}
+            >
+              <DropItem
+                groupItem={groupItem}
+                type={fromItem.id + 'form'}
+                index={i}
+                moveIndex={handleMoveIndex}
+              />
+            </Descriptions.Item>
+          );
+        }
       }
     });
   };
@@ -250,6 +290,11 @@ export default (props: Iprops) => {
             onClick={e => {
               e.preventDefault();
               handleShowModal('add');
+              if (fromItem.formType === 'group') {
+                setIsChangeGroupName(true);
+              } else {
+                setIsChangeGroupName(false);
+              }
             }}
           />
         </Descriptions.Item>

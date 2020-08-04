@@ -1,12 +1,5 @@
 import React from 'react';
-import {
-  Input,
-  Select,
-  InputNumber,
-  DatePicker,
-  Upload,
-  TreeSelect,
-} from 'antd';
+import { Input, Select, InputNumber, DatePicker, Upload } from 'antd';
 
 import {
   useRank,
@@ -20,7 +13,6 @@ import OzTreeSlect from '@/pages/Framework/components/OzTreeSlect';
 
 const { Option } = Select;
 const { TextArea } = Input;
-const { TreeNode } = TreeSelect;
 
 export default props => {
   const { s_type, ismultiplechoice } = props;
@@ -98,6 +90,12 @@ export default props => {
     //department 部门 走组织架构
     case 'department':
       return <OzTreeSlect onlySelect={ismultiplechoice === 0} {...props} />;
+    //department 部门 走组织架构
+    case 'depGroup':
+      return <OzTreeSlect onlySelect={ismultiplechoice === 0} {...props} />;
+    //当前部门组
+    case 'currDepGroup':
+      return <Input {...props} placeholder="当前部门组" disabled={true} />;
     //业务线 business
     case 'business':
       return <BusinessTemplate {...props} placeholder="请选择" />;
@@ -121,7 +119,10 @@ export default props => {
       return <Input {...props} placeholder="当前日期" />;
     //currDatetime 当前日期+时间
     case 'currDatetime':
-      return <Input {...props} placeholder="当前日期+时间" />;
+      return <Input {...props} disabled={true} />;
+    //当前用户工号
+    case 'currJobNumber':
+      return <Input {...props} disabled={true} />;
     //position 职位
     case 'position':
       return <PositionTemplate {...props} placeholder="请选择" />;
@@ -154,7 +155,7 @@ const SelectTemplate = props => {
     data = list.split('|');
   }
   return (
-    <Select {...props} placeholder="请选择">
+    <Select {...props} placeholder="请选择" style={{ width: '100%' }}>
       {data.map((item, index) => {
         return (
           <Option key={index} value={item + '-$-' + item}>
@@ -177,7 +178,11 @@ const MultipleTemplate = props => {
     <Select {...props} placeholder="请选择" mode="multiple">
       {data.map((item, index) => {
         return (
-          <Option key={index} value={item + '-$-' + item}>
+          <Option
+            key={index}
+            value={item + '-$-' + item}
+            style={{ width: '100%' }}
+          >
             {item}
           </Option>
         );
