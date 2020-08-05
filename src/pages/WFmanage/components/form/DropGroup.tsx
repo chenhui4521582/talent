@@ -132,7 +132,13 @@ const DropGroup = (props: Iprops) => {
 
   const handleOk = () => {
     form.validateFields().then(async value => {
-      let newList = JSON.parse(JSON.stringify(groupItem.list));
+      console.log(groupItem?.list);
+      let newdata = JSON.parse(JSON.stringify(groupItem));
+      if (newdata?.list) {
+      } else {
+        newdata.list = [];
+      }
+      let newList = JSON.parse(JSON.stringify(newdata?.list));
       let jsonAll = JSON.parse(JSON.stringify(allData));
       let selectItem = newList && newList[selectIndex];
       if (visibleType === 'edit') {
@@ -177,8 +183,13 @@ const DropGroup = (props: Iprops) => {
       onOk: async () => {
         let jsonAll = JSON.parse(JSON.stringify(allData));
         let newList = JSON.parse(JSON.stringify(groupItem.list));
-        newList.splice(i, 1);
-        jsonAll[formIndex].list[index].list[i] = newList;
+        // console.log('newList')
+        // console.log(groupItem.list)
+        groupItem.list.splice(i, 1);
+        // console.log('newList2')
+        // console.log(jsonAll)
+        jsonAll[formIndex].list[index].list = groupItem.list;
+
         changeData(jsonAll);
       },
     });
@@ -197,21 +208,23 @@ const DropGroup = (props: Iprops) => {
       }}
     >
       <div ref={gropDrop}>
-        {groupItem.list?.map((listItem, i) => {
-          return (
-            <DropGroupItem
-              index={i}
-              listItem={listItem}
-              type={groupItem.id + 'group'}
-              moveIndex={move}
-              showModal={handleShowModal}
-              remove={handleRemove}
-              allData={allData}
-              formIndex={formIndex}
-              changeData={handleChange}
-            />
-          );
-        })}
+        {groupItem.list && groupItem.list.length
+          ? groupItem.list?.map((listItem, i) => {
+              return (
+                <DropGroupItem
+                  index={i}
+                  listItem={listItem}
+                  type={groupItem.id + 'group'}
+                  moveIndex={move}
+                  showModal={handleShowModal}
+                  remove={handleRemove}
+                  allData={allData}
+                  formIndex={formIndex}
+                  changeData={handleChange}
+                />
+              );
+            })
+          : null}
       </div>
       <PlusOutlined
         style={{

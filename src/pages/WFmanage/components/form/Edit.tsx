@@ -165,20 +165,20 @@ const Edit = (props: Iprops) => {
         </Select>
       </Form.Item>
 
-      {!showSpan ? (
-        type !== 2 ? (
-          <Form.Item
-            label="列宽"
-            name="colspan"
-            rules={[{ required: true, message: '请选择列宽!' }]}
-          >
-            <Select placeholder="请选择列宽">
-              <Option value={1}>1</Option>
-              <Option value={2}>2</Option>
-            </Select>
-          </Form.Item>
-        ) : null
-      ) : null}
+      {/* {!showSpan ? (
+        type !== 2 ? ( */}
+      <Form.Item
+        label="列宽"
+        name="colspan"
+        rules={[{ required: true, message: '请选择列宽!' }]}
+      >
+        <Select placeholder="请选择列宽">
+          <Option value={1}>1</Option>
+          <Option value={2}>2</Option>
+        </Select>
+      </Form.Item>
+      {/* ) : null
+      ) : null} */}
     </>
   );
 };

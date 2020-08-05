@@ -62,7 +62,7 @@ export default (props: Iprops) => {
     changeData(jsonAll);
   };
 
-  const handleRemove = (index: number) => {
+  const handleRemove = (i: number) => {
     Modal.confirm({
       title: '确定删除?',
       okText: '确定',
@@ -73,14 +73,18 @@ export default (props: Iprops) => {
         let jsonAll = JSON.parse(JSON.stringify(allData));
         let newList = JSON.parse(JSON.stringify(fromItem.list));
         if (fromItem.type === 2) {
-          let json = await deleteGroup(fromItem.resFormId, newList[index].id);
+          let json = await deleteGroup(fromItem.resFormId, newList[i].id);
           if (json.status === 200) {
-            newList.splice(index, 1);
+            console.log('jsonAll');
+            console.log(newList);
+            newList.splice(i, 1);
+            console.log('jsonAll');
+            console.log(newList);
             jsonAll[index].list = newList;
             changeData(jsonAll);
           }
         } else {
-          newList.splice(index, 1);
+          newList.splice(i, 1);
           jsonAll[index].list = newList;
           changeData(jsonAll);
         }

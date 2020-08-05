@@ -174,7 +174,7 @@ const EditForm = props => {
               selectFrom.id,
               value.name,
               value.columnNum,
-              selectFrom.type,
+              value.type || selectFrom.type,
             );
             if (updataJson.status === 200) {
               list[selectFormIndex] = selectFrom;
@@ -276,12 +276,12 @@ const EditForm = props => {
 
   const fromContent = useMemo(() => {
     if (formDetail?.length) {
-      return formDetail?.map((fromItem, index) => {
+      return formDetail?.map((fromItem, i) => {
         return (
           <DropForm
             allData={formDetail}
             fromItem={fromItem}
-            index={index}
+            index={i}
             moveIndex={handleMoveIndex}
             changeName={handleEditForm}
             changeData={handleChangeForm}
