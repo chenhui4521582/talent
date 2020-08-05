@@ -474,7 +474,7 @@ export default (props: tsProps) => {
       </div>
       <Modal
         key={visible + ''}
-        width="46vw"
+        width="56vw"
         title="设置"
         visible={visible}
         okText="确认"

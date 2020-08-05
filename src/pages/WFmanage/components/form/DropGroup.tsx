@@ -51,7 +51,6 @@ const DropGroup = (props: Iprops) => {
 
     item: { type: type, index },
   });
-  console.log(type);
 
   const [, drop] = useDrop({
     accept: type,
@@ -159,6 +158,7 @@ const DropGroup = (props: Iprops) => {
         newList.push(value);
       }
       jsonAll[formIndex].list[index].list = newList;
+      changeData(jsonAll);
       setVisibleType(undefined);
     });
   };
@@ -269,9 +269,6 @@ const DropGroupItem = (props: IProps) => {
 
     item: { type: type, index },
   });
-
-  console.log('type1');
-  console.log(type);
 
   const [, drop] = useDrop({
     accept: type,

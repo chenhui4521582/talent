@@ -6,7 +6,7 @@ import { getControls, IItem, IControls } from '../../services/form';
 const { Option } = Select;
 
 interface Iprops {
-  type?: string;
+  type?: 0 | 1 | 2;
   showSpan?: boolean;
   selectItem?: any;
 }
@@ -113,7 +113,7 @@ const Edit = (props: Iprops) => {
 
   return (
     <>
-      {type === 'group' ? (
+      {type === 2 ? (
         <Form.Item
           label="组名称"
           name="groupName"
@@ -149,7 +149,7 @@ const Edit = (props: Iprops) => {
       </Form.Item>
 
       {showInput ? (
-        <Form.Item label="控件值" name="ItemList">
+        <Form.Item label="控件值" name="itemList">
           <Input.Group compact>{renderInput()}</Input.Group>
         </Form.Item>
       ) : null}
@@ -166,7 +166,7 @@ const Edit = (props: Iprops) => {
       </Form.Item>
 
       {!showSpan ? (
-        type !== 'group' ? (
+        type !== 2 ? (
           <Form.Item
             label="列宽"
             name="colspan"

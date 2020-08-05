@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Card, Modal, Button, Input, Form, Select } from 'antd';
+import { Card, Modal, Button, Input, Form, Select, notification } from 'antd';
 import { useDrop, DndProvider } from 'react-dnd';
 import update from 'immutability-helper';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import {
   saveCForm,
   updateCForm,
+  updateForm,
   getCForm,
   deleteCForm,
   getFormDetail,
@@ -64,7 +65,6 @@ const EditForm = props => {
               list.push(controlList[g]);
               groupItem.list = list;
               data[k].list.push(groupItem);
-              data[k].formType = 'group';
             }
             // else{
             //   groupItem.list = list;
@@ -80,18 +80,14 @@ const EditForm = props => {
             ) {
               data[k].arr.push(formChildlist[k].controlList[g].id);
               data[k].list.push(controlList[g]);
-              data[k].formType = 'item';
             }
           }
           data[k].list = [...new Set(data[k].list)];
         }
       } else {
-        data[k].formType = 'item';
         data[k].list = controlList;
       }
     }
-    console.log(data);
-    console.log('json.obj');
     setFormDetail(data);
   };
 
@@ -134,7 +130,7 @@ const EditForm = props => {
 
     form.setFieldsValue({
       name: formDetail[index].name,
-      formType: formDetail[index].formType,
+      type: formDetail[index].type,
     });
     handleShowForm('edit', index);
   };
@@ -147,20 +143,30 @@ const EditForm = props => {
           props.match.params.id,
           value.name,
           value.columnNum,
+          value.type,
         );
         if (addJson.status === 200) {
           let getJson = await getCForm(addJson.obj);
-          getJson.list = [];
-          (getJson.formType = value.formType), (list = getJson.list = []);
+          if (getJson.status === 200) {
+            let obj = getJson.obj;
+            obj.list = [];
+            obj.type = value.type;
+            list.push(obj);
+            console.log(list);
+            setFormDetail(list);
+            setAddOrEdit(undefined);
+            form.setFieldsValue({
+              name: undefined,
+              type: undefined,
+              columnNum: undefined,
+            });
+          }
         }
       } else {
         if (selectFormIndex || selectFormIndex === 0) {
           let selectFrom = list && list[selectFormIndex];
           selectFrom.name = value.name;
-          selectFrom.columnNum = value.formType === 'group' ? 1 : 2;
-          selectFrom.formType = value.formType
-            ? value.formType
-            : selectFrom.formType;
+          selectFrom.columnNum = value.type;
           selectFrom.columnNum = value.columnNum;
           if (selectFormIndex) {
             let updataJson = await updateCForm(
@@ -168,6 +174,7 @@ const EditForm = props => {
               selectFrom.id,
               value.name,
               value.columnNum,
+              selectFrom.type,
             );
             if (updataJson.status === 200) {
               list[selectFormIndex] = selectFrom;
@@ -176,7 +183,7 @@ const EditForm = props => {
         }
         setFormDetail(list);
         setAddOrEdit(undefined);
-        form.setFieldsValue({ name: undefined, formType: undefined });
+        form.setFieldsValue({ name: undefined, type: undefined });
       }
     });
   };
@@ -184,13 +191,12 @@ const EditForm = props => {
   const handleShowForm = (value: 'edit' | 'add', index?: number) => {
     if ((index || index === 0) && formDetail) {
       let selectFrom = formDetail[index];
+      form.setFieldsValue({
+        name: formDetail[index].name,
+        type: formDetail[index].type,
+        columnNum: formDetail[index].columnNum,
+      });
       if (selectFrom?.list.length) {
-        form.setFieldsValue({
-          name: formDetail[index].name,
-          formType: formDetail[index].formType,
-          columnNum: formDetail[index].columnNum,
-        });
-
         setHiddenFormType(false);
       } else {
         setHiddenFormType(true);
@@ -202,9 +208,70 @@ const EditForm = props => {
   };
 
   const handleChangeForm = value => {
-    console.log('value');
-    console.log(value);
     setFormDetail([...value]);
+  };
+
+  const handleSave = async () => {
+    let cList: any = [];
+    let sort = 0;
+    formDetail.map((formItem, formIndex) => {
+      let groupList = formItem.list;
+      groupList?.map((groupItem, groupIndex) => {
+        let cItem = groupItem;
+        if (cItem && cItem?.list) {
+          cItem?.list.map((item, cIndex) => {
+            let newItem: any = {};
+            sort += 1;
+            item.id ? (newItem.id = item.id) : null;
+            item.itemList ? (newItem.itemList = item.itemList) : null;
+            item.isRequired = newItem.isRequired;
+            newItem.baseControlType = item.baseControlType;
+            newItem.name = item.name;
+            newItem.resFormChildId = formItem.id;
+            newItem.resFormId = formItem.resFormId;
+            newItem.isGroup = 1;
+            newItem.groupIndex = 1;
+            newItem.resGroupId = groupItem.id;
+            newItem.colspan = item.colspan;
+            newItem.sort = sort;
+            cList.push(newItem);
+          });
+        } else {
+          sort += 1;
+          let newC: any = cItem;
+          let newItem: any = {};
+          newC.id ? (newItem.id = newC.id) : null;
+          newItem.baseControlType = newC.baseControlType;
+          newC.itemList ? (newItem.itemList = newC.itemList) : null;
+          newItem.isRequired = newC.isRequired;
+          newItem.name = newC.name;
+          newItem.resFormChildId = formItem.id;
+          newItem.resFormId = formItem.resFormId;
+          newItem.colspan = newC.colspan;
+          newItem.groupIndex = 1;
+          newItem.isGroup = 0;
+          newItem.sort = sort;
+          cList.push(newItem);
+        }
+      });
+    });
+    console.log([...new Set(cList)]);
+    let json = await updateForm({
+      resFormId: props.match.params.id,
+      resFormControlCrudParamList: [...new Set(cList)],
+    });
+    if (json.status === 200) {
+      getForm();
+      notification['success']({
+        message: json.msg,
+        description: '',
+      });
+    } else {
+      notification['error']({
+        message: json.msg,
+        description: '',
+      });
+    }
   };
 
   const fromContent = useMemo(() => {
@@ -239,7 +306,13 @@ const EditForm = props => {
           >
             添加表单
           </Button>
-          <Button type="primary" style={{ marginLeft: 8 }}>
+          <Button
+            type="primary"
+            style={{ marginLeft: 8 }}
+            onClick={() => {
+              handleSave();
+            }}
+          >
             保存
           </Button>
         </>
@@ -276,7 +349,7 @@ const EditForm = props => {
         }}
         onCancel={() => {
           setSelectFormIndex(undefined);
-          form.setFieldsValue({ name: undefined, formType: undefined });
+          form.setFieldsValue({ name: undefined, type: undefined });
           setAddOrEdit(undefined);
         }}
       >
@@ -298,12 +371,13 @@ const EditForm = props => {
           {hiddenFormTyoe ? (
             <Form.Item
               label="表单类型"
-              name="formType"
+              name="type"
               rules={[{ required: true, message: '请选择表单类型!' }]}
             >
               <Select placeholder="请选择表单类型">
-                <Option value="item">正常表单</Option>
-                <Option value="group">组表单</Option>
+                <Option value={0}>普通表单</Option>
+                {/* <Option value="1">自新增表单</Option> */}
+                <Option value={2}>组表单</Option>
               </Select>
             </Form.Item>
           ) : null}

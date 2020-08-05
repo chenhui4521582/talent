@@ -52,7 +52,6 @@ export default (props: Iprops) => {
     const dragCard = fromItem.list && fromItem.list[dragIndex];
     let jsonAll = JSON.parse(JSON.stringify(allData));
     let newData = JSON.parse(JSON.stringify(fromItem.list));
-    console.log('list1');
     jsonAll[index].list = update(newData, {
       $splice: [
         [dragIndex, 1],
@@ -73,7 +72,7 @@ export default (props: Iprops) => {
       onOk: async () => {
         let jsonAll = JSON.parse(JSON.stringify(allData));
         let newList = JSON.parse(JSON.stringify(fromItem.list));
-        if (fromItem.formType === 'group') {
+        if (fromItem.type === 2) {
           let json = await deleteGroup(fromItem.resFormId, newList[index].id);
           if (json.status === 200) {
             newList.splice(index, 1);
@@ -95,7 +94,7 @@ export default (props: Iprops) => {
       let jsonAll = JSON.parse(JSON.stringify(allData));
       if (visible === 'edit') {
         let selectFrom = list && list[selectGroup];
-        if (fromItem.formType === 'item') {
+        if (fromItem.type === 0) {
           if (value.itemList) {
             let itemList: string[] = [];
             for (let key in value.itemList) {
@@ -117,7 +116,7 @@ export default (props: Iprops) => {
           }
         }
       } else {
-        if (fromItem.formType === 'group') {
+        if (fromItem.type === 2) {
           let res = await saveGroup(fromItem.resFormId, value.name);
           if (res.status === 200) {
             list.push({
@@ -168,7 +167,7 @@ export default (props: Iprops) => {
 
   const renderForm = () => {
     return fromItem.list?.map((groupItem, i) => {
-      if (groupItem && groupItem.list) {
+      if ((groupItem && groupItem.list) || fromItem.type === 2) {
         return (
           <Descriptions.Item
             label={
@@ -290,7 +289,7 @@ export default (props: Iprops) => {
             onClick={e => {
               e.preventDefault();
               handleShowModal('add');
-              if (fromItem.formType === 'group') {
+              if (fromItem.type === 2) {
                 setIsChangeGroupName(true);
               } else {
                 setIsChangeGroupName(false);
@@ -325,7 +324,7 @@ export default (props: Iprops) => {
               <Input placeholder="请输入名称" />
             </Form.Item>
           ) : (
-            <Edit type={fromItem.formType} selectItem={selectItem} />
+            <Edit type={fromItem.type} selectItem={selectItem} />
           )}
         </Form>
       </Modal>

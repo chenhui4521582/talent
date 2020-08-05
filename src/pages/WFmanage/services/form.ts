@@ -18,7 +18,7 @@ export interface IForm {
   name: string;
   sort: number;
   id: number;
-  formType: 'group' | 'item';
+  type: 0 | 1 | 2;
   resFormId: string;
 }
 
@@ -98,7 +98,7 @@ export async function updateGroup(resFormId, id, name) {
 export async function updateForm(data) {
   return request(`/api/talent/wfresformcontrol/updateControls`, {
     method: 'POST',
-    data: { data },
+    data: data,
   });
 }
 
@@ -119,20 +119,20 @@ export async function getCForm(id) {
 }
 
 // 新增子表单
-export async function saveCForm(resFormId, name, columnNum) {
+export async function saveCForm(resFormId, name, columnNum, type) {
   return request(`/api/talent/wfresformchild/save`, {
     method: 'POST',
     data: {
       resFormId,
       name,
       columnNum,
-      allowMultiple: 0,
+      type,
     },
   });
 }
 
 // 更新子表单
-export async function updateCForm(resFormId, id, name, columnNum) {
+export async function updateCForm(resFormId, id, name, columnNum, type) {
   return request(`/api/talent/wfresformchild/update`, {
     method: 'POST',
     data: {
@@ -140,7 +140,7 @@ export async function updateCForm(resFormId, id, name, columnNum) {
       id,
       name,
       columnNum,
-      allowMultiple: 0,
+      type,
     },
   });
 }
