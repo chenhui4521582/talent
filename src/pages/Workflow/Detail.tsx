@@ -195,8 +195,26 @@ export default props => {
           : '';
       case 'select':
         return showValue && value ? (showValue ? showValue : value) : '';
+      case 'multiple':
+        return showValue
+          ? showValue
+            ? showValue.split(',')
+            : undefined
+          : value
+          ? value.split(',')
+          : undefined;
+      case 'files':
+        return value ? value.split(',') : undefined;
+      case 'depGroup':
+        return showValue ? showValue.split(',') : undefined;
       default:
-        return showValue ? showValue : value;
+        return showValue
+          ? showValue
+            ? showValue
+            : undefined
+          : value
+          ? value
+          : undefined;
     }
   };
 
@@ -318,16 +336,21 @@ export default props => {
       idItemList.map(item => {
         let showArr: any = [];
         let valueArr: any = [];
-        if (fromSubData[item.id].constructor === Array) {
+        if (
+          !!fromSubData[item.id] &&
+          fromSubData[item.id].constructor === Array
+        ) {
           fromSubData[item.id].map(u => {
             showArr.push(u.toString().split('-$-')[1]);
             valueArr.push(u.toString().split('-$-')[0]);
           });
         } else {
+          !!fromSubData[item.id] &&
           fromSubData[item.id].toString().indexOf('-$-') > -1
             ? showArr.push(fromSubData[item.id].split('-$-')[1])
             : showArr.push(item.showValue);
 
+          !!fromSubData[item.id] &&
           fromSubData[item.id].toString().indexOf('-$-') > -1
             ? valueArr.push(fromSubData[item.id].split('-$-')[0])
             : valueArr.push(fromSubData[item.id]);
@@ -376,6 +399,22 @@ export default props => {
               showValue: valueArr.join(',').split('-$-')[0],
               value: valueArr.join(',').split('-$-')[0],
             });
+          } else if (item.baseControlType === 'depGroup') {
+            if (fromSubData[item.id].indexOf('-$-') > -1) {
+              subList.push({
+                resFormControlId: item.resFormControlId,
+                multipleNumber: 1,
+                showValue: fromSubData[item.id].split('-$-')[1],
+                value: fromSubData[item.id].split('-$-')[0] || '',
+              });
+            } else {
+              subList.push({
+                resFormControlId: item.resFormControlId,
+                multipleNumber: 1,
+                showValue: item.showValue || '',
+                value: item.value || '',
+              });
+            }
           } else {
             subList.push({
               resFormControlId: item.resFormControlId,
@@ -386,6 +425,7 @@ export default props => {
           }
         }
       });
+      console.log(subList);
       let json: GlobalResParams<string> = await submit({
         remark: fromSubData.remark,
         taskFormId: formId,

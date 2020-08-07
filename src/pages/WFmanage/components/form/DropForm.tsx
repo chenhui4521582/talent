@@ -130,6 +130,13 @@ export default (props: Iprops) => {
             });
           }
         } else {
+          if (value.itemList) {
+            let itemList: string[] = [];
+            for (let key in value.itemList) {
+              itemList.push(value.itemList[key]);
+            }
+            value.itemList = itemList.join('|');
+          }
           list.push({
             ...value,
             id: list.length + 'add',
@@ -154,13 +161,21 @@ export default (props: Iprops) => {
           itemList['value' + key] = item;
         });
       }
-
       fromItem.list &&
         form.setFieldsValue({
           ...fromItem.list[index],
           itemList: { ...itemList },
         });
       setSelectGroup(index);
+    } else {
+      form.setFieldsValue({
+        name: undefined,
+        colspan: undefined,
+        isRequired: undefined,
+        baseControlType: undefined,
+        itemList: undefined,
+        groupName: undefined,
+      });
     }
     setVisible(value);
   };

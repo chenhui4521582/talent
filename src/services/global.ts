@@ -246,3 +246,20 @@ export async function getlevelOr(parentCode: string) {
     data: { parentCode },
   });
 }
+
+// 作品上传
+export async function saveFile(params) {
+  let filedata = new FormData();
+  if (params.files) {
+    filedata.append('files', params.files);
+  }
+  for (let item in params) {
+    if (item !== 'files' && params[item]) {
+      filedata.append(item, params[item]);
+    }
+  }
+  return request(`/api/transmit/upload/saveFile`, {
+    method: 'post',
+    data: filedata,
+  });
+}

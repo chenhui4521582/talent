@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Input, Select, InputNumber, DatePicker, Upload } from 'antd';
+import { UploadOutlined } from '@ant-design/icons';
 
 import {
   useRank,
@@ -7,9 +8,13 @@ import {
   useJob,
   useLabor,
   useDepartment,
+  useCost,
 } from '@/models/global';
+import { saveFile } from '@/services/global';
+import { GlobalResParams } from '@/types/ITypes';
 
 import OzTreeSlect from '@/pages/Framework/components/OzTreeSlect';
+import DepGroup from './DepGroup';
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -73,7 +78,7 @@ export default props => {
       return <MultipleTemplate {...props} />;
     //附件上传
     case 'files':
-      return <Upload {...props} />;
+      return <Uploads {...props} />;
     //remark 说明文字（<p><p>）
     case 'remark':
       return <TextArea {...props} style={{ width: '100%' }} />;
@@ -89,34 +94,42 @@ export default props => {
       );
     //department 部门 走组织架构
     case 'department':
-      return <OzTreeSlect onlySelect={ismultiplechoice === 0} {...props} />;
-    //department 部门 走组织架构
+    // return <OzTreeSlect onlySelect={ismultiplechoice === 0} {...props} />;
+    //department 组别 走组织架构
     case 'depGroup':
-      return <OzTreeSlect onlySelect={ismultiplechoice === 0} {...props} />;
+      return <DepGroup onlySelect={ismultiplechoice === 0} {...props} />;
     //当前部门组
     case 'currDepGroup':
       return <Input {...props} placeholder="当前部门组" disabled={true} />;
-    //业务线 business
+    //业务线 business（一级）
     case 'business':
       return <BusinessTemplate {...props} placeholder="请选择" />;
-    //company 公司
-    case 'company':
-      return <CompanyTemplate {...props} placeholder="请选择" />;
+    //业务线 business（二级）
+    case 'business':
+      return <BusinessTemplate2 {...props} placeholder="请选择" />;
+    //company 劳动关系下拉
+    case 'labor':
+      return <LaborTemplate {...props} placeholder="请选择" />;
+    // 成本中心
+    case 'cost':
+      return <CostTemplate {...props} placeholder="请选择" />;
+    case 'currBusiness2':
+      return <Input {...props} placeholder="当前部门组" disabled={true} />;
     //currUser 当前成员
     case 'currUser':
-      return <Input {...props} placeholder="当前成员" />;
+      return <Input {...props} placeholder="当前成员" disabled={true} />;
     //currDepartment 当前部门
     case 'currDepartment':
-      return <Input {...props} placeholder="当前部门" />;
+      return <Input {...props} placeholder="当前部门" disabled={true} />;
     //currBusiness 当前业务线
     case 'currBusiness':
-      return <Input {...props} placeholder="当前业务线" />;
+      return <Input {...props} placeholder="当前业务线" disabled={true} />;
     //currCompany 当前公司
     case 'currCompany':
-      return <Input {...props} placeholder="当前公司" />;
+      return <Input {...props} placeholder="当前公司" disabled={true} />;
     //currDate 当前日期
     case 'currDate':
-      return <Input {...props} placeholder="当前日期" />;
+      return <Input {...props} placeholder="当前日期" disabled={true} />;
     //currDatetime 当前日期+时间
     case 'currDatetime':
       return <Input {...props} disabled={true} />;
@@ -175,7 +188,12 @@ const MultipleTemplate = props => {
     data = list.split('|');
   }
   return (
-    <Select {...props} placeholder="请选择" mode="multiple">
+    <Select
+      {...props}
+      placeholder="请选择"
+      mode="multiple"
+      style={{ width: '100%' }}
+    >
       {data.map((item, index) => {
         return (
           <Option
@@ -191,9 +209,9 @@ const MultipleTemplate = props => {
   );
 };
 
-// 业务线单选框
+// 业务线单选框(一级)
 const BusinessTemplate = props => {
-  const { departmentList } = useDepartment(2);
+  const { departmentList } = useDepartment(1);
   return (
     <Select
       {...props}
@@ -218,9 +236,9 @@ const BusinessTemplate = props => {
   );
 };
 
-// 劳动关系
-const CompanyTemplate = props => {
-  const { laborList } = useLabor();
+// 业务线单选框(二级)
+const BusinessTemplate2 = props => {
+  const { departmentList } = useDepartment(2);
   return (
     <Select
       {...props}
@@ -229,15 +247,15 @@ const CompanyTemplate = props => {
       filterOption={(input, option) =>
         option?.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
       }
-      placeholder="请选择劳动关系"
+      placeholder="请选择业务线"
     >
-      {laborList?.map(item => {
+      {departmentList?.map(item => {
         return (
           <Option
-            key={item.id + '-$-' + item.id}
-            value={item.id + '-$-' + item.laborRelationName}
+            key={item.code + '-$-' + item.name}
+            value={item.code + '-$-' + item.name}
           >
-            {item.laborRelationName}
+            {item.name}
           </Option>
         );
       })}
@@ -323,5 +341,130 @@ const LevelTemplate = props => {
         );
       })}
     </Select>
+  );
+};
+
+// 成本中心
+const CostTemplate = props => {
+  const { costList } = useCost();
+  return (
+    <Select
+      {...props}
+      showSearch
+      style={{ width: '100%' }}
+      filterOption={(input, option) =>
+        option?.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+      }
+      placeholder="请选择职级"
+    >
+      {costList?.map(item => {
+        return (
+          <Option
+            key={item.id + '-$-' + item.costCenterName}
+            value={item.id + '-$-' + item.costCenterName}
+          >
+            {item.costCenterName}
+          </Option>
+        );
+      })}
+    </Select>
+  );
+};
+
+// 劳动关系
+const LaborTemplate = props => {
+  const { laborList } = useLabor();
+  return (
+    <Select
+      {...props}
+      showSearch
+      style={{ width: '100%' }}
+      filterOption={(input, option) =>
+        option?.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+      }
+      placeholder="请选择劳动关系"
+    >
+      {laborList?.map(item => {
+        return (
+          <Option
+            key={item.id + '-$-' + item.id}
+            value={item.id + '-$-' + item.laborRelationName}
+          >
+            {item.laborRelationName}
+          </Option>
+        );
+      })}
+    </Select>
+  );
+};
+
+interface Ilist {
+  name: string;
+  value: string;
+}
+
+// 上传附件
+const Uploads = props => {
+  const [list, setList] = useState<Ilist[]>([]);
+  let newList = JSON.parse(JSON.stringify(list));
+  const customRequestwork = async files => {
+    const { onSuccess, onError, file, onProgress } = files;
+    console.log(file);
+    let res: GlobalResParams<any> = await saveFile({ file: file });
+    if (res.status === 200) {
+      let item: Ilist = { name: '', value: '' };
+      item.name = file.uid;
+      item.value = res.obj.url;
+      newList.push(item);
+      onSuccess();
+      setList(newList);
+    }
+  };
+
+  const handleRemove = e => {
+    console.log(e.name);
+    let newList: Ilist[] = [];
+    list?.map(item => {
+      if (item.name !== e.uid) {
+        newList.push(item);
+      }
+    });
+    setList(newList);
+  };
+  console.log(props);
+  useEffect(() => {
+    let valueList: string[] = [];
+    console.log('list');
+    console.log(list);
+    list?.map(item => {
+      valueList.push(item.value);
+    });
+    props.onChange && props.onChange(valueList.join(','));
+  }, [list]);
+
+  const onPreview = e => {
+    const { uid } = e;
+    list?.map(item => {
+      if (item.name === uid) {
+        window.open(item.value);
+        return;
+      }
+    });
+  };
+
+  const action = {
+    name: 'file',
+    multiple: true,
+    action: '',
+    accept: '*',
+    // showUploadList: false,
+    customRequest: customRequestwork,
+    onRemove: handleRemove,
+    onPreview: onPreview,
+  };
+  return (
+    <Upload {...action}>
+      <UploadOutlined /> 上传附件
+    </Upload>
   );
 };

@@ -115,8 +115,30 @@ export default props => {
           : defaultValue
           ? moment(defaultValue, 'YYYY-MM-DD HH:mm:ss')
           : '';
+      case 'multiple':
+        return defaultShowValue
+          ? defaultShowValue
+            ? defaultShowValue.split(',')
+            : undefined
+          : defaultValue
+          ? defaultValue.split(',')
+          : undefined;
+      case 'files':
+        return defaultShowValue
+          ? defaultShowValue
+            ? defaultShowValue.split(',')
+            : undefined
+          : defaultValue
+          ? defaultValue.split(',')
+          : undefined;
       default:
-        return defaultShowValue ? defaultShowValue : defaultValue;
+        return defaultShowValue
+          ? defaultShowValue
+            ? defaultShowValue
+            : undefined
+          : defaultValue
+          ? defaultValue
+          : undefined;
     }
   };
 
@@ -140,7 +162,7 @@ export default props => {
                     key={groupItem.id}
                     label={groupItem.name}
                     span={groupItem.colspan}
-                    style={{ maxWidth: '300px' }}
+                    style={{ maxWidth: '180px', padding: 10 }}
                   >
                     {groupItem.list.map(listItem => {
                       return (
@@ -194,7 +216,7 @@ export default props => {
                 return (
                   <Descriptions.Item
                     key={groupItem.id}
-                    style={{ maxWidth: '200px' }}
+                    style={{ maxWidth: '180px', padding: 10 }}
                     label={
                       <span
                         className={groupItem.isRequired ? 'label-required' : ''}
@@ -244,16 +266,21 @@ export default props => {
       idItemList.map(item => {
         let showArr: any = [];
         let valueArr: any = [];
-        if (fromSubData[item.id].constructor === Array) {
+        if (
+          !!fromSubData[item.id] &&
+          fromSubData[item.id]?.constructor === Array
+        ) {
           fromSubData[item.id].map(u => {
             showArr.push(u.toString().split('-$-')[1]);
             valueArr.push(u.toString().split('-$-')[0]);
           });
         } else {
+          !!fromSubData[item.id] &&
           fromSubData[item.id].toString().indexOf('-$-') > -1
             ? showArr.push(fromSubData[item.id].split('-$-')[1])
             : showArr.push(item.defaultShowValue);
 
+          !!fromSubData[item.id] &&
           fromSubData[item.id].toString().indexOf('-$-') > -1
             ? valueArr.push(fromSubData[item.id].split('-$-')[0])
             : valueArr.push(fromSubData[item.id]);
@@ -301,6 +328,13 @@ export default props => {
               showValue: valueArr.join(',').split('-$-')[1],
               value: valueArr.join(',').split('-$-')[0],
             });
+          } else if (item.baseControlType === 'currUser') {
+            subList({
+              id: item.id,
+              multipleNumber: 1,
+              showValue: item.defaultShowValue,
+              value: item.defaultValue,
+            });
           } else {
             subList.push({
               id: item.id,
@@ -311,6 +345,7 @@ export default props => {
           }
         }
       });
+      console.log(subList);
       let json: GlobalResParams<string> = await saveTaskForm({
         resFormId: formId,
         wfResFormSaveItemCrudParamList: subList,

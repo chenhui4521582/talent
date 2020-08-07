@@ -125,7 +125,14 @@ const DropGroup = (props: Iprops) => {
           itemList: { ...itemList },
         });
     } else {
-      form.setFieldsValue({});
+      form.setFieldsValue({
+        name: undefined,
+        colspan: undefined,
+        isRequired: undefined,
+        baseControlType: undefined,
+        itemList: undefined,
+        groupName: undefined,
+      });
     }
     setVisibleType(type);
   };
@@ -150,7 +157,10 @@ const DropGroup = (props: Iprops) => {
             }
             value.itemList = itemList.join('|');
           }
+          console.log(value);
           newList[selectIndex] = value;
+          console.log('-----------------------');
+          console.log(newList);
           setVisibleType(undefined);
         }
       } else {
@@ -164,6 +174,8 @@ const DropGroup = (props: Iprops) => {
         newList.push(value);
       }
       jsonAll[formIndex].list[index].list = newList;
+      console.log(newList);
+      console.log(jsonAll);
       changeData(jsonAll);
       setVisibleType(undefined);
     });
@@ -182,12 +194,7 @@ const DropGroup = (props: Iprops) => {
       cancelText: '取消',
       onOk: async () => {
         let jsonAll = JSON.parse(JSON.stringify(allData));
-        let newList = JSON.parse(JSON.stringify(groupItem.list));
-        // console.log('newList')
-        // console.log(groupItem.list)
         groupItem.list.splice(i, 1);
-        // console.log('newList2')
-        // console.log(jsonAll)
         jsonAll[formIndex].list[index].list = groupItem.list;
 
         changeData(jsonAll);

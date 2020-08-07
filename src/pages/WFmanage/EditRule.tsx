@@ -109,7 +109,19 @@ export default props => {
       item.stepNumber = index + 1;
     });
     data.noticeStatus = stepType;
-    data.crudParam = list1.concat(list2);
+
+    let newList = list1.concat(list2);
+    newList.map((item, i) => {
+      if (i === 0) {
+        item.nodeType = 1;
+      } else if (i === list1?.length - 1) {
+        item.nodeType = 3;
+      } else {
+        item.nodeType = 2;
+      }
+    });
+
+    data.crudParam = newList;
 
     let api = updateRolu;
     if (addOrChange === 'add') {

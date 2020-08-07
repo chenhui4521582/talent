@@ -166,14 +166,14 @@ const EditForm = props => {
         if (selectFormIndex || selectFormIndex === 0) {
           let selectFrom = list && list[selectFormIndex];
           selectFrom.name = value.name;
-          selectFrom.columnNum = value.type;
-          selectFrom.columnNum = value.columnNum;
-          if (selectFormIndex) {
+          selectFrom.columnNum = parseInt(value.columnNum);
+          selectFrom.type = value.type;
+          if (selectFormIndex || selectFormIndex === 0) {
             let updataJson = await updateCForm(
               props.match.params.id,
               selectFrom.id,
               value.name,
-              value.columnNum,
+              parseInt(value.columnNum),
               value.type || selectFrom.type,
             );
             if (updataJson.status === 200) {
@@ -183,7 +183,11 @@ const EditForm = props => {
         }
         setFormDetail(list);
         setAddOrEdit(undefined);
-        form.setFieldsValue({ name: undefined, type: undefined });
+        form.setFieldsValue({
+          name: undefined,
+          type: undefined,
+          columnNum: undefined,
+        });
       }
     });
   };
@@ -222,9 +226,12 @@ const EditForm = props => {
           cItem?.list.map((item, cIndex) => {
             let newItem: any = {};
             sort += 1;
-            item.id ? (newItem.id = item.id) : null;
+            if (item.id && item.id.toString()?.indexOf('add') > -1) {
+            } else {
+              item.id ? (newItem.id = item.id) : null;
+            }
             item.itemList ? (newItem.itemList = item.itemList) : null;
-            item.isRequired = newItem.isRequired;
+            newItem.isRequired = item.isRequired;
             newItem.baseControlType = item.baseControlType;
             newItem.name = item.name;
             newItem.resFormChildId = formItem.id;
@@ -240,7 +247,10 @@ const EditForm = props => {
           sort += 1;
           let newC: any = cItem;
           let newItem: any = {};
-          newC.id ? (newItem.id = newC.id) : null;
+          if (newC.id && newC.id.toString()?.indexOf('add') > -1) {
+          } else {
+            newC.id ? (newItem.id = newC.id) : null;
+          }
           newItem.baseControlType = newC.baseControlType;
           newC.itemList ? (newItem.itemList = newC.itemList) : null;
           newItem.isRequired = newC.isRequired;
@@ -349,7 +359,11 @@ const EditForm = props => {
         }}
         onCancel={() => {
           setSelectFormIndex(undefined);
-          form.setFieldsValue({ name: undefined, type: undefined });
+          form.setFieldsValue({
+            name: undefined,
+            type: undefined,
+            columnNum: undefined,
+          });
           setAddOrEdit(undefined);
         }}
       >

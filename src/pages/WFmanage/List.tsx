@@ -13,7 +13,7 @@ import {
 import { Link } from 'umi';
 
 import { useReq } from '@/components/GlobalTable/useReq';
-import { homeList, changeState, save } from './services/new';
+import { homeList, changeState, save, changeWf } from './services/new';
 import { categoryList, tsCategoryItem } from './services/category';
 import { ColumnProps } from 'antd/es/table';
 import { GlobalResParams } from '@/types/ITypes';
@@ -22,6 +22,7 @@ interface tsList {
   id: number;
   name: string;
   status: number;
+  icon: string;
 }
 
 const { Option } = Select;
@@ -62,6 +63,16 @@ export default () => {
             <Link to={`editForm/${record.id}`}>表单设置</Link>
             <Divider type="vertical" />
             <Link to={`editRule/${record.id}`}>规则设置</Link>
+            <Divider type="vertical" />
+            <a
+              onClick={() => {
+                setType('change');
+                console.log(record);
+                form.setFieldsValue(record);
+              }}
+            >
+              修改
+            </a>
           </span>
         );
       },
