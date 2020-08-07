@@ -86,7 +86,7 @@ export default () => {
       align: 'center',
     },
   ];
-  const { TableContent, searchForm, selectKeys, refresh } = useTable({
+  const { TableContent, searchForm, selectKeys, Refresh } = useTable({
     queryMethod: list,
     columns,
     rowKeyName: 'userCode',
@@ -115,7 +115,7 @@ export default () => {
       value.userCodes = selectKeys.join(',');
       let json: GlobalResParams<string> = await updata(value);
       if (json.status === 200) {
-        refresh();
+        Refresh();
         setVisible(false);
         notification['success']({
           message: json.msg,

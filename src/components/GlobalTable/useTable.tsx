@@ -82,7 +82,10 @@ export const useTable = ({
   };
 
   const { reset, submit } = search;
-
+  const Refresh = () => {
+    reset();
+    setSelectPageObj({});
+  };
   const TableContent = ({ children }) => {
     return (
       <div>
@@ -123,6 +126,7 @@ export const useTable = ({
   return {
     TableContent,
     refresh,
+    Refresh,
     searchForm,
     selectKeys: selectedRowKeys(),
   };
