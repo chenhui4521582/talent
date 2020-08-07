@@ -49,6 +49,8 @@ export default props => {
           handleList(res.obj.stepModelList);
           if (res.obj.stepModelList.length === 0) {
             setAddOrChange('add');
+          } else {
+            setAddOrChange('change');
           }
         }
       }

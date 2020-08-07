@@ -9,6 +9,7 @@ import {
   Input,
   Modal,
   Select,
+  Upload,
 } from 'antd';
 import { Link } from 'umi';
 
@@ -17,6 +18,8 @@ import { homeList, changeState, save, changeWf } from './services/new';
 import { categoryList, tsCategoryItem } from './services/category';
 import { ColumnProps } from 'antd/es/table';
 import { GlobalResParams } from '@/types/ITypes';
+import { UploadOutlined } from '@ant-design/icons';
+import { saveFile } from '@/services/global';
 
 interface tsList {
   id: number;
@@ -82,6 +85,22 @@ export default () => {
   const [type, setType] = useState<'add' | 'change'>();
   const [form] = Form.useForm();
   const [category, setCategory] = useState<tsCategoryItem[]>();
+
+  const customRequestwork = async files => {
+    const { onSuccess, file } = files;
+    let res: GlobalResParams<any> = await saveFile({ file: file });
+    if (res.status === 200) {
+      onSuccess();
+    }
+  };
+
+  const action = {
+    name: 'file',
+    multiple: false,
+    action: 'jpg|jpeg|bmp',
+    accept: '*',
+    customRequest: customRequestwork,
+  };
 
   useEffect(() => {
     async function getCategoryList() {
@@ -181,6 +200,15 @@ export default () => {
               })}
             </Select>
           </Form.Item>
+          {/* <Form.Item
+            label="icon"
+            name="icon"
+            rules={[{ required: true, message: '请上传图标!' }]}
+          >
+            <Upload {...action}>
+              <UploadOutlined /> 上传附件
+            </Upload>
+          </Form.Item> */}
         </Form>
       </Modal>
     </Card>

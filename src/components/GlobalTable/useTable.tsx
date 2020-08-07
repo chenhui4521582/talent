@@ -58,9 +58,27 @@ export const useTable = ({
       let obj: any = JSON.parse(JSON.stringify(selectPageObj));
       obj[page] = selectedRowKeys;
       setSelectPageObj(obj);
-      console.log(selectedRowKeys, selectedRows);
     },
+
     selectedRowKeys: selectedRowKeys(),
+
+    onSelectAll: (selected, selectedRows, changeRows) => {
+      let arr: string[] = [];
+      let page = tableProps.pagination.current || 'none';
+      let obj: any = JSON.parse(JSON.stringify(selectPageObj));
+      if (selected) {
+        selectedRows?.map(item => {
+          console.log(item);
+          if (item) {
+            arr.push(item[rowKeyName]);
+          }
+        });
+        obj[page] = arr;
+        setSelectPageObj(obj);
+      } else {
+        setSelectPageObj({});
+      }
+    },
   };
 
   const { reset, submit } = search;
@@ -78,7 +96,13 @@ export const useTable = ({
                 <Button type="primary" onClick={submit}>
                   查询
                 </Button>
-                <Button onClick={reset} style={{ marginLeft: 16 }}>
+                <Button
+                  onClick={() => {
+                    reset();
+                    setSelectPageObj({});
+                  }}
+                  style={{ marginLeft: 16 }}
+                >
                   重置
                 </Button>
               </Form.Item>

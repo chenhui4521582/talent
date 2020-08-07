@@ -12,6 +12,7 @@ interface listItem {
   key: string;
   title: string;
   labelName: string;
+  isLocked?: number;
 }
 
 interface tsProps {
@@ -34,19 +35,22 @@ export default (props: tsProps) => {
   const getList = async () => {
     let res: GlobalResParams<listItem[]> = await apiList(id);
     if (res.status === 200) {
+      let newList: any = [];
       let obj: listItem[] = JSON.parse(JSON.stringify(res.obj));
       for (let i = 0; i < obj.length; i++) {
-        obj[i].key = obj[i].id;
-        obj[i].title = obj[i].name || obj[i]?.labelName;
+        if (obj[i].isLocked === 0) {
+          newList.push({
+            key: obj[i].id,
+            title: obj[i].name || obj[i]?.labelName,
+          });
+        }
       }
 
-      setList(obj);
+      setList(newList);
     }
   };
 
   useEffect(() => {
-    console.log('selectKeys');
-    console.log(selectKeys);
     setKeyList(selectKeys);
   }, [selectKeys]);
 

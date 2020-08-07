@@ -168,7 +168,12 @@ const SelectTemplate = props => {
     data = list.split('|');
   }
   return (
-    <Select {...props} placeholder="请选择" style={{ width: '100%' }}>
+    <Select
+      {...props}
+      allowClear
+      placeholder="请选择"
+      style={{ width: '100%' }}
+    >
       {data.map((item, index) => {
         return (
           <Option key={index} value={item + '-$-' + item}>
@@ -190,6 +195,7 @@ const MultipleTemplate = props => {
   return (
     <Select
       {...props}
+      allowClear
       placeholder="请选择"
       mode="multiple"
       style={{ width: '100%' }}
@@ -215,6 +221,7 @@ const BusinessTemplate = props => {
   return (
     <Select
       {...props}
+      allowClear
       showSearch
       style={{ width: '100%' }}
       filterOption={(input, option) =>
@@ -242,6 +249,7 @@ const BusinessTemplate2 = props => {
   return (
     <Select
       {...props}
+      allowClear
       showSearch
       style={{ width: '100%' }}
       filterOption={(input, option) =>
@@ -269,6 +277,7 @@ const PositionTemplate = props => {
   return (
     <Select
       {...props}
+      allowClear
       showSearch
       style={{ width: '100%' }}
       filterOption={(input, option) =>
@@ -296,6 +305,7 @@ const JobTemplate = props => {
   return (
     <Select
       {...props}
+      allowClear
       showSearch
       style={{ width: '100%' }}
       filterOption={(input, option) =>
@@ -323,6 +333,7 @@ const LevelTemplate = props => {
   return (
     <Select
       {...props}
+      allowClear
       showSearch
       style={{ width: '100%' }}
       filterOption={(input, option) =>
@@ -350,6 +361,7 @@ const CostTemplate = props => {
   return (
     <Select
       {...props}
+      allowClear
       showSearch
       style={{ width: '100%' }}
       filterOption={(input, option) =>
@@ -377,6 +389,7 @@ const LaborTemplate = props => {
   return (
     <Select
       {...props}
+      allowClear
       showSearch
       style={{ width: '100%' }}
       filterOption={(input, option) =>
@@ -431,11 +444,8 @@ const Uploads = props => {
     });
     setList(newList);
   };
-  console.log(props);
   useEffect(() => {
     let valueList: string[] = [];
-    console.log('list');
-    console.log(list);
     list?.map(item => {
       valueList.push(item.value);
     });

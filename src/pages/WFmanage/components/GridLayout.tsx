@@ -124,8 +124,13 @@ export default (props: tsProps) => {
     controlId = [];
     systemObj = {};
     setSelectObj(undefined);
-    form.setFieldsValue({ type: 1, specifiedLevel: 1 });
-    setType(undefined);
+    form.setFieldsValue({
+      type: undefined,
+      specifiedLevel: undefined,
+      signType: undefined,
+      labelId: undefined,
+    });
+    setType(1);
     setVisible(false);
   };
 
@@ -133,7 +138,7 @@ export default (props: tsProps) => {
   const handleAddOkModal = () => {
     form.validateFields().then(value => {
       let listObj: any = JSON.parse(JSON.stringify(list));
-      let obj = form.getFieldsValue();
+      let obj = value;
       obj.stepName = typeObj[type || 1];
       obj.resFormControlIds = controlId;
       obj.id = listObj.length + 'add';
@@ -155,6 +160,13 @@ export default (props: tsProps) => {
       }
       listObj.push(obj);
       setList(listObj);
+      form.setFieldsValue({
+        type: undefined,
+        specifiedLevel: undefined,
+        signType: undefined,
+        labelId: undefined,
+      });
+      setType(1);
       setVisible(false);
     });
   };
@@ -169,15 +181,19 @@ export default (props: tsProps) => {
     });
     console.log(newList);
     setList(newList);
+    form.setFieldsValue({
+      type: undefined,
+      specifiedLevel: undefined,
+      signType: undefined,
+      labelId: undefined,
+    });
+    setType(1);
     setVisible(false);
   };
   // 编辑的确认
   const handleEditOkModal = () => {
     form.validateFields().then(value => {
-      // let value = form.getFieldsValue();
       value.resFormControlIds = controlId;
-      console.log('value');
-      console.log(value);
       handleObjList(value);
       switch (type) {
         case 1:
@@ -243,6 +259,12 @@ export default (props: tsProps) => {
   };
   // AddshowModal
   const handleAddShowModal = () => {
+    form.setFieldsValue({
+      type: 1,
+      specifiedLevel: undefined,
+      signType: undefined,
+      labelId: undefined,
+    });
     setType(1);
     setEdit(false);
     setVisible(true);
@@ -250,8 +272,6 @@ export default (props: tsProps) => {
   // 编辑的showmodal
   const handleEditShowmodal = selectItem => {
     setSelectObj(selectItem);
-    console.log('selectItem');
-    console.log(selectItem);
     setType(selectItem.type);
     form.setFieldsValue(selectItem || {});
     setEdit(true);
@@ -336,7 +356,7 @@ export default (props: tsProps) => {
               name="signType"
               style={{ marginTop: 4 }}
               label="同时有多个上级时"
-              initialValue={1}
+              initialValue={0}
               rules={[
                 {
                   required: type === 1 ? true : false,
@@ -345,9 +365,9 @@ export default (props: tsProps) => {
               ]}
             >
               <Radio.Group>
-                <Radio value={1}>会签（ 须所有上级同意 ）</Radio>
+                <Radio value={0}>会签（ 须所有上级同意 ）</Radio>
                 <br />
-                <Radio value={2}>或签（ 一名上级同意即可 ）</Radio>
+                <Radio value={1}>或签（ 一名上级同意即可 ）</Radio>
               </Radio.Group>
             </Form.Item>
           </>
@@ -359,7 +379,7 @@ export default (props: tsProps) => {
               name="signType"
               style={{ marginTop: 4 }}
               label="请选择标签审批方式"
-              initialValue={1}
+              initialValue={0}
               rules={[
                 {
                   required: type === 2 ? true : false,
@@ -368,9 +388,9 @@ export default (props: tsProps) => {
               ]}
             >
               <Radio.Group>
-                <Radio value={1}>会签（ 须所有上级同意 ）</Radio>
+                <Radio value={0}>会签（ 须所有上级同意 ）</Radio>
                 <br />
-                <Radio value={2}>或签（ 一名上级同意即可 ）</Radio>
+                <Radio value={1}>或签（ 一名上级同意即可 ）</Radio>
               </Radio.Group>
             </Form.Item>
             <Form.Item
@@ -420,7 +440,7 @@ export default (props: tsProps) => {
               name="signType"
               style={{ marginTop: 4 }}
               label="同时有多个上级时"
-              initialValue={1}
+              initialValue={0}
               rules={[
                 {
                   required: type === 5 ? true : false,
@@ -429,9 +449,9 @@ export default (props: tsProps) => {
               ]}
             >
               <Radio.Group>
-                <Radio value={1}>会签（ 须所有上级同意 ）</Radio>
+                <Radio value={0}>会签（ 须所有上级同意 ）</Radio>
                 <br />
-                <Radio value={2}>或签（ 一名上级同意即可 ）</Radio>
+                <Radio value={1}>或签（ 一名上级同意即可 ）</Radio>
               </Radio.Group>
             </Form.Item>
             <SystemLabel
@@ -487,7 +507,6 @@ export default (props: tsProps) => {
         <Form form={form} layout="vertical">
           <Form.Item
             name="type"
-            initialValue={type}
             label="选择类型"
             rules={[{ required: true, message: '请选择类型!' }]}
           >
@@ -496,7 +515,6 @@ export default (props: tsProps) => {
                 const { value } = e.target;
                 setType(value);
               }}
-              value={type}
             >
               <Radio value={1}>
                 上级（自动设置通讯录中的上级领导为审批人）
