@@ -173,6 +173,12 @@ export default props => {
         return value ? value + '-$-' + showValue : showValue;
       case 'business':
         return value ? value + '-$-' + showValue : showValue;
+      case 'business2':
+        return value ? value + '-$-' + showValue : showValue;
+      case 'cost':
+        return value ? value + '-$-' + showValue : showValue;
+      case 'labor':
+        return value ? value + '-$-' + showValue : showValue;
       case 'company':
         return value ? value + '-$-' + showValue : showValue;
       case 'position':

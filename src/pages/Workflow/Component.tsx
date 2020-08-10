@@ -105,7 +105,7 @@ export default props => {
     case 'business':
       return <BusinessTemplate {...props} placeholder="请选择" />;
     //业务线 business（二级）
-    case 'business':
+    case 'business2':
       return <BusinessTemplate2 {...props} placeholder="请选择" />;
     //company 劳动关系下拉
     case 'labor':

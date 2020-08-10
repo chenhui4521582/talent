@@ -123,7 +123,6 @@ export default (props: tsProps) => {
     userkeyList = '';
     controlId = [];
     systemObj = {};
-    setSelectObj(undefined);
     form.setFieldsValue({
       type: undefined,
       specifiedLevel: undefined,
@@ -131,6 +130,7 @@ export default (props: tsProps) => {
       labelId: undefined,
     });
     setType(1);
+    setSelectObj(undefined);
     setVisible(false);
   };
 
@@ -179,7 +179,6 @@ export default (props: tsProps) => {
       }
       newList.push(item);
     });
-    console.log(newList);
     setList(newList);
     form.setFieldsValue({
       type: undefined,
@@ -187,14 +186,16 @@ export default (props: tsProps) => {
       signType: undefined,
       labelId: undefined,
     });
+    handleHiddleModal();
     setType(1);
     setVisible(false);
   };
   // 编辑的确认
   const handleEditOkModal = () => {
+    // alert(12)
     form.validateFields().then(value => {
       value.resFormControlIds = controlId;
-      handleObjList(value);
+      // handleObjList(value);
       switch (type) {
         case 1:
           handleObjList(value);
@@ -220,7 +221,10 @@ export default (props: tsProps) => {
           handleObjList(value);
           return true;
         case 5:
-          if (systemObj?.input && systemObj?.audo) {
+          if (
+            (systemObj?.input && systemObj?.audo) ||
+            (systemObj?.input === 0 && systemObj?.audo === 0)
+          ) {
             value.relationResFormControlId = systemObj?.input;
             value.sysLabelId = systemObj?.audo;
             handleObjList(value);
@@ -271,6 +275,10 @@ export default (props: tsProps) => {
   };
   // 编辑的showmodal
   const handleEditShowmodal = selectItem => {
+    systemObj = {
+      audo: selectItem.sysLabelId,
+      input: selectItem.relationResFormControlId,
+    };
     setSelectObj(selectItem);
     setType(selectItem.type);
     form.setFieldsValue(selectItem || {});
@@ -487,8 +495,8 @@ export default (props: tsProps) => {
       <div className="add-item" onClick={handleAddShowModal}>
         <PlusOutlined
           style={{
-            marginTop: 15,
-            fontSize: 30,
+            marginTop: 25,
+            fontSize: 40,
           }}
         />
       </div>

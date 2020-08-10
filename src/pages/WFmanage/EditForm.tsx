@@ -271,6 +271,7 @@ const EditForm = props => {
       resFormControlCrudParamList: [...new Set(cList)],
     });
     if (json.status === 200) {
+      window.history.go(-1);
       getForm();
       notification['success']({
         message: json.msg,

@@ -102,16 +102,18 @@ const Card: React.FC<tsStep & IProps> = ({
   });
 
   const style: React.CSSProperties = {
-    margin: '16px 6px',
+    margin: '16px 10px',
     // Card 为占位元素是，透明度 0.4，拖拽状态时透明度 0.2，正常情况透明度为 1
+    backgroundColor: '#5c8de6',
+    color: '#ffffff',
     opacity: isDragging ? 0.2 : 1,
     padding: '20px 0px',
-    width: 70,
-    height: 60,
+    width: 90,
+    height: 90,
     display: 'inline-block',
-    backgroundColor: 'red',
     float: 'left',
     position: 'relative',
+    borderRadius: 5,
   };
 
   // 使用 drag 和 drop 对 ref 进行包裹，则组件既可以进行拖拽也可以接收拖拽组件
@@ -130,26 +132,29 @@ const Card: React.FC<tsStep & IProps> = ({
       <p
         style={{
           position: 'absolute',
-          width: 60,
-          padding: '0 5px',
+          width: 88,
+          padding: '0 4px',
           height: 'auto',
-          top: 70,
+          bottom: 4,
           textAlign: 'center',
           lineHeight: '1em',
+          display: '-webkit-box',
+          WebkitBoxOrient: 'vertical',
+          WebkitLineClamp: 3,
+          overflow: 'hidden',
         }}
       >
         <span>{stepName}</span>
         <EditOutlined
           style={{
             position: 'absolute',
-            right: '-0.2em',
-            top: '-0.2em',
+            right: '0px',
+            top: '0px',
           }}
           onClick={e => {
             e.preventDefault();
             e.stopPropagation();
             handleShowName(item);
-            //   alert(1)
           }}
         />
       </p>

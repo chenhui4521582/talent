@@ -87,6 +87,18 @@ export default props => {
         return defaultValue
           ? defaultValue + '-$-' + defaultShowValue
           : defaultShowValue;
+      case 'business2':
+        return defaultValue
+          ? defaultValue + '-$-' + defaultShowValue
+          : defaultShowValue;
+      case 'labor':
+        return defaultValue
+          ? defaultValue + '-$-' + defaultShowValue
+          : defaultShowValue;
+      case 'cost':
+        return defaultValue
+          ? defaultValue + '-$-' + defaultShowValue
+          : defaultShowValue;
       case 'company':
         return defaultValue
           ? defaultValue + '-$-' + defaultShowValue

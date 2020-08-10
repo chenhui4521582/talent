@@ -79,7 +79,7 @@ export default props => {
     return (
       <Select
         placeholder="请选择控件名称"
-        style={{ minWidth: '20vh' }}
+        style={{ minWidth: '32vh' }}
         onChange={value => {
           setSelectI(value.toString());
           props.change({

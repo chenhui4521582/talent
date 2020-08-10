@@ -45,7 +45,7 @@ export default props => {
           parseInt(idRes.obj[0].id),
         );
         if (res.status === 200) {
-          setStepType(res.obj.noticeStatus || 1);
+          // setStepType(res.obj.noticeStatus || 1);
           handleList(res.obj.stepModelList);
           if (res.obj.stepModelList.length === 0) {
             setAddOrChange('add');
@@ -110,7 +110,7 @@ export default props => {
     list1.map((item, index) => {
       item.stepNumber = index + 1;
     });
-    data.noticeStatus = stepType;
+    data.noticeStatus = 1;
 
     let newList = list1.concat(list2);
     newList.map((item, i) => {
@@ -132,6 +132,7 @@ export default props => {
 
     let res: GlobalResParams<string> = await api(data);
     if (res.status === 200) {
+      window.history.go(-1);
       getDetail();
 
       notification['success']({
@@ -182,7 +183,7 @@ export default props => {
         </Row>
         <Divider />
 
-        <Row style={{ marginTop: 20 }}>
+        {/* <Row style={{ marginTop: 20 }}>
           <Col>抄送通知</Col>
           <Col style={{ marginLeft: 20 }}>
             <Radio.Group
@@ -203,7 +204,7 @@ export default props => {
               </Radio>
             </Radio.Group>
           </Col>
-        </Row>
+        </Row> */}
       </Card>
     </DndProvider>
   );

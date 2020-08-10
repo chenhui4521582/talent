@@ -70,8 +70,8 @@ export default () => {
             <a
               onClick={() => {
                 setType('change');
-                console.log(record);
                 form.setFieldsValue(record);
+                setSelectItem(record);
               }}
             >
               修改
@@ -85,22 +85,7 @@ export default () => {
   const [type, setType] = useState<'add' | 'change'>();
   const [form] = Form.useForm();
   const [category, setCategory] = useState<tsCategoryItem[]>();
-
-  const customRequestwork = async files => {
-    const { onSuccess, file } = files;
-    let res: GlobalResParams<any> = await saveFile({ file: file });
-    if (res.status === 200) {
-      onSuccess();
-    }
-  };
-
-  const action = {
-    name: 'file',
-    multiple: false,
-    action: 'jpg|jpeg|bmp',
-    accept: '*',
-    customRequest: customRequestwork,
-  };
+  const [selectItem, setSelectItem] = useState<tsCategoryItem>();
 
   useEffect(() => {
     async function getCategoryList() {
@@ -136,7 +121,12 @@ export default () => {
 
   const handleOk = () => {
     form.validateFields().then(async value => {
-      let json: GlobalResParams<string> = await save(value);
+      let api = save;
+      if (type === 'change') {
+        value.id = selectItem?.id;
+        api = changeWf;
+      }
+      let json: GlobalResParams<string> = await api(value);
       if (json.status === 200) {
         refresh();
         setType(undefined);
@@ -173,6 +163,7 @@ export default () => {
         cancelText="取消"
         key={type + ''}
         onCancel={() => {
+          setSelectItem(undefined);
           setType(undefined);
         }}
         onOk={handleOk}
@@ -200,17 +191,81 @@ export default () => {
               })}
             </Select>
           </Form.Item>
-          {/* <Form.Item
+          <Form.Item
             label="icon"
             name="icon"
             rules={[{ required: true, message: '请上传图标!' }]}
           >
-            <Upload {...action}>
-              <UploadOutlined /> 上传附件
-            </Upload>
-          </Form.Item> */}
+            <IconImg iconUrl={selectItem?.icon} />
+          </Form.Item>
         </Form>
       </Modal>
     </Card>
+  );
+};
+
+interface Iprops {
+  iconUrl: string | undefined | null;
+  onChange?: (value: string) => {};
+}
+
+const IconImg = (props: Iprops) => {
+  const { iconUrl, onChange } = props;
+  const [fileList, setFileList] = useState<any[]>();
+
+  useEffect(() => {
+    if (iconUrl) {
+      setFileList([
+        {
+          name: '',
+          uid: '-1',
+          url: iconUrl,
+          status: 'done',
+        },
+      ]);
+    }
+  }, [iconUrl]);
+
+  const customRequestwork = async files => {
+    const { onSuccess, file } = files;
+    let res: GlobalResParams<any> = await saveFile({ file: file });
+    if (res.status === 200) {
+      setFileList([
+        {
+          name: '',
+          uid: '-1',
+          url: res.obj.url,
+          status: 'done',
+        },
+      ]);
+      onChange && onChange(res.obj.url);
+      onSuccess();
+    }
+  };
+
+  const action = {
+    name: 'file',
+    multiple: false,
+    customRequest: customRequestwork,
+  };
+
+  const onRemove = () => {
+    setFileList([]);
+  };
+
+  return (
+    <Upload
+      {...action}
+      fileList={fileList}
+      accept="image/*"
+      listType="picture-card"
+      onRemove={onRemove}
+    >
+      {fileList && fileList?.length ? null : (
+        <>
+          <UploadOutlined /> 上传附件
+        </>
+      )}
+    </Upload>
   );
 };
