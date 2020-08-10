@@ -42,6 +42,7 @@ export interface tsGroupList {
 }
 
 export interface tsControlList {
+  icon?: string;
   allowModify: number | null;
   baseControlType: string;
   colspan: number;

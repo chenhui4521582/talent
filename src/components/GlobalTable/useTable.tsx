@@ -48,7 +48,7 @@ export const useTable = ({
     for (let key in selectPageObj) {
       arr = arr.concat(selectPageObj[key]);
     }
-    return arr;
+    return [...new Set(arr)];
   };
 
   const rowSelection = {

@@ -241,6 +241,9 @@ const EditForm = props => {
             newItem.resGroupId = groupItem.id;
             newItem.colspan = item.colspan;
             newItem.sort = sort;
+            item.isMultiplechoice || item.isMultiplechoice === 0
+              ? (newItem.isMultiplechoice = item.isMultiplechoice)
+              : '';
             cList.push(newItem);
           });
         } else {
@@ -261,6 +264,9 @@ const EditForm = props => {
           newItem.groupIndex = 1;
           newItem.isGroup = 0;
           newItem.sort = sort;
+          newC.isMultiplechoice || newC.isMultiplechoice === 0
+            ? (newItem.isMultiplechoice = newC.isMultiplechoice)
+            : '';
           cList.push(newItem);
         }
       });

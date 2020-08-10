@@ -39,6 +39,15 @@ export default () => {
       align: 'center',
     },
     {
+      title: '工作流名称',
+      dataIndex: 'icon',
+      key: 'icon',
+      align: 'center',
+      render: (_, record) => {
+        return <img src={record.icon} style={{ height: 40 }} />;
+      },
+    },
+    {
       title: '当前状态',
       dataIndex: 'status',
       key: 'status',

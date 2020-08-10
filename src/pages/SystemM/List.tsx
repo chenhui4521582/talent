@@ -139,8 +139,12 @@ export default () => {
   };
 
   const renderMadel = useMemo(() => {
-    return roles?.map(item => {
-      return <Option value={item.code}>{item.name}</Option>;
+    return roles?.map((item, i) => {
+      return (
+        <Option key={i} value={item.code}>
+          {item.name}
+        </Option>
+      );
     });
   }, [roles]);
 
@@ -157,7 +161,7 @@ export default () => {
         <Row>
           <Col span={6}>
             <Form.Item label="岗位" name="postId">
-              <Select showSearch optionFilterProp="children">
+              <Select showSearch optionFilterProp="children" allowClear>
                 {jobList?.map(item => {
                   return (
                     <Option key={item.jobId} value={item.jobId}>
@@ -170,19 +174,19 @@ export default () => {
           </Col>
           <Col span={6} offset={2}>
             <Form.Item label="员工编号" name="employeeId">
-              <Input />
+              <Input allowClear />
             </Form.Item>
           </Col>
           <Col span={6} offset={2}>
             <Form.Item label="姓名" name="name">
-              <Input />
+              <Input allowClear />
             </Form.Item>
           </Col>
         </Row>
         <Row>
           <Col span={6}>
             <Form.Item label="业务线" name="businessCode">
-              <Select showSearch optionFilterProp="children">
+              <Select showSearch optionFilterProp="children" allowClear>
                 {businessList?.map(item => {
                   return (
                     <Option key={item.businessCode} value={item.businessCode}>
@@ -196,7 +200,22 @@ export default () => {
         </Row>
       </TableContent>
       <Modal
-        title={'授权管理-' + selectKeys.length + '人'}
+        title={
+          <p>
+            授权管理
+            <span
+              style={{
+                fontWeight: 700,
+                color: 'blue',
+                margin: '0 4px',
+                fontSize: 20,
+              }}
+            >
+              {selectKeys.length}
+            </span>
+            人
+          </p>
+        }
         okText="确认"
         cancelText="取消"
         visible={visible}

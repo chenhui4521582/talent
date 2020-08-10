@@ -350,6 +350,7 @@ export default (props: tsProps) => {
         }
       });
       setList(newListObj);
+      setSelectObj(undefined);
       setName(undefined);
     });
   };
@@ -552,6 +553,7 @@ export default (props: tsProps) => {
         okText="确认"
         cancelText="返回"
         onCancel={() => {
+          setSelectObj(undefined);
           setName(undefined);
         }}
         onOk={handleName}

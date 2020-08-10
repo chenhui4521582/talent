@@ -28,7 +28,18 @@ export default () => {
           {listForm.map(u => {
             return (
               <Button className="button-right" key={u.id}>
-                <Link to={`homedetail/${u.id}`}>{u.name}</Link>
+                <Link to={`homedetail/${u.id}`}>
+                  <img
+                    src={u.icon || ''}
+                    style={{
+                      display: 'inline-block',
+                      width: 20,
+                      height: 20,
+                      marginRight: 4,
+                    }}
+                  />
+                  <span>{u.name}</span>
+                </Link>
               </Button>
             );
           })}

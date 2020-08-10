@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect, useState } from 'react';
 import {
   Card,
   Modal,
@@ -15,6 +15,8 @@ import { useTable } from '@/components/GlobalTable/useTable';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { GlobalResParams } from '@/types/ITypes';
 import { historyList, deleteHistory, tsList } from './services/history';
+import { categoryList, tsCategoryItem } from './services/category';
+
 import { ColumnProps } from 'antd/es/table';
 
 const { Option } = Select;
@@ -81,6 +83,18 @@ export default props => {
     },
   ];
 
+  const [list, setList] = useState<tsCategoryItem[]>();
+
+  useEffect(() => {
+    async function getCategoryList() {
+      let res: GlobalResParams<tsCategoryItem[]> = await categoryList();
+      if (res.status === 200) {
+        setList(res.obj);
+      }
+    }
+    getCategoryList();
+  }, []);
+
   const { TableContent, refresh } = useTable({
     queryMethod: historyList,
     columns,
@@ -121,30 +135,39 @@ export default props => {
           <Col span={5} style={{ display: 'none' }}>
             <Form.Item
               label="id"
-              name="taskType"
+              name="id"
               initialValue={parseInt(props.match.params.id)}
             >
               <Input />
             </Form.Item>
           </Col>
-          <Col span={6}>
+          <Col span={5}>
             <Form.Item label="开始时间" name="startDate">
               <DatePicker format="YYYY-MM-DD" placeholder="请选择" />
             </Form.Item>
           </Col>
-          <Col span={6} offset={1}>
+          <Col span={5} offset={1}>
             <Form.Item label="结束时间" name="endDate">
               <DatePicker format="YYYY-MM-DD" placeholder="请选择" />
             </Form.Item>
           </Col>
-          <Col span={6} offset={1}>
+          <Col span={5} offset={1}>
             <Form.Item label="所属部门" name="businessCode">
               <OzTreeSlect onlySelect={true} onlySelectLevel={3} />
             </Form.Item>
           </Col>
+          <Col span={5} offset={1}>
+            <Form.Item label="工作流类别" name="taskType">
+              <Select placeholder="请选择" allowClear>
+                {list?.map(item => {
+                  return <Option value={item.id}>{item.name}</Option>;
+                })}
+              </Select>
+            </Form.Item>
+          </Col>
         </Row>
         <Row>
-          <Col span={6}>
+          <Col span={5}>
             <Form.Item label="审批状态" name="status">
               <Select placeholder="请选择">
                 <Option value="-1">删除</Option>
@@ -155,12 +178,12 @@ export default props => {
               </Select>
             </Form.Item>
           </Col>
-          <Col span={6} offset={1}>
+          <Col span={5} offset={1}>
             <Form.Item label="审批编号" name="formNumber">
               <Input placeholder="请输入" />
             </Form.Item>
           </Col>
-          <Col span={6} offset={1}>
+          <Col span={5} offset={1}>
             <Form.Item label="申请人" name="applicant">
               <Input placeholder="请输入" />
             </Form.Item>

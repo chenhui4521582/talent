@@ -240,7 +240,7 @@ export default (props: tsProps) => {
       }
     });
 
-    props.onChange(formArr);
+    props.onChange && props.onChange(formArr);
   };
 
   const onChange = value => {
@@ -252,24 +252,24 @@ export default (props: tsProps) => {
           keyTitleList.map(item => {
             if (item.key === value) {
               setValues(value);
-              props.onChange([`${value}-$-${item.title}`]);
+              props.onChange && props.onChange([`${value}-$-${item.title}`]);
             }
           });
         } else {
-          props.onChange([]);
+          props.onChange && props.onChange([]);
           setValues([]);
         }
       } else if (onlySelectLevel) {
         if (levelKeys.indexOf(value) > -1) {
           setValues(value);
-          props.onChange(value);
+          props.onChange && props.onChange(value);
         }
       } else {
         setValues(value);
         keyTitleList.map(item => {
           if (item.key === value) {
             setValues(value);
-            props.onChange([`${value}-$-${item.title}`]);
+            props.onChange && props.onChange([`${value}-$-${item.title}`]);
           }
         });
       }
@@ -289,7 +289,7 @@ export default (props: tsProps) => {
         });
 
         setValues(arr);
-        props.onChange(formArr);
+        props.onChange && props.onChange(formArr);
       } else {
         handleCheckKey(value, value[value.length - 1]);
       }

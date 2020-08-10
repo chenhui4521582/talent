@@ -133,7 +133,7 @@ const Card: React.FC<tsStep & IProps> = ({
         style={{
           position: 'absolute',
           width: 88,
-          padding: '0 4px',
+          padding: '0 15px 0 15px',
           height: 'auto',
           bottom: 4,
           textAlign: 'center',
@@ -142,6 +142,7 @@ const Card: React.FC<tsStep & IProps> = ({
           WebkitBoxOrient: 'vertical',
           WebkitLineClamp: 3,
           overflow: 'hidden',
+          fontSize: 14,
         }}
       >
         <span>{stepName}</span>
