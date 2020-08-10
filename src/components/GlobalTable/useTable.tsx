@@ -96,7 +96,13 @@ export const useTable = ({
               <Form.Item
                 style={{ display: 'flex', justifyContent: 'flex-end' }}
               >
-                <Button type="primary" onClick={submit}>
+                <Button
+                  type="primary"
+                  onClick={() => {
+                    setSelectPageObj({});
+                    submit();
+                  }}
+                >
                   查询
                 </Button>
                 <Button

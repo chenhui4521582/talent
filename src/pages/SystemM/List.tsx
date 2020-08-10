@@ -196,7 +196,7 @@ export default () => {
         </Row>
       </TableContent>
       <Modal
-        title={'授权管理' + selectKeys.length}
+        title={'授权管理-' + selectKeys.length + '人'}
         okText="确认"
         cancelText="取消"
         visible={visible}
