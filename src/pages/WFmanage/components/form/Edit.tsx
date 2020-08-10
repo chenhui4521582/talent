@@ -17,12 +17,19 @@ const Edit = (props: Iprops) => {
   const [inputNameList, setInputNameLis] = useState<string[]>(['value1']);
   const [count, setCount] = useState<number>(1);
   const [showInput, setShowInput] = useState<boolean>(false);
+  const [showMultiple, setShowMultiple] = useState<boolean>(false);
 
   useEffect(() => {
     getC();
   }, []);
 
   useEffect(() => {
+    if (selectItem?.baseControlType === 'user') {
+      setShowMultiple(true);
+    } else {
+      setShowMultiple(false);
+    }
+
     if (
       selectItem?.baseControlType === 'multiple' ||
       selectItem?.baseControlType === 'select'
@@ -142,6 +149,11 @@ const Edit = (props: Iprops) => {
           } else {
             setShowInput(false);
           }
+          if (curValues.baseControlType === 'user') {
+            setShowMultiple(true);
+          } else {
+            setShowMultiple(false);
+          }
           return false;
         }}
       >
@@ -165,8 +177,6 @@ const Edit = (props: Iprops) => {
         </Select>
       </Form.Item>
 
-      {/* {!showSpan ? (
-        type !== 2 ? ( */}
       <Form.Item
         label="列宽"
         name="colspan"
@@ -177,8 +187,19 @@ const Edit = (props: Iprops) => {
           <Option value={2}>2</Option>
         </Select>
       </Form.Item>
-      {/* ) : null
-      ) : null} */}
+
+      {showMultiple ? (
+        <Form.Item
+          label="是否多选"
+          name="isMultiplechoice"
+          rules={[{ required: true, message: '请选择是否多选!' }]}
+        >
+          <Select placeholder="请选择列宽">
+            <Option value={0}>否</Option>
+            <Option value={1}>是</Option>
+          </Select>
+        </Form.Item>
+      ) : null}
     </>
   );
 };

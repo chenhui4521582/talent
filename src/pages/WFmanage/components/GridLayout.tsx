@@ -412,7 +412,7 @@ export default (props: tsProps) => {
               <Select placeholder="请选择标签">
                 {labelList?.map(item => {
                   return (
-                    <Option key={item.id} value={item.id.toString()}>
+                    <Option key={item.id} value={item.id}>
                       {item.labelName}
                     </Option>
                   );

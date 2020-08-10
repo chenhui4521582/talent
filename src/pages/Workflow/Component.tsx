@@ -198,7 +198,7 @@ const MultipleTemplate = props => {
       allowClear
       placeholder="请选择"
       mode="multiple"
-      style={{ width: '100%' }}
+      style={{ width: '100%', minWidth: '14vw' }}
     >
       {data.map((item, index) => {
         return (
