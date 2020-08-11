@@ -17,14 +17,15 @@ import {
   GlobalResParams,
 } from '@/types/ITypes';
 import { useBusiness, useJob, useRole } from '@/models/global';
-import { useRank } from '@/models/global';
+import { useRankP, useRankM } from '@/models/global';
 import { createDemand, INewDemandParams, demandDetail } from './services/list';
 
 const { Option } = Select;
 const { TextArea } = Input;
 export default props => {
   const { demandId, name, updateDemand } = props;
-  const { rankList } = useRank();
+  const { rankList: rankPList } = useRankP();
+  const { rankList: rankMList } = useRankM();
   const [form] = Form.useForm();
   const { businessList } = useBusiness();
   const { jobList } = useJob();
@@ -140,16 +141,12 @@ export default props => {
             optionFilterProp="children"
             allowClear
           >
-            {rankList?.map(item => {
-              if (item.rankName.indexOf('P') > -1) {
-                return (
-                  <Option value={item.rankId.toString()} key={item.rankId + ''}>
-                    {item.rankName}
-                  </Option>
-                );
-              } else {
-                return null;
-              }
+            {rankPList?.map(item => {
+              return (
+                <Option value={item.rankId.toString()} key={item.rankId + ''}>
+                  {item.rankName}
+                </Option>
+              );
             })}
           </Select>
         </Form.Item>
@@ -160,16 +157,12 @@ export default props => {
             optionFilterProp="children"
             allowClear
           >
-            {rankList?.map(item => {
-              if (item.rankName.indexOf('M') > -1) {
-                return (
-                  <Option value={item.rankId.toString()} key={item.rankId + ''}>
-                    {item.rankName}
-                  </Option>
-                );
-              } else {
-                return null;
-              }
+            {rankMList?.map(item => {
+              return (
+                <Option value={item.rankId.toString()} key={item.rankId + ''}>
+                  {item.rankName}
+                </Option>
+              );
             })}
           </Select>
         </Form.Item>

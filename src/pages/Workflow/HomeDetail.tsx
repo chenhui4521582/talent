@@ -91,6 +91,10 @@ export default props => {
         return defaultValue
           ? defaultValue + '-$-' + defaultShowValue
           : defaultShowValue;
+      case 'currBusiness2':
+        return defaultValue
+          ? defaultValue + '-$-' + defaultShowValue
+          : defaultShowValue;
       case 'labor':
         return defaultValue
           ? defaultValue + '-$-' + defaultShowValue
@@ -112,6 +116,10 @@ export default props => {
           ? defaultValue + '-$-' + defaultShowValue
           : defaultShowValue;
       case 'positionLevel':
+        return defaultValue
+          ? defaultValue + '-$-' + defaultShowValue
+          : defaultShowValue;
+      case 'positionMLevel':
         return defaultValue
           ? defaultValue + '-$-' + defaultShowValue
           : defaultShowValue;

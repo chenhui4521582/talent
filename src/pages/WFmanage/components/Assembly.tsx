@@ -13,6 +13,7 @@ interface listItem {
   title: string;
   labelName: string;
   isLocked?: number;
+  childName: string;
 }
 
 interface tsProps {
@@ -41,7 +42,7 @@ export default (props: tsProps) => {
         if (obj[i].isLocked === 0) {
           newList.push({
             key: obj[i].id,
-            title: obj[i].name || obj[i]?.labelName,
+            title: obj[i].childName + '-' + obj[i].name || obj[i]?.labelName,
           });
         }
       }

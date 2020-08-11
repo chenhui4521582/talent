@@ -75,11 +75,7 @@ export default (props: Iprops) => {
         if (fromItem.type === 2) {
           let json = await deleteGroup(fromItem.resFormId, newList[i].id);
           if (json.status === 200) {
-            console.log('jsonAll');
-            console.log(newList);
             newList.splice(i, 1);
-            console.log('jsonAll');
-            console.log(newList);
             jsonAll[index].list = newList;
             changeData(jsonAll);
           }

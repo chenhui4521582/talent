@@ -41,6 +41,7 @@ const Edit = (props: Iprops) => {
           let index = i + 1;
           list.push('value' + index);
         }
+        setCount(list.length);
         setInputNameLis(list);
       }
       setShowInput(true);
@@ -136,6 +137,17 @@ const Edit = (props: Iprops) => {
       >
         <Input placeholder="请输入控件名称" />
       </Form.Item>
+      {(selectItem && selectItem?.id) ||
+      (selectItem && selectItem?.id === 0) ? (
+        <Form.Item
+          style={{ display: 'none' }}
+          label="id"
+          name="id"
+          rules={[{ required: true, message: '请输入控件名称!' }]}
+        >
+          <Input placeholder="请输入控件名称" />
+        </Form.Item>
+      ) : null}
       <Form.Item
         label="控件"
         rules={[{ required: true, message: '请选择控件类型!' }]}

@@ -3,7 +3,8 @@ import { Input, Select, InputNumber, DatePicker, Upload } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 
 import {
-  useRank,
+  useRankP,
+  useRankM,
   useTitle,
   useJob,
   useLabor,
@@ -93,7 +94,7 @@ export default props => {
         />
       );
     //department 部门 走组织架构
-    case 'department':
+    // case 'department':
     // return <OzTreeSlect onlySelect={ismultiplechoice === 0} {...props} />;
     //department 组别 走组织架构
     case 'depGroup':
@@ -114,7 +115,9 @@ export default props => {
     case 'cost':
       return <CostTemplate {...props} placeholder="请选择" />;
     case 'currBusiness2':
-      return <Input {...props} placeholder="当前部门组" disabled={true} />;
+      return (
+        <BusinessTemplate2 {...props} placeholder="请选择" disabled={true} />
+      );
     //currUser 当前成员
     case 'currUser':
       return <Input {...props} placeholder="当前成员" disabled={true} />;
@@ -151,6 +154,8 @@ export default props => {
     //positionLevel 职级
     case 'positionLevel':
       return <LevelTemplate {...props} placeholder="请选择" />;
+    case 'positionMLevel':
+      return <LevelMTemplate {...props} placeholder="请选择" />;
     //wkTask 关联流程
     case 'wkTask':
       return <Input placeholder="关联流程" {...props} />;
@@ -188,6 +193,7 @@ const SelectTemplate = props => {
 // 多选框
 const MultipleTemplate = props => {
   const { list } = props;
+  console.log(props);
   let data = [];
   if (Object.prototype.toString.call(list) === '[object String]') {
     data = list.split('|');
@@ -327,9 +333,37 @@ const JobTemplate = props => {
   );
 };
 
-// 职级下拉框
+// 职级下拉框技术职级
 const LevelTemplate = props => {
-  const { rankList } = useRank();
+  const { rankList } = useRankP();
+  return (
+    <Select
+      {...props}
+      allowClear
+      showSearch
+      style={{ width: '100%' }}
+      filterOption={(input, option) =>
+        option?.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+      }
+      placeholder="请选择职级"
+    >
+      {rankList?.map(item => {
+        return (
+          <Option
+            key={item.rankId + '-$-' + item.rankName}
+            value={item.rankId + '-$-' + item.rankName}
+          >
+            {item.rankName}
+          </Option>
+        );
+      })}
+    </Select>
+  );
+};
+
+// 职级下拉框技术职级
+const LevelMTemplate = props => {
+  const { rankList } = useRankM();
   return (
     <Select
       {...props}

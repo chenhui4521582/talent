@@ -9,6 +9,7 @@ import {
   listDepartment,
   IDepartment,
   listRank,
+  listMRank,
   IRank,
   listTitle,
   ITitle,
@@ -76,11 +77,23 @@ export const useDepartment = (level: number) => {
   return { departmentList };
 };
 
-export const useRank = () => {
+export const useRankP = () => {
   const [rankList, setRankList] = useState<IRank[]>();
   useEffect(() => {
     async function fetchRank() {
       let res: GlobalResParams<IRank[]> = await listRank();
+      setRankList(res.obj);
+    }
+    fetchRank();
+  }, []);
+  return { rankList };
+};
+
+export const useRankM = () => {
+  const [rankList, setRankList] = useState<IRank[]>();
+  useEffect(() => {
+    async function fetchRank() {
+      let res: GlobalResParams<IRank[]> = await listMRank();
       setRankList(res.obj);
     }
     fetchRank();

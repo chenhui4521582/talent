@@ -16,7 +16,8 @@ import {
   useBusiness,
   useJob,
   useDepartment,
-  useRank,
+  useRankP,
+  useRankM,
   useTitle,
   useCost,
   useLabor,
@@ -45,7 +46,8 @@ export default props => {
   const [threeLevel, setThreeLevel] = useState<string>('');
   const [fourLevel, setFourLevel] = useState<string>('');
 
-  const { rankList } = useRank();
+  const { rankList: rankPList } = useRankP();
+  const { rankList: rankMList } = useRankM();
   const { titleList } = useTitle();
   const { costList } = useCost();
   const { laborList } = useLabor();
@@ -307,16 +309,12 @@ export default props => {
           <Col span={5} offset={1}>
             <Form.Item label="管理职级" name="manageRankId">
               <Select showSearch optionFilterProp="children" allowClear>
-                {rankList?.map(item => {
-                  if (item.rankName.indexOf('M') > -1) {
-                    return (
-                      <Option value={item.rankId} key={item.rankId}>
-                        {item.rankName}
-                      </Option>
-                    );
-                  } else {
-                    return null;
-                  }
+                {rankMList?.map(item => {
+                  return (
+                    <Option value={item.rankId} key={item.rankId}>
+                      {item.rankName}
+                    </Option>
+                  );
                 })}
               </Select>
             </Form.Item>
@@ -328,16 +326,12 @@ export default props => {
               rules={[{ required: true, message: '请选择技术职级' }]}
             >
               <Select showSearch optionFilterProp="children" allowClear>
-                {rankList?.map(item => {
-                  if (item.rankName.indexOf('P') > -1) {
-                    return (
-                      <Option value={item.rankId} key={item.rankId}>
-                        {item.rankName}
-                      </Option>
-                    );
-                  } else {
-                    return null;
-                  }
+                {rankPList?.map(item => {
+                  return (
+                    <Option value={item.rankId} key={item.rankId}>
+                      {item.rankName}
+                    </Option>
+                  );
                 })}
               </Select>
             </Form.Item>

@@ -12,6 +12,7 @@ interface tsRolrLable {
   labelName: string;
   status: number;
   updatedBy: string | null;
+  remark?: string;
 }
 
 export default props => {
@@ -90,7 +91,11 @@ export default props => {
         value={selectI}
       >
         {optionList.map(item => {
-          return <Option value={item.id.toString()}>{item.name}</Option>;
+          return (
+            <Option value={item.id.toString()}>
+              {item.childName + '-' + item.name}
+            </Option>
+          );
         })}
       </Select>
     );
@@ -115,6 +120,14 @@ export default props => {
               >
                 <div style={{ marginBottom: 16 }}>需添加动态参数：1 个</div>
                 {renderRight}
+                <div style={{ marginTop: 16 }}>
+                  {' '}
+                  {list.map(item => {
+                    if (item.id.toString() === selectA?.toString()) {
+                      return <span>备注:{item.remark}</span>;
+                    }
+                  })}
+                </div>
               </div>
             </Col>
           </Row>

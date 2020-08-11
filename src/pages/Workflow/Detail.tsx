@@ -175,6 +175,8 @@ export default props => {
         return value ? value + '-$-' + showValue : showValue;
       case 'business2':
         return value ? value + '-$-' + showValue : showValue;
+      case 'currBusiness2':
+        return value ? value + '-$-' + showValue : showValue;
       case 'cost':
         return value ? value + '-$-' + showValue : showValue;
       case 'labor':
@@ -186,6 +188,8 @@ export default props => {
       case 'job':
         return value ? value + '-$-' + showValue : showValue;
       case 'positionLevel':
+        return value ? value + '-$-' + showValue : showValue;
+      case 'positionMLevel':
         return value ? value + '-$-' + showValue : showValue;
       case 'datetime':
         return showValue
@@ -202,12 +206,12 @@ export default props => {
       case 'select':
         return showValue && value ? (showValue ? showValue : value) : '';
       case 'multiple':
-        return showValue
-          ? showValue
-            ? showValue.split(',')
+        return value
+          ? value
+            ? value.split(',')
             : undefined
-          : value
-          ? value.split(',')
+          : showValue
+          ? showValue.split(',')
           : undefined;
       case 'files':
         return value ? value.split(',') : undefined;

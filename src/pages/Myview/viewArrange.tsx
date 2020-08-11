@@ -17,7 +17,7 @@ import {
   updateInterviewByInterviewer,
 } from './services/myview';
 import { ColumnProps } from 'antd/es/table';
-import { useRank } from '@/models/global';
+import { useRankP, useRankM } from '@/models/global';
 import { GlobalResParams, formItemLayout } from '@/types/ITypes';
 
 const { Option } = Select;
@@ -26,7 +26,8 @@ export default () => {
   const [curRecord, setCurRecord] = useState<any>();
   const [form] = Form.useForm();
   const [view, setView] = useState<number>(-1);
-  const { rankList } = useRank();
+  const { rankList: rankPList } = useRankP();
+  const { rankList: rankMList } = useRankM();
   const columns: ColumnProps<any>[] = [
     {
       title: '编号',
@@ -237,7 +238,7 @@ export default () => {
                 rules={[{ required: true, message: '请选择实际职级' }]}
               >
                 <Select showSearch placeholder="请选择实际职级">
-                  {rankList?.map(item => {
+                  {rankPList?.map(item => {
                     return (
                       <Option key={item.rankId} value={item.rankId}>
                         {item.rankName}

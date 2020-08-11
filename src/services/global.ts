@@ -179,9 +179,17 @@ export async function listDepartment(level: number) {
   });
 }
 
-// 职级下拉
+// 技术职级下拉
 export async function listRank() {
   return request(`/api/talent/employeeRoster/listRank`, {
+    method: 'POST',
+    data: {},
+  });
+}
+
+// 管理职级
+export async function listMRank() {
+  return request(`/api/talent/employeeRoster/listManagementRank`, {
     method: 'POST',
     data: {},
   });
