@@ -59,12 +59,16 @@ const EditForm = props => {
         for (let i = 0; i < groupList.length; i++) {
           let groupItem = groupList[i];
           let list: any = [];
+          let sort = 0;
           for (let g = 0; g < controlList.length; g++) {
             if (groupItem.id === controlList[g].resGroupId) {
               data[k].groupColArr.push(formChildlist[k].controlList[g].id);
               list.push(controlList[g]);
+              sort += controlList[g].sort;
               groupItem.list = list;
+              groupItem.sort = sort;
               data[k].list.push(groupItem);
+              data[k].list.sort(compare('sort'));
             }
             // else{
             //   groupItem.list = list;
@@ -88,7 +92,23 @@ const EditForm = props => {
         data[k].list = controlList;
       }
     }
+
+    console.log(data);
     setFormDetail(data);
+  };
+
+  const compare = (name: string) => {
+    return (a, b) => {
+      let v1 = a[name];
+      let v2 = b[name];
+      if (v2 > v1) {
+        return -1;
+      } else if (v2 < v1) {
+        return 1;
+      } else {
+        return 0;
+      }
+    };
   };
 
   const handleMoveIndex = (dragIndex: number, hoverIndex: number) => {
