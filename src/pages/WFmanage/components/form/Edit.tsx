@@ -173,7 +173,7 @@ const Edit = (props: Iprops) => {
       </Form.Item>
 
       {showInput ? (
-        <Form.Item label="控件值" name="itemList">
+        <Form.Item label="控件值" name="ItemList">
           <Input.Group compact>{renderInput()}</Input.Group>
         </Form.Item>
       ) : null}
@@ -207,8 +207,8 @@ const Edit = (props: Iprops) => {
           rules={[{ required: true, message: '请选择是否多选!' }]}
         >
           <Select placeholder="请选择列宽">
-            <Option value={0}>否</Option>
-            <Option value={1}>是</Option>
+            <Option value={0}>单选</Option>
+            <Option value={1}>多选</Option>
           </Select>
         </Form.Item>
       ) : null}

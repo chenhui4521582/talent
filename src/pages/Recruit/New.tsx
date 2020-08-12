@@ -81,7 +81,7 @@ export default props => {
       values as INewDemandParams,
     );
     if (res.status === 200) {
-      history.push('/talent/recruit/mylist');
+      window.history.go(-1);
       notification['success']({
         message: res.msg,
         description: '',

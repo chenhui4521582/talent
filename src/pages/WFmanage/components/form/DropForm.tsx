@@ -90,6 +90,8 @@ export default (props: Iprops) => {
 
   const handleOk = () => {
     form.validateFields().then(async value => {
+      console.log(value);
+      console.log('value');
       let list = JSON.parse(JSON.stringify(fromItem.list));
       let jsonAll = JSON.parse(JSON.stringify(allData));
       if (visible === 'edit') {

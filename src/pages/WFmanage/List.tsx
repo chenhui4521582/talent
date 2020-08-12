@@ -20,6 +20,7 @@ import { ColumnProps } from 'antd/es/table';
 import { GlobalResParams } from '@/types/ITypes';
 import { UploadOutlined } from '@ant-design/icons';
 import { saveFile } from '@/services/global';
+import Icon from '@/images/icon.png';
 
 interface tsList {
   id: number;
@@ -44,7 +45,7 @@ export default () => {
       key: 'icon',
       align: 'center',
       render: (_, record) => {
-        return <img src={record.icon} style={{ height: 40 }} />;
+        return <img src={record.icon || Icon} style={{ height: 40 }} />;
       },
     },
     {

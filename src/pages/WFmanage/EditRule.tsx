@@ -132,7 +132,6 @@ export default props => {
 
     let res: GlobalResParams<string> = await api(data);
     if (res.status === 200) {
-      window.history.go(-1);
       getDetail();
 
       notification['success']({
@@ -205,6 +204,17 @@ export default props => {
             </Radio.Group>
           </Col>
         </Row> */}
+        <div style={{ textAlign: 'center' }}>
+          <Button
+            onClick={() => {
+              window.history.go(-1);
+            }}
+            type="primary"
+          >
+            {' '}
+            返回{' '}
+          </Button>
+        </div>
       </Card>
     </DndProvider>
   );

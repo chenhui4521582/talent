@@ -4,6 +4,7 @@ import { Link } from 'umi';
 import { homeList, tsCategory } from './services/home';
 import { GlobalResParams } from '@/types/ITypes';
 import './style/home.less';
+import Icon from '@/images/icon.png';
 
 export default () => {
   const [list, setList] = useState<tsCategory[]>([]);
@@ -30,7 +31,7 @@ export default () => {
               <Button className="button-right" key={u.id}>
                 <Link to={`homedetail/${u.id}`}>
                   <img
-                    src={u.icon || ''}
+                    src={u.icon || Icon}
                     style={{
                       display: 'inline-block',
                       width: 20,

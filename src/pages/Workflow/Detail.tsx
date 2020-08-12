@@ -64,7 +64,9 @@ const columns: ColumnProps<tsLog>[] = [
     render: (_, item: tsLog) => (
       <div>
         <p>{item.apprRemark}</p>
-        <p>接收人：{item.nextStepUserNames}</p>
+        {item.nextStepUserNames ? (
+          <p>接收人：{item.nextStepUserNames}</p>
+        ) : null}
       </div>
     ),
   },

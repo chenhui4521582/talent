@@ -277,7 +277,6 @@ const EditForm = props => {
       resFormControlCrudParamList: [...new Set(cList)],
     });
     if (json.status === 200) {
-      window.history.go(-1);
       getForm();
       notification['success']({
         message: json.msg,
@@ -404,6 +403,17 @@ const EditForm = props => {
           ) : null}
         </Form>
       </Modal>
+      <div style={{ textAlign: 'center' }}>
+        <Button
+          onClick={() => {
+            window.history.go(-1);
+          }}
+          type="primary"
+        >
+          {' '}
+          返回{' '}
+        </Button>
+      </div>
     </Card>
   );
 };

@@ -10,6 +10,7 @@ import {
   Select,
   notification,
   Cascader,
+  Button,
 } from 'antd';
 import OzTreeSlect from '@/pages/Framework/components/OzTreeSlect';
 import { useTable } from '@/components/GlobalTable/useTable';
@@ -159,7 +160,19 @@ export default props => {
   };
 
   return (
-    <Card title="工作流列表/申请记录">
+    <Card
+      title="工作流列表/申请记录"
+      extra={
+        <Button
+          type="primary"
+          onClick={() => {
+            window.history.go(-1);
+          }}
+        >
+          返回
+        </Button>
+      }
+    >
       <TableContent>
         <Row>
           <Col span={5} style={{ display: 'none' }}>
