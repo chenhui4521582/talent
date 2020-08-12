@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import PDFObject from 'pdfobject';
-import { Card, Descriptions, Tabs } from 'antd';
+import { Card, Descriptions, Tabs, Button } from 'antd';
 import { GlobalResParams, eduHash } from '@/types/ITypes';
 import { commonDetail } from './services/staff';
 import EmployeePrint from '@/pages/Evaluation/Print';
@@ -321,6 +321,15 @@ export default props => {
           )}
         </TabPane>
       </Tabs>
+      <div style={{ textAlign: 'center', marginTop: 16 }}>
+        <Button
+          onClick={() => {
+            window.history.go(-1);
+          }}
+        >
+          返回
+        </Button>
+      </div>
     </Card>
   );
 };

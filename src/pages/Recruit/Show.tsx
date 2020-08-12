@@ -122,7 +122,7 @@ export default props => {
           {demand?.description}
         </Descriptions.Item>
       </Descriptions>
-      <div>
+      <div style={{ textAlign: 'center' }}>
         {demand?.status === 2 && task === '2' ? (
           <Link
             to={`/talent/recruit/search/${demand?.demandId}`}

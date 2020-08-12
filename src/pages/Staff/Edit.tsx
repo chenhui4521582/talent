@@ -754,7 +754,10 @@ export default props => {
             </Form.Item>
           </Col>
         </Row>
-        <Form.Item wrapperCol={{ span: 12, offset: 10 }}>
+        <Form.Item
+          wrapperCol={{ span: 12, offset: 10 }}
+          style={{ textAlign: 'center' }}
+        >
           <Button
             style={{ marginRight: 20, marginTop: 20 }}
             onClick={() => {

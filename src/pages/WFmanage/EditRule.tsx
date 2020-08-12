@@ -209,7 +209,6 @@ export default props => {
             onClick={() => {
               window.history.go(-1);
             }}
-            type="primary"
           >
             {' '}
             返回{' '}

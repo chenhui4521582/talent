@@ -225,7 +225,10 @@ export default props => {
           <TextArea rows={4} placeholder="请填写岗位描述"></TextArea>
         </Form.Item>
 
-        <Form.Item {...submitFormLayout} style={{ marginTop: 32 }}>
+        <Form.Item
+          {...submitFormLayout}
+          style={{ marginTop: 32, textAlign: 'center' }}
+        >
           <Button type="primary" htmlType="submit">
             提交
           </Button>
