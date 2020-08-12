@@ -77,7 +77,7 @@ const Card: React.FC<IProps> = ({ index, moveIndex, name, remove }) => {
     marginTop: 10,
     verticalAlign: 40,
     padding: '6px 8px',
-    width: '8em',
+    width: '16em',
   };
 
   drag(drop(ref));

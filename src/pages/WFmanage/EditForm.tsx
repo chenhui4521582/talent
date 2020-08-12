@@ -340,7 +340,7 @@ const EditForm = props => {
         style={{
           position: 'fixed',
           top: '20vh',
-          right: '3vw',
+          right: '6vw',
           width: '8em',
         }}
       >
