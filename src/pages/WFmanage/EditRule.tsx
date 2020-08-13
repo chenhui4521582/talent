@@ -21,7 +21,7 @@ interface tsGetId {
 export default props => {
   const [listOne, setListOne] = useState<tsStep[]>([]);
   const [listTwo, setListTwo] = useState<tsStep[]>([]);
-  const [stepType, setStepType] = useState<1 | 2 | 3>(1);
+  // const [stepType, setStepType] = useState<1 | 2 | 3>(1);
   const [fromName, setFromName] = useState<string>('审批流程');
   const [addOrChange, setAddOrChange] = useState<'add' | 'change'>('change');
   const [formId, setFormId] = useState<string>();
@@ -147,14 +147,10 @@ export default props => {
   };
 
   const getdata1 = value => {
-    console.log('list1');
-    console.log(value);
     data1 = value;
   };
 
   const getdata2 = value => {
-    console.log('list2');
-    console.log(value);
     data2 = value;
   };
 
@@ -162,7 +158,7 @@ export default props => {
   return (
     <DndProvider backend={HTML5Backend}>
       <Card
-        title="工作流列表/招聘/规则设置"
+        title="规则设置"
         extra={<Button type="primary" onClick={submitData}>{`保存`}</Button>}
       >
         <h4 style={{ margin: '15px 0' }}>{fromName}</h4>
@@ -174,13 +170,13 @@ export default props => {
           </Col>
         </Row>
 
-        <Row>
+        {/* <Row>
           <Col>默认抄送人</Col>
           <Col span={18} offset={1}>
             <GridLayout {...props} ruleList={listTwo} change={getdata2} />
           </Col>
         </Row>
-        <Divider />
+        <Divider /> */}
 
         {/* <Row style={{ marginTop: 20 }}>
           <Col>抄送通知</Col>
@@ -204,7 +200,7 @@ export default props => {
             </Radio.Group>
           </Col>
         </Row> */}
-        <div style={{ textAlign: 'center' }}>
+        <div style={{ textAlign: 'center', marginTop: 20 }}>
           <Button
             onClick={() => {
               window.history.go(-1);

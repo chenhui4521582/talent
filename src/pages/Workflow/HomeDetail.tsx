@@ -43,14 +43,18 @@ export default props => {
         data[k].groupColArr = [];
         if (groupList.length) {
           for (let i = 0; i < groupList.length; i++) {
+            let sort = 0;
             let groupItem = groupList[i];
             let list: any = [];
             for (let g = 0; g < controlList.length; g++) {
               if (groupItem.id === controlList[g].resGroupId) {
+                sort += controlList[g].sort;
                 data[k].groupColArr.push(formChildlist[k].controlList[g].id);
                 list.push(controlList[g]);
                 groupItem.list = list;
+                groupItem.sort = sort;
                 data[k].list.push(groupItem);
+                data[k].list.sort(compare('sort'));
               }
               if (
                 data[k].arr.indexOf(formChildlist[k].controlList[g].id) ===
@@ -74,6 +78,20 @@ export default props => {
       setTitle(obj.name);
       setFormList(data);
     }
+  };
+
+  const compare = (name: string) => {
+    return (a, b) => {
+      let v1 = a[name];
+      let v2 = b[name];
+      if (v2 > v1) {
+        return -1;
+      } else if (v2 < v1) {
+        return 1;
+      } else {
+        return 0;
+      }
+    };
   };
 
   const handleValue = item => {
@@ -365,7 +383,6 @@ export default props => {
           }
         }
       });
-      console.log(subList);
       let json: GlobalResParams<string> = await saveTaskForm({
         resFormId: formId,
         wfResFormSaveItemCrudParamList: subList,
