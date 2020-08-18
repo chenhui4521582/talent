@@ -1,4 +1,5 @@
 import { defineConfig } from 'umi';
+import theme from './src/components/theme';
 
 export default defineConfig({
   nodeModulesTransform: {
@@ -7,6 +8,7 @@ export default defineConfig({
   dynamicImport: {
     loading: '@/components/PageLoading/index',
   },
+  theme: theme,
   targets: {
     edge: 13,
     ie: 10,
@@ -131,6 +133,10 @@ export default defineConfig({
         {
           path: '/talent/staff/list',
           component: '@/pages/Staff/List',
+        },
+        {
+          path: '/talent/staffHrbp/list',
+          component: '@/pages/Staff/HrbpList',
         },
         {
           path: '/talent/staff/upload',
@@ -267,6 +273,14 @@ export default defineConfig({
         {
           path: '/talent/systemm/list',
           component: '@/pages/SystemM/List',
+        },
+        {
+          path: '/talent/systemm/notice/edit',
+          component: '@/pages/SystemM/notice/Edit',
+        },
+        {
+          path: '/talent/systemm/notice/list',
+          component: '@/pages/SystemM/notice/List',
         },
       ],
     },

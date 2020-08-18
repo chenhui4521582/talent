@@ -23,9 +23,7 @@ export default (props: tsProps) => {
   const [keyTitleList, setKeyTitleList] = useState<any[]>([]);
   const [userListObj, setUserList] = useState<any>({});
   const [userKeyList, setUserKeyList] = useState<any[]>([]);
-  const [searchValue, setSearchValue] = useState<string>('');
   const [values, setValues] = useState<string[]>([]);
-  const [expandAll, setExpandAll] = useState<boolean>(false);
   const [once, setOnce] = useState<boolean>(false);
   const [mount, setMount] = useState<boolean>(false);
   const [levelKeys, setLevelKeys] = useState<string[]>([]);
@@ -148,35 +146,6 @@ export default (props: tsProps) => {
     setUserList(userList);
   };
 
-  const loop = data => {
-    let loopdata = JSON.parse(JSON.stringify(data));
-
-    const handleItem = list => {
-      for (let i = 0; i < list.length; i++) {
-        list[i].key = list[i].code + '';
-        if (searchValue.length && list[i].title.indexOf(searchValue) > -1) {
-          const index = list[i].title.indexOf(searchValue);
-          const beforeStr = list[i].title.substr(0, index);
-          const afterStr = list[i].title.substr(index + searchValue.length);
-          list[i].title = (
-            <div>
-              {beforeStr}
-              <span style={{ color: 'red' }}>{searchValue}</span>
-              {afterStr}
-            </div>
-          );
-        } else {
-          list[i].title = list[i].name;
-        }
-        if (list[i].children) {
-          handleItem(list[i].children);
-        }
-      }
-    };
-    handleItem(loopdata);
-    return loopdata;
-  };
-
   // 查找选择后取消祖父节点跟曾子节点的选准状态
   const handleCheckKey = (keys, key) => {
     let fatherArr: string[] = [];
@@ -296,28 +265,19 @@ export default (props: tsProps) => {
     }
   };
 
-  const searchChange = (e): void => {
-    setExpandAll(true);
-    setSearchValue(e);
-  };
-
-  const onTreeExpand = expandedKeys => {
-    setExpandAll(false);
-  };
   return (
     <TreeSelect
       {...props}
       value={values}
       placeholder="请选择"
       showSearch={true}
-      treeData={loop(dataList)}
-      treeDefaultExpandAll={expandAll}
-      onTreeExpand={onTreeExpand}
+      treeData={dataList}
       style={{ minWidth: '200px', width: '100%' }}
       size="middle"
-      onSearch={searchChange}
       multiple={!onlySelect}
       onChange={onChange}
+      allowClear
+      treeNodeFilterProp="title"
     />
   );
 };

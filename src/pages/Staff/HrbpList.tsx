@@ -199,12 +199,10 @@ export default () => {
         return (
           <span>
             <Link
-              to={`detail?employeeId=${record.employeeId}&resumeId=${record.resumeId}`}
+              to={`/talent/staff/detail?employeeId=${record.employeeId}&resumeId=${record.resumeId}`}
             >
               查看详情
             </Link>
-            <Divider type="vertical" />
-            <Link to={`edit?employeeId=${record.employeeId}`}>编辑</Link>
           </span>
         );
       },
@@ -243,9 +241,6 @@ export default () => {
       title="员工花名册"
       extra={
         <div>
-          <Button type="primary">
-            <Link to={`edit`}>新增员工</Link>
-          </Button>
           <Button onClick={_ => setVisible(true)} style={{ marginLeft: 10 }}>
             导出
           </Button>
@@ -280,35 +275,10 @@ export default () => {
         </Row>
         <Row>
           <Col span={6}>
-            <Form.Item label="一级业务线" name="businessCode">
-              <Select
-                showSearch
-                optionFilterProp="children"
-                onChange={e => {
-                  searchForm.setFieldsValue({ businessCode2: undefined });
-                  setSelect1(e as any);
-                }}
-              >
-                {business1?.map(item => {
-                  return (
-                    <Option key={item.code} value={item.code}>
-                      {item.name}
-                    </Option>
-                  );
-                })}
-              </Select>
-            </Form.Item>
-          </Col>
-          <Col span={6} offset={2}>
-            <Form.Item label="二级业务线" name="businessCode2">
-              <Select showSearch optionFilterProp="children" allowClear>
-                {business2?.map(item => {
-                  return (
-                    <Option key={item.code} value={item.code}>
-                      {item.name}
-                    </Option>
-                  );
-                })}
+            <Form.Item label="是否在职" name="">
+              <Select showSearch optionFilterProp="children">
+                <Option value={0}>否</Option>
+                <Option value={1}>是</Option>
               </Select>
             </Form.Item>
           </Col>

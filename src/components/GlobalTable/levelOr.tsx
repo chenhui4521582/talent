@@ -36,8 +36,12 @@ export default (props: tsProps) => {
       value={mount ? value : ''}
       onChange={onChange}
     >
-      {list.map(item => {
-        return <Option value={item.code}>{item.name}</Option>;
+      {list.map((item, i) => {
+        return (
+          <Option key={i} value={item.code}>
+            {item.name}
+          </Option>
+        );
       })}
     </Select>
   );
