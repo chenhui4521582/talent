@@ -19,6 +19,7 @@ export interface tsListItem {
   name: string;
   parentCode?: string | null;
   children?: tsListItem[];
+  memberNumber?: number;
 }
 
 export interface tsUserItem {
@@ -29,6 +30,7 @@ export interface tsUserItem {
   title?: string;
   userType?: string | number;
   parentCode?: string | null;
+  employeeId?: string;
 }
 
 export interface tsDeleteItem {

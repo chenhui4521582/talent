@@ -1,12 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { TreeSelect } from 'antd';
-import { tsListItem } from '../services/organization';
 import { tsUserItem } from '@/services/global';
 import {
   useOrganization,
   usetDeleteOrganization,
   usetDefaultOrganization,
 } from '@/models/global';
+
+interface tsListItem {
+  code: string;
+  key?: string;
+  title?: string;
+  id: number;
+  level?: number;
+  memberList?: tsUserItem[];
+  name: string;
+  parentCode?: string | null;
+  children?: tsListItem[];
+  memberNumber?: number;
+}
 
 interface tsProps {
   renderUser?: boolean;

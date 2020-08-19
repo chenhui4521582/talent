@@ -144,6 +144,13 @@ export default props => {
 
   async function getJson() {
     let list = organizationJson;
+    let totalNum = 0;
+    list.map(item => {
+      if (item.memberNumber) {
+        totalNum += item.memberNumber;
+      }
+    });
+
     let deleteGroupList: tsUserItem[] = [];
     for (let i = 0; i < deleteGroupJson.length; i++) {
       deleteGroupList.push({
@@ -163,6 +170,7 @@ export default props => {
       key: '已删除组',
       title: '已删除组',
       memberList: deleteGroupList,
+      memberNumber: deleteGroupList.length,
     };
 
     list.push(deleteGroupObj);
@@ -186,6 +194,7 @@ export default props => {
       key: '默认分组',
       title: '默认分组',
       memberList: defaulGroupList,
+      memberNumber: defaulGroupList.length,
     };
 
     list.push(defaultGroupObj);
@@ -196,6 +205,7 @@ export default props => {
       code: '奖多多集团',
       name: '奖多多集团',
       children: list,
+      memberNumber: defaulGroupList.length + deleteGroupList.length + totalNum,
     };
     handleList([newObj]);
   }
@@ -401,6 +411,9 @@ export default props => {
                 {beforeStr}{' '}
                 <span style={{ color: 'red' }}> {searchValue} </span>
                 {afterStr}
+                <span style={{ color: 'red', marginLeft: 6 }}>
+                  ({list[i].memberNumber})
+                </span>
                 <span
                   style={{
                     display: 'flex',
@@ -425,6 +438,9 @@ export default props => {
                     {beforeStr}{' '}
                     <span style={{ color: 'red' }}>{searchValue}</span>{' '}
                     {afterStr}{' '}
+                    <span style={{ color: 'red', marginLeft: 6 }}>
+                      ({list[i].memberNumber})
+                    </span>
                   </span>
                   {list[i].title === '已删除组' || list[i].title === '默认分组'
                     ? null
@@ -443,7 +459,10 @@ export default props => {
                     {' '}
                     {beforeStr}{' '}
                     <span style={{ color: 'red' }}>{searchValue}</span>{' '}
-                    {afterStr}{' '}
+                    {afterStr}
+                    <span style={{ color: 'red', marginLeft: 6 }}>
+                      ({list[i].memberNumber})
+                    </span>
                   </span>
                 </div>
               );
@@ -454,6 +473,9 @@ export default props => {
             list[i].title = (
               <div style={{ minWidth: '10em', display: 'flex' }}>
                 {list[i].name}
+                <span style={{ color: 'red', marginLeft: 6 }}>
+                  ({list[i].memberNumber})
+                </span>
                 <span
                   style={{
                     display: 'flex',
@@ -475,6 +497,9 @@ export default props => {
                 <div style={{ minWidth: '10em', display: 'flex', flex: '1' }}>
                   <span style={{ display: 'flex', flex: '1' }}>
                     {list[i].name}
+                    <span style={{ color: 'red', marginLeft: 6 }}>
+                      ({list[i].memberNumber})
+                    </span>
                   </span>
                   {list[i].title === '已删除组' || list[i].title === '默认分组'
                     ? null
@@ -486,6 +511,9 @@ export default props => {
                 <div style={{ minWidth: '10em', display: 'flex', flex: '1' }}>
                   <span style={{ display: 'flex', flex: '1' }}>
                     {list[i].name}
+                    <span style={{ color: 'red', marginLeft: 6 }}>
+                      ({list[i].memberNumber})
+                    </span>
                   </span>
                 </div>
               );

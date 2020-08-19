@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'umi';
 import { useTable } from '@/components/GlobalTable/useTable';
 import { ColumnProps } from 'antd/es/table';
-import { listByConditionsRoster } from './services/staff';
+import { listByHrbp } from './services/staff';
 import {
   Card,
   Form,
@@ -209,10 +209,10 @@ export default () => {
     },
   ];
   const { TableContent, searchForm } = useTable({
-    queryMethod: listByConditionsRoster,
+    queryMethod: listByHrbp,
     columns,
     rowKeyName: 'employeeId',
-    cacheKey: 'employeeRoster/listByConditionsRoster',
+    cacheKey: 'employeeRoster/listByHr',
   });
 
   const changeCheck = checkedValues => {
@@ -275,10 +275,10 @@ export default () => {
         </Row>
         <Row>
           <Col span={6}>
-            <Form.Item label="是否在职" name="">
+            <Form.Item label="是否在职" name="currentPosition">
               <Select showSearch optionFilterProp="children">
-                <Option value={0}>否</Option>
-                <Option value={1}>是</Option>
+                <Option value={0}>离职</Option>
+                <Option value={1}>在职</Option>
               </Select>
             </Form.Item>
           </Col>

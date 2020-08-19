@@ -124,6 +124,7 @@ export default () => {
     });
     setChecked([...newArr]);
   }, [visible]);
+
   const columns: ColumnProps<any>[] = [
     {
       title: '员工编号',
@@ -210,6 +211,7 @@ export default () => {
       },
     },
   ];
+
   const { TableContent, searchForm } = useTable({
     queryMethod: listByConditionsRoster,
     columns,
@@ -280,7 +282,7 @@ export default () => {
         </Row>
         <Row>
           <Col span={6}>
-            <Form.Item label="一级业务线" name="businessCode">
+            <Form.Item label="一级业务线" name="firstBusinessCode">
               <Select
                 showSearch
                 optionFilterProp="children"
@@ -300,7 +302,7 @@ export default () => {
             </Form.Item>
           </Col>
           <Col span={6} offset={2}>
-            <Form.Item label="二级业务线" name="businessCode2">
+            <Form.Item label="二级业务线" name="businessCode">
               <Select showSearch optionFilterProp="children" allowClear>
                 {business2?.map(item => {
                   return (
@@ -309,6 +311,14 @@ export default () => {
                     </Option>
                   );
                 })}
+              </Select>
+            </Form.Item>
+          </Col>
+          <Col span={6} offset={2}>
+            <Form.Item label="是否在职" name="currentPosition">
+              <Select showSearch optionFilterProp="children">
+                <Option value={0}>离职</Option>
+                <Option value={1}>在职</Option>
               </Select>
             </Form.Item>
           </Col>

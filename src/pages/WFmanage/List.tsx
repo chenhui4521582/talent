@@ -184,7 +184,7 @@ export default () => {
             name="name"
             rules={[{ required: true, message: '请输入工作流名称!' }]}
           >
-            <Input placeholder="请输入用户名称" />
+            <Input placeholder="请输入工作流名称" />
           </Form.Item>
           <Form.Item
             label="所属类别"
@@ -201,11 +201,7 @@ export default () => {
               })}
             </Select>
           </Form.Item>
-          <Form.Item
-            label="icon"
-            name="icon"
-            rules={[{ required: true, message: '请上传图标!' }]}
-          >
+          <Form.Item label="工作流图标" name="icon">
             <IconImg iconUrl={selectItem?.icon} />
           </Form.Item>
         </Form>
