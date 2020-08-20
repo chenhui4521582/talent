@@ -275,7 +275,11 @@ export default defineConfig({
           component: '@/pages/SystemM/List',
         },
         {
-          path: '/talent/systemm/notice/edit',
+          path: '/talent/systemm/notice/new',
+          component: '@/pages/SystemM/notice/Edit',
+        },
+        {
+          path: '/talent/systemm/notice/edit/:id',
           component: '@/pages/SystemM/notice/Edit',
         },
         {
