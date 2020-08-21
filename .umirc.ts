@@ -240,7 +240,11 @@ export default defineConfig({
         },
         {
           path: '/talent/framework/systemLabel',
-          component: '@/pages/Framework/systemlabel',
+          component: '@/pages/Framework/Systemlabel',
+        },
+        {
+          path: '/talent/framework/handlesystem',
+          component: '@/pages/Framework/HandleSystem',
         },
         {
           path: '/talent/wfmanage/list',
@@ -265,10 +269,6 @@ export default defineConfig({
         {
           path: '/talent/wfmanage/category',
           component: '@/pages/WFmanage/Category',
-        },
-        {
-          path: '/talent/wftemplate/list',
-          component: '@/pages/WFtemplate/list',
         },
         {
           path: '/talent/systemm/list',

@@ -10,6 +10,7 @@ import { GlobalResParams } from '@/types/ITypes';
 import { Card, Descriptions, Button, Form, notification, Table } from 'antd';
 import moment from 'moment';
 import Temp from './Component';
+import update from 'immutability-helper';
 import './style/home.less';
 
 export default props => {
@@ -36,7 +37,9 @@ export default props => {
       for (let k = 0; k < formChildlist.length; k++) {
         let fromItem = formChildlist[k];
         let controlList = fromItem.controlList;
-        idItem = idItem.concat(controlList);
+        if (fromItem.type !== 1) {
+          idItem = idItem.concat(controlList);
+        }
         data[k] = fromItem;
         data[k].list = [];
         data[k].arr = [];
@@ -305,6 +308,7 @@ export default props => {
 
   const submit = (): void => {
     form.validateFields().then(async fromSubData => {
+      console.log(fromSubData);
       let subList: any = [];
       idItemList.map(item => {
         let showArr: any = [];
@@ -388,6 +392,76 @@ export default props => {
           }
         }
       });
+
+      for (let key in fromSubData) {
+        if (key.split('-')[1] && key.split('-')[0]) {
+          if (key.split('-')[0] === 'date') {
+            subList.push({
+              id: parseInt(key.split('-')[1]),
+              value: moment(fromSubData[key])?.format('YYYY-MM-DD') || '',
+              multipleNumber: parseInt(key.split('-')[2]),
+            });
+          } else if (key.split('-')[0] === 'datetime') {
+            subList.push({
+              id: parseInt(key.split('-')[1]),
+              value:
+                moment(fromSubData[key])?.format('YYYY-MM-DD HH:mm:ss') || '',
+              multipleNumber: parseInt(key.split('-')[2]),
+            });
+          } else if (key.split('-')[0] === 'depGroup') {
+            subList.push({
+              id: parseInt(key.split('-')[1]),
+              value: fromSubData[key] ? fromSubData[key].split('-$-')[0] : '',
+              showValue: fromSubData[key]
+                ? fromSubData[key].split('-$-')[1]
+                : '',
+              multipleNumber: parseInt(key.split('-')[2]),
+            });
+          } else if (
+            key.split('-')[0] === 'multiple' ||
+            key.split('-')[0] === 'user'
+          ) {
+            let vArr: any = [];
+            let sArr: any = [];
+            if (fromSubData[key]) {
+              for (let i = 0; i < fromSubData[key].length; i++) {
+                vArr.push(fromSubData[key][i].split('-$-')[0]);
+                sArr.push(fromSubData[key][i].split('-$-')[1]);
+              }
+            }
+            subList.push({
+              id: parseInt(key.split('-')[1]),
+              value: vArr.join(','),
+              showValue: sArr.join(','),
+              multipleNumber: parseInt(key.split('-')[2]),
+            });
+          } else if (
+            key.split('-')[0] === 'select' ||
+            key.split('-')[0] === 'business' ||
+            key.split('-')[0] === 'business2' ||
+            key.split('-')[0] === 'labor' ||
+            key.split('-')[0] === 'cost' ||
+            key.split('-')[0] === 'positionLevel' ||
+            key.split('-')[0] === 'positionMLevel'
+          ) {
+            subList.push({
+              id: parseInt(key.split('-')[1]),
+              value: fromSubData[key] ? fromSubData[key].split('-$-')[0] : '',
+              showValue: fromSubData[key]
+                ? fromSubData[key].split('-$-')[1]
+                : '',
+              multipleNumber: parseInt(key.split('-')[2]),
+            });
+          } else {
+            subList.push({
+              id: parseInt(key.split('-')[1]),
+              value: fromSubData[key],
+              showValue: fromSubData[key],
+              multipleNumber: parseInt(key.split('-')[2]),
+            });
+          }
+        }
+      }
       let json: GlobalResParams<string> = await saveTaskForm({
         resFormId: formId,
         wfResFormSaveItemCrudParamList: subList,
@@ -445,32 +519,85 @@ const AutoTable = props => {
 
   useEffect(() => {
     let dataItem: any = {};
-    let newData = JSON.parse(JSON.stringify(dataSource));
+    let newColumns: any = [];
     list.map(item => {
-      columns.push({
+      newColumns.push({
         title: item.name,
         dataIndex: item.baseControlType + '-' + item.id,
-        key: item.id + '',
+        key: item.id,
         align: 'center',
         ...item,
       });
       dataItem[item.baseControlType + '-' + item.id] = { ...item };
     });
-    console.log(dataItem);
-    newData.push(dataItem);
+    newColumns.push({
+      title: '操作',
+      dataIndex: 'action',
+      key: 'action',
+      render: (_, record, index) => (
+        <span>
+          <a
+            onClick={() => {
+              let newList = new Set(dataSource);
+              newList = update(newList, {
+                $remove: [newList[index]],
+              });
+            }}
+          >
+            删除
+          </a>
+        </span>
+      ),
+    });
 
-    setColumns(columns);
-    setDataSource(newData);
+    setColumns(newColumns);
     setTemplate(dataItem);
+    setDataSource([dataItem]);
   }, [list]);
+
+  useEffect(() => {
+    let dataItem: any = {};
+    let newColumns: any = [];
+    list.map(item => {
+      newColumns.push({
+        title: item.name,
+        dataIndex: item.baseControlType + '-' + item.id,
+        key: item.id,
+        align: 'center',
+        ...item,
+      });
+      dataItem[item.baseControlType + '-' + item.id] = { ...item };
+    });
+    newColumns.push({
+      title: '操作',
+      dataIndex: 'action',
+      key: 'action',
+      render: (_, record, index) => (
+        <span>
+          <a
+            onClick={() => {
+              let newList = new Set(dataSource);
+              console.log(dataSource[index]);
+              console.log(newList);
+              newList = update(newList, {
+                $remove: [dataSource[index]],
+              });
+              console.log(newList);
+              setDataSource([...newList]);
+            }}
+          >
+            删除
+          </a>
+        </span>
+      ),
+    });
+    setColumns(newColumns);
+  }, [dataSource]);
 
   const handleDataSource = dataSource => {
     let newData = JSON.parse(JSON.stringify(dataSource));
     for (let i = 0; i < newData.length; i++) {
       let item = newData[i];
-      console.log('item');
-      console.log(item);
-      console.log('item');
       for (let key in item) {
         let itemKey = item[key];
         item[key] = (
@@ -486,7 +613,7 @@ const AutoTable = props => {
                 message: `${itemKey.name}'必填!`,
               },
             ]}
-            name={itemKey.baseControlType + '-' + itemKey.id + '-' + i + 1}
+            name={itemKey.baseControlType + '-' + itemKey.id + '-' + (i + 1)}
             initialValue={handleValue(itemKey)}
           >
             <Temp
@@ -498,6 +625,8 @@ const AutoTable = props => {
           </Form.Item>
         );
       }
+      item.id = i;
+      item.key = i;
     }
     return newData;
   };

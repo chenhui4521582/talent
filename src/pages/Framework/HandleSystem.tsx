@@ -2,12 +2,10 @@ import React, { useState, useEffect, useMemo } from 'react';
 import {
   getLableList,
   getLableMemberList,
-  changeNameLable,
   deleteLable,
-  newLable,
   editLable,
   tsLableItem,
-} from './services/system';
+} from './services/handle';
 import { GlobalResParams } from '@/types/ITypes';
 import {
   Card,
@@ -24,7 +22,7 @@ const { Search, TextArea } = Input;
 
 interface tsRolrLable {
   id: number;
-  labelName: string;
+  name: string;
   status: number;
   updatedBy: string | null;
 }
@@ -88,7 +86,7 @@ export default () => {
 
   const editOk = async () => {
     editForm.validateFields().then(async values => {
-      values.id = selectItem?.id;
+      selectItem?.id ? (values.id = selectItem?.id) : '';
       let json: GlobalResParams<string> = await editLable(values);
       if (json.status === 200) {
         notification['success']({
@@ -107,45 +105,14 @@ export default () => {
     });
   };
 
-  const nameOk = () => {
-    newForm.validateFields().then(async values => {
-      let submit;
-      if (type === 'edit') {
-        submit = changeNameLable;
-        values.id = selectItem?.id;
-      } else {
-        submit = newLable;
-      }
-      let json: GlobalResParams<string> = await submit(values);
-      if (json.status === 200) {
-        notification['success']({
-          message: json.msg,
-          description: '',
-        });
-        setChangeOrAddVisible(false);
-        getApilableList();
-      } else {
-        notification['success']({
-          message: json.msg,
-          description: '',
-        });
-      }
-    });
-  };
-
   const loop = list => {
     let loopdata = JSON.parse(JSON.stringify(list));
     for (let i = 0; i < loopdata.length; i++) {
-      if (
-        searchValue?.length &&
-        loopdata[i].labelName.indexOf(searchValue) > -1
-      ) {
-        const index = loopdata[i].labelName.indexOf(searchValue);
-        const beforeStr = loopdata[i].labelName.substr(0, index);
-        const afterStr = loopdata[i].labelName.substr(
-          index + searchValue.length,
-        );
-        loopdata[i].labelName = (
+      if (searchValue?.length && loopdata[i].name.indexOf(searchValue) > -1) {
+        const index = loopdata[i].name.indexOf(searchValue);
+        const beforeStr = loopdata[i].name.substr(0, index);
+        const afterStr = loopdata[i].name.substr(index + searchValue.length);
+        loopdata[i].name = (
           <>
             {beforeStr}
             <span style={{ color: 'red' }}>{searchValue}</span>
@@ -170,7 +137,7 @@ export default () => {
             handleSelectRole(item.id);
           }}
         >
-          {item.labelName}
+          {item.name}
           {item.id === selectItem?.id ? (
             <Popconfirm
               key={changeOrAddVisible + '' + removeLableVisible}
@@ -188,13 +155,15 @@ export default () => {
                     className="alert-hover"
                     onClick={() => {
                       setType('edit');
-                      newForm.setFieldsValue({
-                        labelName: selectItem?.labelName,
-                      });
+                      // newForm.setFieldsValue({
+                      //   name: selectItem?.name,
+                      // });
                       setChangeOrAddVisible(true);
+                      editForm.setFieldsValue(detail);
+                      setEditVisible(true);
                     }}
                   >
-                    修改名称
+                    修改
                   </div>
                   <div
                     className="alert-hover"
@@ -225,7 +194,7 @@ export default () => {
     return detail?.id ? (
       <div className="role-right" style={{ width: '70%', marginLeft: 60 }}>
         <div className="table-title">
-          {selectItem?.labelName}
+          {selectItem?.name}
           <span
             style={{
               color: 'rgb(24, 144, 255)',
@@ -242,16 +211,12 @@ export default () => {
         </div>
 
         <Descriptions
-          // title={selectItem?.labelName}
           layout="vertical"
           bordered
           column={1}
           style={{ width: '100%', marginTop: 20 }}
         >
           <Descriptions.Item label="URL内容：">{detail?.url}</Descriptions.Item>
-          <Descriptions.Item label="参数名称：">
-            {detail?.param}
-          </Descriptions.Item>
           <Descriptions.Item label="标签描述：">
             {detail?.remark}
           </Descriptions.Item>
@@ -261,7 +226,7 @@ export default () => {
   }, [selectItem, detail]);
 
   return (
-    <Card title="系统标签管理">
+    <Card title="执行操作管理">
       <div className="role">
         <div style={{ width: '20%' }} className="role-left">
           {mount ? (
@@ -276,11 +241,12 @@ export default () => {
             所有标签名
             <span
               onClick={() => {
-                setType('add');
-                newForm.setFieldsValue({
-                  labelName: '',
+                editForm.setFieldsValue({
+                  name: undefined,
+                  url: undefined,
+                  remark: undefined,
                 });
-                setChangeOrAddVisible(true);
+                setEditVisible(true);
               }}
             >
               +
@@ -317,6 +283,13 @@ export default () => {
       >
         <Form form={editForm}>
           <Form.Item
+            name="name"
+            label="标题"
+            rules={[{ required: true, message: `标题内容必填!` }]}
+          >
+            <Input placeholder="请输入" />
+          </Form.Item>
+          <Form.Item
             name="url"
             label="URL内容"
             rules={[{ required: true, message: `URL内容必填!` }]}
@@ -324,39 +297,11 @@ export default () => {
             <Input placeholder="示例：http://172.16.248.175:8082/syslabel/get?type=ceo&businessCode={}" />
           </Form.Item>
           <Form.Item
-            name="param"
-            label="参数名称"
-            rules={[{ required: true, message: `URL内容必填!` }]}
-          >
-            <Input placeholder="示例：businessCode" />
-          </Form.Item>
-          <Form.Item
             name="remark"
             label="标签描述"
             rules={[{ required: true, message: `URL内容必填!` }]}
           >
             <TextArea placeholder="请输入描述信息" />
-          </Form.Item>
-        </Form>
-      </Modal>
-
-      <Modal
-        title={type === 'add' ? '新增标签' : '修改标签名'}
-        visible={changeOrAddVisible}
-        okText="确认"
-        cancelText="取消"
-        onCancel={() => {
-          setChangeOrAddVisible(false);
-        }}
-        onOk={nameOk}
-      >
-        <Form form={newForm}>
-          <Form.Item
-            label="标签名"
-            name="labelName"
-            rules={[{ required: true, message: `标签名必填!` }]}
-          >
-            <Input placeholder="示例: 行政/财务/华南区/领导" />
           </Form.Item>
         </Form>
       </Modal>
