@@ -416,7 +416,7 @@ const EditForm = props => {
             >
               <Select placeholder="请选择表单类型">
                 <Option value={0}>普通表单</Option>
-                {/* <Option value="1">自新增表单</Option> */}
+                <Option value={1}>自新增表单</Option>
                 <Option value={2}>组表单</Option>
               </Select>
             </Form.Item>

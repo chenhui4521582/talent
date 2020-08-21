@@ -24,6 +24,7 @@ export interface tsFormChildlist {
   updatedBy: string | null;
   controlList: tsControlList[];
   list: tsGroupList[] | tsControlList[];
+  type: number;
 }
 
 export interface tsGroupList {
