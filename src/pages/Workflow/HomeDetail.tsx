@@ -98,88 +98,64 @@ export default props => {
   };
 
   const handleValue = item => {
-    const { baseControlType, defaultValue, defaultShowValue } = item;
-    switch (baseControlType) {
-      case 'department':
-        return defaultValue
-          ? defaultValue + '-$-' + defaultShowValue
-          : defaultShowValue;
-      case 'business':
-        return defaultValue
-          ? defaultValue + '-$-' + defaultShowValue
-          : defaultShowValue;
-      case 'business2':
-        return defaultValue
-          ? defaultValue + '-$-' + defaultShowValue
-          : defaultShowValue;
-      case 'currBusiness2':
-        return defaultValue
-          ? defaultValue + '-$-' + defaultShowValue
-          : defaultShowValue;
-      case 'labor':
-        return defaultValue
-          ? defaultValue + '-$-' + defaultShowValue
-          : defaultShowValue;
-      case 'cost':
-        return defaultValue
-          ? defaultValue + '-$-' + defaultShowValue
-          : defaultShowValue;
-      case 'company':
-        return defaultValue
-          ? defaultValue + '-$-' + defaultShowValue
-          : defaultShowValue;
-      case 'position':
-        return defaultValue
-          ? defaultValue + '-$-' + defaultShowValue
-          : defaultShowValue;
-      case 'job':
-        return defaultValue
-          ? defaultValue + '-$-' + defaultShowValue
-          : defaultShowValue;
-      case 'positionLevel':
-        return defaultValue
-          ? defaultValue + '-$-' + defaultShowValue
-          : defaultShowValue;
-      case 'positionMLevel':
-        return defaultValue
-          ? defaultValue + '-$-' + defaultShowValue
-          : defaultShowValue;
-      case 'datetime':
-        return defaultShowValue
-          ? moment(defaultShowValue, 'YYYY-MM-DD HH:mm:ss')
-          : defaultValue
-          ? moment(defaultValue, 'YYYY-MM-DD HH:mm:ss')
-          : '';
-      case 'date':
-        return defaultShowValue
-          ? moment(defaultShowValue, 'YYYY-MM-DD HH:mm:ss')
-          : defaultValue
-          ? moment(defaultValue, 'YYYY-MM-DD HH:mm:ss')
-          : '';
-      case 'multiple':
-        return defaultShowValue
-          ? defaultShowValue
-            ? defaultShowValue.split(',')
-            : undefined
-          : defaultValue
-          ? defaultValue.split(',')
-          : undefined;
-      case 'files':
-        return defaultShowValue
-          ? defaultShowValue
-            ? defaultShowValue.split(',')
-            : undefined
-          : defaultValue
-          ? defaultValue.split(',')
-          : undefined;
-      default:
-        return defaultShowValue
-          ? defaultShowValue
-            ? defaultShowValue
-            : undefined
-          : defaultValue
-          ? defaultValue
-          : undefined;
+    const {
+      baseControlType,
+      defaultValue: value,
+      defaultShowValue: showValue,
+    } = item;
+    if (
+      baseControlType === 'department' ||
+      baseControlType === 'business' ||
+      baseControlType === 'business2' ||
+      baseControlType === 'currBusiness2' ||
+      baseControlType === 'labor' ||
+      baseControlType === 'cost' ||
+      baseControlType === 'company' ||
+      baseControlType === 'position' ||
+      baseControlType === 'job' ||
+      baseControlType === 'positionLevel' ||
+      baseControlType === 'positionMLevel' ||
+      baseControlType === 'user'
+    ) {
+      return value
+        ? value + '-$-' + showValue
+        : showValue
+        ? showValue
+        : undefined;
+    } else if (baseControlType === 'datetime') {
+      return showValue
+        ? moment(showValue, 'YYYY-MM-DD HH:mm:ss')
+        : value
+        ? moment(value, 'YYYY-MM-DD HH:mm:ss')
+        : '';
+    } else if (baseControlType === 'date') {
+      return showValue
+        ? moment(showValue, 'YYYY-MM-DD HH:mm:ss')
+        : value
+        ? moment(value, 'YYYY-MM-DD HH:mm:ss')
+        : '';
+    } else if (baseControlType === 'select') {
+      return showValue && value ? (showValue ? showValue : value) : undefined;
+    } else if (baseControlType === 'multiple') {
+      return value
+        ? value
+          ? value.split(',')
+          : undefined
+        : showValue
+        ? showValue.split(',')
+        : undefined;
+    } else if (baseControlType === 'files') {
+      return value ? value.split(',') : undefined;
+    } else if (baseControlType === 'depGroup') {
+      return showValue ? showValue.split(',') : undefined;
+    } else {
+      return showValue
+        ? showValue
+          ? showValue
+          : undefined
+        : value
+        ? value
+        : undefined;
     }
   };
 
@@ -424,17 +400,33 @@ export default props => {
             let vArr: any = [];
             let sArr: any = [];
             if (fromSubData[key]) {
-              for (let i = 0; i < fromSubData[key].length; i++) {
-                vArr.push(fromSubData[key][i].split('-$-')[0]);
-                sArr.push(fromSubData[key][i].split('-$-')[1]);
+              if (
+                !!fromSubData[key] &&
+                fromSubData[key].constructor === Array
+              ) {
+                for (let i = 0; i < fromSubData[key].length; i++) {
+                  vArr.push(fromSubData[key][i].split('-$-')[0]);
+                  sArr.push(fromSubData[key][i].split('-$-')[1]);
+                }
+                subList.push({
+                  id: parseInt(key.split('-')[1]),
+                  value: vArr.join(','),
+                  showValue: sArr.join(','),
+                  multipleNumber: parseInt(key.split('-')[2]),
+                });
+              } else if (!!fromSubData[key]) {
+                subList.push({
+                  id: parseInt(key.split('-')[1]),
+                  value: fromSubData[key]
+                    ? fromSubData[key].split('-$-')[0]
+                    : '',
+                  showValue: fromSubData[key]
+                    ? fromSubData[key].split('-$-')[1]
+                    : '',
+                  multipleNumber: parseInt(key.split('-')[2]),
+                });
               }
             }
-            subList.push({
-              id: parseInt(key.split('-')[1]),
-              value: vArr.join(','),
-              showValue: sArr.join(','),
-              multipleNumber: parseInt(key.split('-')[2]),
-            });
           } else if (
             key.split('-')[0] === 'select' ||
             key.split('-')[0] === 'business' ||
@@ -525,7 +517,7 @@ const AutoTable = props => {
         title: item.name,
         dataIndex: item.baseControlType + '-' + item.id,
         key: item.id,
-        align: 'center',
+        align: 'left',
         ...item,
       });
       dataItem[item.baseControlType + '-' + item.id] = { ...item };
@@ -563,7 +555,7 @@ const AutoTable = props => {
         title: item.name,
         dataIndex: item.baseControlType + '-' + item.id,
         key: item.id,
-        align: 'center',
+        align: 'left',
         ...item,
       });
       dataItem[item.baseControlType + '-' + item.id] = { ...item };

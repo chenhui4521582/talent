@@ -189,65 +189,59 @@ export default props => {
 
   const handleValue = item => {
     const { baseControlType, value, showValue } = item;
-    switch (baseControlType) {
-      case 'user':
-        return value ? value + '-$-' + showValue : showValue;
-      case 'department':
-        return value ? value + '-$-' + showValue : showValue;
-      case 'business':
-        return value ? value + '-$-' + showValue : showValue;
-      case 'business2':
-        return value ? value + '-$-' + showValue : showValue;
-      case 'currBusiness2':
-        return value ? value + '-$-' + showValue : showValue;
-      case 'cost':
-        return value ? value + '-$-' + showValue : showValue;
-      case 'labor':
-        return value ? value + '-$-' + showValue : showValue;
-      case 'company':
-        return value ? value + '-$-' + showValue : showValue;
-      case 'position':
-        return value ? value + '-$-' + showValue : showValue;
-      case 'job':
-        return value ? value + '-$-' + showValue : showValue;
-      case 'positionLevel':
-        return value ? value + '-$-' + showValue : showValue;
-      case 'positionMLevel':
-        return value ? value + '-$-' + showValue : showValue;
-      case 'datetime':
-        return showValue
-          ? moment(showValue, 'YYYY-MM-DD HH:mm:ss')
-          : value
-          ? moment(value, 'YYYY-MM-DD HH:mm:ss')
-          : '';
-      case 'date':
-        return showValue
-          ? moment(showValue, 'YYYY-MM-DD HH:mm:ss')
-          : value
-          ? moment(value, 'YYYY-MM-DD HH:mm:ss')
-          : '';
-      case 'select':
-        return showValue && value ? (showValue ? showValue : value) : '';
-      case 'multiple':
-        return value
-          ? value
-            ? value.split(',')
-            : undefined
-          : showValue
-          ? showValue.split(',')
-          : undefined;
-      case 'files':
-        return value ? value.split(',') : undefined;
-      case 'depGroup':
-        return showValue ? showValue.split(',') : undefined;
-      default:
-        return showValue
+    if (
+      baseControlType === 'department' ||
+      baseControlType === 'business' ||
+      baseControlType === 'business2' ||
+      baseControlType === 'currBusiness2' ||
+      baseControlType === 'labor' ||
+      baseControlType === 'cost' ||
+      baseControlType === 'company' ||
+      baseControlType === 'position' ||
+      baseControlType === 'job' ||
+      baseControlType === 'positionLevel' ||
+      baseControlType === 'positionMLevel' ||
+      baseControlType === 'user'
+    ) {
+      return value
+        ? value + '-$-' + showValue
+        : showValue
+        ? showValue
+        : undefined;
+    } else if (baseControlType === 'datetime') {
+      return showValue
+        ? moment(showValue, 'YYYY-MM-DD HH:mm:ss')
+        : value
+        ? moment(value, 'YYYY-MM-DD HH:mm:ss')
+        : '';
+    } else if (baseControlType === 'date') {
+      return showValue
+        ? moment(showValue, 'YYYY-MM-DD HH:mm:ss')
+        : value
+        ? moment(value, 'YYYY-MM-DD HH:mm:ss')
+        : '';
+    } else if (baseControlType === 'select') {
+      return showValue && value ? (showValue ? showValue : value) : null;
+    } else if (baseControlType === 'multiple') {
+      return value
+        ? value
+          ? value.split(',')
+          : undefined
+        : showValue
+        ? showValue.split(',')
+        : undefined;
+    } else if (baseControlType === 'files') {
+      return value ? value.split(',') : undefined;
+    } else if (baseControlType === 'depGroup') {
+      return showValue ? showValue.split(',') : undefined;
+    } else {
+      return showValue
+        ? showValue
           ? showValue
-            ? showValue
-            : undefined
-          : value
-          ? value
-          : undefined;
+          : undefined
+        : value
+        ? value
+        : undefined;
     }
   };
 
@@ -371,6 +365,7 @@ export default props => {
 
   const submitData = (type: number): void => {
     form.validateFields().then(async fromSubData => {
+      console.log(fromSubData);
       let subList: any = [];
       idItemList.map(item => {
         let showArr: any = [];
@@ -464,7 +459,91 @@ export default props => {
           }
         }
       });
-      console.log(subList);
+      for (let key in fromSubData) {
+        if (key.split('-')[1] && key.split('-')[0]) {
+          if (key.split('-')[0] === 'date') {
+            subList.push({
+              resFormControlId: parseInt(key.split('-')[1]),
+              value: moment(fromSubData[key])?.format('YYYY-MM-DD') || '',
+              multipleNumber: parseInt(key.split('-')[2]),
+            });
+          } else if (key.split('-')[0] === 'datetime') {
+            subList.push({
+              resFormControlId: parseInt(key.split('-')[1]),
+              value:
+                moment(fromSubData[key])?.format('YYYY-MM-DD HH:mm:ss') || '',
+              multipleNumber: parseInt(key.split('-')[2]),
+            });
+          } else if (key.split('-')[0] === 'depGroup') {
+            subList.push({
+              resFormControlId: parseInt(key.split('-')[1]),
+              value: fromSubData[key] ? fromSubData[key].split('-$-')[0] : '',
+              showValue: fromSubData[key]
+                ? fromSubData[key].split('-$-')[1]
+                : '',
+              multipleNumber: parseInt(key.split('-')[2]),
+            });
+          } else if (
+            key.split('-')[0] === 'multiple' ||
+            key.split('-')[0] === 'user'
+          ) {
+            let vArr: any = [];
+            let sArr: any = [];
+            if (fromSubData[key]) {
+              if (
+                !!fromSubData[key] &&
+                fromSubData[key].constructor === Array
+              ) {
+                for (let i = 0; i < fromSubData[key].length; i++) {
+                  vArr.push(fromSubData[key][i].split('-$-')[0]);
+                  sArr.push(fromSubData[key][i].split('-$-')[1]);
+                }
+                subList.push({
+                  resFormControlId: parseInt(key.split('-')[1]),
+                  value: vArr.join(','),
+                  showValue: sArr.join(','),
+                  multipleNumber: parseInt(key.split('-')[2]),
+                });
+              } else if (!!fromSubData[key]) {
+                subList.push({
+                  resFormControlId: parseInt(key.split('-')[1]),
+                  value: fromSubData[key]
+                    ? fromSubData[key].split('-$-')[0]
+                    : '',
+                  showValue: fromSubData[key]
+                    ? fromSubData[key].split('-$-')[1]
+                    : '',
+                  multipleNumber: parseInt(key.split('-')[2]),
+                });
+              }
+            }
+          } else if (
+            key.split('-')[0] === 'select' ||
+            key.split('-')[0] === 'business' ||
+            key.split('-')[0] === 'business2' ||
+            key.split('-')[0] === 'labor' ||
+            key.split('-')[0] === 'cost' ||
+            key.split('-')[0] === 'positionLevel' ||
+            key.split('-')[0] === 'positionMLevel'
+          ) {
+            subList.push({
+              resFormControlId: parseInt(key.split('-')[1]),
+              value: fromSubData[key] ? fromSubData[key].split('-$-')[0] : '',
+              showValue: fromSubData[key]
+                ? fromSubData[key].split('-$-')[1]
+                : '',
+              multipleNumber: parseInt(key.split('-')[2]),
+            });
+          } else {
+            subList.push({
+              resFormControlId: parseInt(key.split('-')[1]),
+              value: fromSubData[key],
+              showValue: fromSubData[key],
+              multipleNumber: parseInt(key.split('-')[2]),
+            });
+          }
+        }
+      }
       let json: GlobalResParams<string> = await submit({
         remark: fromSubData.remark,
         taskFormId: formId,
@@ -591,119 +670,166 @@ const AutoTable = props => {
   const [template, setTemplate] = useState<any>();
 
   useEffect(() => {
-    let dataItem: any = {};
-    let newColumns: any = [];
+    let newList: any = [];
+    let multipleNumberArr: any = [];
+    let objList: any = [];
     list.map(item => {
-      newColumns.push({
-        title: item.name,
-        dataIndex: item.baseControlType + '-' + item.id,
-        key: item.id,
-        align: 'center',
-        ...item,
-      });
-      dataItem[item.baseControlType + '-' + item.id] = { ...item };
+      multipleNumberArr.push(item.multipleNumber);
     });
-    newColumns.push({
-      title: '操作',
-      dataIndex: 'action',
-      key: 'action',
-      render: (_, record, index) => (
-        <span>
-          <a
-            onClick={() => {
-              let newList = new Set(dataSource);
-              newList = update(newList, {
-                $remove: [newList[index]],
-              });
-            }}
-          >
-            删除
-          </a>
-        </span>
-      ),
-    });
+    multipleNumberArr = [...new Set(multipleNumberArr)].sort();
 
-    setColumns(newColumns);
-    setTemplate(dataItem);
-    setDataSource([dataItem]);
+    for (let i = 0; i < multipleNumberArr.length; i++) {
+      objList[i] = [];
+      list.map(item => {
+        if (item.multipleNumber === multipleNumberArr[i]) {
+          objList[i].push(item);
+          objList[i].sort(compare('sort'));
+        }
+      });
+    }
+    if (objList[0]) {
+      objList.map((itemArr, index) => {
+        newList[index] = [];
+        itemArr.map(item => {
+          newList[index].push(item);
+        });
+      });
+    }
+
+    setTemplate(objList[0]);
+    if (objList.length === 0) {
+      setDataSource([objList[0]]);
+    } else {
+      setDataSource(newList);
+    }
   }, [list]);
 
   useEffect(() => {
-    let dataItem: any = {};
     let newColumns: any = [];
+    let multipleNumberArr: any = [];
+    let objList: any = [];
     list.map(item => {
-      newColumns.push({
-        title: item.name,
-        dataIndex: item.baseControlType + '-' + item.id,
-        key: item.id,
-        align: 'center',
-        ...item,
+      multipleNumberArr.push(item.multipleNumber);
+    });
+    multipleNumberArr = [...new Set(multipleNumberArr)].sort();
+
+    for (let i = 0; i < multipleNumberArr.length; i++) {
+      objList[i] = [];
+      list.map(item => {
+        if (item.multipleNumber === multipleNumberArr[i]) {
+          objList[i].push(item);
+          objList[i].sort(compare('sort'));
+        }
       });
-      dataItem[item.baseControlType + '-' + item.id] = { ...item };
-    });
-    newColumns.push({
-      title: '操作',
-      dataIndex: 'action',
-      key: 'action',
-      render: (_, record, index) => (
-        <span>
-          <a
-            onClick={() => {
-              let newList = new Set(dataSource);
-              console.log(dataSource[index]);
-              console.log(newList);
-              newList = update(newList, {
-                $remove: [dataSource[index]],
-              });
-              console.log(newList);
-              setDataSource([...newList]);
-            }}
-          >
-            删除
-          </a>
-        </span>
-      ),
-    });
+    }
+    if (objList[0]) {
+      objList[0].map(item => {
+        newColumns.push({
+          title: item.name,
+          dataIndex: item.baseControlType + '-' + item.resFormControlId,
+          key: item.id,
+          align: 'left',
+          ...item,
+        });
+      });
+      newColumns.push({
+        title: '操作',
+        dataIndex: 'action',
+        key: 'action',
+        render: (_, record, index) => (
+          <span>
+            <a
+              onClick={() => {
+                let newList = new Set(dataSource);
+                newList = update(newList, {
+                  $remove: [dataSource[index]],
+                });
+                console.log(newList);
+                setDataSource([...newList]);
+              }}
+            >
+              删除
+            </a>
+          </span>
+        ),
+      });
+    }
     setColumns(newColumns);
   }, [dataSource]);
 
+  const compare = (name: string) => {
+    return (a, b) => {
+      let v1 = a[name];
+      let v2 = b[name];
+      if (v2 > v1) {
+        return -1;
+      } else if (v2 < v1) {
+        return 1;
+      } else {
+        return 0;
+      }
+    };
+  };
   const handleDataSource = dataSource => {
     let newData = JSON.parse(JSON.stringify(dataSource));
+    let sortArr: any = [];
     for (let i = 0; i < newData.length; i++) {
-      let item = newData[i];
-      for (let key in item) {
-        let itemKey = item[key];
-        item[key] = (
-          <Form.Item
-            style={{
-              width: '100%',
-              marginBottom: 6,
-              marginTop: 6,
-            }}
-            rules={[
-              {
-                required: itemKey.isRequired,
-                message: `${itemKey.name}'必填!`,
-              },
-            ]}
-            name={itemKey.baseControlType + '-' + itemKey.id + '-' + (i + 1)}
-            initialValue={handleValue(itemKey)}
-          >
-            <Temp
-              ismultiplechoice={itemKey.isMultiplechoice}
-              s_type={itemKey.baseControlType}
-              disabled={itemKey.isLocked}
-              list={itemKey.itemList || []}
-            />
-          </Form.Item>
-        );
-      }
-      item.id = i;
-      item.key = i;
+      newData[i].map(item => {
+        sortArr.push(item.multipleNumber);
+      });
     }
-    return newData;
-  };
 
+    sortArr.sort();
+    sortArr = [...new Set(sortArr)];
+
+    let objArr: any = [];
+    sortArr.map(sortItem => {
+      let obj: any = {};
+      for (let i = 0; i < newData.length; i++) {
+        newData[i].map(itemKey => {
+          if (itemKey.multipleNumber === parseInt(sortItem)) {
+            obj.key = itemKey.baseControlType + '-' + itemKey.resFormControlId;
+            obj[itemKey.baseControlType + '-' + itemKey.resFormControlId] = (
+              <Form.Item
+                style={{
+                  width: '100%',
+                  marginBottom: 6,
+                  marginTop: 6,
+                }}
+                rules={[
+                  {
+                    required: itemKey.isRequired,
+                    message: `${itemKey.name}'必填!`,
+                  },
+                ]}
+                name={
+                  itemKey.baseControlType +
+                  '-' +
+                  itemKey.resFormControlId +
+                  '-' +
+                  sortItem +
+                  '-' +
+                  itemKey.id +
+                  'itemKey.name'
+                }
+                initialValue={handleValue(itemKey)}
+              >
+                <Temp
+                  ismultiplechoice={itemKey.isMultiplechoice}
+                  s_type={itemKey.baseControlType}
+                  disabled={itemKey.isLocked}
+                  list={itemKey.itemList || []}
+                />
+              </Form.Item>
+            );
+          }
+        });
+      }
+      objArr.push(obj);
+    });
+    return objArr;
+  };
+  console.log(dataSource);
   return (
     <Table
       title={() => {
@@ -711,7 +837,13 @@ const AutoTable = props => {
           <Button
             onClick={() => {
               let newData = JSON.parse(JSON.stringify(dataSource));
-              newData.push(template);
+              let newTemplate = JSON.parse(JSON.stringify(template));
+              newTemplate.map(item => {
+                item.multipleNumber = parseInt(newData.length) + 1;
+                item.value = null;
+                item.showValue = null;
+              });
+              newData.push(newTemplate);
               setDataSource(newData);
             }}
           >

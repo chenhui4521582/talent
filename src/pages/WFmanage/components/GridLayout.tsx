@@ -585,15 +585,13 @@ export default (props: tsProps) => {
           <Divider />
           {renderModalBottom}
           <Divider />
-          {type !== 6 ? (
-            <Assembly
-              {...props}
-              apiList={getFormSimple}
-              header="表单控件可编辑权限设置（支持多选）"
-              change={handleGetControlIds}
-              selectKeys={selectObj?.resFormControlIds || []}
-            />
-          ) : null}
+          <Assembly
+            {...props}
+            apiList={getFormSimple}
+            header="表单控件可编辑权限设置（支持多选）"
+            change={handleGetControlIds}
+            selectKeys={selectObj?.resFormControlIds || []}
+          />
         </Form>
       </Modal>
       <Modal
