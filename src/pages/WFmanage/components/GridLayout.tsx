@@ -16,12 +16,20 @@ import { GlobalResParams } from '@/types/ITypes';
 import { getLableList } from '@/pages/Framework/services/role';
 import { useDrop } from 'react-dnd';
 import MoveInOz from '@/pages/Framework/components/MoveInOz';
+import { getLableList as handleLable } from '@/pages/Framework/services/handle';
 
 import Assembly from './Assembly';
 import SystemLabel from './SystemLabel';
 import Card from './Card';
 
 import './style/rule.less';
+
+interface tsRolrLable {
+  id: number;
+  name: string;
+  status: number;
+  updatedBy: string | null;
+}
 
 const { Option } = Select;
 const { Panel } = Collapse;
@@ -61,7 +69,7 @@ let userkeyList;
 let controlId;
 let systemObj;
 
-// type 审批类型；   1：上级，2：标签，3：单个成员，4：申请人，5：动态标签 ,
+// type 审批类型；   1：上级，2：标签，3：单个成员，4：申请人，5：动态标签 6.归档,
 // signType : 0：会签，1：或签 在审批类型为上级和标签时有效 ,
 // nodeType : 节点类型 1:开始节点;2:中间节点;3:结束节点
 // specifiedLevel
@@ -81,6 +89,8 @@ export default (props: tsProps) => {
   const [type, setType] = useState<number | undefined>(1);
   const [selectObj, setSelectObj] = useState<tsStep>();
   const [name, setName] = useState<string>();
+  const [cardIndex, setCardIndex] = useState<number>();
+  const [handleList, setHandleList] = useState<tsRolrLable[]>();
 
   useEffect(() => {
     async function getLable() {
@@ -89,6 +99,15 @@ export default (props: tsProps) => {
         setLabelList(json.obj);
       }
     }
+
+    const getApilableList = async () => {
+      let json: GlobalResParams<tsRolrLable[]> = await handleLable();
+      if (json.status === 200) {
+        setHandleList(json.obj);
+      }
+    };
+
+    getApilableList();
     getLable();
   }, []);
 
@@ -159,6 +178,10 @@ export default (props: tsProps) => {
         }
       }
       listObj.push(obj);
+      let handleId = listObj[listObj.length - 2].handleId;
+      listObj[listObj.length - 1].handleId = handleId;
+      delete listObj[listObj.length - 2].handleId;
+      // 互换执行操作
       setList(listObj);
       form.setFieldsValue({
         type: undefined,
@@ -470,6 +493,26 @@ export default (props: tsProps) => {
             />
           </>
         );
+
+      case 6:
+        return (
+          <Form.Item
+            name="handleId"
+            style={{ marginTop: 4 }}
+            label="自执行"
+            rules={[{ required: true, message: '请选择标签!' }]}
+          >
+            <Select placeholder="请选择标签">
+              {handleList?.map(item => {
+                return (
+                  <Option key={item.id} value={item.id}>
+                    {item.name}
+                  </Option>
+                );
+              })}
+            </Select>
+          </Form.Item>
+        );
       default:
         return null;
     }
@@ -489,6 +532,7 @@ export default (props: tsProps) => {
               handleEditShowmodal={handleEditShowmodal}
               handleShowName={handleShowName}
               handleRemove={handleRemove}
+              setCardIndex={setCardIndex}
             />
           );
         })}
@@ -532,19 +576,24 @@ export default (props: tsProps) => {
               <Radio value={2}>标签</Radio> <br />
               <Radio value={3}>指定成员</Radio> <br />
               <Radio value={4}>申请人</Radio> <br />
-              <Radio value={5}>动态标签</Radio>
+              <Radio value={5}>动态标签</Radio> <br />
+              {list && cardIndex === list?.length - 1 ? (
+                <Radio value={6}>归档</Radio>
+              ) : null}
             </Radio.Group>
           </Form.Item>
           <Divider />
           {renderModalBottom}
           <Divider />
-          <Assembly
-            {...props}
-            apiList={getFormSimple}
-            header="表单控件可编辑权限设置（支持多选）"
-            change={handleGetControlIds}
-            selectKeys={selectObj?.resFormControlIds || []}
-          />
+          {type !== 6 ? (
+            <Assembly
+              {...props}
+              apiList={getFormSimple}
+              header="表单控件可编辑权限设置（支持多选）"
+              change={handleGetControlIds}
+              selectKeys={selectObj?.resFormControlIds || []}
+            />
+          ) : null}
         </Form>
       </Modal>
       <Modal

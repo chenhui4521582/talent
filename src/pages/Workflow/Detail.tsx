@@ -23,6 +23,7 @@ import { tsFormChildlist } from './services/home';
 import { GlobalResParams } from '@/types/ITypes';
 import { ColumnProps } from 'antd/es/table';
 import moment from 'moment';
+import update from 'immutability-helper';
 
 const { TextArea } = Input;
 
@@ -115,7 +116,9 @@ export default props => {
       for (let k = 0; k < formChildlist.length; k++) {
         let fromItem = formChildlist[k];
         let controlList = fromItem.controlList;
-        idItem = idItem.concat(controlList);
+        if (fromItem.type !== 1) {
+          idItem = idItem.concat(controlList);
+        }
         data[k] = fromItem;
         data[k].list = [];
         data[k].arr = [];
@@ -252,108 +255,114 @@ export default props => {
     if (formList.length) {
       return formList.map(fromItem => {
         let list: any[] = fromItem.list;
-        return (
-          <Descriptions
-            title={<div style={{ textAlign: 'center' }}>{fromItem.name}</div>}
-            key={fromItem.id}
-            bordered
-            column={fromItem.columnNum}
-            style={{ marginBottom: 40, width: '90%', marginLeft: '5%' }}
-          >
-            {list.map(groupItem => {
-              if (groupItem.list && groupItem.list.length) {
-                return (
-                  <Descriptions.Item
-                    key={groupItem.id}
-                    label={groupItem.name}
-                    span={groupItem.colspan}
-                    style={{ maxWidth: '300px' }}
-                  >
-                    {groupItem.list.map(listItem => {
-                      return (
-                        <div
-                          key={listItem.id}
-                          style={{
-                            display: 'flex',
-                            flex: 1,
-                            flexDirection: 'row',
-                          }}
-                        >
-                          <div
-                            className={
-                              listItem.isRequired ? 'label-required' : ''
-                            }
-                            style={{ display: 'flex', flex: 1 }}
-                          >
-                            {listItem.name}
-                          </div>
-                          <div style={{ display: 'flex', flex: 1 }}>
-                            <Form.Item
-                              style={{ width: '100%' }}
-                              rules={[
-                                {
-                                  required: listItem.isRequired,
-                                  message: `${listItem.name}'必填!`,
-                                },
-                              ]}
-                              name={listItem.id}
-                              initialValue={handleValue(listItem)}
-                            >
-                              <Temp
-                                ismultiplechoice={groupItem.isMultiplechoice}
-                                s_type={listItem.baseControlType}
-                                disabled={listItem.isLocked}
-                                list={listItem.itemList || []}
-                              />
-                            </Form.Item>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </Descriptions.Item>
-                );
-              } else {
-                return (
-                  <Descriptions.Item
-                    key={groupItem.id}
-                    label={
-                      <span
-                        className={groupItem.isRequired ? 'label-required' : ''}
-                      >
-                        {groupItem.name}
-                      </span>
-                    }
-                    span={groupItem.colspan}
-                    style={{ maxWidth: '200px' }}
-                  >
-                    <Form.Item
-                      style={{
-                        width: '100%',
-                        marginBottom: 0,
-                        marginTop: 0,
-                      }}
-                      name={groupItem.id}
-                      initialValue={handleValue(groupItem)}
-                      rules={[
-                        {
-                          required: groupItem.isRequired,
-                          message: `${groupItem.name}'必填!`,
-                        },
-                      ]}
+        if (fromItem.type === 1) {
+          return <AutoTable list={list} handleValue={handleValue} />;
+        } else {
+          return (
+            <Descriptions
+              title={<div style={{ textAlign: 'center' }}>{fromItem.name}</div>}
+              key={fromItem.id}
+              bordered
+              column={fromItem.columnNum}
+              style={{ marginBottom: 40, width: '90%', marginLeft: '5%' }}
+            >
+              {list.map(groupItem => {
+                if (groupItem.list && groupItem.list.length) {
+                  return (
+                    <Descriptions.Item
+                      key={groupItem.id}
+                      label={groupItem.name}
+                      span={groupItem.colspan}
+                      style={{ maxWidth: '300px' }}
                     >
-                      <Temp
-                        ismultiplechoice={groupItem.isMultiplechoice}
-                        s_type={groupItem.baseControlType}
-                        disabled={groupItem.isLocked}
-                        list={groupItem.itemList || []}
-                      />
-                    </Form.Item>
-                  </Descriptions.Item>
-                );
-              }
-            })}
-          </Descriptions>
-        );
+                      {groupItem.list.map(listItem => {
+                        return (
+                          <div
+                            key={listItem.id}
+                            style={{
+                              display: 'flex',
+                              flex: 1,
+                              flexDirection: 'row',
+                            }}
+                          >
+                            <div
+                              className={
+                                listItem.isRequired ? 'label-required' : ''
+                              }
+                              style={{ display: 'flex', flex: 1 }}
+                            >
+                              {listItem.name}
+                            </div>
+                            <div style={{ display: 'flex', flex: 1 }}>
+                              <Form.Item
+                                style={{ width: '100%' }}
+                                rules={[
+                                  {
+                                    required: listItem.isRequired,
+                                    message: `${listItem.name}'必填!`,
+                                  },
+                                ]}
+                                name={listItem.id}
+                                initialValue={handleValue(listItem)}
+                              >
+                                <Temp
+                                  ismultiplechoice={groupItem.isMultiplechoice}
+                                  s_type={listItem.baseControlType}
+                                  disabled={listItem.isLocked}
+                                  list={listItem.itemList || []}
+                                />
+                              </Form.Item>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </Descriptions.Item>
+                  );
+                } else {
+                  return (
+                    <Descriptions.Item
+                      key={groupItem.id}
+                      label={
+                        <span
+                          className={
+                            groupItem.isRequired ? 'label-required' : ''
+                          }
+                        >
+                          {groupItem.name}
+                        </span>
+                      }
+                      span={groupItem.colspan}
+                      style={{ maxWidth: '200px' }}
+                    >
+                      <Form.Item
+                        style={{
+                          width: '100%',
+                          marginBottom: 0,
+                          marginTop: 0,
+                        }}
+                        name={groupItem.id}
+                        initialValue={handleValue(groupItem)}
+                        rules={[
+                          {
+                            required: groupItem.isRequired,
+                            message: `${groupItem.name}'必填!`,
+                          },
+                        ]}
+                      >
+                        <Temp
+                          ismultiplechoice={groupItem.isMultiplechoice}
+                          s_type={groupItem.baseControlType}
+                          disabled={groupItem.isLocked}
+                          list={groupItem.itemList || []}
+                        />
+                      </Form.Item>
+                    </Descriptions.Item>
+                  );
+                }
+              })}
+            </Descriptions>
+          );
+        }
       });
     } else {
       return null;
@@ -572,5 +581,147 @@ export default props => {
         </Button>
       </div>
     </Card>
+  );
+};
+
+const AutoTable = props => {
+  const { list, handleValue } = props;
+  const [columns, setColumns] = useState<any>([]);
+  const [dataSource, setDataSource] = useState<any>([]);
+  const [template, setTemplate] = useState<any>();
+
+  useEffect(() => {
+    let dataItem: any = {};
+    let newColumns: any = [];
+    list.map(item => {
+      newColumns.push({
+        title: item.name,
+        dataIndex: item.baseControlType + '-' + item.id,
+        key: item.id,
+        align: 'center',
+        ...item,
+      });
+      dataItem[item.baseControlType + '-' + item.id] = { ...item };
+    });
+    newColumns.push({
+      title: '操作',
+      dataIndex: 'action',
+      key: 'action',
+      render: (_, record, index) => (
+        <span>
+          <a
+            onClick={() => {
+              let newList = new Set(dataSource);
+              newList = update(newList, {
+                $remove: [newList[index]],
+              });
+            }}
+          >
+            删除
+          </a>
+        </span>
+      ),
+    });
+
+    setColumns(newColumns);
+    setTemplate(dataItem);
+    setDataSource([dataItem]);
+  }, [list]);
+
+  useEffect(() => {
+    let dataItem: any = {};
+    let newColumns: any = [];
+    list.map(item => {
+      newColumns.push({
+        title: item.name,
+        dataIndex: item.baseControlType + '-' + item.id,
+        key: item.id,
+        align: 'center',
+        ...item,
+      });
+      dataItem[item.baseControlType + '-' + item.id] = { ...item };
+    });
+    newColumns.push({
+      title: '操作',
+      dataIndex: 'action',
+      key: 'action',
+      render: (_, record, index) => (
+        <span>
+          <a
+            onClick={() => {
+              let newList = new Set(dataSource);
+              console.log(dataSource[index]);
+              console.log(newList);
+              newList = update(newList, {
+                $remove: [dataSource[index]],
+              });
+              console.log(newList);
+              setDataSource([...newList]);
+            }}
+          >
+            删除
+          </a>
+        </span>
+      ),
+    });
+    setColumns(newColumns);
+  }, [dataSource]);
+
+  const handleDataSource = dataSource => {
+    let newData = JSON.parse(JSON.stringify(dataSource));
+    for (let i = 0; i < newData.length; i++) {
+      let item = newData[i];
+      for (let key in item) {
+        let itemKey = item[key];
+        item[key] = (
+          <Form.Item
+            style={{
+              width: '100%',
+              marginBottom: 6,
+              marginTop: 6,
+            }}
+            rules={[
+              {
+                required: itemKey.isRequired,
+                message: `${itemKey.name}'必填!`,
+              },
+            ]}
+            name={itemKey.baseControlType + '-' + itemKey.id + '-' + (i + 1)}
+            initialValue={handleValue(itemKey)}
+          >
+            <Temp
+              ismultiplechoice={itemKey.isMultiplechoice}
+              s_type={itemKey.baseControlType}
+              disabled={itemKey.isLocked}
+              list={itemKey.itemList || []}
+            />
+          </Form.Item>
+        );
+      }
+      item.id = i;
+      item.key = i;
+    }
+    return newData;
+  };
+
+  return (
+    <Table
+      title={() => {
+        return (
+          <Button
+            onClick={() => {
+              let newData = JSON.parse(JSON.stringify(dataSource));
+              newData.push(template);
+              setDataSource(newData);
+            }}
+          >
+            新增
+          </Button>
+        );
+      }}
+      columns={columns}
+      style={{ marginBottom: 40, width: '90%', marginLeft: '5%' }}
+      dataSource={handleDataSource(dataSource)}
+    />
   );
 };

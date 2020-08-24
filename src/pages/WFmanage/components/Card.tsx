@@ -20,6 +20,7 @@ interface IProps {
   handleEditShowmodal: (item) => void;
   handleShowName: (item) => void;
   handleRemove: (item) => void;
+  setCardIndex: (index) => void;
   item: any;
 }
 
@@ -31,6 +32,7 @@ const Card: React.FC<tsStep & IProps> = ({
   handleEditShowmodal,
   handleShowName,
   handleRemove,
+  setCardIndex,
 }) => {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -127,6 +129,7 @@ const Card: React.FC<tsStep & IProps> = ({
         e.preventDefault();
         e.stopPropagation();
         handleEditShowmodal(item);
+        setCardIndex(index);
       }}
     >
       <p
