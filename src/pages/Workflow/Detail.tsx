@@ -213,13 +213,13 @@ export default props => {
         ? moment(showValue, 'YYYY-MM-DD HH:mm:ss')
         : value
         ? moment(value, 'YYYY-MM-DD HH:mm:ss')
-        : '';
+        : undefined;
     } else if (baseControlType === 'date') {
       return showValue
         ? moment(showValue, 'YYYY-MM-DD HH:mm:ss')
         : value
         ? moment(value, 'YYYY-MM-DD HH:mm:ss')
-        : '';
+        : undefined;
     } else if (baseControlType === 'select') {
       return showValue && value ? (showValue ? showValue : value) : null;
     } else if (baseControlType === 'multiple') {
@@ -838,6 +838,8 @@ const AutoTable = props => {
             onClick={() => {
               let newData = JSON.parse(JSON.stringify(dataSource));
               let newTemplate = JSON.parse(JSON.stringify(template));
+              console.log(template);
+              console.log('template');
               newTemplate.map(item => {
                 item.multipleNumber = parseInt(newData.length) + 1;
                 item.value = null;

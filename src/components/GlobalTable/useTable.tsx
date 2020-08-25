@@ -3,6 +3,7 @@ import { Table, Button, Form, Row } from 'antd';
 import { useFormTable } from '@umijs/hooks';
 import { PaginationTableParams } from '@/types/ITypes';
 import { ColumnProps } from 'antd/es/table';
+import './table.less';
 
 interface useTablesParams {
   queryMethod: (params: any) => Promise<any>;
@@ -124,6 +125,13 @@ export const useTable = ({
           rowKey={rowKeyName}
           {...tableProps}
           rowSelection={showCheck ? rowSelection : undefined}
+          rowClassName={(record, index) => {
+            if (index % 2 === 1) {
+              return 'table-row';
+            } else {
+              return '';
+            }
+          }}
         />
       </div>
     );

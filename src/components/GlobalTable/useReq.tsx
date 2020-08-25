@@ -3,6 +3,7 @@ import { Table } from 'antd';
 import { useRequest, useFormTable } from '@umijs/hooks';
 import { PaginationTableParams } from '@/types/ITypes';
 import { ColumnProps } from 'antd/es/table';
+import './table.less';
 
 interface useTablesParams {
   queryMethod: (params: any) => Promise<any>;
@@ -40,6 +41,13 @@ export const useReq = ({
           columns={columns}
           rowKey={rowKeyName}
           {...tableProps}
+          rowClassName={(record, index) => {
+            if (index % 2 === 1) {
+              return 'table-row';
+            } else {
+              return '';
+            }
+          }}
         />
       </div>
     );

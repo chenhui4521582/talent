@@ -16,6 +16,7 @@ import {
 import { GlobalResParams } from '@/types/ITypes';
 import DropForm from './components/form/DropForm';
 import DropIcon from './components/form/DropIcon';
+import DropTable from './components/form/DropTable';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 
 const { Option } = Select;
@@ -59,14 +60,15 @@ const EditForm = props => {
         for (let i = 0; i < groupList.length; i++) {
           let groupItem = groupList[i];
           let list: any = [];
-          let sort = 0;
+          let sort: any = [];
           for (let g = 0; g < controlList.length; g++) {
             if (groupItem.id === controlList[g].resGroupId) {
               data[k].groupColArr.push(formChildlist[k].controlList[g].id);
               list.push(controlList[g]);
-              sort += controlList[g].sort;
+              sort.push(controlList[g].sort);
+              sort = sort.sort();
               groupItem.list = list;
-              groupItem.sort = sort;
+              groupItem.sort = sort[0];
               data[k].list.push(groupItem);
               data[k].list.sort(compare('sort'));
             }
@@ -93,7 +95,6 @@ const EditForm = props => {
       }
     }
 
-    console.log(data);
     setFormDetail(data);
   };
 
@@ -187,7 +188,7 @@ const EditForm = props => {
           let selectFrom = list && list[selectFormIndex];
           selectFrom.name = value.name;
           selectFrom.columnNum = parseInt(value.columnNum);
-          selectFrom.type = value.type;
+          value.type ? (selectFrom.type = value.type) : null;
           if (selectFormIndex || selectFormIndex === 0) {
             let updataJson = await updateCForm(
               props.match.params.id,
@@ -196,6 +197,7 @@ const EditForm = props => {
               parseInt(value.columnNum),
               value.type || selectFrom.type,
             );
+            console.log(selectFrom);
             if (updataJson.status === 200) {
               list[selectFormIndex] = selectFrom;
             }
@@ -313,16 +315,30 @@ const EditForm = props => {
   const fromContent = useMemo(() => {
     if (formDetail?.length) {
       return formDetail?.map((fromItem, i) => {
-        return (
-          <DropForm
-            allData={formDetail}
-            fromItem={fromItem}
-            index={i}
-            moveIndex={handleMoveIndex}
-            changeName={handleEditForm}
-            changeData={handleChangeForm}
-          />
-        );
+        console.log(fromItem);
+        if (fromItem.type === 1) {
+          return (
+            <DropTable
+              allData={formDetail}
+              fromItem={fromItem}
+              index={i}
+              moveIndex={handleMoveIndex}
+              changeName={handleEditForm}
+              changeData={handleChangeForm}
+            />
+          );
+        } else {
+          return (
+            <DropForm
+              allData={formDetail}
+              fromItem={fromItem}
+              index={i}
+              moveIndex={handleMoveIndex}
+              changeName={handleEditForm}
+              changeData={handleChangeForm}
+            />
+          );
+        }
       });
     } else {
       return null;

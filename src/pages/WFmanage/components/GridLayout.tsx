@@ -178,9 +178,9 @@ export default (props: tsProps) => {
         }
       }
       listObj.push(obj);
-      let handleId = listObj[listObj.length - 2].handleId;
-      listObj[listObj.length - 1].handleId = handleId;
-      delete listObj[listObj.length - 2].handleId;
+      // let handleId = listObj[listObj.length - 2].handleId;
+      // listObj[listObj.length - 1].handleId = handleId;
+      // delete listObj[listObj.length - 2].handleId;
       // 互换执行操作
       setList(listObj);
       form.setFieldsValue({
