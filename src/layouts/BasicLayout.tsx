@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import ProLayout, { MenuDataItem } from '@ant-design/pro-layout';
-import { Link, IRouteComponentProps } from 'umi';
+import { Link, IRouteComponentProps, history } from 'umi';
 import logo from '@/assets/logo.svg';
 import { Dropdown, Spin, Menu } from 'antd';
 import {
@@ -52,16 +52,14 @@ export default (props: IRouteComponentProps) => {
     if (getToken('ods_token_front')) {
       fetchCurrent();
     } else {
-      window.location.href =
-        document.location.protocol + '//console.jdd-hub.com/login';
+      history.push('/user/login');
     }
   }, []);
 
   const handleMenuClick = ({ key }: KeyParams) => {
     if (key === 'logout') {
       removeToken('ods_token_front');
-      window.location.href =
-        document.location.protocol + '//console.jdd-hub.com/login';
+      history.push('/user/login');
     } else {
       setModalName(key);
     }

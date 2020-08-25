@@ -13,6 +13,14 @@ export default defineConfig({
   },
   routes: [
     {
+      path: '/user',
+      component: '@/layouts/UserLayout',
+      routes: [{
+        path: '/user/login',
+        component: '@/pages/User/Login',
+      }]
+    },
+    {
       path: '/',
       component: '@/layouts/BasicLayout',
       routes: [
