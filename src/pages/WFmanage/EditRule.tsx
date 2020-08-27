@@ -18,15 +18,16 @@ interface tsGetId {
   name: string;
 }
 // stepType  类型；类型 1：审批，2：抄送 ,
+let data1 = [];
+let data2 = [];
 export default props => {
   const [listOne, setListOne] = useState<tsStep[]>([]);
   const [listTwo, setListTwo] = useState<tsStep[]>([]);
-  // const [stepType, setStepType] = useState<1 | 2 | 3>(1);
   const [fromName, setFromName] = useState<string>('审批流程');
   const [addOrChange, setAddOrChange] = useState<'add' | 'change'>('change');
+  const [controlModels, setControlModels] = useState<any[]>();
   const [formId, setFormId] = useState<string>();
-  let data1 = [];
-  let data2 = [];
+  let archiveControlParams: any = [];
 
   useEffect(() => {
     getDetail();
@@ -45,12 +46,12 @@ export default props => {
           parseInt(idRes.obj[0].id),
         );
         if (res.status === 200) {
-          // setStepType(res.obj.noticeStatus || 1);
           handleList(res.obj.stepModelList);
           if (res.obj.stepModelList.length === 0) {
             setAddOrChange('add');
           } else {
             setAddOrChange('change');
+            setControlModels(res.obj.controlModels);
           }
         }
       }
@@ -106,9 +107,13 @@ export default props => {
       list2.push(item);
     });
     list1 = list1.concat(list2);
-    console.log(list1);
     list1.map((item, index) => {
-      item.stepNumber = index + 1;
+      if (item.type === 6) {
+        delete item.stepNumber;
+        delete item.resFormControlIds;
+      } else {
+        item.stepNumber = index + 1;
+      }
     });
     data.noticeStatus = 1;
 
@@ -124,6 +129,7 @@ export default props => {
     });
 
     data.crudParam = newList;
+    data.archiveControlParams = controlModels;
 
     let api = updateRolu;
     if (addOrChange === 'add') {
@@ -150,6 +156,18 @@ export default props => {
     data1 = value;
   };
 
+  const getArchiveControlParams = value => {
+    console.log(value);
+    archiveControlParams = [];
+    for (let key in value) {
+      archiveControlParams.push({
+        resApprArchiveDemandId: key,
+        resFormControlId: value[key],
+      });
+    }
+    setControlModels(archiveControlParams);
+  };
+
   const getdata2 = value => {
     data2 = value;
   };
@@ -166,7 +184,13 @@ export default props => {
         <Row>
           <Col>默认审批人</Col>
           <Col span={18} offset={1}>
-            <GridLayout {...props} ruleList={listOne} change={getdata1} />
+            <GridLayout
+              {...props}
+              ruleList={listOne}
+              change={getdata1}
+              controlModels={controlModels}
+              getArchiveControlParams={getArchiveControlParams}
+            />
           </Col>
         </Row>
 

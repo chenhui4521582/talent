@@ -229,7 +229,6 @@ export default () => {
 
   const handleOk = () => {
     const value = checked.join(',');
-
     window.open(
       serialize(
         `/api/talent/employeeRoster/export?includ=${value}`,
@@ -258,7 +257,7 @@ export default () => {
         <Row>
           <Col span={6}>
             <Form.Item label="岗位" name="postId">
-              <Select showSearch optionFilterProp="children">
+              <Select showSearch optionFilterProp="children" allowClear>
                 {jobList?.map(item => {
                   return (
                     <Option key={item.jobId} value={item.jobId}>
@@ -271,12 +270,12 @@ export default () => {
           </Col>
           <Col span={6} offset={2}>
             <Form.Item label="员工编号" name="employeeId">
-              <Input />
+              <Input allowClear />
             </Form.Item>
           </Col>
           <Col span={6} offset={2}>
             <Form.Item label="姓名" name="name">
-              <Input />
+              <Input allowClear />
             </Form.Item>
           </Col>
         </Row>
@@ -284,10 +283,11 @@ export default () => {
           <Col span={6}>
             <Form.Item label="一级业务线" name="firstBusinessCode">
               <Select
+                allowClear
                 showSearch
                 optionFilterProp="children"
                 onChange={e => {
-                  searchForm.setFieldsValue({ businessCode2: undefined });
+                  searchForm.setFieldsValue({ businessCode: undefined });
                   setSelect1(e as any);
                 }}
               >
@@ -316,7 +316,7 @@ export default () => {
           </Col>
           <Col span={6} offset={2}>
             <Form.Item label="是否在职" name="currentPosition">
-              <Select showSearch optionFilterProp="children">
+              <Select showSearch optionFilterProp="children" allowClear>
                 <Option value={0}>离职</Option>
                 <Option value={1}>在职</Option>
               </Select>

@@ -201,7 +201,8 @@ export default props => {
       baseControlType === 'job' ||
       baseControlType === 'positionLevel' ||
       baseControlType === 'positionMLevel' ||
-      baseControlType === 'user'
+      baseControlType === 'user' ||
+      baseControlType === 'wkTask'
     ) {
       return value
         ? value + '-$-' + showValue
@@ -304,6 +305,8 @@ export default props => {
                                   s_type={listItem.baseControlType}
                                   disabled={listItem.isLocked}
                                   list={listItem.itemList || []}
+                                  fileLists={listItem.fileList || []}
+                                  item={listItem}
                                 />
                               </Form.Item>
                             </div>
@@ -348,6 +351,8 @@ export default props => {
                           s_type={groupItem.baseControlType}
                           disabled={groupItem.isLocked}
                           list={groupItem.itemList || []}
+                          fileLists={groupItem.fileList || []}
+                          item={groupItem}
                         />
                       </Form.Item>
                     </Descriptions.Item>

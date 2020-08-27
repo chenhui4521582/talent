@@ -11,13 +11,17 @@ import {
 } from 'antd';
 import { PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import update from 'immutability-helper';
-import { getFormSimple, tsStep, ItemTypes } from '../services/rule';
+import {
+  getFormSimple,
+  tsStep,
+  ItemTypes,
+  getLableList as handleLable,
+  getParam,
+} from '../services/rule';
 import { GlobalResParams } from '@/types/ITypes';
 import { getLableList } from '@/pages/Framework/services/role';
 import { useDrop } from 'react-dnd';
 import MoveInOz from '@/pages/Framework/components/MoveInOz';
-import { getLableList as handleLable } from '@/pages/Framework/services/handle';
-
 import Assembly from './Assembly';
 import SystemLabel from './SystemLabel';
 import Card from './Card';
@@ -39,6 +43,23 @@ interface tsLabel {
   labelName: string;
 }
 
+interface IFile {
+  controlShowName: string;
+  id: number;
+}
+
+interface IListItem {
+  id: string;
+  isGroup: 0 | 1;
+  name: string;
+  type: string;
+  key: string;
+  title: string;
+  labelName: string;
+  isLocked?: number;
+  childName: string;
+}
+
 const levelList = [
   '直接上级',
   '第二上级',
@@ -52,17 +73,13 @@ const levelList = [
   '第十上级',
 ];
 
-interface tsProps {
-  ruleList?: tsStep[];
-  change?: (value) => {};
-}
-
 const typeObj = {
   1: '上级',
   2: '标签',
   3: '指定成员',
   4: '申请人',
   5: '动态标签',
+  6: '归档',
 };
 
 let userkeyList;
@@ -74,8 +91,8 @@ let systemObj;
 // nodeType : 节点类型 1:开始节点;2:中间节点;3:结束节点
 // specifiedLevel
 
-export default (props: tsProps) => {
-  const { ruleList, change } = props;
+export default props => {
+  const { ruleList, controlModels, change, getArchiveControlParams } = props;
   const [list, setList] = useState<tsStep[]>();
   const [, drop] = useDrop({
     accept: ItemTypes.Card,
@@ -91,12 +108,23 @@ export default (props: tsProps) => {
   const [name, setName] = useState<string>();
   const [cardIndex, setCardIndex] = useState<number>();
   const [handleList, setHandleList] = useState<tsRolrLable[]>();
+  const [paramForm] = Form.useForm();
+  const [param, setParam] = useState<IFile[]>([]);
+  const [controlList, setControlList] = useState<IListItem[]>();
+  const [isFiles, setIsFiles] = useState<boolean>(false);
 
   useEffect(() => {
     async function getLable() {
       let json: GlobalResParams<tsLabel[]> = await getLableList();
       if (json.status === 200) {
         setLabelList(json.obj);
+      }
+
+      let res: GlobalResParams<IListItem[]> = await getFormSimple(
+        props?.match.params.id,
+      );
+      if (res.status === 200) {
+        setControlList(res.obj);
       }
     }
 
@@ -117,6 +145,11 @@ export default (props: tsProps) => {
 
   useEffect(() => {
     change && change(list);
+    list?.map(item => {
+      if (item.type === 6) {
+        setIsFiles(true);
+      }
+    });
   }, [list]);
 
   const moveCard = (index, index1) => {
@@ -161,36 +194,48 @@ export default (props: tsProps) => {
       obj.stepName = typeObj[type || 1];
       obj.resFormControlIds = controlId;
       obj.id = listObj.length + 'add';
-      if (type === 3) {
-        if (userkeyList && userkeyList.length) {
-          obj.userCodeList = userkeyList.join(',');
-        } else {
-          message.warning('请选择指定成员');
-          return;
+      if (type === 6) {
+        paramForm.validateFields().then(value1 => {
+          getArchiveControlParams(value1);
+          listObj.push(obj);
+          setList(listObj);
+          form.setFieldsValue({
+            type: undefined,
+            specifiedLevel: undefined,
+            signType: undefined,
+            labelId: undefined,
+          });
+          setType(1);
+          setVisible(false);
+        });
+      } else {
+        if (type === 3) {
+          if (userkeyList && userkeyList.length) {
+            obj.userCodeList = userkeyList.join(',');
+          } else {
+            message.warning('请选择指定成员');
+            return;
+          }
+        } else if (type === 5) {
+          if (systemObj?.input && systemObj?.audo) {
+            obj.relationResFormControlId = systemObj?.input;
+            obj.sysLabelId = systemObj?.audo;
+          } else {
+            message.warning('请选择动态标签以及标签参数');
+            return;
+          }
         }
-      } else if (type === 5) {
-        if (systemObj?.input && systemObj?.audo) {
-          obj.relationResFormControlId = systemObj?.input;
-          obj.sysLabelId = systemObj?.audo;
-        } else {
-          message.warning('请选择动态标签以及标签参数');
-          return;
-        }
+        listObj.push(obj);
+        setList(listObj);
+        form.setFieldsValue({
+          type: undefined,
+          specifiedLevel: undefined,
+          signType: undefined,
+          labelId: undefined,
+        });
+        setType(1);
+        setVisible(false);
       }
-      listObj.push(obj);
-      // let handleId = listObj[listObj.length - 2].handleId;
-      // listObj[listObj.length - 1].handleId = handleId;
-      // delete listObj[listObj.length - 2].handleId;
-      // 互换执行操作
-      setList(listObj);
-      form.setFieldsValue({
-        type: undefined,
-        specifiedLevel: undefined,
-        signType: undefined,
-        labelId: undefined,
-      });
-      setType(1);
-      setVisible(false);
     });
   };
 
@@ -203,19 +248,33 @@ export default (props: tsProps) => {
       newList.push(item);
     });
     setList(newList);
-    form.setFieldsValue({
-      type: undefined,
-      specifiedLevel: undefined,
-      signType: undefined,
-      labelId: undefined,
-    });
-    handleHiddleModal();
-    setType(1);
-    setVisible(false);
+    if (type === 6) {
+      paramForm.validateFields().then(value => {
+        getArchiveControlParams(value);
+        handleHiddleModal();
+        setType(1);
+        setVisible(false);
+        form.setFieldsValue({
+          type: undefined,
+          specifiedLevel: undefined,
+          signType: undefined,
+          labelId: undefined,
+        });
+      });
+    } else {
+      handleHiddleModal();
+      setType(1);
+      setVisible(false);
+      form.setFieldsValue({
+        type: undefined,
+        specifiedLevel: undefined,
+        signType: undefined,
+        labelId: undefined,
+      });
+    }
   };
   // 编辑的确认
   const handleEditOkModal = () => {
-    // alert(12)
     form.validateFields().then(value => {
       value.resFormControlIds = controlId;
       // handleObjList(value);
@@ -262,7 +321,6 @@ export default (props: tsProps) => {
       }
     });
   };
-
   // 获取人员
   const handleGetUser = value => {
     userkeyList = value;
@@ -305,6 +363,23 @@ export default (props: tsProps) => {
     setSelectObj(selectItem);
     setType(selectItem.type);
     form.setFieldsValue(selectItem || {});
+
+    async function getP() {
+      let json = await getParam(selectItem.archiveId);
+      if (json.status === 200) {
+        setParam(json.obj);
+      }
+    }
+
+    if (selectItem.type === 6) {
+      getP();
+      controlModels?.map(item => {
+        let obj: any = {};
+        obj[item.resApprArchiveDemandId] = item.resFormControlId;
+        paramForm.setFieldsValue(obj);
+      });
+    }
+
     setEdit(true);
     setVisible(true);
   };
@@ -497,12 +572,20 @@ export default (props: tsProps) => {
       case 6:
         return (
           <Form.Item
-            name="handleId"
+            name="archiveId"
             style={{ marginTop: 4 }}
             label="自执行"
             rules={[{ required: true, message: '请选择标签!' }]}
           >
-            <Select placeholder="请选择标签">
+            <Select
+              placeholder="请选择标签"
+              onChange={async e => {
+                let json = await getParam(e);
+                if (json.status === 200) {
+                  setParam(json.obj);
+                }
+              }}
+            >
               {handleList?.map(item => {
                 return (
                   <Option key={item.id} value={item.id}>
@@ -577,7 +660,7 @@ export default (props: tsProps) => {
               <Radio value={3}>指定成员</Radio> <br />
               <Radio value={4}>申请人</Radio> <br />
               <Radio value={5}>动态标签</Radio> <br />
-              {list && cardIndex === list?.length - 1 ? (
+              {!isFiles || selectObj?.type === 6 ? (
                 <Radio value={6}>归档</Radio>
               ) : null}
             </Radio.Group>
@@ -585,14 +668,50 @@ export default (props: tsProps) => {
           <Divider />
           {renderModalBottom}
           <Divider />
-          <Assembly
-            {...props}
-            apiList={getFormSimple}
-            header="表单控件可编辑权限设置（支持多选）"
-            change={handleGetControlIds}
-            selectKeys={selectObj?.resFormControlIds || []}
-          />
+          {type === 6 ? null : (
+            <Assembly
+              {...props}
+              apiList={getFormSimple}
+              header="表单控件可编辑权限设置（支持多选）"
+              change={handleGetControlIds}
+              selectKeys={selectObj?.resFormControlIds || []}
+            />
+          )}
         </Form>
+        {type === 6 ? (
+          <Form form={paramForm}>
+            {param?.map(item => {
+              return (
+                <Form.Item
+                  key={item.id}
+                  style={{
+                    width: '40%',
+                    marginLeft: '5%',
+                    display: 'inline-block',
+                  }}
+                  label={item.controlShowName}
+                  name={item.id}
+                  rules={[
+                    {
+                      required: true,
+                      message: '请输入' + item.controlShowName + '!',
+                    },
+                  ]}
+                >
+                  <Select>
+                    {controlList?.map(control => {
+                      return (
+                        <Option value={control.id} key={control.id}>
+                          {control.childName + '_' + control.name}
+                        </Option>
+                      );
+                    })}
+                  </Select>
+                </Form.Item>
+              );
+            })}
+          </Form>
+        ) : null}
       </Modal>
       <Modal
         title="修改名称"

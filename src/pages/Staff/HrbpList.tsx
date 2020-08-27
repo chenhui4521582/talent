@@ -225,10 +225,9 @@ export default () => {
 
   const handleOk = () => {
     const value = checked.join(',');
-
     window.open(
       serialize(
-        `/api/talent/employeeRoster/export?includ=${value}`,
+        `/api/talent/employeeRoster/hrExport?includ=${value}`,
         searchForm.getFieldsValue(),
       ),
     );
@@ -251,7 +250,7 @@ export default () => {
         <Row>
           <Col span={6}>
             <Form.Item label="岗位" name="postId">
-              <Select showSearch optionFilterProp="children">
+              <Select showSearch optionFilterProp="children" allowClear>
                 {jobList?.map(item => {
                   return (
                     <Option key={item.jobId} value={item.jobId}>
@@ -264,19 +263,19 @@ export default () => {
           </Col>
           <Col span={6} offset={2}>
             <Form.Item label="员工编号" name="employeeId">
-              <Input />
+              <Input allowClear />
             </Form.Item>
           </Col>
           <Col span={6} offset={2}>
             <Form.Item label="姓名" name="name">
-              <Input />
+              <Input allowClear />
             </Form.Item>
           </Col>
         </Row>
         <Row>
           <Col span={6}>
             <Form.Item label="是否在职" name="currentPosition">
-              <Select showSearch optionFilterProp="children">
+              <Select showSearch optionFilterProp="children" allowClear>
                 <Option value={0}>离职</Option>
                 <Option value={1}>在职</Option>
               </Select>

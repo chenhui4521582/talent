@@ -39,7 +39,6 @@ export default (props: Iprops) => {
   const [selectItem, setSelectItem] = useState<any>();
   const [columns, setColumns] = useState<any>([]);
   const [dataSource, setDataSource] = useState<any>([]);
-  // const [template, setTemplate] = useState<any>();
   const [, drop] = useDrop({
     accept: fromItem.id + 'form',
   });
@@ -68,7 +67,6 @@ export default (props: Iprops) => {
     });
     setDataSource([dataItem]);
     setColumns(newColumns);
-    // setTemplate(dataItem);
   }, [fromItem, fromItem.list]);
 
   useEffect(() => {
@@ -93,32 +91,7 @@ export default (props: Iprops) => {
       });
       dataItem[item.baseControlType + '-' + item.id] = { ...item };
     });
-    // newColumns.push({
-    //   title: '操作',
-    //   dataIndex: 'action',
-    //   align: 'center',
-    //   key: 'action',
-    //   render: (_, record, index) => (
-    //     <span>
-    //       <a
-    //         onClick={() => {
-    //           let newList = new Set(dataSource);
-    //           console.log(dataSource[index]);
-    //           console.log(newList);
-    //           newList = update(newList, {
-    //             $remove: [dataSource[index]],
-    //           });
-    //           console.log(newList);
-    //           setDataSource([...newList]);
-    //         }}
-    //       >
-    //         删除
-    //       </a>
-    //     </span>
-    //   ),
-    // });
     setColumns(newColumns);
-    // setTemplate(dataItem);
   }, [dataSource, fromItem]);
 
   const handleDataSource = dataSource => {
@@ -201,13 +174,11 @@ export default (props: Iprops) => {
 
   const handleOk = () => {
     form.validateFields().then(async value => {
-      console.log(value);
-      console.log('value');
       let list = JSON.parse(JSON.stringify(fromItem.list));
       let jsonAll = JSON.parse(JSON.stringify(allData));
       if (visible === 'edit') {
         let selectFrom = list && list[selectGroup];
-        if (fromItem.type === 0) {
+        if (fromItem.type !== 2) {
           if (value.itemList) {
             let itemList: string[] = [];
             for (let key in value.itemList) {

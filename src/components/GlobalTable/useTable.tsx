@@ -13,6 +13,7 @@ interface useTablesParams {
   paramValue?: string | number;
   cacheKey: string;
   showCheck?: boolean | undefined;
+  noClearKey?: boolean | undefined;
 }
 const selectedType = 'checkbox';
 export const useTable = ({
@@ -23,6 +24,7 @@ export const useTable = ({
   paramValue,
   cacheKey,
   showCheck,
+  noClearKey,
 }: useTablesParams) => {
   const [searchForm] = Form.useForm();
   const { tableProps, refresh, search } = useFormTable(
@@ -30,6 +32,9 @@ export const useTable = ({
       const data = searchForm.getFieldsValue();
       if (paramName) data[paramName] = paramValue;
       let response = await queryMethod({ pageNum: current, pageSize, ...data });
+      let newList = JSON.parse(JSON.stringify(allList));
+      newList = newList.concat(response.obj?.list);
+      setAllList([...new Set(newList)]);
       return {
         total: response.obj?.total,
         list: response.obj?.list,
@@ -43,9 +48,14 @@ export const useTable = ({
   );
 
   const [selectPageObj, setSelectPageObj] = useState<any>({});
+  const [allList, setAllList] = useState<any[]>([]);
+  const [defaultKeys, setDefaultKeys] = useState<string[]>([]);
 
   const selectedRowKeys = () => {
-    let arr = [];
+    let arr: string[] = [];
+    if (defaultKeys) {
+      arr = arr.concat(defaultKeys);
+    }
     for (let key in selectPageObj) {
       arr = arr.concat(selectPageObj[key]);
     }
@@ -59,6 +69,9 @@ export const useTable = ({
       let obj: any = JSON.parse(JSON.stringify(selectPageObj));
       obj[page] = selectedRowKeys;
       setSelectPageObj(obj);
+      if (defaultKeys) {
+        setDefaultKeys([]);
+      }
     },
 
     selectedRowKeys: selectedRowKeys(),
@@ -69,7 +82,6 @@ export const useTable = ({
       let obj: any = JSON.parse(JSON.stringify(selectPageObj));
       if (selected) {
         selectedRows?.map(item => {
-          console.log(item);
           if (item) {
             arr.push(item[rowKeyName]);
           }
@@ -100,7 +112,10 @@ export const useTable = ({
                 <Button
                   type="primary"
                   onClick={() => {
-                    setSelectPageObj({});
+                    if (noClearKey === true) {
+                    } else {
+                      setSelectPageObj({});
+                    }
                     submit();
                   }}
                 >
@@ -108,8 +123,11 @@ export const useTable = ({
                 </Button>
                 <Button
                   onClick={() => {
+                    if (noClearKey === true) {
+                    } else {
+                      setSelectPageObj({});
+                    }
                     reset();
-                    setSelectPageObj({});
                   }}
                   style={{ marginLeft: 16 }}
                 >
@@ -143,5 +161,7 @@ export const useTable = ({
     Refresh,
     searchForm,
     selectKeys: selectedRowKeys(),
+    allList: allList,
+    selectedRowKeys: setDefaultKeys,
   };
 };

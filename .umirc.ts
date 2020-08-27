@@ -243,12 +243,12 @@ export default defineConfig({
           component: '@/pages/Framework/Systemlabel',
         },
         {
-          path: '/talent/framework/handlesystem',
-          component: '@/pages/Framework/HandleSystem',
-        },
-        {
           path: '/talent/wfmanage/list',
           component: '@/pages/WFmanage/List',
+        },
+        {
+          path: '/talent/processm/list',
+          component: '@/pages/ProcessM/List',
         },
         {
           path: '/talent/wfmanage/applicationrecord/:id',

@@ -149,6 +149,7 @@ const Card: React.FC<tsStep & IProps> = ({
         }}
       >
         <span>{stepName}</span>
+        <br />
         <EditOutlined
           style={{
             position: 'absolute',
@@ -175,6 +176,19 @@ const Card: React.FC<tsStep & IProps> = ({
           cursor: 'pointer',
         }}
       />
+      {item.type === 6 ? (
+        <p
+          style={{
+            color: 'red',
+            position: 'absolute',
+            textAlign: 'center',
+            width: '100%',
+            bottom: '-3em',
+          }}
+        >
+          归档
+        </p>
+      ) : null}
     </div>
   );
 };

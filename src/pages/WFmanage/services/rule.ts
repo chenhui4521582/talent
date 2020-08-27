@@ -4,6 +4,7 @@ export interface tsList {}
 export interface tsStepObj {
   noticeStatus: 1 | 2 | 3;
   stepModelList: tsStep[];
+  controlModels?: any[];
 }
 export interface tsStep {
   id: string;
@@ -84,5 +85,20 @@ export async function getStepId(formId: number) {
   return request(`/api/talent/wfresapproval/list`, {
     method: 'POST',
     data: { formId },
+  });
+}
+
+// 获取归档下拉
+export async function getLableList() {
+  return request(`/api/talent/wfresapprarchive/selectAll`, {
+    method: 'POST',
+  });
+}
+
+// 获取归档参数
+export async function getParam(id) {
+  return request(`/api/talent/wfresapprarchive/selectDemandControllerList`, {
+    method: 'POST',
+    data: { id },
   });
 }

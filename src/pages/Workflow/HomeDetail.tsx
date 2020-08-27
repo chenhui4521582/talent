@@ -144,8 +144,6 @@ export default props => {
         : showValue
         ? showValue.split(',')
         : undefined;
-    } else if (baseControlType === 'files') {
-      return value ? value.split(',') : undefined;
     } else if (baseControlType === 'depGroup') {
       return showValue ? showValue.split(',') : undefined;
     } else {
@@ -223,6 +221,8 @@ export default props => {
                                   s_type={listItem.baseControlType}
                                   disabled={listItem.isLocked}
                                   list={listItem.itemList || []}
+                                  fileLists={listItem.fileList || []}
+                                  item={listItem}
                                 />
                               </Form.Item>
                             </div>
@@ -267,6 +267,8 @@ export default props => {
                           s_type={groupItem.baseControlType}
                           disabled={groupItem.isLocked}
                           list={groupItem.itemList || []}
+                          fileLists={groupItem.fileList || []}
+                          item={groupItem}
                         />
                       </Form.Item>
                     </Descriptions.Item>
@@ -286,6 +288,7 @@ export default props => {
     form.validateFields().then(async fromSubData => {
       console.log(fromSubData);
       let subList: any = [];
+      let wfTaskFormFilesCrudParamList: any = [];
       idItemList.map(item => {
         let showArr: any = [];
         let valueArr: any = [];
@@ -308,6 +311,18 @@ export default props => {
             ? valueArr.push(fromSubData[item.id].split('-$-')[0])
             : valueArr.push(fromSubData[item.id]);
         }
+        if (item.baseControlType === 'files') {
+          fromSubData[item.id].map(file => {
+            wfTaskFormFilesCrudParamList.push({
+              resFormControlId: item.id,
+              fileUrl: file.url,
+              fileName: file.name,
+              fileSize: file.size,
+              fileExtname: file.type,
+            });
+          });
+        }
+
         if (item.isLocked) {
           subList.push({
             id: item.id,
@@ -368,7 +383,7 @@ export default props => {
           }
         }
       });
-
+      console.log(subList);
       for (let key in fromSubData) {
         if (key.split('-')[1] && key.split('-')[0]) {
           if (key.split('-')[0] === 'date') {
@@ -434,7 +449,8 @@ export default props => {
             key.split('-')[0] === 'labor' ||
             key.split('-')[0] === 'cost' ||
             key.split('-')[0] === 'positionLevel' ||
-            key.split('-')[0] === 'positionMLevel'
+            key.split('-')[0] === 'positionMLevel' ||
+            key.split('-')[0] === 'wkTask'
           ) {
             subList.push({
               id: parseInt(key.split('-')[1]),
@@ -443,6 +459,16 @@ export default props => {
                 ? fromSubData[key].split('-$-')[1]
                 : '',
               multipleNumber: parseInt(key.split('-')[2]),
+            });
+          } else if (key.split('-')[0] === 'files') {
+            fromSubData[key.split('-')[1]].map(file => {
+              wfTaskFormFilesCrudParamList.push({
+                resFormControlId: key.split('-')[1],
+                fileUrl: file.url,
+                fileName: file.name,
+                fileSize: file.size,
+                fileExtname: file.type,
+              });
             });
           } else {
             subList.push({
@@ -454,10 +480,15 @@ export default props => {
           }
         }
       }
+      console.log({
+        resFormId: formId,
+        wfResFormSaveItemCrudParamList: subList,
+        wfTaskFormFilesCrudParamList: wfTaskFormFilesCrudParamList,
+      });
       let json: GlobalResParams<string> = await saveTaskForm({
         resFormId: formId,
         wfResFormSaveItemCrudParamList: subList,
-        wfTaskFormFilesCrudParamList: [],
+        wfTaskFormFilesCrudParamList: wfTaskFormFilesCrudParamList,
       });
       if (json.status === 200) {
         notification['success']({

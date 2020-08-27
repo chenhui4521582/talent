@@ -11,6 +11,14 @@ import { ColumnProps } from 'antd/es/table';
 import { GlobalResParams } from '@/types/ITypes';
 const { Option } = Select;
 
+const status = {
+  '-1': '删除',
+  '0': '已撤销',
+  '1': '审批中',
+  '2': '已通过',
+  '3': '已驳回',
+};
+
 export default () => {
   const [list, setList] = useState<tsCategoryItem[]>();
   useEffect(() => {
