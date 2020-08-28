@@ -262,6 +262,7 @@ const EditForm = props => {
             newItem.groupIndex = 1;
             newItem.resGroupId = groupItem.id;
             newItem.colspan = item.colspan;
+            newItem.isLocked = item.isLocked;
             newItem.sort = sort;
             item.isMultiplechoice || item.isMultiplechoice === 0
               ? (newItem.isMultiplechoice = item.isMultiplechoice)
@@ -283,6 +284,7 @@ const EditForm = props => {
           newItem.resFormChildId = formItem.id;
           newItem.resFormId = formItem.resFormId;
           newItem.colspan = newC.colspan;
+          newItem.isLocked = newC.isLocked;
           newItem.groupIndex = 1;
           newItem.isGroup = 0;
           newItem.sort = sort;

@@ -78,7 +78,7 @@ const typeObj = {
   2: '标签',
   3: '指定成员',
   4: '申请人',
-  5: '动态标签',
+  5: '系统标签',
   6: '归档',
 };
 
@@ -86,7 +86,7 @@ let userkeyList;
 let controlId;
 let systemObj;
 
-// type 审批类型；   1：上级，2：标签，3：单个成员，4：申请人，5：动态标签 6.归档,
+// type 审批类型；   1：上级，2：标签，3：单个成员，4：申请人，5：系统标签 6.归档,
 // signType : 0：会签，1：或签 在审批类型为上级和标签时有效 ,
 // nodeType : 节点类型 1:开始节点;2:中间节点;3:结束节点
 // specifiedLevel
@@ -221,7 +221,7 @@ export default props => {
             obj.relationResFormControlId = systemObj?.input;
             obj.sysLabelId = systemObj?.audo;
           } else {
-            message.warning('请选择动态标签以及标签参数');
+            message.warning('请选择系统标签以及标签参数');
             return;
           }
         }
@@ -312,7 +312,7 @@ export default props => {
             handleObjList(value);
             return true;
           } else {
-            message.warning('请选择动态标签以及标签参数');
+            message.warning('请选择系统标签以及标签参数');
             return false;
           }
         default:
@@ -659,7 +659,7 @@ export default props => {
               <Radio value={2}>标签</Radio> <br />
               <Radio value={3}>指定成员</Radio> <br />
               <Radio value={4}>申请人</Radio> <br />
-              <Radio value={5}>动态标签</Radio> <br />
+              <Radio value={5}>系统标签</Radio> <br />
               {!isFiles || selectObj?.type === 6 ? (
                 <Radio value={6}>归档</Radio>
               ) : null}

@@ -146,7 +146,9 @@ export default props => {
         setRuleList(res.obj);
       }
     }
-    getRule();
+    if (selectItem) {
+      getRule();
+    }
   }, [selectItem]);
 
   useEffect(() => {
