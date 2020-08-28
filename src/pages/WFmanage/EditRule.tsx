@@ -157,7 +157,6 @@ export default props => {
   };
 
   const getArchiveControlParams = value => {
-    console.log(value);
     archiveControlParams = [];
     for (let key in value) {
       archiveControlParams.push({

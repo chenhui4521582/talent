@@ -370,7 +370,6 @@ export default props => {
 
   const submitData = (type: number): void => {
     form.validateFields().then(async fromSubData => {
-      console.log(fromSubData);
       let subList: any = [];
       let wfTaskFormFilesCrudParamList: any = [];
       idItemList.map(item => {
@@ -445,7 +444,6 @@ export default props => {
             item.baseControlType === 'currDepartment' ||
             item.baseControlType === 'currUser'
           ) {
-            console.log(valueArr);
             subList.push({
               resFormControlId: item.resFormControlId,
               multipleNumber: 1,
@@ -774,7 +772,6 @@ const AutoTable = props => {
                 newList = update(newList, {
                   $remove: [dataSource[index]],
                 });
-                console.log(newList);
                 setDataSource([...newList]);
               }}
             >
@@ -859,7 +856,6 @@ const AutoTable = props => {
     });
     return objArr;
   };
-  console.log(dataSource);
   return (
     <Table
       title={() => {
@@ -868,8 +864,6 @@ const AutoTable = props => {
             onClick={() => {
               let newData = JSON.parse(JSON.stringify(dataSource));
               let newTemplate = JSON.parse(JSON.stringify(template));
-              console.log(template);
-              console.log('template');
               newTemplate.map(item => {
                 item.multipleNumber = parseInt(newData.length) + 1;
                 item.value = null;

@@ -153,7 +153,6 @@ export default props => {
   }, [list]);
 
   const moveCard = (index, index1) => {
-    console.log(index, index1);
     let newList = JSON.parse(JSON.stringify(list));
     let dragCard = newList[index];
 
@@ -324,22 +323,15 @@ export default props => {
   // 获取人员
   const handleGetUser = value => {
     userkeyList = value;
-    console.log('userkeyList');
-    console.log(value);
-    // userkeyList
   };
   // 获取组件id列表
   const handleGetControlIds = (value: any): void => {
     controlId = value;
-    console.log('controlId');
-    console.log(value);
     // controlId
   };
   // 获取系统标签id
   const handleSystem = value => {
     systemObj = value;
-    console.log('systemObj');
-    console.log(value);
     // systemObj
   };
   // AddshowModal

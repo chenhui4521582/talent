@@ -95,8 +95,6 @@ export default (props: Iprops) => {
   }, [dataSource, fromItem]);
 
   const handleDataSource = dataSource => {
-    console.log('dataSource');
-    console.log(dataSource);
     let newData = JSON.parse(JSON.stringify(dataSource));
     for (let i = 0; i < newData.length; i++) {
       let item = newData[i];

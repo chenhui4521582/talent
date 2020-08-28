@@ -217,7 +217,6 @@ const SelectTemplate = props => {
 // 多选框
 const MultipleTemplate = props => {
   const { list } = props;
-  console.log(props);
   let data = [];
   if (Object.prototype.toString.call(list) === '[object String]') {
     data = list.split('|');

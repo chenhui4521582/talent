@@ -286,7 +286,6 @@ export default props => {
 
   const submit = (): void => {
     form.validateFields().then(async fromSubData => {
-      console.log(fromSubData);
       let subList: any = [];
       let wfTaskFormFilesCrudParamList: any = [];
       idItemList.map(item => {
@@ -384,7 +383,6 @@ export default props => {
           }
         }
       });
-      console.log(subList);
       for (let key in fromSubData) {
         if (key.split('-')[1] && key.split('-')[0]) {
           if (key.split('-')[0] === 'date') {
@@ -482,11 +480,6 @@ export default props => {
           }
         }
       }
-      console.log({
-        resFormId: formId,
-        wfResFormSaveItemCrudParamList: subList,
-        wfTaskFormFilesCrudParamList: wfTaskFormFilesCrudParamList,
-      });
       let json: GlobalResParams<string> = await saveTaskForm({
         resFormId: formId,
         wfResFormSaveItemCrudParamList: subList,
@@ -602,12 +595,9 @@ const AutoTable = props => {
           <a
             onClick={() => {
               let newList = new Set(dataSource);
-              console.log(dataSource[index]);
-              console.log(newList);
               newList = update(newList, {
                 $remove: [dataSource[index]],
               });
-              console.log(newList);
               setDataSource([...newList]);
             }}
           >

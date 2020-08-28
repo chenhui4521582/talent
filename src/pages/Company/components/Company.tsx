@@ -7,11 +7,9 @@ function Company(props: tsCompany, formRef) {
   const { name, paramName, defaultValue } = props;
 
   useEffect(() => {
-    console.log(defaultValue);
     if (defaultValue) {
       let obj = {};
       obj[paramName] = defaultValue;
-      console.log(defaultValue);
       form.setFieldsValue(obj);
     }
   });

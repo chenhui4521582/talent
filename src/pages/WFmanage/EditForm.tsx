@@ -173,7 +173,6 @@ const EditForm = props => {
             obj.list = [];
             obj.type = value.type;
             list.push(obj);
-            console.log(list);
             setFormDetail(list);
             setAddOrEdit(undefined);
             form.setFieldsValue({
@@ -197,7 +196,6 @@ const EditForm = props => {
               parseInt(value.columnNum),
               value.type || selectFrom.type,
             );
-            console.log(selectFrom);
             if (updataJson.status === 200) {
               list[selectFormIndex] = selectFrom;
             }
@@ -295,7 +293,6 @@ const EditForm = props => {
         }
       });
     });
-    console.log([...new Set(cList)]);
     let json = await updateForm({
       resFormId: props.match.params.id,
       resFormControlCrudParamList: [...new Set(cList)],
@@ -317,7 +314,6 @@ const EditForm = props => {
   const fromContent = useMemo(() => {
     if (formDetail?.length) {
       return formDetail?.map((fromItem, i) => {
-        console.log(fromItem);
         if (fromItem.type === 1) {
           return (
             <DropTable

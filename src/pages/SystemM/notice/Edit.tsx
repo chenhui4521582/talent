@@ -86,7 +86,6 @@ export default props => {
   };
 
   const submitData = async () => {
-    console.log(editorRef.current.state.value);
     let api = save;
     let values: any = {};
     values.content = editorRef.current.state.value;
