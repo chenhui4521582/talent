@@ -319,6 +319,7 @@ export default props => {
               fileName: file.name,
               fileSize: file.size,
               fileExtname: file.type,
+              multipleNumber: 1,
             });
           });
         }
@@ -461,13 +462,14 @@ export default props => {
               multipleNumber: parseInt(key.split('-')[2]),
             });
           } else if (key.split('-')[0] === 'files') {
-            fromSubData[key.split('-')[1]].map(file => {
+            fromSubData[key].map(file => {
               wfTaskFormFilesCrudParamList.push({
                 resFormControlId: key.split('-')[1],
                 fileUrl: file.url,
                 fileName: file.name,
                 fileSize: file.size,
                 fileExtname: file.type,
+                multipleNumber: parseInt(key.split('-')[2]),
               });
             });
           } else {

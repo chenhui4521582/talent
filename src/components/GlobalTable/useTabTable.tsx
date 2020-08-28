@@ -87,6 +87,7 @@ export const useTabTable = ({
             return (
               <TabPane tab={item.name} key={item.value}>
                 <Table
+                  bordered
                   size="small"
                   columns={columns}
                   rowKey={rowKeyName}

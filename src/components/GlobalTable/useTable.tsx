@@ -49,10 +49,10 @@ export const useTable = ({
 
   const [selectPageObj, setSelectPageObj] = useState<any>({});
   const [allList, setAllList] = useState<any[]>([]);
-  const [defaultKeys, setDefaultKeys] = useState<string[]>([]);
+  const [defaultKeys, setDefaultKeys] = useState<number[]>([]);
 
   const selectedRowKeys = () => {
-    let arr: string[] = [];
+    let arr: number[] = [];
     if (defaultKeys) {
       arr = arr.concat(defaultKeys);
     }
@@ -142,6 +142,7 @@ export const useTable = ({
           columns={columns}
           rowKey={rowKeyName}
           {...tableProps}
+          bordered
           rowSelection={showCheck ? rowSelection : undefined}
           rowClassName={(record, index) => {
             if (index % 2 === 1) {

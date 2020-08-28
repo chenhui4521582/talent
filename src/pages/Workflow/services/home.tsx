@@ -167,3 +167,11 @@ export async function homeList() {
     method: 'POST',
   });
 }
+
+// 我的列表
+export async function myListPageWt(params: PaginationTableParams) {
+  return request(`/api/talent/wftaskform/listRelationFormPage`, {
+    method: 'POST',
+    data: params,
+  });
+}

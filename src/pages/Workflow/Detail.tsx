@@ -372,6 +372,7 @@ export default props => {
     form.validateFields().then(async fromSubData => {
       console.log(fromSubData);
       let subList: any = [];
+      let wfTaskFormFilesCrudParamList: any = [];
       idItemList.map(item => {
         let showArr: any = [];
         let valueArr: any = [];
@@ -394,6 +395,19 @@ export default props => {
             ? valueArr.push(fromSubData[item.id].split('-$-')[0])
             : valueArr.push(fromSubData[item.id]);
         }
+        if (item.baseControlType === 'files') {
+          fromSubData[item.id].map(file => {
+            wfTaskFormFilesCrudParamList.push({
+              resFormControlId: item.id,
+              fileUrl: file.url,
+              fileName: file.name,
+              fileSize: file.size,
+              fileExtname: file.type,
+              multipleNumber: 1,
+            });
+          });
+        }
+
         if (item.isLocked) {
           subList.push({
             resFormControlId: item.resFormControlId,
@@ -538,6 +552,17 @@ export default props => {
                 ? fromSubData[key].split('-$-')[1]
                 : '',
               multipleNumber: parseInt(key.split('-')[2]),
+            });
+          } else if (key.split('-')[0] === 'files') {
+            fromSubData[key].map(file => {
+              wfTaskFormFilesCrudParamList.push({
+                resFormControlId: key.split('-')[1],
+                fileUrl: file.url,
+                fileName: file.name,
+                fileSize: file.size,
+                fileExtname: file.type,
+                multipleNumber: parseInt(key.split('-')[2]),
+              });
             });
           } else {
             subList.push({

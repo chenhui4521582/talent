@@ -37,6 +37,7 @@ export const useReq = ({
     return (
       <div>
         <Table
+          bordered
           size="small"
           columns={columns}
           rowKey={rowKeyName}

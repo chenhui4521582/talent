@@ -411,7 +411,7 @@ export default props => {
                 {beforeStr}{' '}
                 <span style={{ color: 'red' }}> {searchValue} </span>
                 {afterStr}
-                <span style={{ color: 'red', marginLeft: 6 }}>
+                <span style={{ color: '#4E72C9', marginLeft: 6 }}>
                   ({list[i].memberNumber})
                 </span>
                 <span
@@ -438,7 +438,7 @@ export default props => {
                     {beforeStr}{' '}
                     <span style={{ color: 'red' }}>{searchValue}</span>{' '}
                     {afterStr}{' '}
-                    <span style={{ color: 'red', marginLeft: 6 }}>
+                    <span style={{ color: '#4E72C9', marginLeft: 6 }}>
                       ({list[i].memberNumber})
                     </span>
                   </span>
@@ -460,7 +460,7 @@ export default props => {
                     {beforeStr}{' '}
                     <span style={{ color: 'red' }}>{searchValue}</span>{' '}
                     {afterStr}
-                    <span style={{ color: 'red', marginLeft: 6 }}>
+                    <span style={{ color: '#4E72C9', marginLeft: 6 }}>
                       ({list[i].memberNumber})
                     </span>
                   </span>
@@ -473,7 +473,7 @@ export default props => {
             list[i].title = (
               <div style={{ minWidth: '10em', display: 'flex' }}>
                 {list[i].name}
-                <span style={{ color: 'red', marginLeft: 6 }}>
+                <span style={{ color: '#4E72C9', marginLeft: 6 }}>
                   ({list[i].memberNumber})
                 </span>
                 <span
@@ -497,7 +497,7 @@ export default props => {
                 <div style={{ minWidth: '10em', display: 'flex', flex: '1' }}>
                   <span style={{ display: 'flex', flex: '1' }}>
                     {list[i].name}
-                    <span style={{ color: 'red', marginLeft: 6 }}>
+                    <span style={{ color: '#4E72C9', marginLeft: 6 }}>
                       ({list[i].memberNumber})
                     </span>
                   </span>
@@ -511,7 +511,7 @@ export default props => {
                 <div style={{ minWidth: '10em', display: 'flex', flex: '1' }}>
                   <span style={{ display: 'flex', flex: '1' }}>
                     {list[i].name}
-                    <span style={{ color: 'red', marginLeft: 6 }}>
+                    <span style={{ color: '#4E72C9', marginLeft: 6 }}>
                       ({list[i].memberNumber})
                     </span>
                   </span>

@@ -29,7 +29,7 @@ import {
 } from '@/models/global';
 import { saveFile } from '@/services/global';
 import { GlobalResParams } from '@/types/ITypes';
-import { myListPage, tsList } from './services/home';
+import { myListPageWt, tsList } from './services/home';
 
 import OzTreeSlect from '@/pages/Framework/components/OzTreeSlect';
 import DepGroup from './DepGroup';
@@ -562,7 +562,7 @@ const Uploads = props => {
     return (size / Math.pow(num, 4)).toFixed(2) + 'T'; //T
   }
   return (
-    <Upload {...action}>
+    <Upload {...action} disabled={props.disabled}>
       <UploadOutlined /> 上传附件
     </Upload>
   );
@@ -620,7 +620,7 @@ const WkTask = props => {
     allList,
     selectedRowKeys,
   } = useTable({
-    queryMethod: myListPage,
+    queryMethod: myListPageWt,
     columns,
     rowKeyName: 'id',
     cacheKey: 'wftaskform/listMyFormPageWkTask',
@@ -642,15 +642,15 @@ const WkTask = props => {
   };
 
   useEffect(() => {
-    if (props.item.value) {
+    if (props.item?.value) {
       let arr: number[] = [];
-      props.item.value.split(',').map(item => {
+      props.item?.value.split(',').map(item => {
         arr.push(parseInt(item));
       });
       selectedRowKeys(arr);
     }
-    if (props.item.showValue) {
-      setValue(props.item.showValue);
+    if (props.item?.showValue) {
+      setValue(props.item?.showValue);
     }
   }, [props.item]);
 
