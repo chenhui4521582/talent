@@ -395,18 +395,6 @@ export default props => {
             ? valueArr.push(fromSubData[item.id].split('-$-')[0])
             : valueArr.push(fromSubData[item.id]);
         }
-        if (item.baseControlType === 'files') {
-          fromSubData[item.id].map(file => {
-            wfTaskFormFilesCrudParamList.push({
-              resFormControlId: item.id,
-              fileUrl: file.url,
-              fileName: file.name,
-              fileSize: file.size,
-              fileExtname: file.type,
-              multipleNumber: 1,
-            });
-          });
-        }
 
         if (item.isLocked) {
           subList.push({
@@ -416,6 +404,24 @@ export default props => {
             value: item.value || '',
           });
         } else {
+          if (item.baseControlType === 'files') {
+            subList.push({
+              resFormControlId: item.resFormControlId,
+              multipleNumber: 1,
+              showValue: '',
+              value: '',
+            });
+            fromSubData[item.id].map(file => {
+              wfTaskFormFilesCrudParamList.push({
+                resFormControlId: item.id,
+                fileUrl: file.url,
+                fileName: file.name,
+                fileSize: file.size,
+                fileExtname: file.type,
+                multipleNumber: 1,
+              });
+            });
+          }
           if (item.baseControlType === 'datetime') {
             subList.push({
               resFormControlId: item.resFormControlId,
@@ -458,6 +464,13 @@ export default props => {
                 multipleNumber: 1,
                 showValue: fromSubData[item.id].split('-$-')[1],
                 value: fromSubData[item.id].split('-$-')[0] || '',
+              });
+            } else if (item.baseControlType === 'files') {
+              subList.push({
+                resFormControlId: item.resFormControlId,
+                multipleNumber: 1,
+                showValue: '',
+                value: '',
               });
             } else {
               subList.push({

@@ -367,11 +367,18 @@ export default props => {
               value: valueArr.join(',').split('-$-')[0],
             });
           } else if (item.baseControlType === 'currUser') {
-            subList({
+            subList.push({
               id: item.id,
               multipleNumber: 1,
               showValue: item.defaultShowValue,
               value: item.defaultValue,
+            });
+          } else if (item.baseControlType === 'files') {
+            subList.push({
+              id: item.id,
+              multipleNumber: 1,
+              showValue: '',
+              value: '',
             });
           } else {
             subList.push({
@@ -480,6 +487,8 @@ export default props => {
           }
         }
       }
+      console.log(subList);
+      console.log(wfTaskFormFilesCrudParamList);
       let json: GlobalResParams<string> = await saveTaskForm({
         resFormId: formId,
         wfResFormSaveItemCrudParamList: subList,

@@ -18,8 +18,9 @@ interface tsGetId {
   name: string;
 }
 // stepType  类型；类型 1：审批，2：抄送 ,
-let data1 = [];
+let data1: any = [];
 let data2 = [];
+let flag = true;
 export default props => {
   const [listOne, setListOne] = useState<tsStep[]>([]);
   const [listTwo, setListTwo] = useState<tsStep[]>([]);
@@ -34,8 +35,6 @@ export default props => {
   }, [props.match.params.id]);
 
   async function getDetail() {
-    data2 = [];
-    data1 = [];
     const id = props.match.params.id;
     let idRes: GlobalResParams<tsGetId[]> = await getStepId(parseInt(id));
     if (idRes.status === 200) {
@@ -48,8 +47,11 @@ export default props => {
         if (res.status === 200) {
           handleList(res.obj.stepModelList);
           if (res.obj.stepModelList.length === 0) {
+            data2 = [];
+            data1 = [];
             setAddOrChange('add');
           } else {
+            data1 = res.obj.stepModelList;
             setAddOrChange('change');
             setControlModels(res.obj.controlModels);
           }
@@ -126,29 +128,51 @@ export default props => {
       } else {
         item.nodeType = 2;
       }
+
+      if (item.type === 6 && i === list1?.length - 1) {
+        item.nodeType = 4;
+        list1[list1.length - 2] = {
+          ...item,
+          nodeType: 3,
+        };
+      } else {
+        item.nodeType = 3;
+      }
+    });
+
+    let newControlModels = controlModels
+      ? JSON.parse(JSON.stringify(controlModels))
+      : null;
+    newControlModels?.map(item => {
+      delete item.controlShowName;
     });
 
     data.crudParam = newList;
-    data.archiveControlParams = controlModels;
+    data.archiveControlParams = newControlModels;
 
     let api = updateRolu;
     if (addOrChange === 'add') {
       api = saveRolu;
     }
 
-    let res: GlobalResParams<string> = await api(data);
-    if (res.status === 200) {
-      getDetail();
-
-      notification['success']({
-        message: res.msg,
-        description: '',
-      });
-    } else {
-      notification['error']({
-        message: res.msg,
-        description: '',
-      });
+    if (flag) {
+      flag = false;
+      setTimeout(() => {
+        flag = true;
+      }, 1000);
+      let res: GlobalResParams<string> = await api(data);
+      if (res.status === 200) {
+        getDetail();
+        notification['success']({
+          message: res.msg,
+          description: '',
+        });
+      } else {
+        notification['error']({
+          message: res.msg,
+          description: '',
+        });
+      }
     }
   };
 
@@ -159,10 +183,18 @@ export default props => {
   const getArchiveControlParams = value => {
     archiveControlParams = [];
     for (let key in value) {
-      archiveControlParams.push({
-        resApprArchiveDemandId: key,
-        resFormControlId: value[key],
-      });
+      if (value.id) {
+        archiveControlParams.push({
+          resApprArchiveDemandId: key,
+          resFormControlId: value[key],
+          id: value.id,
+        });
+      } else {
+        archiveControlParams.push({
+          resApprArchiveDemandId: key,
+          resFormControlId: value[key],
+        });
+      }
     }
     setControlModels(archiveControlParams);
   };
