@@ -140,7 +140,7 @@ export default props => {
   }, []);
 
   useEffect(() => {
-    setList(ruleList);
+    setList(sortTypeList(ruleList));
   }, [ruleList]);
 
   useEffect(() => {
@@ -167,7 +167,29 @@ export default props => {
       item.stepNumber = index;
     });
 
-    setList(newList);
+    setList(sortTypeList(newList));
+  };
+
+  const sortTypeList = listp => {
+    listp?.map(item => {
+      if (item.type === 6) {
+        item.stepNumber = 100000000;
+      }
+    });
+    const compare = (name: string) => {
+      return (a, b) => {
+        let v1 = a[name];
+        let v2 = b[name];
+        if (v2 > v1) {
+          return -1;
+        } else if (v2 < v1) {
+          return 1;
+        } else {
+          return 0;
+        }
+      };
+    };
+    return listp.sort(compare('stepNumber'));
   };
 
   const handleHiddleModal = () => {
@@ -197,7 +219,7 @@ export default props => {
         paramForm.validateFields().then(value1 => {
           getArchiveControlParams(value1);
           listObj.push(obj);
-          setList(listObj);
+          setList(sortTypeList(listObj));
           form.setFieldsValue({
             type: undefined,
             specifiedLevel: undefined,
@@ -225,7 +247,7 @@ export default props => {
           }
         }
         listObj.push(obj);
-        setList(listObj);
+        setList(sortTypeList(listObj));
         form.setFieldsValue({
           type: undefined,
           specifiedLevel: undefined,
@@ -246,7 +268,7 @@ export default props => {
       }
       newList.push(item);
     });
-    setList(newList);
+    setList(sortTypeList(newList));
     if (type === 6) {
       paramForm.validateFields().then(value => {
         getArchiveControlParams(value);
@@ -391,7 +413,7 @@ export default props => {
             newList.push(item1);
           }
         });
-        setList(newList);
+        setList(sortTypeList(newList));
       },
     });
   };
@@ -409,7 +431,11 @@ export default props => {
             { required: type === 1 ? true : false, message: '请选择指定职级!' },
           ]}
         >
-          <Select placeholder="请选择级别" style={{ maxWidth: '12vw' }}>
+          <Select
+            allowClear
+            placeholder="请选择级别"
+            style={{ maxWidth: '12vw' }}
+          >
             {levelList.map((item, index) => {
               return (
                 <Option key={index} value={index + 1}>
@@ -439,7 +465,7 @@ export default props => {
           item.stepName = fromSubData.name;
         }
       });
-      setList(newListObj);
+      setList(sortTypeList(newListObj));
       setSelectObj(undefined);
       setName(undefined);
     });
@@ -500,7 +526,7 @@ export default props => {
                 { required: type === 2 ? true : false, message: '请选择标签!' },
               ]}
             >
-              <Select placeholder="请选择标签">
+              <Select placeholder="请选择标签" allowClear>
                 {labelList?.map(item => {
                   return (
                     <Option key={item.id} value={item.id}>
@@ -570,6 +596,7 @@ export default props => {
             rules={[{ required: true, message: '请选择标签!' }]}
           >
             <Select
+              allowClear
               placeholder="请选择标签"
               onChange={async e => {
                 let json = await getParam(e);
@@ -690,7 +717,7 @@ export default props => {
                     },
                   ]}
                 >
-                  <Select>
+                  <Select allowClear>
                     {controlList?.map(control => {
                       return (
                         <Option value={control.id} key={control.id}>

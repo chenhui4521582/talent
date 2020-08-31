@@ -46,7 +46,9 @@ export const useTable = ({
       cacheKey: cacheKey,
     },
   );
-
+  tableProps.pagination.showTotal = () => {
+    return `总计：${tableProps.pagination.total} 条`;
+  };
   const [selectPageObj, setSelectPageObj] = useState<any>({});
   const [allList, setAllList] = useState<any[]>([]);
   const [defaultKeys, setDefaultKeys] = useState<number[]>([]);
@@ -142,6 +144,7 @@ export const useTable = ({
           columns={columns}
           rowKey={rowKeyName}
           {...tableProps}
+          pagination={tableProps.pagination}
           bordered
           rowSelection={showCheck ? rowSelection : undefined}
           rowClassName={(record, index) => {

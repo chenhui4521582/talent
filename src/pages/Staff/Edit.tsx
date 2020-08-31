@@ -69,7 +69,9 @@ export default props => {
           ? (values.graduationDate = moment(values.graduationDate))
           : '';
         values.birthDate ? (values.birthDate = moment(values.birthDate)) : '';
-        values.superiorsNo = values.superiorsName + '-' + values.superiorsNo;
+        values.superiorsNo = values.superiorsName
+          ? values.superiorsName + '-' + values.superiorsNo
+          : undefined;
       }
       setTwoLevel(values.firstBusinessCode);
       setThreeLevel(values.businessCode);
@@ -341,7 +343,7 @@ export default props => {
         <Row>
           <Col span={5}>
             <Form.Item
-              label="上级编号"
+              label="上级姓名-编号"
               name="superiorsNo"
               rules={[{ required: true, message: '请输入上级编号' }]}
             >
@@ -351,16 +353,6 @@ export default props => {
                 onlySelect={true}
                 {...props}
               />
-              {/* <Input /> */}
-            </Form.Item>
-          </Col>
-          <Col span={5} offset={1}>
-            <Form.Item
-              label="上级姓名"
-              name="superiorsName"
-              rules={[{ required: true, message: '请输入上级姓名' }]}
-            >
-              <Input disabled />
             </Form.Item>
           </Col>
           <Col span={5} offset={1}>
@@ -373,6 +365,16 @@ export default props => {
                 <Option value="专业">专业</Option>
                 <Option value="管理">管理</Option>
               </Select>
+            </Form.Item>
+          </Col>
+          <Col span={5} offset={1}>
+            <Form.Item
+              label="上级姓名"
+              name="superiorsName"
+              rules={[{ required: true, message: '请输入上级姓名' }]}
+              style={{ display: 'none' }}
+            >
+              <Input disabled />
             </Form.Item>
           </Col>
         </Row>

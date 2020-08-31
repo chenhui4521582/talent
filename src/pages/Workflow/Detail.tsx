@@ -38,6 +38,7 @@ const status = {
   1: '通过',
   2: '退回',
   3: '已提交',
+  4: '撤销',
 };
 
 const columns: ColumnProps<tsLog>[] = [

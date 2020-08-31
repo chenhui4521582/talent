@@ -9,6 +9,7 @@ import {
   Row,
   Col,
   Form,
+  Tooltip,
 } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import { useTable } from '@/components/GlobalTable/useTable';
@@ -659,16 +660,35 @@ const WkTask = props => {
 
   return (
     <>
-      <Input
-        // {...props}
-        readOnly={true}
-        disabled={props.disabled}
-        placeholder="关联流程"
-        onClick={() => {
-          setVisible(true);
-        }}
-        value={value}
-      />
+      {value ? (
+        <Tooltip
+          title={() => {
+            return value?.split(',').map(item => {
+              return <p>{item}</p>;
+            });
+          }}
+        >
+          <Input
+            readOnly={true}
+            disabled={props.disabled}
+            placeholder="关联流程"
+            onClick={() => {
+              setVisible(true);
+            }}
+            value={value}
+          />
+        </Tooltip>
+      ) : (
+        <Input
+          readOnly={true}
+          disabled={props.disabled}
+          placeholder="关联流程"
+          onClick={() => {
+            setVisible(true);
+          }}
+          value={value}
+        />
+      )}
       <Modal
         title="关联流程"
         visible={visible}

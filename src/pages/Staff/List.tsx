@@ -114,6 +114,8 @@ export default () => {
     }
     if (select1) {
       list();
+    } else {
+      setBusiness2(undefined);
     }
   }, [select1]);
 
