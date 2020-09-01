@@ -129,14 +129,13 @@ export default props => {
         item.nodeType = 2;
       }
 
-      if (item.type === 6 && i === list1?.length - 1) {
+      if (item.type === 6) {
         item.nodeType = 4;
-        list1[list1.length - 2] = {
-          ...item,
-          nodeType: 3,
-        };
-      } else {
-        item.nodeType = 3;
+        if (list1.length >= 2) {
+          let obj = list1[list1.length - 2];
+          obj.nodeType = 3;
+          list1[list1.length - 2] = obj;
+        }
       }
     });
 

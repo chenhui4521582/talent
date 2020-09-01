@@ -476,6 +476,12 @@ export default props => {
                 fileExtname: file.type,
                 multipleNumber: parseInt(key.split('-')[2]),
               });
+              subList.push({
+                id: parseInt(key.split('-')[1]),
+                value: '',
+                showValue: '',
+                multipleNumber: parseInt(key.split('-')[2]),
+              });
             });
           } else {
             subList.push({
@@ -645,6 +651,8 @@ const AutoTable = props => {
               s_type={itemKey.baseControlType}
               disabled={itemKey.isLocked}
               list={itemKey.itemList || []}
+              fileLists={itemKey.fileList || []}
+              item={itemKey}
             />
           </Form.Item>
         );

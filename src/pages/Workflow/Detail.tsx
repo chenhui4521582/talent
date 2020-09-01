@@ -812,12 +812,14 @@ const AutoTable = props => {
     };
   };
   const handleDataSource = dataSource => {
-    let newData = JSON.parse(JSON.stringify(dataSource));
+    console.log(dataSource);
+    let newData = JSON.parse(JSON.stringify(dataSource)) || [];
     let sortArr: any = [];
     for (let i = 0; i < newData.length; i++) {
-      newData[i].map(item => {
-        sortArr.push(item.multipleNumber);
-      });
+      newData[i] &&
+        newData[i].map(item => {
+          sortArr.push(item.multipleNumber);
+        });
     }
 
     sortArr.sort();
@@ -860,6 +862,8 @@ const AutoTable = props => {
                   s_type={itemKey.baseControlType}
                   disabled={itemKey.isLocked}
                   list={itemKey.itemList || []}
+                  fileLists={itemKey.fileList || []}
+                  item={itemKey}
                 />
               </Form.Item>
             );
@@ -882,6 +886,7 @@ const AutoTable = props => {
                 item.multipleNumber = parseInt(newData.length) + 1;
                 item.value = null;
                 item.showValue = null;
+                item.fileList = [];
               });
               newData.push(newTemplate);
               setDataSource(newData);
