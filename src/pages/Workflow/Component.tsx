@@ -44,6 +44,7 @@ const status = {
   '1': '审批中',
   '2': '已通过',
   '3': '已驳回',
+  '4': '已归档',
 };
 
 export default props => {
@@ -734,7 +735,7 @@ const WkTask = props => {
           </Row>
           <Row>
             <Col span={6}>
-              <Form.Item label="审批编号" name="formNumber">
+              <Form.Item label="申请单号" name="formNumber">
                 <Input placeholder="请输入" allowClear />
               </Form.Item>
             </Col>

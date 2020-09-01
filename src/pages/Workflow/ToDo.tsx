@@ -112,7 +112,7 @@ export default () => {
         </Row>
         <Row>
           <Col span={5}>
-            <Form.Item label="审批编号" name="formNumber">
+            <Form.Item label="申请单号" name="formNumber">
               <Input placeholder="请输入" allowClear />
             </Form.Item>
           </Col>

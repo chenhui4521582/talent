@@ -13,9 +13,10 @@ import {
   Button,
   Divider,
   Radio,
+  Spin,
 } from 'antd';
 import { useTable } from '@/components/GlobalTable/useTable';
-import { ExclamationCircleOutlined } from '@ant-design/icons';
+import { LoadingOutlined } from '@ant-design/icons';
 import { GlobalResParams } from '@/types/ITypes';
 import {
   historyList,
@@ -31,6 +32,7 @@ import { ColumnProps } from 'antd/es/table';
 import User from './User';
 import { save, getRuleList } from './services/list';
 
+const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 const { Option } = Select;
 const status = {
   '-1': '删除',
@@ -51,6 +53,7 @@ interface IRuleList {
   stepName: string;
 }
 
+let flag = true;
 export default props => {
   const columns: ColumnProps<tsList>[] = [
     {
@@ -181,19 +184,31 @@ export default props => {
   });
 
   const handleOk = async () => {
-    let data = form.getFieldsValue();
-    let response = await save(data);
-    if (response.status === 200) {
-      notification['success']({
-        message: response.msg,
-        description: '',
-      });
-      setVisible(false);
-    } else {
-      notification['error']({
-        message: response.msg,
-        description: '',
-      });
+    if (flag) {
+      flag = false;
+      setTimeout(() => {
+        flag = true;
+      }, 1500);
+      let data = form.getFieldsValue();
+      let response = await save(data);
+      if (response.status === 200) {
+        flag = true;
+        notification['success']({
+          message: response.msg,
+          description: '',
+        });
+        form.setFieldsValue({
+          type: 1,
+          resApprStepId: undefined,
+          userCode: undefined,
+        });
+        setVisible(false);
+      } else {
+        notification['error']({
+          message: response.msg,
+          description: '',
+        });
+      }
     }
   };
 
@@ -279,6 +294,11 @@ export default props => {
         onOk={handleOk}
         onCancel={() => {
           setVisible(false);
+          form.setFieldsValue({
+            type: 1,
+            resApprStepId: undefined,
+            userCode: undefined,
+          });
         }}
       >
         <Form form={form} layout="vertical">

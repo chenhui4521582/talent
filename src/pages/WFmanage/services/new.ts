@@ -14,9 +14,10 @@ export interface tsCategoryItem {
 }
 
 // 获取工作流列表
-export async function homeList() {
+export async function homeList(param) {
   return request(`/api/talent/wfresform/getList`, {
     method: 'POST',
+    data: param,
   });
 }
 

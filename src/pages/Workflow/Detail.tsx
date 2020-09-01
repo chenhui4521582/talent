@@ -371,6 +371,7 @@ export default props => {
 
   const submitData = (type: number): void => {
     form.validateFields().then(async fromSubData => {
+      console.log(fromSubData);
       let subList: any = [];
       let wfTaskFormFilesCrudParamList: any = [];
       idItemList.map(item => {
@@ -385,15 +386,17 @@ export default props => {
             valueArr.push(u.toString().split('-$-')[0]);
           });
         } else {
-          !!fromSubData[item.id] &&
-          fromSubData[item.id].toString().indexOf('-$-') > -1
-            ? showArr.push(fromSubData[item.id].split('-$-')[1])
-            : showArr.push(item.showValue);
+          if (fromSubData[item.id]) {
+            !!fromSubData[item.id] &&
+            fromSubData[item.id].toString().indexOf('-$-') > -1
+              ? showArr.push(fromSubData[item.id].split('-$-')[1])
+              : showArr.push(item.showValue);
 
-          !!fromSubData[item.id] &&
-          fromSubData[item.id].toString().indexOf('-$-') > -1
-            ? valueArr.push(fromSubData[item.id].split('-$-')[0])
-            : valueArr.push(fromSubData[item.id]);
+            !!fromSubData[item.id] &&
+            fromSubData[item.id].toString().indexOf('-$-') > -1
+              ? valueArr.push(fromSubData[item.id].split('-$-')[0])
+              : valueArr.push(fromSubData[item.id]);
+          }
         }
 
         if (item.isLocked) {
@@ -424,24 +427,6 @@ export default props => {
             });
           }
         } else {
-          if (item.baseControlType === 'files') {
-            subList.push({
-              resFormControlId: item.resFormControlId,
-              multipleNumber: 1,
-              showValue: '',
-              value: '',
-            });
-            fromSubData[item.id].map(file => {
-              wfTaskFormFilesCrudParamList.push({
-                resFormControlId: item.id,
-                fileUrl: file.url,
-                fileName: file.name,
-                fileSize: file.size,
-                fileExtname: file.type,
-                multipleNumber: 1,
-              });
-            });
-          }
           if (item.baseControlType === 'datetime') {
             subList.push({
               resFormControlId: item.resFormControlId,
@@ -477,6 +462,23 @@ export default props => {
               showValue: valueArr.join(',').split('-$-')[0],
               value: valueArr.join(',').split('-$-')[0],
             });
+          } else if (item.baseControlType === 'files') {
+            subList.push({
+              resFormControlId: item.resFormControlId,
+              multipleNumber: 1,
+              showValue: '',
+              value: '',
+            });
+            fromSubData[item.id].map(file => {
+              wfTaskFormFilesCrudParamList.push({
+                resFormControlId: item.id,
+                fileUrl: file.url,
+                fileName: file.name,
+                fileSize: file.size,
+                fileExtname: file.type,
+                multipleNumber: 1,
+              });
+            });
           } else if (item.baseControlType === 'depGroup') {
             if (fromSubData[item.id].indexOf('-$-') > -1) {
               subList.push({
@@ -484,13 +486,6 @@ export default props => {
                 multipleNumber: 1,
                 showValue: fromSubData[item.id].split('-$-')[1],
                 value: fromSubData[item.id].split('-$-')[0] || '',
-              });
-            } else if (item.baseControlType === 'files') {
-              subList.push({
-                resFormControlId: item.resFormControlId,
-                multipleNumber: 1,
-                showValue: '',
-                value: '',
               });
             } else {
               subList.push({
@@ -612,13 +607,13 @@ export default props => {
           }
         }
       }
-      console.log({
-        remark: fromSubData.remark,
-        taskFormId: formId,
-        type: type,
-        wfResFormUpdateItemCrudParamList: subList,
-        wfTaskFormFilesCrudParamList: wfTaskFormFilesCrudParamList,
-      });
+      // console.log({
+      //   remark: fromSubData.remark,
+      //   taskFormId: formId,
+      //   type: type,
+      //   wfResFormUpdateItemCrudParamList: subList,
+      //   wfTaskFormFilesCrudParamList: wfTaskFormFilesCrudParamList,
+      // });
       let json: GlobalResParams<string> = await submit({
         remark: fromSubData.remark,
         taskFormId: formId,
@@ -845,7 +840,6 @@ const AutoTable = props => {
     };
   };
   const handleDataSource = dataSource => {
-    console.log(dataSource);
     let newData = JSON.parse(JSON.stringify(dataSource)) || [];
     let sortArr: any = [];
     for (let i = 0; i < newData.length; i++) {

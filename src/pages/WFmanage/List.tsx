@@ -10,10 +10,12 @@ import {
   Modal,
   Select,
   Upload,
+  Row,
+  Col,
 } from 'antd';
 import { Link } from 'umi';
 
-import { useReq } from '@/components/GlobalTable/useReq';
+import { useTable } from '@/components/GlobalTable/useTable';
 import { homeList, changeState, save, changeWf } from './services/new';
 import { categoryList, tsCategoryItem } from './services/category';
 import { ColumnProps } from 'antd/es/table';
@@ -34,13 +36,25 @@ const { Option } = Select;
 export default () => {
   const columns: ColumnProps<tsList>[] = [
     {
+      title: 'id',
+      dataIndex: 'id',
+      key: 'id',
+      align: 'center',
+    },
+    {
       title: '工作流名称',
       dataIndex: 'name',
       key: 'name',
       align: 'center',
     },
     {
-      title: '工作流名称',
+      title: '工作流类别',
+      dataIndex: 'formCategoryName',
+      key: 'formCategoryName',
+      align: 'center',
+    },
+    {
+      title: '工作流图标',
       dataIndex: 'icon',
       key: 'icon',
       align: 'center',
@@ -122,7 +136,7 @@ export default () => {
     }
   };
 
-  const { TableContent, refresh } = useReq({
+  const { TableContent, refresh } = useTable({
     queryMethod: homeList,
     columns,
     rowKeyName: 'id',
@@ -165,7 +179,36 @@ export default () => {
         >{`新增工作流`}</Button>
       }
     >
-      <TableContent />
+      <TableContent>
+        <Row>
+          <Col span={5}>
+            <Form.Item label="工作流名称" name="name">
+              <Input placeholder="请输入" allowClear />
+            </Form.Item>
+          </Col>
+          <Col span={5} offset={1}>
+            <Form.Item label="状态" name="status">
+              <Select placeholder="请选择" allowClear>
+                <Option value={0}>禁用</Option>
+                <Option value={1}>启用</Option>
+              </Select>
+            </Form.Item>
+          </Col>
+          <Col span={5} offset={1}>
+            <Form.Item label="工作流类别" name="categoryId">
+              <Select placeholder="请选择" allowClear>
+                {category?.map((item, i) => {
+                  return (
+                    <Option key={i} value={item.id}>
+                      {item.name}
+                    </Option>
+                  );
+                })}
+              </Select>
+            </Form.Item>
+          </Col>
+        </Row>
+      </TableContent>
       <Modal
         title={type === 'add' ? '新增工作流' : '修改工作流'}
         visible={!!type}

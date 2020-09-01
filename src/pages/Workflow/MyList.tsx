@@ -17,6 +17,7 @@ const status = {
   '1': '审批中',
   '2': '已通过',
   '3': '已驳回',
+  '4': '已归档',
 };
 
 export default () => {
@@ -114,13 +115,14 @@ export default () => {
                 <Option value="1">审批中</Option>
                 <Option value="2">已通过</Option>
                 <Option value="3">已驳回</Option>
+                <Option value="4">已归档</Option>
               </Select>
             </Form.Item>
           </Col>
         </Row>
         <Row>
           <Col span={5}>
-            <Form.Item label="审批编号" name="formNumber">
+            <Form.Item label="申请单号" name="formNumber">
               <Input placeholder="请输入" allowClear />
             </Form.Item>
           </Col>
