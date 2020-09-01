@@ -397,12 +397,32 @@ export default props => {
         }
 
         if (item.isLocked) {
-          subList.push({
-            resFormControlId: item.resFormControlId,
-            multipleNumber: 1,
-            showValue: item.showValue || '',
-            value: item.value || '',
-          });
+          if (item.baseControlType === 'files') {
+            subList.push({
+              resFormControlId: item.resFormControlId,
+              multipleNumber: 1,
+              showValue: '',
+              value: '',
+            });
+            item.fileList.length &&
+              item.fileList?.map(file => {
+                wfTaskFormFilesCrudParamList.push({
+                  fileExtname: file.fileExtname,
+                  fileName: file.fileName,
+                  fileSize: file.fileSize,
+                  fileUrl: file.fileUrl,
+                  multipleNumber: file.multipleNumber,
+                  resFormControlId: file.resFormControlId,
+                });
+              });
+          } else {
+            subList.push({
+              resFormControlId: item.resFormControlId,
+              multipleNumber: 1,
+              showValue: item.showValue || '',
+              value: item.value || '',
+            });
+          }
         } else {
           if (item.baseControlType === 'files') {
             subList.push({
@@ -575,6 +595,12 @@ export default props => {
                 fileExtname: file.type,
                 multipleNumber: parseInt(key.split('-')[2]),
               });
+              subList.push({
+                resFormControlId: parseInt(key.split('-')[1]),
+                value: '',
+                showValue: '',
+                multipleNumber: parseInt(key.split('-')[2]),
+              });
             });
           } else {
             subList.push({
@@ -586,12 +612,19 @@ export default props => {
           }
         }
       }
+      console.log({
+        remark: fromSubData.remark,
+        taskFormId: formId,
+        type: type,
+        wfResFormUpdateItemCrudParamList: subList,
+        wfTaskFormFilesCrudParamList: wfTaskFormFilesCrudParamList,
+      });
       let json: GlobalResParams<string> = await submit({
         remark: fromSubData.remark,
         taskFormId: formId,
         type: type,
         wfResFormUpdateItemCrudParamList: subList,
-        wfTaskFormFilesCrudParamList: [],
+        wfTaskFormFilesCrudParamList: wfTaskFormFilesCrudParamList,
       });
 
       if (json.status === 200) {
