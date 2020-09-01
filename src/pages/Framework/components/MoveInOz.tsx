@@ -226,7 +226,6 @@ function Organization(props: tsProps, formRef) {
     const handleItem = list => {
       for (let i = 0; i < list.length; i++) {
         list[i].key = list[i].code;
-        console.log(list[i]);
         if (
           searchValue.length &&
           list[i].name &&

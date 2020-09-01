@@ -95,8 +95,6 @@ const DropGroup = (props: Iprops) => {
     const dragCard = groupItem.list && groupItem.list[dragIndex];
     let newData = JSON.parse(JSON.stringify(groupItem.list));
     let jsonAll = JSON.parse(JSON.stringify(allData));
-    console.log(groupItem.list);
-    console.log(jsonAll[formIndex].list[index].list[dragIndex]);
     jsonAll[formIndex].list[index].list = update(newData, {
       $splice: [
         [dragIndex, 1],
@@ -139,7 +137,6 @@ const DropGroup = (props: Iprops) => {
 
   const handleOk = () => {
     form.validateFields().then(async value => {
-      console.log(groupItem?.list);
       let newdata = JSON.parse(JSON.stringify(groupItem));
       if (newdata?.list) {
       } else {
@@ -157,10 +154,7 @@ const DropGroup = (props: Iprops) => {
             }
             value.itemList = itemList.join('|');
           }
-          console.log(value);
           newList[selectIndex] = value;
-          console.log('-----------------------');
-          console.log(newList);
           setVisibleType(undefined);
         }
       } else {
@@ -174,8 +168,6 @@ const DropGroup = (props: Iprops) => {
         newList.push(value);
       }
       jsonAll[formIndex].list[index].list = newList;
-      console.log(newList);
-      console.log(jsonAll);
       changeData(jsonAll);
       setVisibleType(undefined);
     });

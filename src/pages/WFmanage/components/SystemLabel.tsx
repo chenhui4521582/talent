@@ -38,8 +38,6 @@ export default props => {
   };
 
   useEffect(() => {
-    console.log('props.selectObj');
-    console.log(props.selectObj);
     props.selectObj?.relationResFormControlId
       ? setSelectI(props.selectObj?.relationResFormControlId + '')
       : '';

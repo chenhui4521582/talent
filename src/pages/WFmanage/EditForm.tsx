@@ -16,6 +16,7 @@ import {
 import { GlobalResParams } from '@/types/ITypes';
 import DropForm from './components/form/DropForm';
 import DropIcon from './components/form/DropIcon';
+import DropTable from './components/form/DropTable';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 
 const { Option } = Select;
@@ -59,14 +60,15 @@ const EditForm = props => {
         for (let i = 0; i < groupList.length; i++) {
           let groupItem = groupList[i];
           let list: any = [];
-          let sort = 0;
+          let sort: any = [];
           for (let g = 0; g < controlList.length; g++) {
             if (groupItem.id === controlList[g].resGroupId) {
               data[k].groupColArr.push(formChildlist[k].controlList[g].id);
               list.push(controlList[g]);
-              sort += controlList[g].sort;
+              sort.push(controlList[g].sort);
+              sort = sort.sort();
               groupItem.list = list;
-              groupItem.sort = sort;
+              groupItem.sort = sort[0];
               data[k].list.push(groupItem);
               data[k].list.sort(compare('sort'));
             }
@@ -93,7 +95,6 @@ const EditForm = props => {
       }
     }
 
-    console.log(data);
     setFormDetail(data);
   };
 
@@ -172,7 +173,6 @@ const EditForm = props => {
             obj.list = [];
             obj.type = value.type;
             list.push(obj);
-            console.log(list);
             setFormDetail(list);
             setAddOrEdit(undefined);
             form.setFieldsValue({
@@ -187,7 +187,7 @@ const EditForm = props => {
           let selectFrom = list && list[selectFormIndex];
           selectFrom.name = value.name;
           selectFrom.columnNum = parseInt(value.columnNum);
-          selectFrom.type = value.type;
+          value.type ? (selectFrom.type = value.type) : null;
           if (selectFormIndex || selectFormIndex === 0) {
             let updataJson = await updateCForm(
               props.match.params.id,
@@ -260,6 +260,7 @@ const EditForm = props => {
             newItem.groupIndex = 1;
             newItem.resGroupId = groupItem.id;
             newItem.colspan = item.colspan;
+            newItem.isLocked = item.isLocked;
             newItem.sort = sort;
             item.isMultiplechoice || item.isMultiplechoice === 0
               ? (newItem.isMultiplechoice = item.isMultiplechoice)
@@ -281,6 +282,7 @@ const EditForm = props => {
           newItem.resFormChildId = formItem.id;
           newItem.resFormId = formItem.resFormId;
           newItem.colspan = newC.colspan;
+          newItem.isLocked = newC.isLocked;
           newItem.groupIndex = 1;
           newItem.isGroup = 0;
           newItem.sort = sort;
@@ -291,7 +293,6 @@ const EditForm = props => {
         }
       });
     });
-    console.log([...new Set(cList)]);
     let json = await updateForm({
       resFormId: props.match.params.id,
       resFormControlCrudParamList: [...new Set(cList)],
@@ -313,16 +314,29 @@ const EditForm = props => {
   const fromContent = useMemo(() => {
     if (formDetail?.length) {
       return formDetail?.map((fromItem, i) => {
-        return (
-          <DropForm
-            allData={formDetail}
-            fromItem={fromItem}
-            index={i}
-            moveIndex={handleMoveIndex}
-            changeName={handleEditForm}
-            changeData={handleChangeForm}
-          />
-        );
+        if (fromItem.type === 1) {
+          return (
+            <DropTable
+              allData={formDetail}
+              fromItem={fromItem}
+              index={i}
+              moveIndex={handleMoveIndex}
+              changeName={handleEditForm}
+              changeData={handleChangeForm}
+            />
+          );
+        } else {
+          return (
+            <DropForm
+              allData={formDetail}
+              fromItem={fromItem}
+              index={i}
+              moveIndex={handleMoveIndex}
+              changeName={handleEditForm}
+              changeData={handleChangeForm}
+            />
+          );
+        }
       });
     } else {
       return null;
@@ -416,7 +430,7 @@ const EditForm = props => {
             >
               <Select placeholder="请选择表单类型">
                 <Option value={0}>普通表单</Option>
-                {/* <Option value="1">自新增表单</Option> */}
+                <Option value={1}>自新增表单</Option>
                 <Option value={2}>组表单</Option>
               </Select>
             </Form.Item>

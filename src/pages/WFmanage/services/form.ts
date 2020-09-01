@@ -29,6 +29,7 @@ export interface IGroupItem {
   colspan: number;
   isRequired: boolean;
   itemList?: string;
+  baseControlType?: string;
 }
 
 export interface IItem {

@@ -166,8 +166,6 @@ function Organization(props: tsProps, formRef) {
               } else {
                 u.type = 'department';
               }
-              console.log('u');
-              console.log(u);
               arr.push(u);
             }
           });

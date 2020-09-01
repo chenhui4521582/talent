@@ -88,6 +88,7 @@ export interface tsListItem {
   name: string;
   parentCode?: string | null;
   children?: tsListItem[];
+  memberNumber?: number;
 }
 
 export interface tsUserItem {

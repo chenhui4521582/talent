@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'umi';
 import { useTable } from '@/components/GlobalTable/useTable';
 import { ColumnProps } from 'antd/es/table';
-import { listByConditionsRoster } from './services/staff';
+import { listByHrbp } from './services/staff';
 import {
   Card,
   Form,
@@ -114,8 +114,6 @@ export default () => {
     }
     if (select1) {
       list();
-    } else {
-      setBusiness2(undefined);
     }
   }, [select1]);
 
@@ -126,7 +124,6 @@ export default () => {
     });
     setChecked([...newArr]);
   }, [visible]);
-
   const columns: ColumnProps<any>[] = [
     {
       title: '员工编号',
@@ -202,23 +199,20 @@ export default () => {
         return (
           <span>
             <Link
-              to={`detail?employeeId=${record.employeeId}&resumeId=${record.resumeId}`}
+              to={`/talent/staff/detail?employeeId=${record.employeeId}&resumeId=${record.resumeId}`}
             >
               查看详情
             </Link>
-            <Divider type="vertical" />
-            <Link to={`edit?employeeId=${record.employeeId}`}>编辑</Link>
           </span>
         );
       },
     },
   ];
-
   const { TableContent, searchForm } = useTable({
-    queryMethod: listByConditionsRoster,
+    queryMethod: listByHrbp,
     columns,
     rowKeyName: 'employeeId',
-    cacheKey: 'employeeRoster/listByConditionsRoster',
+    cacheKey: 'employeeRoster/listByHr',
   });
 
   const changeCheck = checkedValues => {
@@ -233,7 +227,7 @@ export default () => {
     const value = checked.join(',');
     window.open(
       serialize(
-        `/api/talent/employeeRoster/export?includ=${value}`,
+        `/api/talent/employeeRoster/hrExport?includ=${value}`,
         searchForm.getFieldsValue(),
       ),
     );
@@ -246,9 +240,6 @@ export default () => {
       title="员工花名册"
       extra={
         <div>
-          <Button type="primary">
-            <Link to={`edit`}>新增员工</Link>
-          </Button>
           <Button onClick={_ => setVisible(true)} style={{ marginLeft: 10 }}>
             导出
           </Button>
@@ -283,40 +274,6 @@ export default () => {
         </Row>
         <Row>
           <Col span={6}>
-            <Form.Item label="一级业务线" name="firstBusinessCode">
-              <Select
-                allowClear
-                showSearch
-                optionFilterProp="children"
-                onChange={e => {
-                  searchForm.setFieldsValue({ businessCode: undefined });
-                  setSelect1(e as any);
-                }}
-              >
-                {business1?.map(item => {
-                  return (
-                    <Option key={item.code} value={item.code}>
-                      {item.name}
-                    </Option>
-                  );
-                })}
-              </Select>
-            </Form.Item>
-          </Col>
-          <Col span={6} offset={2}>
-            <Form.Item label="二级业务线" name="businessCode">
-              <Select showSearch optionFilterProp="children" allowClear>
-                {business2?.map(item => {
-                  return (
-                    <Option key={item.code} value={item.code}>
-                      {item.name}
-                    </Option>
-                  );
-                })}
-              </Select>
-            </Form.Item>
-          </Col>
-          <Col span={6} offset={2}>
             <Form.Item label="是否在职" name="currentPosition">
               <Select showSearch optionFilterProp="children" allowClear>
                 <Option value={0}>离职</Option>

@@ -25,7 +25,7 @@ export default () => {
       const name = item.name;
       return (
         <div className="type" key={id}>
-          <h3>{name}</h3>
+          {listForm.length ? <h3>{name}</h3> : null}
           {listForm.map(u => {
             return (
               <Button className="button-right" key={u.id}>

@@ -173,7 +173,6 @@ export default props => {
   const changeNote = () => {
     noteForm.validateFields().then(async fromSubData => {
       fromSubData.resumeId = curRecord?.resumeId;
-      console.log(fromSubData);
       let res: GlobalResParams<string> = await addNote(fromSubData);
       if (res.status === 200) {
         refresh();

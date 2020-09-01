@@ -4,6 +4,7 @@ import { useFormTable } from '@umijs/hooks';
 import { PaginationTableParams } from '@/types/ITypes';
 import { ColumnProps } from 'antd/es/table';
 import { useUpdateEffect } from '@umijs/hooks';
+import './table.less';
 
 const { TabPane } = Tabs;
 
@@ -86,10 +87,18 @@ export const useTabTable = ({
             return (
               <TabPane tab={item.name} key={item.value}>
                 <Table
+                  bordered
                   size="small"
                   columns={columns}
                   rowKey={rowKeyName}
                   {...tableProps}
+                  rowClassName={(record, index) => {
+                    if (index % 2 === 1) {
+                      return 'table-row';
+                    } else {
+                      return '';
+                    }
+                  }}
                 />
               </TabPane>
             );

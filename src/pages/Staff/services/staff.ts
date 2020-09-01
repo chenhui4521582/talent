@@ -8,6 +8,14 @@ export async function listByConditionsRoster(params) {
   });
 }
 
+// 花名册列表
+export async function listByHrbp(params) {
+  return request('/api/talent/employeeRoster/listByHr', {
+    method: 'POST',
+    data: params,
+  });
+}
+
 export async function importRoster(params) {
   let filedata = new FormData();
   if (params.files) {
@@ -68,13 +76,13 @@ export async function commonDetail(employeeId: string) {
 export async function saveEmployeeInfo(params) {
   return request('/api/talent/employeeRoster/saveEmployeeInfo', {
     method: 'POST',
-    data: params
+    data: params,
   });
 }
 // 编辑员工
 export async function updateEmployeeInfo(params) {
   return request('/api/talent/employeeRoster/updateEmployeeInfo', {
     method: 'POST',
-    data: params
+    data: params,
   });
 }

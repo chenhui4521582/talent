@@ -261,7 +261,7 @@ export default () => {
   }, [selectItem, detail]);
 
   return (
-    <Card title="角色标签管理">
+    <Card title="系统标签管理">
       <div className="role">
         <div style={{ width: '20%' }} className="role-left">
           {mount ? (

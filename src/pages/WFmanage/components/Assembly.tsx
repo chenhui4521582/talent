@@ -52,7 +52,6 @@ export default (props: tsProps) => {
   };
 
   useEffect(() => {
-    console.log(selectKeys);
     setKeyList(selectKeys);
   }, [selectKeys]);
 

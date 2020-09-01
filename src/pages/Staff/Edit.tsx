@@ -13,9 +13,7 @@ import {
 import { history } from 'umi';
 import moment from 'moment';
 import {
-  useBusiness,
   useJob,
-  useDepartment,
   useRankP,
   useRankM,
   useTitle,
@@ -28,7 +26,7 @@ import {
   updateEmployeeInfo,
 } from './services/staff';
 import { GlobalResParams } from '@/types/ITypes';
-import OzTreeSlect from '@/pages/Framework/components/OzTreeSlect';
+import User from './User';
 import LevelOr from '@/components/GlobalTable/levelOr';
 
 const { Option } = Select;
@@ -36,12 +34,7 @@ const { TextArea } = Input;
 export default props => {
   const { employeeId } = props.location.query;
   const [form] = Form.useForm();
-  const { businessList } = useBusiness();
   const { jobList } = useJob();
-  const { departmentList: firstBusiness } = useDepartment(1);
-  const { departmentList: secondBusiness } = useDepartment(2);
-  const { departmentList } = useDepartment(3);
-  const { departmentList: groupList } = useDepartment(4);
   const [twoLevel, setTwoLevel] = useState<string>('');
   const [threeLevel, setThreeLevel] = useState<string>('');
   const [fourLevel, setFourLevel] = useState<string>('');
@@ -76,6 +69,9 @@ export default props => {
           ? (values.graduationDate = moment(values.graduationDate))
           : '';
         values.birthDate ? (values.birthDate = moment(values.birthDate)) : '';
+        values.superiorsNo = values.superiorsName
+          ? values.superiorsName + '-' + values.superiorsNo
+          : undefined;
       }
       setTwoLevel(values.firstBusinessCode);
       setThreeLevel(values.businessCode);
@@ -97,6 +93,7 @@ export default props => {
       : null;
     values.graduationDate = moment(values.graduationDate).format('YYYY/MM/DD');
     values.birthDate = moment(values.birthDate).format('YYYY/MM/DD');
+    values.superiorsNo = values.superiorsNo.split('-')[1];
     if (employeeId) {
       actionMethod = updateEmployeeInfo;
     } else {
@@ -117,6 +114,12 @@ export default props => {
     }
   };
   const handleFormChange = changedValues => {
+    if (changedValues.superiorsNo) {
+      form.setFieldsValue({
+        superiorsName: changedValues.superiorsNo.split('-')[0],
+      });
+    }
+
     if (changedValues.firstBusinessCode) {
       setTwoLevel(changedValues.firstBusinessCode);
       setThreeLevel('none');
@@ -340,20 +343,16 @@ export default props => {
         <Row>
           <Col span={5}>
             <Form.Item
-              label="上级编号"
+              label="上级姓名-编号"
               name="superiorsNo"
               rules={[{ required: true, message: '请输入上级编号' }]}
             >
-              <Input />
-            </Form.Item>
-          </Col>
-          <Col span={5} offset={1}>
-            <Form.Item
-              label="上级姓名"
-              name="superiorsName"
-              rules={[{ required: true, message: '请输入上级姓名' }]}
-            >
-              <Input />
+              <User
+                renderUser={true}
+                onlySelectUser={true}
+                onlySelect={true}
+                {...props}
+              />
             </Form.Item>
           </Col>
           <Col span={5} offset={1}>
@@ -366,6 +365,16 @@ export default props => {
                 <Option value="专业">专业</Option>
                 <Option value="管理">管理</Option>
               </Select>
+            </Form.Item>
+          </Col>
+          <Col span={5} offset={1}>
+            <Form.Item
+              label="上级姓名"
+              name="superiorsName"
+              rules={[{ required: true, message: '请输入上级姓名' }]}
+              style={{ display: 'none' }}
+            >
+              <Input disabled />
             </Form.Item>
           </Col>
         </Row>

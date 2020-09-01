@@ -1,4 +1,5 @@
 import { defineConfig } from 'umi';
+import theme from './src/components/theme';
 
 export default defineConfig({
   nodeModulesTransform: {
@@ -7,6 +8,7 @@ export default defineConfig({
   dynamicImport: {
     loading: '@/components/PageLoading/index',
   },
+  theme: theme,
   targets: {
     edge: 13,
     ie: 10,
@@ -141,6 +143,10 @@ export default defineConfig({
           component: '@/pages/Staff/List',
         },
         {
+          path: '/talent/staffHrbp/list',
+          component: '@/pages/Staff/HrbpList',
+        },
+        {
           path: '/talent/staff/upload',
           component: '@/pages/Staff/Upload',
         },
@@ -242,11 +248,15 @@ export default defineConfig({
         },
         {
           path: '/talent/framework/systemLabel',
-          component: '@/pages/Framework/systemlabel',
+          component: '@/pages/Framework/Systemlabel',
         },
         {
           path: '/talent/wfmanage/list',
           component: '@/pages/WFmanage/List',
+        },
+        {
+          path: '/talent/processm/list',
+          component: '@/pages/ProcessM/List',
         },
         {
           path: '/talent/wfmanage/applicationrecord/:id',
@@ -269,12 +279,20 @@ export default defineConfig({
           component: '@/pages/WFmanage/Category',
         },
         {
-          path: '/talent/wftemplate/list',
-          component: '@/pages/WFtemplate/list',
-        },
-        {
           path: '/talent/systemm/list',
           component: '@/pages/SystemM/List',
+        },
+        {
+          path: '/talent/systemm/notice/new',
+          component: '@/pages/SystemM/notice/Edit',
+        },
+        {
+          path: '/talent/systemm/notice/edit/:id',
+          component: '@/pages/SystemM/notice/Edit',
+        },
+        {
+          path: '/talent/systemm/notice/list',
+          component: '@/pages/SystemM/notice/List',
         },
       ],
     },

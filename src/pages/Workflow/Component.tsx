@@ -1,7 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import { Input, Select, InputNumber, DatePicker, Upload } from 'antd';
+import {
+  Input,
+  Select,
+  InputNumber,
+  DatePicker,
+  Upload,
+  Modal,
+  Row,
+  Col,
+  Form,
+  Tooltip,
+} from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
-
+import { useTable } from '@/components/GlobalTable/useTable';
+import { Link } from 'umi';
+import {
+  categoryList,
+  tsCategoryItem,
+} from '@/pages/WFmanage/services/category';
+import { ColumnProps } from 'antd/es/table';
 import {
   useRankP,
   useRankM,
@@ -13,12 +30,21 @@ import {
 } from '@/models/global';
 import { saveFile } from '@/services/global';
 import { GlobalResParams } from '@/types/ITypes';
+import { myListPageWt, tsList } from './services/home';
 
 import OzTreeSlect from '@/pages/Framework/components/OzTreeSlect';
 import DepGroup from './DepGroup';
 
 const { Option } = Select;
 const { TextArea } = Input;
+
+const status = {
+  '-1': '删除',
+  '0': '已撤销',
+  '1': '审批中',
+  '2': '已通过',
+  '3': '已驳回',
+};
 
 export default props => {
   const { s_type, ismultiplechoice } = props;
@@ -158,8 +184,7 @@ export default props => {
       return <LevelMTemplate {...props} placeholder="请选择" />;
     //wkTask 关联流程
     case 'wkTask':
-      return <Input placeholder="关联流程" {...props} />;
-
+      return <WkTask {...props} />;
     default:
       return <></>;
   }
@@ -193,7 +218,6 @@ const SelectTemplate = props => {
 // 多选框
 const MultipleTemplate = props => {
   const { list } = props;
-  console.log(props);
   let data = [];
   if (Object.prototype.toString.call(list) === '[object String]') {
     data = list.split('|');
@@ -447,51 +471,60 @@ const LaborTemplate = props => {
 
 interface Ilist {
   name: string;
-  value: string;
+  url: string;
+  size: number;
+  uid: string;
+  type: string;
 }
 
 // 上传附件
 const Uploads = props => {
-  const [list, setList] = useState<Ilist[]>([]);
-  let newList = JSON.parse(JSON.stringify(list));
+  const [fileList, setFileList] = useState<Ilist[]>([]);
+
+  useEffect(() => {
+    if (props.fileLists && props.fileLists.length) {
+      let lists: Ilist[] = [];
+      props.fileLists.map(item => {
+        lists.push({
+          name: item.fileName,
+          url: item.fileUrl,
+          size: item.fileSize,
+          uid: item.id,
+          type: item.fileExtname,
+        });
+      });
+      setFileList(lists);
+    }
+  }, [props.fileLists]);
+
+  useEffect(() => {
+    props.onChange && props.onChange(fileList);
+  }, [fileList]);
+
   const customRequestwork = async files => {
     const { onSuccess, onError, file, onProgress } = files;
-    console.log(file);
     let res: GlobalResParams<any> = await saveFile({ file: file });
     if (res.status === 200) {
-      let item: Ilist = { name: '', value: '' };
-      item.name = file.uid;
-      item.value = res.obj.url;
-      newList.push(item);
+      file.url = res.obj.url;
       onSuccess();
-      setList(newList);
+    } else {
+      onError();
     }
-  };
+    fileList.push({
+      name: file.name + '(' + getfilesize(file.size) + ')',
+      url: file.url,
+      size: file.size,
+      uid: file.uid,
+      type: file.type,
+    });
 
-  const handleRemove = e => {
-    console.log(e.name);
-    let newList: Ilist[] = [];
-    list?.map(item => {
-      if (item.name !== e.uid) {
-        newList.push(item);
-      }
-    });
-    setList(newList);
+    setFileList([...fileList]);
   };
-  useEffect(() => {
-    let valueList: string[] = [];
-    list?.map(item => {
-      valueList.push(item.value);
-    });
-    props.onChange && props.onChange(valueList.join(','));
-  }, [list]);
 
   const onPreview = e => {
-    const { uid } = e;
-    list?.map(item => {
-      if (item.name === uid) {
-        window.open(item.value);
-        return;
+    fileList.map(item => {
+      if (e.uid === item.uid) {
+        window.open(item.url);
       }
     });
   };
@@ -501,14 +534,223 @@ const Uploads = props => {
     multiple: true,
     action: '',
     accept: '*',
-    // showUploadList: false,
     customRequest: customRequestwork,
-    onRemove: handleRemove,
     onPreview: onPreview,
+    onRemove: e => {
+      let newList = JSON.parse(JSON.stringify(fileList));
+      newList.map((item, index) => {
+        if (e.uid === item.uid) {
+          newList.splice(index, 1);
+        }
+      });
+      setFileList(newList);
+    },
+    fileList: fileList,
   };
+
+  function getfilesize(size) {
+    if (!size) return '';
+
+    var num = 1024.0; //byte
+
+    if (size < num) return size + 'B';
+    if (size < Math.pow(num, 2)) return (size / num).toFixed(2) + 'K'; //kb
+    if (size < Math.pow(num, 3))
+      return (size / Math.pow(num, 2)).toFixed(2) + 'M'; //M
+    if (size < Math.pow(num, 4))
+      return (size / Math.pow(num, 3)).toFixed(2) + 'G'; //G
+    return (size / Math.pow(num, 4)).toFixed(2) + 'T'; //T
+  }
   return (
-    <Upload {...action}>
+    <Upload {...action} disabled={props.disabled}>
       <UploadOutlined /> 上传附件
     </Upload>
+  );
+};
+
+// 关联流程
+
+const WkTask = props => {
+  const [visible, setVisible] = useState<boolean>(false);
+  const [list, setList] = useState<tsCategoryItem[]>();
+  const [value, setValue] = useState<string>();
+
+  useEffect(() => {
+    async function getCategoryList() {
+      let res: GlobalResParams<tsCategoryItem[]> = await categoryList();
+      if (res.status === 200) {
+        setList(res.obj);
+      }
+    }
+    getCategoryList();
+  }, []);
+  const columns: ColumnProps<tsList>[] = [
+    {
+      title: '标题',
+      key: 'title',
+      dataIndex: 'title',
+      align: 'center',
+    },
+    {
+      title: '审批状态',
+      dataIndex: 'status',
+      key: 'status',
+      align: 'center',
+      render: (_, record: tsList) => <span>{status[record.status]}</span>,
+    },
+    {
+      title: '未操作者',
+      dataIndex: 'dealUser',
+      key: 'dealUser',
+      align: 'center',
+      width: '15vw',
+    },
+    {
+      title: '创建日期',
+      dataIndex: 'createTime',
+      key: 'createTime',
+      align: 'center',
+    },
+  ];
+
+  const {
+    TableContent,
+    refresh,
+    selectKeys,
+    allList,
+    selectedRowKeys,
+  } = useTable({
+    queryMethod: myListPageWt,
+    columns,
+    rowKeyName: 'id',
+    cacheKey: 'wftaskform/listMyFormPageWkTask',
+    showCheck: true,
+    noClearKey: true,
+  });
+
+  const handleOk = () => {
+    let nameArr: any[] = [];
+    selectKeys.map(item => {
+      allList.map(itemObj => {
+        if (itemObj.id === item) {
+          nameArr.push(itemObj.title);
+        }
+      });
+    });
+    setValue(nameArr.join(','));
+    setVisible(false);
+  };
+
+  useEffect(() => {
+    if (props.item?.value) {
+      let arr: number[] = [];
+      props.item?.value.split(',').map(item => {
+        arr.push(parseInt(item));
+      });
+      selectedRowKeys(arr);
+    }
+    if (props.item?.showValue) {
+      setValue(props.item?.showValue);
+    }
+  }, [props.item]);
+
+  useEffect(() => {
+    props.onChange && props.onChange(selectKeys.join(',') + '-$-' + value);
+  }, [value]);
+
+  return (
+    <>
+      {value ? (
+        <Tooltip
+          title={() => {
+            return value?.split(',').map(item => {
+              return <p>{item}</p>;
+            });
+          }}
+        >
+          <Input
+            readOnly={true}
+            disabled={props.disabled}
+            placeholder="关联流程"
+            onClick={() => {
+              setVisible(true);
+            }}
+            value={value}
+          />
+        </Tooltip>
+      ) : (
+        <Input
+          readOnly={true}
+          disabled={props.disabled}
+          placeholder="关联流程"
+          onClick={() => {
+            setVisible(true);
+          }}
+          value={value}
+        />
+      )}
+      <Modal
+        title="关联流程"
+        visible={visible}
+        okText="确定"
+        cancelText="取消"
+        onOk={handleOk}
+        onCancel={handleOk}
+        width="46vw"
+      >
+        <TableContent>
+          <Row>
+            <Col span={6}>
+              <Form.Item label="开始时间" name="createTimeStart">
+                <DatePicker
+                  format="YYYY-MM-DD"
+                  placeholder="请选择"
+                  allowClear
+                />
+              </Form.Item>
+            </Col>
+            <Col span={6} offset={2}>
+              <Form.Item label="结束时间" name="createTimeEnd">
+                <DatePicker
+                  format="YYYY-MM-DD"
+                  placeholder="请选择"
+                  allowClear
+                />
+              </Form.Item>
+            </Col>
+            <Col span={6} offset={2}>
+              <Form.Item label="工作流类别" name="categoryId">
+                <Select placeholder="请选择" allowClear>
+                  {list?.map((item, i) => {
+                    return (
+                      <Option key={i} value={item.id}>
+                        {item.name}
+                      </Option>
+                    );
+                  })}
+                </Select>
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row>
+            <Col span={6}>
+              <Form.Item label="审批编号" name="formNumber">
+                <Input placeholder="请输入" allowClear />
+              </Form.Item>
+            </Col>
+            <Col span={6} offset={2}>
+              <Form.Item label="申请人" name="createUserName">
+                <Input placeholder="请输入" allowClear />
+              </Form.Item>
+            </Col>
+            <Col span={6} offset={2}>
+              <Form.Item label="关键字" name="title">
+                <Input placeholder="搜索标题" allowClear />
+              </Form.Item>
+            </Col>
+          </Row>
+        </TableContent>
+      </Modal>
+    </>
   );
 };

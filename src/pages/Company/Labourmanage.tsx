@@ -104,7 +104,6 @@ export default () => {
   const handleAdd = async (values: tsLabourSave) => {
     let actionMethod;
     if (action === 'add') {
-      console.log(values);
       actionMethod = saveLabour;
     } else {
       actionMethod = updateLabour;

@@ -7,9 +7,10 @@ import {
   saveTaskForm,
 } from './services/home';
 import { GlobalResParams } from '@/types/ITypes';
-import { Card, Descriptions, Button, Form, notification } from 'antd';
+import { Card, Descriptions, Button, Form, notification, Table } from 'antd';
 import moment from 'moment';
 import Temp from './Component';
+import update from 'immutability-helper';
 import './style/home.less';
 
 export default props => {
@@ -36,7 +37,9 @@ export default props => {
       for (let k = 0; k < formChildlist.length; k++) {
         let fromItem = formChildlist[k];
         let controlList = fromItem.controlList;
-        idItem = idItem.concat(controlList);
+        if (fromItem.type !== 1) {
+          idItem = idItem.concat(controlList);
+        }
         data[k] = fromItem;
         data[k].list = [];
         data[k].arr = [];
@@ -95,88 +98,62 @@ export default props => {
   };
 
   const handleValue = item => {
-    const { baseControlType, defaultValue, defaultShowValue } = item;
-    switch (baseControlType) {
-      case 'department':
-        return defaultValue
-          ? defaultValue + '-$-' + defaultShowValue
-          : defaultShowValue;
-      case 'business':
-        return defaultValue
-          ? defaultValue + '-$-' + defaultShowValue
-          : defaultShowValue;
-      case 'business2':
-        return defaultValue
-          ? defaultValue + '-$-' + defaultShowValue
-          : defaultShowValue;
-      case 'currBusiness2':
-        return defaultValue
-          ? defaultValue + '-$-' + defaultShowValue
-          : defaultShowValue;
-      case 'labor':
-        return defaultValue
-          ? defaultValue + '-$-' + defaultShowValue
-          : defaultShowValue;
-      case 'cost':
-        return defaultValue
-          ? defaultValue + '-$-' + defaultShowValue
-          : defaultShowValue;
-      case 'company':
-        return defaultValue
-          ? defaultValue + '-$-' + defaultShowValue
-          : defaultShowValue;
-      case 'position':
-        return defaultValue
-          ? defaultValue + '-$-' + defaultShowValue
-          : defaultShowValue;
-      case 'job':
-        return defaultValue
-          ? defaultValue + '-$-' + defaultShowValue
-          : defaultShowValue;
-      case 'positionLevel':
-        return defaultValue
-          ? defaultValue + '-$-' + defaultShowValue
-          : defaultShowValue;
-      case 'positionMLevel':
-        return defaultValue
-          ? defaultValue + '-$-' + defaultShowValue
-          : defaultShowValue;
-      case 'datetime':
-        return defaultShowValue
-          ? moment(defaultShowValue, 'YYYY-MM-DD HH:mm:ss')
-          : defaultValue
-          ? moment(defaultValue, 'YYYY-MM-DD HH:mm:ss')
-          : '';
-      case 'date':
-        return defaultShowValue
-          ? moment(defaultShowValue, 'YYYY-MM-DD HH:mm:ss')
-          : defaultValue
-          ? moment(defaultValue, 'YYYY-MM-DD HH:mm:ss')
-          : '';
-      case 'multiple':
-        return defaultShowValue
-          ? defaultShowValue
-            ? defaultShowValue.split(',')
-            : undefined
-          : defaultValue
-          ? defaultValue.split(',')
-          : undefined;
-      case 'files':
-        return defaultShowValue
-          ? defaultShowValue
-            ? defaultShowValue.split(',')
-            : undefined
-          : defaultValue
-          ? defaultValue.split(',')
-          : undefined;
-      default:
-        return defaultShowValue
-          ? defaultShowValue
-            ? defaultShowValue
-            : undefined
-          : defaultValue
-          ? defaultValue
-          : undefined;
+    const {
+      baseControlType,
+      defaultValue: value,
+      defaultShowValue: showValue,
+    } = item;
+    if (
+      baseControlType === 'department' ||
+      baseControlType === 'business' ||
+      baseControlType === 'business2' ||
+      baseControlType === 'currBusiness2' ||
+      baseControlType === 'labor' ||
+      baseControlType === 'cost' ||
+      baseControlType === 'company' ||
+      baseControlType === 'position' ||
+      baseControlType === 'job' ||
+      baseControlType === 'positionLevel' ||
+      baseControlType === 'positionMLevel' ||
+      baseControlType === 'user'
+    ) {
+      return value
+        ? value + '-$-' + showValue
+        : showValue
+        ? showValue
+        : undefined;
+    } else if (baseControlType === 'datetime') {
+      return showValue
+        ? moment(showValue, 'YYYY-MM-DD HH:mm:ss')
+        : value
+        ? moment(value, 'YYYY-MM-DD HH:mm:ss')
+        : '';
+    } else if (baseControlType === 'date') {
+      return showValue
+        ? moment(showValue, 'YYYY-MM-DD HH:mm:ss')
+        : value
+        ? moment(value, 'YYYY-MM-DD HH:mm:ss')
+        : '';
+    } else if (baseControlType === 'select') {
+      return showValue && value ? (showValue ? showValue : value) : undefined;
+    } else if (baseControlType === 'multiple') {
+      return value
+        ? value
+          ? value.split(',')
+          : undefined
+        : showValue
+        ? showValue.split(',')
+        : undefined;
+    } else if (baseControlType === 'depGroup') {
+      return showValue ? showValue.split(',') : undefined;
+    } else {
+      return showValue
+        ? showValue
+          ? showValue
+          : undefined
+        : value
+        ? value
+        : undefined;
     }
   };
 
@@ -184,114 +161,123 @@ export default props => {
     if (formList.length) {
       return formList.map(fromItem => {
         let list: any[] = fromItem.list;
-
-        return (
-          <Descriptions
-            title={<div style={{ textAlign: 'center' }}>{fromItem.name}</div>}
-            key={fromItem.id}
-            bordered
-            column={fromItem.columnNum}
-            style={{ marginBottom: 40, width: '90%', marginLeft: '5%' }}
-          >
-            {list.map(groupItem => {
-              if (groupItem.list && groupItem.list.length) {
-                return (
-                  <Descriptions.Item
-                    key={groupItem.id}
-                    label={groupItem.name}
-                    span={groupItem.colspan}
-                    style={{ maxWidth: '180px', padding: 10 }}
-                  >
-                    {groupItem.list.map(listItem => {
-                      return (
-                        <div
-                          key={listItem.id}
-                          style={{
-                            display: 'flex',
-                            flex: 1,
-                            flexDirection: 'row',
-                            margin: '10px',
-                          }}
-                        >
-                          <div
-                            className={
-                              listItem.isRequired ? 'label-required' : ''
-                            }
-                            style={{ display: 'flex', flex: 1 }}
-                          >
-                            {listItem.name}
-                          </div>
-                          <div style={{ display: 'flex', flex: 1 }}>
-                            <Form.Item
-                              style={{
-                                width: '100%',
-                                marginBottom: 6,
-                                marginTop: 6,
-                              }}
-                              rules={[
-                                {
-                                  required: listItem.isRequired,
-                                  message: `${listItem.name}'必填!`,
-                                },
-                              ]}
-                              name={listItem.id}
-                              initialValue={handleValue(listItem)}
-                            >
-                              <Temp
-                                ismultiplechoice={listItem.isMultiplechoice}
-                                s_type={listItem.baseControlType}
-                                disabled={listItem.isLocked}
-                                list={listItem.itemList || []}
-                              />
-                            </Form.Item>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </Descriptions.Item>
-                );
-              } else {
-                return (
-                  <Descriptions.Item
-                    key={groupItem.id}
-                    style={{ maxWidth: '180px', padding: 10 }}
-                    label={
-                      <span
-                        className={groupItem.isRequired ? 'label-required' : ''}
-                      >
-                        {groupItem.name}
-                      </span>
-                    }
-                    span={groupItem.colspan}
-                  >
-                    <Form.Item
-                      style={{
-                        width: '100%',
-                        marginBottom: 0,
-                        marginTop: 0,
-                      }}
-                      name={groupItem.id}
-                      initialValue={handleValue(groupItem)}
-                      rules={[
-                        {
-                          required: groupItem.isRequired,
-                          message: `${groupItem.name}'必填!`,
-                        },
-                      ]}
+        if (fromItem.type === 1) {
+          return <AutoTable list={list} handleValue={handleValue} />;
+        } else {
+          return (
+            <Descriptions
+              title={<div style={{ textAlign: 'center' }}>{fromItem.name}</div>}
+              key={fromItem.id}
+              bordered
+              column={fromItem.columnNum}
+              style={{ marginBottom: 40, width: '90%', marginLeft: '5%' }}
+            >
+              {list.map(groupItem => {
+                if (groupItem.list && groupItem.list.length) {
+                  return (
+                    <Descriptions.Item
+                      key={groupItem.id}
+                      label={groupItem.name}
+                      span={groupItem.colspan}
+                      style={{ maxWidth: '180px', padding: 10 }}
                     >
-                      <Temp
-                        ismultiplechoice={groupItem.isMultiplechoice}
-                        s_type={groupItem.baseControlType}
-                        disabled={groupItem.isLocked}
-                        list={groupItem.itemList || []}
-                      />
-                    </Form.Item>
-                  </Descriptions.Item>
-                );
-              }
-            })}
-          </Descriptions>
-        );
+                      {groupItem.list.map(listItem => {
+                        return (
+                          <div
+                            key={listItem.id}
+                            style={{
+                              display: 'flex',
+                              flex: 1,
+                              flexDirection: 'row',
+                              margin: '10px',
+                            }}
+                          >
+                            <div
+                              className={
+                                listItem.isRequired ? 'label-required' : ''
+                              }
+                              style={{ display: 'flex', flex: 1 }}
+                            >
+                              {listItem.name}
+                            </div>
+                            <div style={{ display: 'flex', flex: 1 }}>
+                              <Form.Item
+                                style={{
+                                  width: '100%',
+                                  marginBottom: 6,
+                                  marginTop: 6,
+                                }}
+                                rules={[
+                                  {
+                                    required: listItem.isRequired,
+                                    message: `${listItem.name}'必填!`,
+                                  },
+                                ]}
+                                name={listItem.id}
+                                initialValue={handleValue(listItem)}
+                              >
+                                <Temp
+                                  ismultiplechoice={listItem.isMultiplechoice}
+                                  s_type={listItem.baseControlType}
+                                  disabled={listItem.isLocked}
+                                  list={listItem.itemList || []}
+                                  fileLists={listItem.fileList || []}
+                                  item={listItem}
+                                />
+                              </Form.Item>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </Descriptions.Item>
+                  );
+                } else {
+                  return (
+                    <Descriptions.Item
+                      key={groupItem.id}
+                      style={{ maxWidth: '180px', padding: 10 }}
+                      label={
+                        <span
+                          className={
+                            groupItem.isRequired ? 'label-required' : ''
+                          }
+                        >
+                          {groupItem.name}
+                        </span>
+                      }
+                      span={groupItem.colspan}
+                    >
+                      <Form.Item
+                        style={{
+                          width: '100%',
+                          marginBottom: 0,
+                          marginTop: 0,
+                        }}
+                        name={groupItem.id}
+                        initialValue={handleValue(groupItem)}
+                        rules={[
+                          {
+                            required: groupItem.isRequired,
+                            message: `${groupItem.name}'必填!`,
+                          },
+                        ]}
+                      >
+                        <Temp
+                          ismultiplechoice={groupItem.isMultiplechoice}
+                          s_type={groupItem.baseControlType}
+                          disabled={groupItem.isLocked}
+                          list={groupItem.itemList || []}
+                          fileLists={groupItem.fileList || []}
+                          item={groupItem}
+                        />
+                      </Form.Item>
+                    </Descriptions.Item>
+                  );
+                }
+              })}
+            </Descriptions>
+          );
+        }
       });
     } else {
       return null;
@@ -301,6 +287,7 @@ export default props => {
   const submit = (): void => {
     form.validateFields().then(async fromSubData => {
       let subList: any = [];
+      let wfTaskFormFilesCrudParamList: any = [];
       idItemList.map(item => {
         let showArr: any = [];
         let valueArr: any = [];
@@ -323,6 +310,19 @@ export default props => {
             ? valueArr.push(fromSubData[item.id].split('-$-')[0])
             : valueArr.push(fromSubData[item.id]);
         }
+        if (item.baseControlType === 'files') {
+          fromSubData[item.id].map(file => {
+            wfTaskFormFilesCrudParamList.push({
+              resFormControlId: item.id,
+              fileUrl: file.url,
+              fileName: file.name,
+              fileSize: file.size,
+              fileExtname: file.type,
+              multipleNumber: 1,
+            });
+          });
+        }
+
         if (item.isLocked) {
           subList.push({
             id: item.id,
@@ -367,11 +367,18 @@ export default props => {
               value: valueArr.join(',').split('-$-')[0],
             });
           } else if (item.baseControlType === 'currUser') {
-            subList({
+            subList.push({
               id: item.id,
               multipleNumber: 1,
               showValue: item.defaultShowValue,
               value: item.defaultValue,
+            });
+          } else if (item.baseControlType === 'files') {
+            subList.push({
+              id: item.id,
+              multipleNumber: 1,
+              showValue: '',
+              value: '',
             });
           } else {
             subList.push({
@@ -383,10 +390,115 @@ export default props => {
           }
         }
       });
+      for (let key in fromSubData) {
+        if (key.split('-')[1] && key.split('-')[0]) {
+          if (key.split('-')[0] === 'date') {
+            subList.push({
+              id: parseInt(key.split('-')[1]),
+              value: moment(fromSubData[key])?.format('YYYY-MM-DD') || '',
+              multipleNumber: parseInt(key.split('-')[2]),
+            });
+          } else if (key.split('-')[0] === 'datetime') {
+            subList.push({
+              id: parseInt(key.split('-')[1]),
+              value:
+                moment(fromSubData[key])?.format('YYYY-MM-DD HH:mm:ss') || '',
+              multipleNumber: parseInt(key.split('-')[2]),
+            });
+          } else if (key.split('-')[0] === 'depGroup') {
+            subList.push({
+              id: parseInt(key.split('-')[1]),
+              value: fromSubData[key] ? fromSubData[key].split('-$-')[0] : '',
+              showValue: fromSubData[key]
+                ? fromSubData[key].split('-$-')[1]
+                : '',
+              multipleNumber: parseInt(key.split('-')[2]),
+            });
+          } else if (
+            key.split('-')[0] === 'multiple' ||
+            key.split('-')[0] === 'user'
+          ) {
+            let vArr: any = [];
+            let sArr: any = [];
+            if (fromSubData[key]) {
+              if (
+                !!fromSubData[key] &&
+                fromSubData[key].constructor === Array
+              ) {
+                for (let i = 0; i < fromSubData[key].length; i++) {
+                  vArr.push(fromSubData[key][i].split('-$-')[0]);
+                  sArr.push(fromSubData[key][i].split('-$-')[1]);
+                }
+                subList.push({
+                  id: parseInt(key.split('-')[1]),
+                  value: vArr.join(','),
+                  showValue: sArr.join(','),
+                  multipleNumber: parseInt(key.split('-')[2]),
+                });
+              } else if (!!fromSubData[key]) {
+                subList.push({
+                  id: parseInt(key.split('-')[1]),
+                  value: fromSubData[key]
+                    ? fromSubData[key].split('-$-')[0]
+                    : '',
+                  showValue: fromSubData[key]
+                    ? fromSubData[key].split('-$-')[1]
+                    : '',
+                  multipleNumber: parseInt(key.split('-')[2]),
+                });
+              }
+            }
+          } else if (
+            key.split('-')[0] === 'select' ||
+            key.split('-')[0] === 'business' ||
+            key.split('-')[0] === 'business2' ||
+            key.split('-')[0] === 'labor' ||
+            key.split('-')[0] === 'cost' ||
+            key.split('-')[0] === 'positionLevel' ||
+            key.split('-')[0] === 'positionMLevel' ||
+            key.split('-')[0] === 'wkTask'
+          ) {
+            subList.push({
+              id: parseInt(key.split('-')[1]),
+              value: fromSubData[key] ? fromSubData[key].split('-$-')[0] : '',
+              showValue: fromSubData[key]
+                ? fromSubData[key].split('-$-')[1]
+                : '',
+              multipleNumber: parseInt(key.split('-')[2]),
+            });
+          } else if (key.split('-')[0] === 'files') {
+            fromSubData[key].map(file => {
+              wfTaskFormFilesCrudParamList.push({
+                resFormControlId: key.split('-')[1],
+                fileUrl: file.url,
+                fileName: file.name,
+                fileSize: file.size,
+                fileExtname: file.type,
+                multipleNumber: parseInt(key.split('-')[2]),
+              });
+              subList.push({
+                id: parseInt(key.split('-')[1]),
+                value: '',
+                showValue: '',
+                multipleNumber: parseInt(key.split('-')[2]),
+              });
+            });
+          } else {
+            subList.push({
+              id: parseInt(key.split('-')[1]),
+              value: fromSubData[key],
+              showValue: fromSubData[key],
+              multipleNumber: parseInt(key.split('-')[2]),
+            });
+          }
+        }
+      }
+      console.log(subList);
+      console.log(wfTaskFormFilesCrudParamList);
       let json: GlobalResParams<string> = await saveTaskForm({
         resFormId: formId,
         wfResFormSaveItemCrudParamList: subList,
-        wfTaskFormFilesCrudParamList: [],
+        wfTaskFormFilesCrudParamList: wfTaskFormFilesCrudParamList,
       });
       if (json.status === 200) {
         notification['success']({
@@ -429,5 +541,146 @@ export default props => {
         ) : null}
       </Form>
     </Card>
+  );
+};
+
+const AutoTable = props => {
+  const { list, handleValue } = props;
+  const [columns, setColumns] = useState<any>([]);
+  const [dataSource, setDataSource] = useState<any>([]);
+  const [template, setTemplate] = useState<any>();
+
+  useEffect(() => {
+    let dataItem: any = {};
+    let newColumns: any = [];
+    list.map(item => {
+      newColumns.push({
+        title: item.name,
+        dataIndex: item.baseControlType + '-' + item.id,
+        key: item.id,
+        align: 'left',
+        ...item,
+      });
+      dataItem[item.baseControlType + '-' + item.id] = { ...item };
+    });
+    newColumns.push({
+      title: '操作',
+      dataIndex: 'action',
+      key: 'action',
+      render: (_, record, index) => (
+        <span>
+          <a
+            onClick={() => {
+              let newList = new Set(dataSource);
+              newList = update(newList, {
+                $remove: [newList[index]],
+              });
+            }}
+          >
+            删除
+          </a>
+        </span>
+      ),
+    });
+
+    setColumns(newColumns);
+    setTemplate(dataItem);
+    setDataSource([dataItem]);
+  }, [list]);
+
+  useEffect(() => {
+    let dataItem: any = {};
+    let newColumns: any = [];
+    list.map(item => {
+      newColumns.push({
+        title: item.name,
+        dataIndex: item.baseControlType + '-' + item.id,
+        key: item.id,
+        align: 'left',
+        ...item,
+      });
+      dataItem[item.baseControlType + '-' + item.id] = { ...item };
+    });
+    newColumns.push({
+      title: '操作',
+      dataIndex: 'action',
+      key: 'action',
+      render: (_, record, index) => (
+        <span>
+          <a
+            onClick={() => {
+              let newList = new Set(dataSource);
+              newList = update(newList, {
+                $remove: [dataSource[index]],
+              });
+              setDataSource([...newList]);
+            }}
+          >
+            删除
+          </a>
+        </span>
+      ),
+    });
+    setColumns(newColumns);
+  }, [dataSource]);
+
+  const handleDataSource = dataSource => {
+    let newData = JSON.parse(JSON.stringify(dataSource));
+    for (let i = 0; i < newData.length; i++) {
+      let item = newData[i];
+      for (let key in item) {
+        let itemKey = item[key];
+        item[key] = (
+          <Form.Item
+            style={{
+              width: '100%',
+              marginBottom: 6,
+              marginTop: 6,
+            }}
+            rules={[
+              {
+                required: itemKey.isRequired,
+                message: `${itemKey.name}'必填!`,
+              },
+            ]}
+            name={itemKey.baseControlType + '-' + itemKey.id + '-' + (i + 1)}
+            initialValue={handleValue(itemKey)}
+          >
+            <Temp
+              ismultiplechoice={itemKey.isMultiplechoice}
+              s_type={itemKey.baseControlType}
+              disabled={itemKey.isLocked}
+              list={itemKey.itemList || []}
+              fileLists={itemKey.fileList || []}
+              item={itemKey}
+            />
+          </Form.Item>
+        );
+      }
+      item.id = i;
+      item.key = i;
+    }
+    return newData;
+  };
+
+  return (
+    <Table
+      title={() => {
+        return (
+          <Button
+            onClick={() => {
+              let newData = JSON.parse(JSON.stringify(dataSource));
+              newData.push(template);
+              setDataSource(newData);
+            }}
+          >
+            新增
+          </Button>
+        );
+      }}
+      columns={columns}
+      style={{ marginBottom: 40, width: '90%', marginLeft: '5%' }}
+      dataSource={handleDataSource(dataSource)}
+    />
   );
 };

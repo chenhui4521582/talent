@@ -24,6 +24,7 @@ export interface tsFormChildlist {
   updatedBy: string | null;
   controlList: tsControlList[];
   list: tsGroupList[] | tsControlList[];
+  type: number;
 }
 
 export interface tsGroupList {
@@ -164,5 +165,13 @@ export async function myDoneListPage(params: PaginationTableParams) {
 export async function homeList() {
   return request(`/api/talent/wfresform/list`, {
     method: 'POST',
+  });
+}
+
+// 我的列表
+export async function myListPageWt(params: PaginationTableParams) {
+  return request(`/api/talent/wftaskform/listRelationFormPage`, {
+    method: 'POST',
+    data: params,
   });
 }

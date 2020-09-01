@@ -212,6 +212,16 @@ const Edit = (props: Iprops) => {
           </Select>
         </Form.Item>
       ) : null}
+      <Form.Item
+        label="是否锁定"
+        name="isLocked"
+        rules={[{ required: true, message: '请选择列宽!' }]}
+      >
+        <Select placeholder="请选择">
+          <Option value={0}>不锁定</Option>
+          <Option value={1}>锁定</Option>
+        </Select>
+      </Form.Item>
     </>
   );
 };
