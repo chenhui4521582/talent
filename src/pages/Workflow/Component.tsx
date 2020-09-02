@@ -10,6 +10,7 @@ import {
   Col,
   Form,
   Tooltip,
+  message,
 } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import { useTable } from '@/components/GlobalTable/useTable';
@@ -505,22 +506,26 @@ const Uploads = props => {
 
   const customRequestwork = async files => {
     const { onSuccess, onError, file, onProgress } = files;
-    let res: GlobalResParams<any> = await saveFile({ file: file });
-    if (res.status === 200) {
-      file.url = res.obj.url;
-      onSuccess();
-    } else {
-      onError();
-    }
-    fileList.push({
-      name: file.name + '(' + getfilesize(file.size) + ')',
-      url: file.url,
-      size: file.size,
-      uid: file.uid,
-      type: file.type,
-    });
+    if (file.size / 1024 / 1024 < 20) {
+      let res: GlobalResParams<any> = await saveFile({ file: file });
+      if (res.status === 200) {
+        file.url = res.obj.url;
+        onSuccess();
+      } else {
+        onError();
+      }
+      fileList.push({
+        name: file.name + '(' + getfilesize(file.size) + ')',
+        url: file.url,
+        size: file.size,
+        uid: file.uid,
+        type: file.type,
+      });
 
-    setFileList([...fileList]);
+      setFileList([...fileList]);
+    } else {
+      message.warning('单个文件大小需要小于20M！');
+    }
   };
 
   const onPreview = e => {
@@ -565,7 +570,7 @@ const Uploads = props => {
   }
   return (
     <Upload {...action} disabled={props.disabled}>
-      <UploadOutlined /> 上传附件(单个文件大于20M)
+      <UploadOutlined /> 上传附件(单个文件不大于20M)
     </Upload>
   );
 };
