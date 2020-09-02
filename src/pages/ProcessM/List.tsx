@@ -40,6 +40,7 @@ const status = {
   '1': '审批中',
   '2': '已通过',
   '3': '已驳回',
+  '4': '已归档',
 };
 
 interface tsListItem {
@@ -261,9 +262,7 @@ export default props => {
           <Col span={5}>
             <Form.Item label="审批状态" name="status">
               <Select placeholder="请选择" allowClear>
-                <Option value="0">已撤销</Option>
                 <Option value="1">审批中</Option>
-                <Option value="2">已通过</Option>
                 <Option value="3">已驳回</Option>
               </Select>
             </Form.Item>
@@ -281,6 +280,16 @@ export default props => {
           <Col span={5} offset={1}>
             <Form.Item label="关键字" name="title">
               <Input placeholder="搜索标题" allowClear />
+            </Form.Item>
+          </Col>
+          <Col span={5}>
+            <Form.Item
+              label="审批状态"
+              name="isIntervene"
+              style={{ display: 'none' }}
+              initialValue={1}
+            >
+              <Input allowClear />
             </Form.Item>
           </Col>
         </Row>

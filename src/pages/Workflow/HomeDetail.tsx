@@ -311,7 +311,7 @@ export default props => {
             : valueArr.push(fromSubData[item.id]);
         }
         if (item.baseControlType === 'files') {
-          fromSubData[item.id].map(file => {
+          fromSubData[item.id]?.map(file => {
             wfTaskFormFilesCrudParamList.push({
               resFormControlId: item.id,
               fileUrl: file.url,
@@ -467,7 +467,7 @@ export default props => {
               multipleNumber: parseInt(key.split('-')[2]),
             });
           } else if (key.split('-')[0] === 'files') {
-            fromSubData[key].map(file => {
+            fromSubData[key]?.map(file => {
               wfTaskFormFilesCrudParamList.push({
                 resFormControlId: key.split('-')[1],
                 fileUrl: file.url,

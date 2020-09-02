@@ -468,7 +468,7 @@ export default props => {
               showValue: '',
               value: '',
             });
-            fromSubData[item.id].map(file => {
+            fromSubData[item.id]?.map(file => {
               wfTaskFormFilesCrudParamList.push({
                 resFormControlId: item.resFormControlId,
                 fileUrl: file.url,
@@ -580,7 +580,7 @@ export default props => {
               multipleNumber: parseInt(key.split('-')[2]),
             });
           } else if (key.split('-')[0] === 'files') {
-            fromSubData[key].map(file => {
+            fromSubData[key]?.map(file => {
               wfTaskFormFilesCrudParamList.push({
                 resFormControlId: key.split('-')[1],
                 fileUrl: file.url,
@@ -606,13 +606,7 @@ export default props => {
           }
         }
       }
-      // console.log({
-      //   remark: fromSubData.remark,
-      //   taskFormId: formId,
-      //   type: type,
-      //   wfResFormUpdateItemCrudParamList: subList,
-      //   wfTaskFormFilesCrudParamList: wfTaskFormFilesCrudParamList,
-      // });
+
       let json: GlobalResParams<string> = await submit({
         remark: fromSubData.remark,
         taskFormId: formId,
