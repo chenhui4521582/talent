@@ -223,7 +223,7 @@ export default props => {
         ? moment(value, 'YYYY-MM-DD HH:mm:ss')
         : undefined;
     } else if (baseControlType === 'select') {
-      return showValue && value ? (showValue ? showValue : value) : null;
+      return showValue || value ? (showValue ? showValue : value) : null;
     } else if (baseControlType === 'multiple') {
       return value
         ? value
@@ -371,7 +371,6 @@ export default props => {
 
   const submitData = (type: number): void => {
     form.validateFields().then(async fromSubData => {
-      console.log(fromSubData);
       let subList: any = [];
       let wfTaskFormFilesCrudParamList: any = [];
       idItemList.map(item => {
@@ -415,7 +414,7 @@ export default props => {
                   fileSize: file.fileSize,
                   fileUrl: file.fileUrl,
                   multipleNumber: file.multipleNumber,
-                  resFormControlId: file.resFormControlId,
+                  resFormControlId: item.resFormControlId,
                 });
               });
           } else {
@@ -471,7 +470,7 @@ export default props => {
             });
             fromSubData[item.id].map(file => {
               wfTaskFormFilesCrudParamList.push({
-                resFormControlId: item.id,
+                resFormControlId: item.resFormControlId,
                 fileUrl: file.url,
                 fileName: file.name,
                 fileSize: file.size,
@@ -795,10 +794,15 @@ const AutoTable = props => {
     if (objList[0]) {
       objList[0].map(item => {
         newColumns.push({
-          title: item.name,
+          title: (
+            <span className={item.isRequired ? 'label-required' : ''}>
+              {item.name}
+            </span>
+          ),
           dataIndex: item.baseControlType + '-' + item.resFormControlId,
           key: item.id,
           align: 'left',
+          width: (100 / (objList[0].length + 1)) * item.colspan - 2 + '%',
           ...item,
         });
       });
@@ -806,6 +810,8 @@ const AutoTable = props => {
         title: '操作',
         dataIndex: 'action',
         key: 'action',
+        colSpan: 1,
+        align: 'center',
         render: (_, record, index) => (
           <span>
             <a
@@ -862,7 +868,7 @@ const AutoTable = props => {
             obj[itemKey.baseControlType + '-' + itemKey.resFormControlId] = (
               <Form.Item
                 style={{
-                  width: '100%',
+                  // minWidth: '8em',
                   marginBottom: 6,
                   marginTop: 6,
                 }}

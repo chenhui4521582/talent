@@ -57,7 +57,7 @@ let flag = true;
 export default props => {
   const columns: ColumnProps<tsList>[] = [
     {
-      title: '审批编号',
+      title: '申请单号',
       dataIndex: 'formNumber',
       key: 'formNumber',
       align: 'center',
@@ -269,7 +269,7 @@ export default props => {
             </Form.Item>
           </Col>
           <Col span={5} offset={1}>
-            <Form.Item label="审批编号" name="formNumber">
+            <Form.Item label="申请单号" name="formNumber">
               <Input placeholder="请输入" allowClear />
             </Form.Item>
           </Col>

@@ -497,9 +497,10 @@ const Uploads = props => {
       setFileList(lists);
     }
   }, [props.fileLists]);
-
   useEffect(() => {
-    props.onChange && props.onChange(fileList);
+    if (fileList?.length) {
+      props.onChange && props.onChange(fileList);
+    }
   }, [fileList]);
 
   const customRequestwork = async files => {
@@ -525,7 +526,7 @@ const Uploads = props => {
   const onPreview = e => {
     fileList.map(item => {
       if (e.uid === item.uid) {
-        window.open(item.url);
+        window.open(window.location.origin + '/' + item.url);
       }
     });
   };
@@ -564,7 +565,7 @@ const Uploads = props => {
   }
   return (
     <Upload {...action} disabled={props.disabled}>
-      <UploadOutlined /> 上传附件
+      <UploadOutlined /> 上传附件(单个文件大于20M)
     </Upload>
   );
 };

@@ -493,8 +493,6 @@ export default props => {
           }
         }
       }
-      console.log(subList);
-      console.log(wfTaskFormFilesCrudParamList);
       let json: GlobalResParams<string> = await saveTaskForm({
         resFormId: formId,
         wfResFormSaveItemCrudParamList: subList,
@@ -555,10 +553,15 @@ const AutoTable = props => {
     let newColumns: any = [];
     list.map(item => {
       newColumns.push({
-        title: item.name,
+        title: (
+          <span className={item.isRequired ? 'label-required' : ''}>
+            {item.name}
+          </span>
+        ),
         dataIndex: item.baseControlType + '-' + item.id,
         key: item.id,
         align: 'left',
+        width: (100 / (list.length + 1)) * item.colspan - 2 + '%',
         ...item,
       });
       dataItem[item.baseControlType + '-' + item.id] = { ...item };
@@ -567,6 +570,7 @@ const AutoTable = props => {
       title: '操作',
       dataIndex: 'action',
       key: 'action',
+      align: 'center',
       render: (_, record, index) => (
         <span>
           <a
@@ -593,10 +597,15 @@ const AutoTable = props => {
     let newColumns: any = [];
     list.map(item => {
       newColumns.push({
-        title: item.name,
+        title: (
+          <span className={item.isRequired ? 'label-required' : ''}>
+            {item.name}
+          </span>
+        ),
         dataIndex: item.baseControlType + '-' + item.id,
         key: item.id,
         align: 'left',
+        width: (100 / (list.length + 1)) * item.colspan - 2 + '%',
         ...item,
       });
       dataItem[item.baseControlType + '-' + item.id] = { ...item };
@@ -605,6 +614,7 @@ const AutoTable = props => {
       title: '操作',
       dataIndex: 'action',
       key: 'action',
+      align: 'center',
       render: (_, record, index) => (
         <span>
           <a
