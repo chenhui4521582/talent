@@ -13,7 +13,6 @@ import {
   Button,
   Divider,
   Radio,
-  Spin,
 } from 'antd';
 import { useTable } from '@/components/GlobalTable/useTable';
 import { LoadingOutlined } from '@ant-design/icons';
@@ -31,6 +30,7 @@ import { useOrganization } from '@/models/global';
 import { ColumnProps } from 'antd/es/table';
 import User from './User';
 import { save, getRuleList } from './services/list';
+import { Link } from 'umi';
 
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 const { Option } = Select;
@@ -103,13 +103,7 @@ export default props => {
       render: (_, record) => {
         return (
           <span>
-            <a
-              onClick={() => {
-                window.location.href = `/talent/workflow/detail/${record.id}`;
-              }}
-            >
-              详情
-            </a>
+            <Link to={`/talent/workflow/detail/${record.id}`}>点击查看</Link>
             <Divider type="vertical" />
             <a
               onClick={() => {
@@ -181,7 +175,7 @@ export default props => {
     queryMethod: historyList,
     columns,
     rowKeyName: 'id',
-    cacheKey: 'wftaskform/taskFormListByCondition',
+    cacheKey: 'wftaskform/taskFormListByCondition/wt',
   });
 
   const handleOk = async () => {

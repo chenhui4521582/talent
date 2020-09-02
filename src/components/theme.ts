@@ -8,6 +8,10 @@ let obj = {
 
   'table-header-bg': '#f4f4f4',
   'table-header-color': ' #333333',
+
+  'btn-primary-bg': '#4E72C9',
+  'btn-primary-color': '#FFFFFF',
+  'btn-border-radius-base': '5px',
 };
 
 export default obj;
