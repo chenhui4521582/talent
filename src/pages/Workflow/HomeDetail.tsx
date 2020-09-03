@@ -310,24 +310,6 @@ export default props => {
             ? valueArr.push(fromSubData[item.id].split('-$-')[0])
             : valueArr.push(fromSubData[item.id]);
         }
-        if (item.baseControlType === 'files') {
-          subList.push({
-            id: item.id,
-            multipleNumber: 1,
-            showValue: '',
-            value: '',
-          });
-          fromSubData[item.id]?.map(file => {
-            wfTaskFormFilesCrudParamList.push({
-              resFormControlId: item.id,
-              fileUrl: file.url,
-              fileName: file.name,
-              fileSize: file.size,
-              fileExtname: file.type,
-              multipleNumber: 1,
-            });
-          });
-        }
 
         if (item.isLocked) {
           subList.push({
@@ -380,6 +362,16 @@ export default props => {
               value: item.defaultValue,
             });
           } else if (item.baseControlType === 'files') {
+            fromSubData[item.id]?.map(file => {
+              wfTaskFormFilesCrudParamList.push({
+                resFormControlId: item.id,
+                fileUrl: file.url,
+                fileName: file.name,
+                fileSize: file.size,
+                fileExtname: file.type,
+                multipleNumber: 1,
+              });
+            });
             subList.push({
               id: item.id,
               multipleNumber: 1,

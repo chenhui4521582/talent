@@ -510,7 +510,6 @@ const Uploads = props => {
 
   const customRequestwork = async files => {
     const { onSuccess, onError, file } = files;
-    console.log(files);
     if (file.size / 1024 / 1024 < 20) {
       let res: GlobalResParams<any> = await saveFile({ file: file });
       if (res.status === 200) {
