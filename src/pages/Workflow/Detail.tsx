@@ -731,6 +731,7 @@ const AutoTable = props => {
   const [columns, setColumns] = useState<any>([]);
   const [dataSource, setDataSource] = useState<any>([]);
   const [template, setTemplate] = useState<any>();
+  const [isRemove, setIsRemove] = useState<boolean>(false);
 
   useEffect(() => {
     let newList: any = [];
@@ -776,8 +777,9 @@ const AutoTable = props => {
       dataIndex: 'action',
       key: 'action',
       align: 'center',
-      width: '6em',
-      render: (_, record, index) => <span>{index + 1}</span>,
+      render: (_, record, index) => (
+        <div style={{ width: '4em' }}>{index + 1}</div>
+      ),
     });
     list.map(item => {
       multipleNumberArr.push(item.multipleNumber);
@@ -794,7 +796,9 @@ const AutoTable = props => {
       });
     }
     if (objList[0]) {
+      let isRmoved = 0;
       objList[0].map(item => {
+        isRmoved += item.isLocked;
         newColumns.push({
           title: (
             <span className={item.isRequired ? 'label-required' : ''}>
@@ -804,32 +808,39 @@ const AutoTable = props => {
           dataIndex: item.baseControlType + '-' + item.resFormControlId,
           key: item.id,
           align: 'left',
-          width: (100 / (objList[0].length + 1)) * item.colspan - 3 + '%',
+          width: !isRemove
+            ? (100 / objList[0].length) * item.colspan + '%'
+            : (100 / (objList[0].length + 1)) * item.colspan - 3.2 + '%',
           ...item,
         });
       });
-      newColumns.push({
-        title: '操作',
-        dataIndex: 'action',
-        key: 'action',
-        colSpan: 1,
-        align: 'center',
-        render: (_, record, index) => (
-          <span>
-            <a
-              onClick={() => {
-                let newList = new Set(dataSource);
-                newList = update(newList, {
-                  $remove: [dataSource[index]],
-                });
-                setDataSource([...newList]);
-              }}
-            >
-              删除
-            </a>
-          </span>
-        ),
-      });
+      setIsRemove(isRmoved === objList[0].length ? false : true);
+      if (isRmoved !== objList[0].length) {
+        newColumns.push({
+          title: '操作',
+          dataIndex: 'action',
+          key: 'action',
+          colSpan: 1,
+          align: 'center',
+          render: (_, record, index) => {
+            return (
+              <div style={{ width: '4em' }}>
+                <a
+                  onClick={() => {
+                    let newList = new Set(dataSource);
+                    newList = update(newList, {
+                      $remove: [dataSource[index]],
+                    });
+                    setDataSource([...newList]);
+                  }}
+                >
+                  删除
+                </a>
+              </div>
+            );
+          },
+        });
+      }
     }
     setColumns(newColumns);
   }, [dataSource]);
@@ -847,6 +858,7 @@ const AutoTable = props => {
       }
     };
   };
+
   const handleDataSource = dataSource => {
     let newData = JSON.parse(JSON.stringify(dataSource)) || [];
     let sortArr: any = [];
@@ -867,6 +879,7 @@ const AutoTable = props => {
         newData[i].map(itemKey => {
           if (itemKey.multipleNumber === parseInt(sortItem)) {
             obj.key = itemKey.baseControlType + '-' + itemKey.resFormControlId;
+
             obj[itemKey.baseControlType + '-' + itemKey.resFormControlId] = (
               <Form.Item
                 style={{
@@ -912,25 +925,29 @@ const AutoTable = props => {
   return (
     <Table
       title={() => {
-        return (
-          <Button
-            onClick={() => {
-              let newData = JSON.parse(JSON.stringify(dataSource));
-              let newTemplate = JSON.parse(JSON.stringify(template));
-              newTemplate.map(item => {
-                item.multipleNumber = parseInt(newData.length) + 1;
-                item.value = null;
-                item.showValue = null;
-                item.fileList = [];
-              });
-              newTemplate.isRemove = true;
-              newData.push(newTemplate);
-              setDataSource(newData);
-            }}
-          >
-            新增
-          </Button>
-        );
+        if (isRemove) {
+          return (
+            <Button
+              onClick={() => {
+                let newData = JSON.parse(JSON.stringify(dataSource));
+                let newTemplate = JSON.parse(JSON.stringify(template));
+                newTemplate.map(item => {
+                  item.multipleNumber = parseInt(newData.length) + 1;
+                  item.value = null;
+                  item.showValue = null;
+                  item.fileList = [];
+                });
+                newTemplate.isRemove = true;
+                newData.push(newTemplate);
+                setDataSource(newData);
+              }}
+            >
+              新增
+            </Button>
+          );
+        } else {
+          return null;
+        }
       }}
       columns={columns}
       style={{ marginBottom: 40, width: '90%', marginLeft: '5%' }}
