@@ -311,6 +311,12 @@ export default props => {
             : valueArr.push(fromSubData[item.id]);
         }
         if (item.baseControlType === 'files') {
+          subList.push({
+            id: item.id,
+            multipleNumber: 1,
+            showValue: '',
+            value: '',
+          });
           fromSubData[item.id]?.map(file => {
             wfTaskFormFilesCrudParamList.push({
               resFormControlId: item.id,
@@ -551,6 +557,14 @@ const AutoTable = props => {
   useEffect(() => {
     let dataItem: any = {};
     let newColumns: any = [];
+    newColumns.push({
+      title: '序号',
+      dataIndex: 'action',
+      key: 'action',
+      align: 'center',
+      width: '6em',
+      render: (_, record, index) => <span>{index + 1}</span>,
+    });
     list.map(item => {
       newColumns.push({
         title: (
@@ -561,7 +575,7 @@ const AutoTable = props => {
         dataIndex: item.baseControlType + '-' + item.id,
         key: item.id,
         align: 'left',
-        width: (100 / (list.length + 1)) * item.colspan - 2 + '%',
+        width: (100 / (list.length + 1)) * item.colspan - 1.8 + '%',
         ...item,
       });
       dataItem[item.baseControlType + '-' + item.id] = { ...item };
@@ -571,6 +585,7 @@ const AutoTable = props => {
       dataIndex: 'action',
       key: 'action',
       align: 'center',
+      width: '6em',
       render: (_, record, index) => (
         <span>
           <a
@@ -595,6 +610,16 @@ const AutoTable = props => {
   useEffect(() => {
     let dataItem: any = {};
     let newColumns: any = [];
+    newColumns.push({
+      title: '序号',
+      dataIndex: 'action',
+      key: 'action',
+      align: 'center',
+      width: '6em',
+      render: (_, record, index) => {
+        return <span>{index + 1}</span>;
+      },
+    });
     list.map(item => {
       newColumns.push({
         title: (
@@ -605,7 +630,7 @@ const AutoTable = props => {
         dataIndex: item.baseControlType + '-' + item.id,
         key: item.id,
         align: 'left',
-        width: (100 / (list.length + 1)) * item.colspan - 2 + '%',
+        width: (100 / (list.length + 1)) * item.colspan - 1.8 + '%',
         ...item,
       });
       dataItem[item.baseControlType + '-' + item.id] = { ...item };
@@ -615,6 +640,7 @@ const AutoTable = props => {
       dataIndex: 'action',
       key: 'action',
       align: 'center',
+      width: '6em',
       render: (_, record, index) => (
         <span>
           <a

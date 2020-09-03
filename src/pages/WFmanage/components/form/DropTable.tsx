@@ -46,6 +46,14 @@ export default (props: Iprops) => {
   useEffect(() => {
     let dataItem: any = {};
     let newColumns: any = [];
+    newColumns.push({
+      title: '序号',
+      dataIndex: 'action',
+      key: 'action',
+      align: 'center',
+      // width: '6em',
+      render: (_, record, index) => <span>{index + 1}</span>,
+    });
     fromItem?.list.map((item, i) => {
       newColumns.push({
         title: (
@@ -72,6 +80,14 @@ export default (props: Iprops) => {
   useEffect(() => {
     let dataItem: any = {};
     let newColumns: any = [];
+    newColumns.push({
+      title: '序号',
+      dataIndex: 'action',
+      key: 'action',
+      align: 'center',
+      // width: '6em',
+      render: (_, record, index) => <span>{index + 1}</span>,
+    });
     fromItem?.list.map((item, i) => {
       newColumns.push({
         title: (

@@ -759,7 +759,7 @@ const AutoTable = props => {
       });
     }
 
-    setTemplate(objList[0]);
+    setTemplate(objList[0] || []);
     if (objList.length === 0) {
       setDataSource([objList[0]]);
     } else {
@@ -771,6 +771,14 @@ const AutoTable = props => {
     let newColumns: any = [];
     let multipleNumberArr: any = [];
     let objList: any = [];
+    newColumns.push({
+      title: '序号',
+      dataIndex: 'action',
+      key: 'action',
+      align: 'center',
+      width: '6em',
+      render: (_, record, index) => <span>{index + 1}</span>,
+    });
     list.map(item => {
       multipleNumberArr.push(item.multipleNumber);
     });
@@ -796,7 +804,7 @@ const AutoTable = props => {
           dataIndex: item.baseControlType + '-' + item.resFormControlId,
           key: item.id,
           align: 'left',
-          width: (100 / (objList[0].length + 1)) * item.colspan - 2 + '%',
+          width: (100 / (objList[0].length + 1)) * item.colspan - 3 + '%',
           ...item,
         });
       });
@@ -915,6 +923,7 @@ const AutoTable = props => {
                 item.showValue = null;
                 item.fileList = [];
               });
+              newTemplate.isRemove = true;
               newData.push(newTemplate);
               setDataSource(newData);
             }}

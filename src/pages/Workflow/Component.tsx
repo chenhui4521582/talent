@@ -488,7 +488,7 @@ const Uploads = props => {
       let lists: Ilist[] = [];
       props.fileLists.map(item => {
         lists.push({
-          name: item.fileName,
+          name: item.fileName + ' (文件大小' + getfilesize(item.fileSize) + ')',
           url: item.fileUrl,
           size: item.fileSize,
           uid: item.id,
@@ -500,29 +500,34 @@ const Uploads = props => {
   }, [props.fileLists]);
   useEffect(() => {
     if (fileList?.length) {
-      props.onChange && props.onChange(fileList);
+      let newList = JSON.parse(JSON.stringify(fileList));
+      newList.map((item, index) => {
+        item.name = item.name.split(' (文件大小')[0];
+      });
+      props.onChange && props.onChange(newList);
     }
   }, [fileList]);
 
   const customRequestwork = async files => {
-    const { onSuccess, onError, file, onProgress } = files;
+    const { onSuccess, onError, file } = files;
+    console.log(files);
     if (file.size / 1024 / 1024 < 20) {
       let res: GlobalResParams<any> = await saveFile({ file: file });
       if (res.status === 200) {
         file.url = res.obj.url;
+        fileList.push({
+          name: file.name + ' (文件大小' + getfilesize(file.size) + ')',
+          url: file.url,
+          size: file.size,
+          uid: file.uid,
+          type: file.name.split('.')[file.name.split('.').length - 1],
+        });
+        setFileList([...fileList]);
         onSuccess();
       } else {
+        message.error(res.msg);
         onError();
       }
-      fileList.push({
-        name: file.name + '(' + getfilesize(file.size) + ')',
-        url: file.url,
-        size: file.size,
-        uid: file.uid,
-        type: file.type,
-      });
-
-      setFileList([...fileList]);
     } else {
       message.warning('单个文件大小需要小于20M！');
     }
@@ -531,7 +536,7 @@ const Uploads = props => {
   const onPreview = e => {
     fileList.map(item => {
       if (e.uid === item.uid) {
-        window.open(window.location.origin + '/' + item.url);
+        window.open(item.url + '?filename=' + item.name.split('(文件大小')[0]);
       }
     });
   };
@@ -570,7 +575,11 @@ const Uploads = props => {
   }
   return (
     <Upload {...action} disabled={props.disabled}>
-      <UploadOutlined /> 上传附件(单个文件不大于20M)
+      {props.disabled === 0 ? (
+        <>
+          <UploadOutlined /> 上传附件(单个文件不大于20M)
+        </>
+      ) : null}
     </Upload>
   );
 };
@@ -703,7 +712,7 @@ const WkTask = props => {
         cancelText="取消"
         onOk={handleOk}
         onCancel={handleOk}
-        width="46vw"
+        width="50vw"
       >
         <TableContent>
           <Row>
