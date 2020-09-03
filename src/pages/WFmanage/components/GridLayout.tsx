@@ -592,7 +592,7 @@ export default props => {
           <Form.Item
             name="archiveId"
             style={{ marginTop: 4 }}
-            label="自执行"
+            label="归档操作"
             rules={[{ required: true, message: '请选择标签!' }]}
           >
             <Select
