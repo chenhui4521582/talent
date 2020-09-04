@@ -17,10 +17,12 @@ export default defineConfig({
     {
       path: '/user',
       component: '@/layouts/UserLayout',
-      routes: [{
-        path: '/user/login',
-        component: '@/pages/User/Login',
-      }]
+      routes: [
+        {
+          path: '/user/login',
+          component: '@/pages/User/Login',
+        },
+      ],
     },
     {
       path: '/',
@@ -293,6 +295,80 @@ export default defineConfig({
         {
           path: '/talent/systemm/notice/list',
           component: '@/pages/SystemM/notice/List',
+        },
+        //考勤管理
+        {
+          path: '/talent/attendancem/myclockIn',
+          component: '@/pages/AttendanceM/MyAttendance/MyClockIn',
+        },
+        {
+          path: '/talent/attendancem/monthlyreport',
+          component: '@/pages/AttendanceM/MyAttendance/MonthlyReport',
+        },
+        {
+          path: '/talent/attendancem/canleave',
+          component: '@/pages/AttendanceM/MyAttendance/CanLeave',
+        },
+
+        {
+          path: '/talent/attendanceconfig/rulelist',
+          component: '@/pages/AttendanceM/AttendanceConfig/RuleList',
+        },
+        {
+          path: '/talent/attendanceconfig/addrule',
+          component: '@/pages/AttendanceM/AttendanceConfig/AddRule',
+        },
+        {
+          path: '/talent/attendanceconfig/clockIntime',
+          component: '@/pages/AttendanceM/AttendanceConfig/ClockInTime',
+        },
+        {
+          path: '/talent/attendancem/editscheduling',
+          component: '@/pages/AttendanceM/AttendanceConfig/EditScheduling',
+        },
+        {
+          path: '/talent/attendancem/attendanceconfig/globalc',
+          component: '@/pages/AttendanceM/AttendanceConfig/GlobalC',
+        },
+        {
+          path: '/talent/attendancem/attendanceconfig/entranceguardc',
+          component: '@/pages/AttendanceM/AttendanceConfig/EntranceGuardC',
+        },
+        {
+          path: '/talent/attendancem/attendanceconfig/holidaym',
+          component: '@/pages/AttendanceM/AttendanceConfig/holidayM',
+        },
+        {
+          path: '/talent/Attendancem/attendanceconfig/duringholidaym',
+          component: '@/pages/AttendanceM/AttendanceConfig/DuringHolidayM',
+        },
+        {
+          path: '/talent/attendancem/attendanceconfig/bucklefalsem',
+          component: '@/pages/AttendanceM/AttendanceConfig/BuckleFalseM',
+        },
+        {
+          path: '/talent/attendancem/attendancesummary',
+          component: '@/pages/AttendanceM/Atatistical/AttendanceSummary',
+        },
+        {
+          path: '/talent/attendancem/annualLeavesummary',
+          component: '@/pages/AttendanceM/Atatistical/AnnualLeaveSummary',
+        },
+        {
+          path: '/talent/atatistical/cumulative',
+          component: '@/pages/AttendanceM/Atatistical/Cumulative',
+        },
+        {
+          path: '/talent/atatistical/percapita',
+          component: '@/pages/AttendanceM/Atatistical/PerCapita',
+        },
+        {
+          path: '/talent/atatistical/clockrate',
+          component: '@/pages/AttendanceM/Atatistical/ClockRate',
+        },
+        {
+          path: '/talent/atatistical/personal',
+          component: '@/pages/AttendanceM/Atatistical/Personal',
         },
       ],
     },

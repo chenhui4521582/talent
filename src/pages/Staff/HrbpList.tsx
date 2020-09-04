@@ -20,6 +20,7 @@ import { serialize } from '@/utils/serialize';
 import { useJob } from '@/models/global';
 import { getlevelOr } from '@/services/global';
 import { GlobalResParams } from '@/types/ITypes';
+import watermark from '@/utils/watermark';
 
 interface tsItem {
   code: string;
@@ -124,6 +125,21 @@ export default () => {
     });
     setChecked([...newArr]);
   }, [visible]);
+
+  useEffect(() => {
+    watermark.set('水印文本', {
+      l: 300,
+      h: 150,
+      top: '10px',
+      left: '0px',
+      width: '100%',
+      height: '100%',
+    });
+    return () => {
+      watermark.remove();
+    };
+  }, []);
+
   const columns: ColumnProps<any>[] = [
     {
       title: '员工编号',

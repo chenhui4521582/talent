@@ -36,6 +36,7 @@ import OzTreeSlect from './components/OzTreeSlect';
 import { StarOutlined } from '@ant-design/icons';
 import { GlobalResParams } from '@/types/ITypes';
 import { ColumnProps } from 'antd/es/table';
+import watermark from '@/utils/watermark';
 import './style/organization.less';
 const { Search } = Input;
 
@@ -141,6 +142,20 @@ export default props => {
   useEffect(() => {
     getJson();
   }, [organizationJson]);
+
+  useEffect(() => {
+    watermark.set('水印文本', {
+      l: 300,
+      h: 150,
+      top: '10px',
+      left: '0px',
+      width: '100%',
+      height: '100%',
+    });
+    return () => {
+      watermark.remove();
+    };
+  }, []);
 
   async function getJson() {
     let list = organizationJson;

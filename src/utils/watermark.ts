@@ -2,7 +2,7 @@ let watermark: any = {};
 
 let setWatermark = (str, option: any = {}) => {
   let id = '123.123.123';
-  if (document.getElementById(id) !== null) {
+  if (document.getElementById(id)) {
     document.body.removeChild(document.getElementById(id) as any);
   }
 
@@ -28,7 +28,7 @@ let setWatermark = (str, option: any = {}) => {
   div.id = id;
   div.style.pointerEvents = 'none';
   div.style.top = option.top || '100px';
-  div.style.left = option.left || '180px';
+  div.style.left = option.left || '200px';
   div.style.position = 'fixed';
   div.style.zIndex = '100000';
   div.style.width = option.width || document.documentElement.clientWidth + 'px';
@@ -52,6 +52,15 @@ watermark.set = str => {
     setWatermark(str);
   };
 };
+
+watermark.remove = () => {
+  var El: any = document.getElementById('123.123.123');
+  if (El) {
+    El.style.width = '0px';
+    El.style.height = '0px';
+  }
+};
+
 // watermark.set('水印文本', { l: 300, h: 150, top: '10px', left: '0px', width: '100%', height: '100%' })
 
 export default watermark;

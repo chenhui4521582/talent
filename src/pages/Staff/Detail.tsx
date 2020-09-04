@@ -4,6 +4,7 @@ import { Card, Descriptions, Tabs, Button } from 'antd';
 import { GlobalResParams, eduHash } from '@/types/ITypes';
 import { commonDetail } from './services/staff';
 import EmployeePrint from '@/pages/Evaluation/Print';
+import watermark from '@/utils/watermark';
 
 const { TabPane } = Tabs;
 export default props => {
@@ -23,6 +24,17 @@ export default props => {
       }
     }
     getDetail();
+    watermark.set('水印文本', {
+      l: 300,
+      h: 150,
+      top: '10px',
+      left: '0px',
+      width: '100%',
+      height: '100%',
+    });
+    return () => {
+      watermark.remove();
+    };
   }, []);
 
   useEffect(() => {
