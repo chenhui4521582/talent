@@ -309,22 +309,13 @@ export default defineConfig({
           path: '/talent/attendancem/canleave',
           component: '@/pages/AttendanceM/MyAttendance/CanLeave',
         },
-
+        {
+          path: '/talent/attendanceconfig/addrule',
+          component: '@/pages/AttendanceM/AttendanceConfig/addRule',
+        },
         {
           path: '/talent/attendanceconfig/rulelist',
           component: '@/pages/AttendanceM/AttendanceConfig/RuleList',
-        },
-        {
-          path: '/talent/attendanceconfig/addrule',
-          component: '@/pages/AttendanceM/AttendanceConfig/AddRule',
-        },
-        {
-          path: '/talent/attendanceconfig/clockIntime',
-          component: '@/pages/AttendanceM/AttendanceConfig/ClockInTime',
-        },
-        {
-          path: '/talent/attendancem/editscheduling',
-          component: '@/pages/AttendanceM/AttendanceConfig/EditScheduling',
         },
         {
           path: '/talent/attendancem/attendanceconfig/globalc',
