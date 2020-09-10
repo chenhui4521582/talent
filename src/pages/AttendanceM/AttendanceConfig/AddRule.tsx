@@ -2,6 +2,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Card, Form, Input, Button, Modal, Radio, Checkbox } from 'antd';
 import AddUserList from './components/AddUserList';
+import AddTime from './components/AddTime';
+import AddSchedulingList from './components/AddSchedulingList';
 
 export default props => {
   const [form] = Form.useForm();
@@ -49,10 +51,10 @@ export default props => {
           rules={[{ required: true, message: '请输入用户名称!' }]}
           style={{ width: '70vw', marginBottom: 20, minHeight: '40px' }}
         >
-          <AddUserList {...props} />
+          <AddSchedulingList {...props} />
         </Form.Item>
 
-        <Form.Item
+        {/* <Form.Item
           label="打卡时间"
           name="clockTimes"
           rules={[{ required: true, message: '请输入用户名称!' }]}
@@ -112,7 +114,7 @@ export default props => {
             <Radio value={0}>明日生效</Radio>
             <Radio value={1}>立即生效</Radio>
           </Radio.Group>
-        </Form.Item>
+        </Form.Item> */}
       </Form>
     </Card>
   );

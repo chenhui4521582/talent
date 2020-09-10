@@ -14,7 +14,7 @@ interface Iprops {
 const Edit = (props: Iprops) => {
   const { type, showSpan, selectItem } = props;
   const [controlList, setControlList] = useState<IControls[]>();
-  const [inputNameList, setInputNameLis] = useState<string[]>(['value1']);
+  const [inputNameList, setInputNameLisT] = useState<string[]>(['value1']);
   const [count, setCount] = useState<number>(1);
   const [showInput, setShowInput] = useState<boolean>(false);
   const [showMultiple, setShowMultiple] = useState<boolean>(false);
@@ -42,7 +42,7 @@ const Edit = (props: Iprops) => {
           list.push('value' + index);
         }
         setCount(list.length);
-        setInputNameLis(list);
+        setInputNameLisT(list);
       }
       setShowInput(true);
     }
@@ -59,14 +59,14 @@ const Edit = (props: Iprops) => {
     let newList = JSON.parse(JSON.stringify(inputNameList));
     let nameIndex = count + 1;
     newList.push('value' + nameIndex);
-    setInputNameLis([...newList]);
+    setInputNameLisT([...newList]);
     setCount(nameIndex);
   };
 
   const handleRemove = value => {
     let newList = JSON.parse(JSON.stringify(inputNameList));
     newList.splice(newList.indexOf(value), 1);
-    setInputNameLis([...newList]);
+    setInputNameLisT([...newList]);
   };
 
   const renderControl = useMemo(() => {

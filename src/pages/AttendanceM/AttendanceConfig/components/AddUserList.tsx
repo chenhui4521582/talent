@@ -5,7 +5,7 @@ import { DeleteOutlined } from '@ant-design/icons';
 import AddUser from './AddUser';
 
 export default props => {
-  const [visible, setVisible] = useState<boolean>(true);
+  const [visible, setVisible] = useState<boolean>(false);
   const [list, setList] = useState<any>([]);
   const ref = useRef<any>();
 
@@ -61,7 +61,7 @@ export default props => {
       <div style={{ minHeight: 40, display: 'inline-block' }}>
         {renderList}
         <a
-          style={{ padding: '5px 12px' }}
+          style={{ padding: '5px 12px', lineHeight: '40px' }}
           onClick={() => {
             setVisible(true);
           }}
