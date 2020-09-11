@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'umi';
-import { useTable } from '@/components/GlobalTable/useTable';
+import { useReq } from '@/components/GlobalTable/useReq';
 import { ColumnProps } from 'antd/es/table';
 import {
   ruleList,
@@ -26,26 +26,66 @@ export default () => {
   const columns: ColumnProps<any>[] = [
     {
       title: '规则名称',
-      dataIndex: 'name',
-      key: 'name',
+      dataIndex: 'ruleName',
+      key: 'ruleName',
       align: 'center',
     },
     {
       title: '打卡类型',
-      dataIndex: 'firstBusinessName',
-      key: 'firstBusinessName',
+      dataIndex: 'clockTimeList',
+      key: 'clockTimeList',
       align: 'center',
+      render: (_, record) => {
+        if (record.ruleType === 0) {
+          let str: any[] = [];
+          let timeStr: any[] = [];
+          return record?.clockTimeList.map(item => {
+            if (item.friday) {
+              str.push('星期一');
+            } else if (item.tuesday) {
+              str.push('星期二');
+            } else if (item.wednesday) {
+              str.push('星期三');
+            } else if (item.thursday) {
+              str.push('星期四');
+            } else if (item.friday) {
+              str.push('星期五');
+            } else if (item.saturday) {
+              str.push('星期六');
+            } else if (item.sunday) {
+              str.push('星期日');
+            }
+            item.clockPeriods.map((time, index) => {
+              timeStr.push(
+                '上班' + time.startTime + '-' + '下班' + time.endTime,
+              );
+            });
+            return (
+              <div>
+                {str.join(',')}
+                <br />
+                {timeStr.join(',')}
+              </div>
+            );
+          });
+        } else {
+          return <div>按照班次上下班打卡</div>;
+        }
+      },
     },
     {
       title: '手机打卡',
-      dataIndex: 'businessName',
-      key: 'businessName',
+      dataIndex: 'enablePhoneClock',
+      key: 'enablePhoneClock',
       align: 'center',
+      render: (_, record) => {
+        return <span>{record.enablePhoneClock ? '已开启' : '未开启'}</span>;
+      },
     },
     {
       title: '打卡地点',
-      dataIndex: 'departmentName',
-      key: 'departmentName',
+      dataIndex: 'rulePhone',
+      key: 'rulePhone',
       align: 'center',
     },
     {
@@ -77,10 +117,10 @@ export default () => {
       },
     },
   ];
-  const { TableContent, searchForm } = useTable({
+  const { TableContent } = useReq({
     queryMethod: ruleList,
     columns,
-    rowKeyName: 'id',
+    rowKeyName: 'ruleId',
     cacheKey: '/attendance/rule/listRule',
   });
 
@@ -95,7 +135,7 @@ export default () => {
         </div>
       }
     >
-      <TableContent></TableContent>
+      <TableContent />
     </Card>
   );
 };

@@ -41,9 +41,9 @@ export default forwardRef((props, formRef) => {
       list.push(
         <Form.Item noStyle key={i}>
           <Form.Item
-            name={['ItemList', inputNameList[i]]}
+            name={['clockPeriods', i]}
             noStyle
-            rules={[{ required: true, message: '多选单选时此项必填' }]}
+            rules={[{ required: true, message: '请填写时间段' }]}
             key={i}
           >
             <RangePicker
@@ -72,14 +72,13 @@ export default forwardRef((props, formRef) => {
     <Form form={form}>
       <Form.Item
         label="班次名称"
-        name="1"
-        rules={[{ required: true, message: '请输入用户名称!' }]}
+        name="name"
+        rules={[{ required: true, message: '请输入班次名称!' }]}
         style={{ width: 400, marginBottom: 40 }}
       >
         <Input placeholder="规则名称" />
       </Form.Item>
       <Form.Item label="打卡时间" style={{ width: 400, marginBottom: 40 }}>
-        {' '}
         <Input.Group compact>{renderInput()}</Input.Group>
         <a style={{ display: 'block' }} onClick={handleAdd}>
           新增时段
@@ -88,16 +87,21 @@ export default forwardRef((props, formRef) => {
 
       <Form.Item
         label="休息时间"
-        name="2"
-        rules={[{ required: true, message: '请输入用户名称!' }]}
+        name="breakTimeStart-breakTimeEnd"
+        rules={[{ required: true, message: '请输入休息时间!' }]}
         style={{ width: 400, marginBottom: 40 }}
       >
         <RangePicker allowClear={true} picker="time" locale={locale} />
       </Form.Item>
       <Form.Item
         label="是否开启"
-        name="4"
-        rules={[{ required: true, message: '请输入用户名称!' }]}
+        name="breakTimeCalculation"
+        rules={[
+          {
+            required: true,
+            message: '请选择是否开启休息时间内不计算工作时长!',
+          },
+        ]}
         style={{ width: 400, marginBottom: 40 }}
       >
         <Radio.Group>
