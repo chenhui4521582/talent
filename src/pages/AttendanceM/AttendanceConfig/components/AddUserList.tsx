@@ -5,26 +5,95 @@ import { DeleteOutlined } from '@ant-design/icons';
 import AddUser from './AddUser';
 
 export default props => {
+  const { ruleDetail, handleChangeUserList } = props;
   const [visible, setVisible] = useState<boolean>(false);
   const [list, setList] = useState<any>([]);
+  const [userList, setUserList] = useState<any>([]);
   const ref = useRef<any>();
 
-  const handleChange = list => {};
+  useEffect(() => {
+    let newList = JSON.parse(JSON.stringify(list));
+    ruleDetail?.memberList?.map(item => {
+      newList.push({
+        codeName: item.codeName,
+        code: item.code,
+        type: item.type,
+      });
+    });
+    setList(newList);
+  }, [ruleDetail]);
+
+  useEffect(() => {
+    handleChangeUserList(userList);
+  }, [userList]);
 
   const handleOk = () => {
-    setList(ref.current.getvalue());
-    console.log(ref.current.getvalue());
+    let newList = JSON.parse(JSON.stringify(list));
+    ref.current.getvalue()?.map(item => {
+      newList.push({
+        code: item.key,
+        codeName: item.name,
+        type: item.level ? 1 : 0,
+      });
+    });
+
     setVisible(false);
+
+    let newArr: any = [];
+    let newUserList = JSON.parse(JSON.stringify(userList));
+    ref.current.getvalue().map(item => {
+      let userObj: any = {};
+
+      if (item.level) {
+        newArr = newArr.concat(handleList(item));
+        setUserList(newArr);
+      } else {
+        userObj[item.code] = [item];
+        newUserList.push(userObj);
+        setUserList(newUserList);
+      }
+    });
+
+    setList(newList);
   };
 
-  const handleRemove = key => {
-    let selectItemArr = JSON.parse(JSON.stringify(list));
+  const handleList = data => {
+    let userObj: any = {};
+    let newArr: any = [];
+    let newUserList = JSON.parse(JSON.stringify(userList));
+    const handleItem = list => {
+      for (let i = 0; i < list.length; i++) {
+        if (!list[i].level) {
+          newArr.push(list[i]);
+        }
+        if (list[i].children) {
+          handleItem(list[i].children);
+        }
+      }
+    };
 
+    handleItem(data.children);
+    userObj[data.code] = newArr;
+    newUserList.push(userObj);
+    return newUserList;
+  };
+
+  const handleRemove = code => {
+    let selectItemArr = JSON.parse(JSON.stringify(list));
+    let newUserList = JSON.parse(JSON.stringify(userList));
     selectItemArr.splice(
-      selectItemArr.findIndex(item => item.key === key),
+      selectItemArr.findIndex(item => item.code === code),
       1,
     );
     setList([...new Set(selectItemArr)]);
+    newUserList.map((item, index) => {
+      for (let key in item) {
+        if (key === code) {
+          newUserList.splice(index, 1);
+        }
+      }
+    });
+    setUserList(newUserList);
   };
 
   const renderList = useMemo(() => {
@@ -38,8 +107,9 @@ export default props => {
             marginBottom: 20,
             display: 'inline-block',
           }}
+          key={item.code}
         >
-          {item.title}
+          {item.codeName}
           <DeleteOutlined
             style={{
               cursor: 'pointer',
@@ -48,7 +118,7 @@ export default props => {
             onClick={e => {
               e.preventDefault();
               e.stopPropagation();
-              handleRemove(item.key);
+              handleRemove(item.code);
             }}
           />
         </div>
@@ -81,12 +151,7 @@ export default props => {
         }}
         width="46vw"
       >
-        <AddUser
-          key={visible + ''}
-          handleChange={handleChange}
-          renderUser={true}
-          ref={ref}
-        />
+        <AddUser key={visible + ''} renderUser={true} ref={ref} />
       </Modal>
     </>
   );

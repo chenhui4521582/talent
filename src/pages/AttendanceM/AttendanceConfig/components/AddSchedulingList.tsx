@@ -1,18 +1,21 @@
 // 添加排班
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { Modal, Divider, Select } from 'antd';
+import { Modal, Pagination, Select, Form } from 'antd';
 import moment from 'moment';
-import { DeleteOutlined } from '@ant-design/icons';
+import { LeftOutlined, RightOutlined } from '@ant-design/icons';
 import AddScheduling from './AddScheduling';
+import { GlobalResParams } from '@/types/ITypes';
+import { getScheduleDetail } from '../services/rule';
+import { AutoSizer, List } from 'react-virtualized';
 import '../styles/scheduling.less';
 
 const { Option } = Select;
 export default props => {
-  const [visible, setVisible] = useState<boolean>(true);
+  const { userList } = props;
+  const [visibleDate, setVisibleDate] = useState<boolean>(false);
+  const [editType, setEditType] = useState<'edit' | 'add'>();
   const [list, setList] = useState<any>([]);
   const ref = useRef<any>();
-
-  useEffect(() => {}, []);
 
   const handleOk = () => {
     let form = ref.current.getvalue;
@@ -22,7 +25,7 @@ export default props => {
       console.log(value);
       newList.push(value);
       setList(newList);
-      setVisible(false);
+      setEditType(undefined);
       form.resetFields();
     });
   };
@@ -34,20 +37,30 @@ export default props => {
         <div className="scheduling-box-one-item" key={index}>
           <span>{item.name}</span>
           <span>
-            {item.clockPeriods.map(datas => {
-              return (
-                <>
-                  {moment(datas[0]).format('HH:mm:ss') +
-                    '——' +
-                    moment(datas[1]).format('HH:mm:ss')}
-                  <br />
-                </>
-              );
-            })}
+            {moment(item.clockPeriods[0]).format('HH:mm:ss') +
+              '——' +
+              moment(item.clockPeriods[1]).format('HH:mm:ss')}
           </span>
           <span>
-            <a>编辑</a>
-            <a style={{ marginLeft: 6 }}>删除</a>
+            <a
+              onClick={() => {
+                console.log(item);
+                setEditType('edit');
+                ref.current.getvalue.setFieldsValue(item);
+              }}
+            >
+              编辑
+            </a>
+            <a
+              style={{ marginLeft: 6 }}
+              onClick={() => {
+                let newList = JSON.parse(JSON.stringify(list));
+                newList.splice(index, 1);
+                setList(newList);
+              }}
+            >
+              删除
+            </a>
           </span>
         </div>
       );
@@ -60,51 +73,72 @@ export default props => {
         <a
           style={{ padding: '0px 12px', lineHeight: '40px' }}
           onClick={() => {
-            setVisible(true);
+            setEditType('add');
           }}
         >
           添加
         </a>
+        <a
+          style={{ padding: '0px 12px', lineHeight: '40px' }}
+          onClick={() => {
+            setVisibleDate(true);
+          }}
+        >
+          人员排班
+        </a>
       </div>
-      <div className="scheduling-box-one">{renderList}</div>
-      <SchedulingUser />
+      {list?.length ? (
+        <div className="scheduling-box-one">{renderList}</div>
+      ) : null}
       <Modal
-        title="添加排班"
+        title={editType === 'edit' ? '编辑排版' : '新增排版'}
         okText="确认"
         cancelText="取消"
-        visible={visible}
+        visible={!!editType}
         onOk={() => {
           handleOk();
         }}
         onCancel={() => {
-          ref.current.getvalue.re;
-          setVisible(false);
+          ref.current.getvalue.resetFields();
+          setEditType(undefined);
         }}
       >
         <AddScheduling ref={ref} />
+      </Modal>
+      <Modal
+        title="添加人员"
+        okText="确认"
+        cancelText="取消"
+        bodyStyle={{ height: '84vh', overflowY: 'auto' }}
+        style={{ top: '2vh' }}
+        width="94vw"
+        visible={visibleDate}
+        onOk={() => {
+          setVisibleDate(false);
+        }}
+        onCancel={() => {
+          setVisibleDate(false);
+        }}
+      >
+        <SchedulingUser
+          ruleId={props.ruleId}
+          userList={userList()}
+          list={list}
+        />
       </Modal>
     </>
   );
 };
 
-const SchedulingUser = () => {
-  const [month, setMonth] = useState<number>();
-  const [year, setYear] = useState<number>();
+let date = new Date();
+const SchedulingUser = props => {
+  const { ruleId, userList, list } = props;
+  const [form] = Form.useForm();
+  const [month, setMonth] = useState<number>(date.getMonth() + 1);
+  const [year, setYear] = useState<number>(date.getFullYear());
   const [dateList, setDateList] = useState<any[]>();
-  const [yearArr, setYearArr] = useState<number[]>();
-  const monthArr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-
-  useEffect(() => {
-    let date = new Date();
-    let arr: number[] = [];
-
-    for (let i = 0; i < 10; i++) {
-      arr?.push(date.getFullYear() - i + 1);
-    }
-    setYearArr(arr);
-    setYear(date.getFullYear());
-    setMonth(date.getMonth() + 1);
-  }, []);
+  const [page, setPage] = useState<number>(1);
+  const [values, setValues] = useState<any>();
 
   const getWeek = date => {
     let week;
@@ -130,44 +164,171 @@ const SchedulingUser = () => {
         console.log();
         arrDate.push(obj);
       }
+      setDateList(arrDate);
       console.log(arrDate);
+      async function getDetail() {
+        let res: GlobalResParams<any> = await getScheduleDetail(
+          ruleId,
+          year + '-' + month,
+        );
+        console.log(res);
+        if (res.status === 200) {
+        }
+      }
+      getDetail();
     }
-
-    // return d.getDate();
   }, [month, year]);
+
+  const renderTableOne = useMemo(() => {
+    return (
+      <div className="schedul-table-one-item">
+        <span style={{ width: 200, flex: '0 0 100px' }}>姓名</span>
+        {dateList?.map(item => {
+          return (
+            <span key={item.date}>
+              {item.date}
+              <br />
+              {item.day}
+            </span>
+          );
+        })}
+      </div>
+    );
+  }, [dateList]);
+
+  const renderTableHead = useMemo(() => {
+    return (
+      <h3 style={{ textAlign: 'center' }}>
+        <LeftOutlined
+          onClick={() => {
+            if (month && month - 1 === 0) {
+              setMonth(12);
+              setYear(year && year - 1);
+            } else {
+              setMonth(month && month - 1);
+            }
+          }}
+        />
+        <span style={{ padding: 4, display: 'inline-block', width: '7em' }}>
+          {year}年{month}月
+        </span>
+        <RightOutlined
+          onClick={() => {
+            if (month && month + 1 === 13) {
+              setMonth(1);
+              setYear(year && year + 1);
+            } else {
+              setMonth(month && month + 1);
+            }
+          }}
+        />
+      </h3>
+    );
+  }, [month, year]);
+
+  const renderUserList = useMemo(() => {
+    console.log(userList);
+
+    let arr: any = [];
+    userList.map((items, indexs) => {
+      if (indexs < page * 6 && indexs >= (page - 1) * 6) {
+        arr.push(
+          <div key={indexs} className="schedul-table-one-item">
+            <span style={{ width: 200, flex: '0 0 100px' }}>{items.name}</span>
+            {dateList?.map((item, index) => {
+              return (
+                <Form.Item
+                  key={index}
+                  name={month + '1' + year + item.date + '|' + items.code}
+                  style={{
+                    flex: 1,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <Select style={{ padding: '0 2px' }}>
+                    {list.map(times => {
+                      return (
+                        <Option value={times.id || times.name}>
+                          {times.name}
+                        </Option>
+                      );
+                    })}
+                  </Select>
+                </Form.Item>
+              );
+            })}
+          </div>,
+        );
+      }
+    });
+    return arr;
+  }, [dateList, userList, month, year, page]);
+
+  const handleStatisticsValue = (dataString, value) => {
+    let num = 0;
+    let values = form.getFieldsValue();
+    console.log(values);
+    for (let key in values) {
+      if (key.indexOf(dataString) > -1 && values[key] === value) {
+        num += 1;
+      }
+    }
+    return num;
+  };
+
+  const renderStatistics = useMemo(() => {
+    return list.map((items, indexs) => {
+      return (
+        <div key={indexs} className="schedul-table-one-item">
+          <span style={{ width: 200, flex: '0 0 100px' }}>{items.name}</span>
+          {dateList?.map((item, index) => {
+            return (
+              <span>
+                {handleStatisticsValue(
+                  month + '1' + year + item.date,
+                  items.id || items.name,
+                )}
+              </span>
+            );
+          })}
+        </div>
+      );
+    });
+  }, [list, values, dateList, month, year, page]);
 
   return (
     <>
-      年
-      <Select
-        value={year}
-        onChange={e => {
-          setYear(e);
+      {renderTableHead}
+      <Form
+        form={form}
+        onValuesChange={value => {
+          setTimeout(() => {
+            setValues(value);
+          }, 400);
         }}
       >
-        {yearArr?.map(item => {
-          return (
-            <Option key={item} value={item}>
-              {item}年
-            </Option>
-          );
-        })}
-      </Select>
-      月
-      <Select
-        value={month}
-        onChange={e => {
-          setMonth(e);
-        }}
-      >
-        {monthArr.map(item => {
-          return (
-            <Option key={item} value={item}>
-              {item}月
-            </Option>
-          );
-        })}
-      </Select>
+        <div className="schedul-table-one">
+          {renderTableOne}
+          {renderUserList}
+          <Pagination
+            defaultCurrent={1}
+            total={userList.length}
+            hideOnSinglePage
+            current={page}
+            pageSize={6}
+            showSizeChanger={false}
+            style={{ position: 'absolute', right: 0, bottom: 0 }}
+            onChange={(page, pageSize) => {
+              setPage(page);
+              console.log(page, pageSize);
+            }}
+          />
+        </div>
+      </Form>
+      <div className="schedul-table-one" style={{ marginTop: 30 }}>
+        {renderStatistics}
+      </div>
     </>
   );
 };

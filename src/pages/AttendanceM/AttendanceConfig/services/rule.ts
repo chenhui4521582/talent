@@ -39,3 +39,11 @@ export async function deleteRule(ruleId: number) {
     data: { ruleId },
   });
 }
+
+// 获取编辑规则时候的排版
+export async function getScheduleDetail(ruleId: number, workDate: string) {
+  return request(`/api/attendance/rule/getScheduleDetail`, {
+    method: 'POST',
+    data: { ruleId, workDate },
+  });
+}

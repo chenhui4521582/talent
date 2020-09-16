@@ -2,7 +2,8 @@
   width: 30vw;
   border-bottom: 1px solid #d9d9d9;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
+
   div {
     padding: 10px 6px;
     border: 1px solid #d9d9d9;
@@ -18,6 +19,34 @@
       text-align: center;
       align-items: center;
       justify-content: center;
+    }
+  }
+}
+
+.schedul-table-one {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 90vw;
+  height: 36vh;
+  padding-bottom: 50px;
+  .schedul-table-one-item {
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 10px;
+    align-items: center;
+    justify-content: center;
+    span {
+      align-items: center;
+      justify-content: center;
+      display: flex;
+      flex: 1;
+    }
+    .ant-form-item {
+      margin-bottom: 0;
+    }
+    .ant-select-selection-item {
+      padding-right: 6px;
     }
   }
 }

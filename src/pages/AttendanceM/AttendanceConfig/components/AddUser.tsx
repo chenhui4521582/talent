@@ -233,6 +233,10 @@ function Organization(props: tsProps, formRef) {
           list.findIndex(item => item === key),
           1,
         );
+        selectItemArr.splice(
+          selectItemArr.findIndex(item => item.key === key),
+          1,
+        );
       }
     }
     console.log(list);

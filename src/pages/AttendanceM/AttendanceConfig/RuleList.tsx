@@ -2,25 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'umi';
 import { useReq } from '@/components/GlobalTable/useReq';
 import { ColumnProps } from 'antd/es/table';
-import {
-  ruleList,
-  saveRule,
-  updateRule,
-  getRuleDetail,
-  deleteRule,
-} from './services/rule';
-import {
-  Card,
-  Form,
-  Input,
-  Select,
-  Row,
-  Col,
-  Button,
-  Divider,
-  Modal,
-  Checkbox,
-} from 'antd';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
+import { GlobalResParams } from '@/types/ITypes';
+import { ruleList, deleteRule } from './services/rule';
+import { Card, notification, Button, Divider, Modal } from 'antd';
 
 export default () => {
   const columns: ColumnProps<any>[] = [
@@ -39,7 +24,7 @@ export default () => {
         if (record.ruleType === 0) {
           let str: any[] = [];
           let timeStr: any[] = [];
-          return record?.clockTimeList.map(item => {
+          return record?.clockTimeList.map((item, index) => {
             if (item.friday) {
               str.push('星期一');
             } else if (item.tuesday) {
@@ -55,13 +40,15 @@ export default () => {
             } else if (item.sunday) {
               str.push('星期日');
             }
-            item.clockPeriods.map((time, index) => {
-              timeStr.push(
-                '上班' + time.startTime + '-' + '下班' + time.endTime,
-              );
-            });
+            timeStr.push(
+              '上班' +
+                item.clockPeriods.startTime +
+                '-' +
+                '下班' +
+                item.clockPeriods.endTime,
+            );
             return (
-              <div>
+              <div key={index}>
                 {str.join(',')}
                 <br />
                 {timeStr.join(',')}
@@ -87,6 +74,22 @@ export default () => {
       dataIndex: 'rulePhone',
       key: 'rulePhone',
       align: 'center',
+      render: (_, record) => {
+        let wifiArr: any = [];
+        let areasArr: any = [];
+        record?.rulePhone.wifis?.map(item => {
+          wifiArr.push(item.wifiName + ' ' + item.wifiCode);
+        });
+        record?.rulePhone.areas.map(item => {
+          areasArr.push(item.areaName);
+        });
+        return (
+          <div>
+            <div>{areasArr.join(',')}</div>
+            <div>{wifiArr.join(',')}</div>
+          </div>
+        );
+      },
     },
     {
       title: '操作',
@@ -96,28 +99,44 @@ export default () => {
         return (
           <>
             <Link
-              to={`/talent/staff/detail?employeeId=${record.employeeId}&resumeId=${record.resumeId}`}
-            >
-              排班
-            </Link>
-            <Divider type="vertical" />
-            <Link
-              to={`/talent/staff/detail?employeeId=${record.employeeId}&resumeId=${record.resumeId}`}
+              to={`/talent/attendanceconfig/addrule?ruleId=${record.ruleId}`}
             >
               编辑
             </Link>
             <Divider type="vertical" />
-            <Link
-              to={`/talent/staff/detail?employeeId=${record.employeeId}&resumeId=${record.resumeId}`}
-            >
-              删除
-            </Link>
+            <a onClick={handleDelete}>删除</a>
           </>
         );
       },
     },
   ];
-  const { TableContent } = useReq({
+
+  const handleDelete = (record): void => {
+    Modal.confirm({
+      title: '确定删除?',
+      okText: '确定',
+      icon: <ExclamationCircleOutlined />,
+      okType: 'danger' as any,
+      cancelText: '取消',
+      onOk: async () => {
+        let res: GlobalResParams<string> = await deleteRule(record.ruleId);
+        if (res.status === 200) {
+          refresh();
+          notification['success']({
+            message: res.msg,
+            description: '',
+          });
+        } else {
+          notification['error']({
+            message: res.msg,
+            description: '',
+          });
+        }
+      },
+    });
+  };
+
+  const { TableContent, refresh } = useReq({
     queryMethod: ruleList,
     columns,
     rowKeyName: 'ruleId',
