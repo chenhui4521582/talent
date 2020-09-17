@@ -15,6 +15,10 @@ export default props => {
   const [list, setList] = useState<any>([]);
   const [radius, setRadius] = useState<number>(500);
 
+  useEffect(() => {
+    list && list.length && props.onChange(list);
+  }, [list]);
+
   const handleOk = () => {
     if (editType === 'edit') {
       setEditType(undefined);
@@ -247,7 +251,7 @@ export default props => {
             />
           </Form.Item>
           <Form.Item
-            name="lon"
+            name="range"
             rules={[{ required: true, message: '请输入打卡名称!' }]}
             label="打卡范围"
             initialValue={500}

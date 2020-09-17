@@ -1,14 +1,56 @@
 //新增规则
-import React, { useState, useEffect, useMemo } from 'react';
-import { Card, Form, Input, Button, Select, Radio, Checkbox } from 'antd';
+import React, { useState, useEffect } from 'react';
+import {
+  Card,
+  Form,
+  Input,
+  Button,
+  Select,
+  Radio,
+  Checkbox,
+  notification,
+} from 'antd';
+import moment from 'moment';
 import AddUserList from './components/AddUserList';
-import AddTime from './components/AddTime';
+
 import AddSchedulingList from './components/AddSchedulingList';
 import { GlobalResParams } from '@/types/ITypes';
 import { getRuleDetail } from './services/rule';
 import DailyAttendance from './components/DailyAttendance';
 import AreasList from './components/AreasList';
 import Wifi from './components/Wifi';
+import { saveRule, updateRule } from './services/rule';
+
+// 部门 人员
+interface IMemberList {
+  code: string;
+  type: string;
+  codeName: string;
+}
+
+// 打卡时间
+interface IClockTimeList {
+  monday: 0 | 1;
+  tuesday: 0 | 1;
+  wednesday: 0 | 1;
+  thursday: 0 | 1;
+  friday: 0 | 1;
+  saturday: 0 | 1;
+  sunday: 0 | 1;
+  clockPeriods: {
+    endTime: string;
+    startTime: string;
+    periodId?: string;
+  };
+  breakTimeCalculation: 0 | 1;
+  breakTimeStart: string;
+  breakTimeEnd: string;
+  flexible: 0 | 1;
+  leaveEarly: number;
+  leaveLater: number;
+  startLimit: 1 | 2 | 3 | 4 | 5;
+  endLimit: 1 | 2 | 3 | 4 | 5;
+}
 
 const { Option } = Select;
 export default props => {
@@ -39,6 +81,194 @@ export default props => {
   const handleChangeUserList = list => {
     console.log('value');
     setUserList(list);
+  };
+
+  const submit = () => {
+    console.log(form.getFieldsValue());
+    form.validateFields().then(async data => {
+      let ruleName = data.ruleName;
+      let ruleType = data.ruleType;
+
+      // 打卡人员
+      let memberList: IMemberList[] = [];
+      memberList = data.memberList;
+
+      //打卡时间
+      let clockTimeList: IClockTimeList[] = [];
+      data.clockTimeList?.map(item => {
+        let clockTimeListObj: IMemberList | any = {};
+        let day = item.day;
+        clockTimeListObj['monday'] = day.indexOf('monday') > -1 ? 1 : 0;
+        clockTimeListObj['tuesday'] = day.indexOf('tuesday') > -1 ? 1 : 0;
+        clockTimeListObj['wednesday'] = day.indexOf('wednesday') > -1 ? 1 : 0;
+        clockTimeListObj['thursday'] = day.indexOf('thursday') > -1 ? 1 : 0;
+        clockTimeListObj['friday'] = day.indexOf('friday') > -1 ? 1 : 0;
+        clockTimeListObj['saturday'] = day.indexOf('saturday') > -1 ? 1 : 0;
+        clockTimeListObj['sunday'] = day.indexOf('sunday') > -1 ? 1 : 0;
+        clockTimeListObj.clockPeriods = {
+          endTime: moment(item.clockPeriods[0]).format('HH:mm:ss'),
+          startTime: moment(item.clockPeriods[1]).format('HH:mm:ss'),
+        };
+        clockTimeListObj.breakTimeCalculation = item.rest.breakTimeCalculation;
+        clockTimeListObj.breakTimeStart = moment(
+          item.rest['breakTimeStart-breakTimeEnd'][0],
+        ).format('HH:mm:ss');
+        clockTimeListObj.breakTimeEnd = moment(
+          item.rest['breakTimeStart-breakTimeEnd'][1],
+        ).format('HH:mm:ss');
+        clockTimeListObj.flexible = item.flex.flexible;
+        clockTimeListObj.leaveEarly = item.flex.leaveEarly;
+        clockTimeListObj.leaveLater = item.flex.leaveLater;
+        clockTimeListObj.startLimit = item.itemList.startLimit;
+        clockTimeListObj.endLimit = item.itemList.endLimit;
+        clockTimeList.push(clockTimeListObj);
+      });
+      // 排班
+      let scheduleList: any = [];
+
+      data.scheduleList?.list?.map(item => {
+        let scheduleListObj: any = {};
+        (scheduleListObj.name = item.name),
+          (scheduleListObj.clockPeriods = {
+            endTime: moment(item.clockPeriods[0]).format('HH:mm:ss'),
+            startTime: moment(item.clockPeriods[1]).format('HH:mm:ss'),
+          });
+        scheduleListObj.breakTimeCalculation = item.breakTimeCalculation;
+        scheduleListObj.breakTimeStart = moment(
+          item['breakTimeStart-breakTimeEnd'][0],
+        ).format('HH:mm:ss');
+        scheduleListObj.breakTimeEnd = moment(
+          item['breakTimeStart-breakTimeEnd'][1],
+        ).format('HH:mm:ss');
+        scheduleListObj.startLimit = item.itemList.startLimit;
+        scheduleListObj.endLimit = item.itemList.endLimit;
+        scheduleList.push(scheduleListObj);
+      });
+      // 人员排班
+      let scheduleDetailList: any = {};
+      if (data.scheduleList?.detail) {
+        let scheduleDetailObj: any = {};
+        for (let key in data.scheduleList?.detail) {
+          if (data.scheduleList?.detail[key]) {
+            if (!scheduleDetailObj[key.split('|')[2]]) {
+              scheduleDetailObj[key.split('|')[2]] = [];
+              scheduleDetailObj[key.split('|')[2]].push({
+                time: key.split('|')[1],
+                data: key.split('|')[0],
+                value: data.scheduleList?.detail[key],
+              });
+            } else {
+              scheduleDetailObj[key.split('|')[2]].push({
+                time: key.split('|')[1],
+                data: key.split('|')[0],
+                value: data.scheduleList?.detail[key],
+              });
+            }
+          }
+        }
+        scheduleDetailList = scheduleDetailObj;
+      }
+
+      //位置
+      let areas: any = [];
+      data.areas?.map(item => {
+        areas.push({
+          areaName: item.areaName,
+          range: item.range,
+          lon: item.lng,
+          lat: item.lat,
+        });
+      });
+      //wifi
+      let wifis: any = [];
+      data.wifis?.map(item => {
+        let wifisObj: any = {};
+        wifisObj.wifiName = item.wifiName;
+        wifisObj.wifiCode = Object.values(item.wifiCode).join(':');
+        wifis.push(wifisObj);
+      });
+      // 手机打卡
+      let enablePhoneClock =
+        (data.enablePhoneClock && data.enablePhoneClock[0]) || 0;
+      // 手机生效
+      let effectiveTime = data.effectiveTime;
+
+      let subdata: any;
+      if (ruleType === 1) {
+        if (phoneClock) {
+          subdata = {
+            ruleName,
+            ruleType,
+            // clockTimeList:clockTimeList||[],
+            enablePhoneClock,
+            effectiveTime,
+            scheduleList,
+            scheduleDetailList,
+            rulePhone: {
+              areas,
+              wifis,
+            },
+            memberList,
+          };
+        } else {
+          subdata = {
+            ruleName,
+            ruleType,
+            // clockTimeList:clockTimeList||[],
+            enablePhoneClock,
+            effectiveTime,
+            scheduleList,
+            scheduleDetailList,
+            memberList,
+            // areas,
+            // wifis
+          };
+        }
+      } else {
+        if (phoneClock) {
+          subdata = {
+            ruleName,
+            ruleType,
+            clockTimeList: clockTimeList || [],
+            enablePhoneClock,
+            effectiveTime,
+            memberList,
+            rulePhone: {
+              areas,
+              wifis,
+            },
+            // scheduleList,
+            // scheduleDetailList,
+          };
+        } else {
+          subdata = {
+            ruleName,
+            ruleType,
+            clockTimeList: clockTimeList || [],
+            enablePhoneClock,
+            effectiveTime,
+            memberList,
+            // scheduleList,
+            // scheduleDetailList,
+            // areas,
+            // wifis
+          };
+        }
+      }
+      let json: GlobalResParams<string> = await saveRule(subdata);
+      if (json.status === 200) {
+        notification['success']({
+          message: json.msg,
+          description: '',
+        });
+        history.go(-1);
+      } else {
+        notification['error']({
+          message: json.msg,
+          description: '',
+        });
+      }
+    });
   };
 
   return (
@@ -76,7 +306,7 @@ export default props => {
 
         <Form.Item
           label="打卡人员"
-          name="userCodes"
+          name="memberList"
           rules={[{ required: true, message: '请输入用户名称!' }]}
           style={{
             width: '82vw',
@@ -95,7 +325,7 @@ export default props => {
         {ruleType === 1 ? (
           <Form.Item
             label="排班设置"
-            name="userCodes"
+            name="scheduleList"
             rules={[{ required: true, message: '请输入用户名称!' }]}
             style={{ width: '82vw', marginBottom: 20, minHeight: '40px' }}
           >
@@ -104,7 +334,7 @@ export default props => {
               ruleDetail={ruleDetail}
               userList={() => {
                 let newUserList: any = [];
-                userList.map(item => {
+                userList?.map(item => {
                   for (let key in item) {
                     newUserList = newUserList.concat(item[key]);
                   }
@@ -117,9 +347,9 @@ export default props => {
         {ruleType === 0 ? (
           <Form.Item
             label="打卡时间"
-            name="clockTimes"
+            name="clockTimeList"
             rules={[{ required: true, message: '请输入用户名称!' }]}
-            style={{ width: 400, marginBottom: 20 }}
+            style={{ width: '82vw', marginBottom: 20 }}
           >
             <DailyAttendance />
           </Form.Item>
@@ -218,7 +448,7 @@ export default props => {
           </Form.Item>
         ) : null}
         <Form.Item
-          label="规则生效时间"
+          label="规则生效"
           name="effectiveTime"
           rules={[{ required: true, message: '请选择范围外打卡!' }]}
         >
@@ -232,6 +462,24 @@ export default props => {
           </Radio.Group>
         </Form.Item>
       </Form>
+      <div style={{ textAlign: 'center' }}>
+        <Button
+          type="primary"
+          style={{ marginRight: 20 }}
+          onClick={() => {
+            submit();
+          }}
+        >
+          提交
+        </Button>
+        <Button
+          onClick={() => {
+            history.go(-1);
+          }}
+        >
+          返回
+        </Button>
+      </div>
     </Card>
   );
 };

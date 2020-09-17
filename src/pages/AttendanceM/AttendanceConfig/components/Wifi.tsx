@@ -1,7 +1,6 @@
 // 打卡地点设置
 import React, { useState, useEffect, useMemo } from 'react';
 import { Modal, Select, Form, Input } from 'antd';
-import { Map, Marker, Circle } from 'react-amap';
 import moment from 'moment';
 
 import '../styles/scheduling.less';
@@ -10,6 +9,10 @@ export default props => {
   const [form] = Form.useForm();
   const [editType, setEditType] = useState<'edit' | 'add'>();
   const [list, setList] = useState<any>([]);
+
+  useEffect(() => {
+    list && list.length && props.onChange(list);
+  }, [list]);
 
   const handleOk = () => {
     if (editType === 'edit') {

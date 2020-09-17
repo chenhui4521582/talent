@@ -24,8 +24,8 @@ export default () => {
         if (record.ruleType === 0) {
           let str: any[] = [];
           let timeStr: any[] = [];
-          return record?.clockTimeList.map((item, index) => {
-            if (item.friday) {
+          return record?.clockTimeList?.map((item, index) => {
+            if (item.monday) {
               str.push('星期一');
             } else if (item.tuesday) {
               str.push('星期二');
@@ -77,10 +77,10 @@ export default () => {
       render: (_, record) => {
         let wifiArr: any = [];
         let areasArr: any = [];
-        record?.rulePhone.wifis?.map(item => {
+        record?.rulePhone?.wifis?.map(item => {
           wifiArr.push(item.wifiName + ' ' + item.wifiCode);
         });
-        record?.rulePhone.areas.map(item => {
+        record?.rulePhone?.areas.map(item => {
           areasArr.push(item.areaName);
         });
         return (
@@ -104,7 +104,13 @@ export default () => {
               编辑
             </Link>
             <Divider type="vertical" />
-            <a onClick={handleDelete}>删除</a>
+            <a
+              onClick={() => {
+                handleDelete(record);
+              }}
+            >
+              删除
+            </a>
           </>
         );
       },

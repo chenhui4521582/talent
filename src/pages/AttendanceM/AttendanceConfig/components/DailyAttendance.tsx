@@ -10,12 +10,15 @@ const { Option } = Select;
 export default props => {
   const [form] = Form.useForm();
   const [editType, setEditType] = useState<'edit' | 'add'>();
+  const [list, setList] = useState<any>();
 
-  const [list, setList] = useState<any>([]);
+  useEffect(() => {
+    list && props.onChange(list);
+  }, [list]);
 
   const handleOk = () => {
     form.validateFields().then(value => {
-      let newList = JSON.parse(JSON.stringify(list));
+      let newList = JSON.parse(JSON.stringify(list || []));
       console.log(value);
       newList.push(value);
       setList(newList);
@@ -25,11 +28,28 @@ export default props => {
   };
 
   const renderList = useMemo(() => {
-    console.log(list);
-    return list.map((item, index) => {
+    return list?.map((item, index) => {
+      let str: string[] = [];
+      item.day?.map(day => {
+        if (day === 'monday') {
+          str.push('星期一');
+        } else if (day === 'tuesday') {
+          str.push('星期二');
+        } else if (day === 'wednesday') {
+          str.push('星期三');
+        } else if (day === 'thursday') {
+          str.push('星期四');
+        } else if (day === 'friday') {
+          str.push('星期五');
+        } else if (day === 'saturday') {
+          str.push('星期六');
+        } else if (day === 'sunday') {
+          str.push('星期日');
+        }
+      });
       return (
         <div className="scheduling-box-one-item" key={index}>
-          <span>{item.name}</span>
+          <span>{str}</span>
           <span>
             {moment(item.clockPeriods[0]).format('HH:mm:ss') +
               '——' +
@@ -77,7 +97,7 @@ export default props => {
         <div className="scheduling-box-one">{renderList}</div>
       ) : null}
       <Modal
-        title={editType === 'edit' ? '编辑排版' : '新增排版'}
+        title={editType === 'edit' ? '编辑打卡时间' : '新增打卡时间'}
         okText="确认"
         cancelText="取消"
         visible={!!editType}
@@ -92,7 +112,7 @@ export default props => {
         <Form form={form}>
           <Form.Item
             label="工作日"
-            name="ruleName"
+            name="day"
             rules={[{ required: true, message: '请输入用户名称!' }]}
             style={{ marginBottom: 40 }}
           >

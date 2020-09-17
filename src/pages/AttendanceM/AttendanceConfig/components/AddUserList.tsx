@@ -7,12 +7,12 @@ import AddUser from './AddUser';
 export default props => {
   const { ruleDetail, handleChangeUserList } = props;
   const [visible, setVisible] = useState<boolean>(false);
-  const [list, setList] = useState<any>([]);
-  const [userList, setUserList] = useState<any>([]);
+  const [list, setList] = useState<any>();
+  const [userList, setUserList] = useState<any>();
   const ref = useRef<any>();
 
   useEffect(() => {
-    let newList = JSON.parse(JSON.stringify(list));
+    let newList = JSON.parse(JSON.stringify(list || []));
     ruleDetail?.memberList?.map(item => {
       newList.push({
         codeName: item.codeName,
@@ -25,10 +25,11 @@ export default props => {
 
   useEffect(() => {
     handleChangeUserList(userList);
-  }, [userList]);
+    list && list.length && props.onChange(list);
+  }, [list]);
 
   const handleOk = () => {
-    let newList = JSON.parse(JSON.stringify(list));
+    let newList = JSON.parse(JSON.stringify(list || []));
     ref.current.getvalue()?.map(item => {
       newList.push({
         code: item.key,
@@ -40,7 +41,7 @@ export default props => {
     setVisible(false);
 
     let newArr: any = [];
-    let newUserList = JSON.parse(JSON.stringify(userList));
+    let newUserList = JSON.parse(JSON.stringify(userList || []));
     ref.current.getvalue().map(item => {
       let userObj: any = {};
 
@@ -60,7 +61,7 @@ export default props => {
   const handleList = data => {
     let userObj: any = {};
     let newArr: any = [];
-    let newUserList = JSON.parse(JSON.stringify(userList));
+    let newUserList = JSON.parse(JSON.stringify(userList || []));
     const handleItem = list => {
       for (let i = 0; i < list.length; i++) {
         if (!list[i].level) {
@@ -79,8 +80,8 @@ export default props => {
   };
 
   const handleRemove = code => {
-    let selectItemArr = JSON.parse(JSON.stringify(list));
-    let newUserList = JSON.parse(JSON.stringify(userList));
+    let selectItemArr = JSON.parse(JSON.stringify(list || []));
+    let newUserList = JSON.parse(JSON.stringify(userList || []));
     selectItemArr.splice(
       selectItemArr.findIndex(item => item.code === code),
       1,
@@ -97,7 +98,7 @@ export default props => {
   };
 
   const renderList = useMemo(() => {
-    return list.map(item => {
+    return list?.map(item => {
       return (
         <div
           style={{

@@ -1,12 +1,19 @@
 // 添加排班
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useMemo,
+  useRef,
+  useImperativeHandle,
+  forwardRef,
+} from 'react';
 import { Modal, Pagination, Select, Form } from 'antd';
 import moment from 'moment';
 import { LeftOutlined, RightOutlined } from '@ant-design/icons';
 import AddScheduling from './AddScheduling';
 import { GlobalResParams } from '@/types/ITypes';
 import { getScheduleDetail } from '../services/rule';
-import { AutoSizer, List } from 'react-virtualized';
+
 import '../styles/scheduling.less';
 
 const { Option } = Select;
@@ -15,7 +22,21 @@ export default props => {
   const [visibleDate, setVisibleDate] = useState<boolean>(false);
   const [editType, setEditType] = useState<'edit' | 'add'>();
   const [list, setList] = useState<any>([]);
+  const [detail, setDetail] = useState<any>();
   const ref = useRef<any>();
+  const formRef = useRef<any>();
+
+  useEffect(() => {
+    list && list.length && props.onChange({ list: list, detail: detail });
+  }, [list, detail]);
+
+  const handleDetailOk = () => {
+    let form = formRef.current.getvalue;
+    form.validateFields().then(value => {
+      setDetail(value);
+      setVisibleDate(false);
+    });
+  };
 
   const handleOk = () => {
     let form = ref.current.getvalue;
@@ -78,14 +99,16 @@ export default props => {
         >
           添加
         </a>
-        <a
-          style={{ padding: '0px 12px', lineHeight: '40px' }}
-          onClick={() => {
-            setVisibleDate(true);
-          }}
-        >
-          人员排班
-        </a>
+        {list && list.length && userList() && userList().length ? (
+          <a
+            style={{ padding: '0px 12px', lineHeight: '40px' }}
+            onClick={() => {
+              setVisibleDate(true);
+            }}
+          >
+            人员排班
+          </a>
+        ) : null}
       </div>
       {list?.length ? (
         <div className="scheduling-box-one">{renderList}</div>
@@ -95,6 +118,7 @@ export default props => {
         okText="确认"
         cancelText="取消"
         visible={!!editType}
+        width="34vw"
         onOk={() => {
           handleOk();
         }}
@@ -106,17 +130,16 @@ export default props => {
         <AddScheduling ref={ref} />
       </Modal>
       <Modal
-        title="添加人员"
+        title="人员排班"
         okText="确认"
         cancelText="取消"
         bodyStyle={{ height: '84vh', overflowY: 'auto' }}
         style={{ top: '2vh' }}
         width="94vw"
         visible={visibleDate}
-        onOk={() => {
-          setVisibleDate(false);
-        }}
+        onOk={handleDetailOk}
         onCancel={() => {
+          formRef.current.getvalue.resetFields();
           setVisibleDate(false);
         }}
       >
@@ -124,6 +147,7 @@ export default props => {
           ruleId={props.ruleId}
           userList={userList()}
           list={list}
+          ref={formRef}
         />
       </Modal>
     </>
@@ -131,7 +155,7 @@ export default props => {
 };
 
 let date = new Date();
-const SchedulingUser = props => {
+const SchedulingUser = forwardRef((props: any, formRef) => {
   const { ruleId, userList, list } = props;
   const [form] = Form.useForm();
   const [month, setMonth] = useState<number>(date.getMonth() + 1);
@@ -139,6 +163,12 @@ const SchedulingUser = props => {
   const [dateList, setDateList] = useState<any[]>();
   const [page, setPage] = useState<number>(1);
   const [values, setValues] = useState<any>();
+
+  useImperativeHandle(formRef, () => {
+    return {
+      getvalue: form,
+    };
+  });
 
   const getWeek = date => {
     let week;
@@ -239,7 +269,17 @@ const SchedulingUser = props => {
               return (
                 <Form.Item
                   key={index}
-                  name={month + '1' + year + item.date + '|' + items.code}
+                  name={
+                    item.day +
+                    '|' +
+                    year +
+                    '-' +
+                    month +
+                    '-' +
+                    item.date +
+                    '|' +
+                    items.code
+                  }
                   style={{
                     flex: 1,
                     alignItems: 'center',
@@ -286,7 +326,7 @@ const SchedulingUser = props => {
             return (
               <span>
                 {handleStatisticsValue(
-                  month + '1' + year + item.date,
+                  item.day + '|' + year + '-' + month + '-' + item.date,
                   items.id || items.name,
                 )}
               </span>
@@ -331,7 +371,7 @@ const SchedulingUser = props => {
       </div>
     </>
   );
-};
+});
 
 // scheduleList:{
 //   name:''
