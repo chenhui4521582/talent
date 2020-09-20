@@ -22,9 +22,9 @@ export default () => {
       align: 'center',
       render: (_, record) => {
         if (record.ruleType === 0) {
-          let str: any[] = [];
-          let timeStr: any[] = [];
           return record?.clockTimeList?.map((item, index) => {
+            let str: any[] = [];
+            let timeStr: any[] = [];
             if (item.monday) {
               str.push('星期一');
             } else if (item.tuesday) {

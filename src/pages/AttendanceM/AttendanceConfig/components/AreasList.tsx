@@ -7,6 +7,7 @@ import moment from 'moment';
 import '../styles/scheduling.less';
 const { Option } = Select;
 export default props => {
+  const { areas } = props;
   const [form] = Form.useForm();
   const [editType, setEditType] = useState<'edit' | 'add'>();
   const [inputValue, setInputValue] = useState<string>();
@@ -18,6 +19,20 @@ export default props => {
   useEffect(() => {
     list && list.length && props.onChange(list);
   }, [list]);
+
+  useEffect(() => {
+    let newList = JSON.parse(JSON.stringify(list || []));
+    areas?.map(item => {
+      newList.push({
+        areaId: item.areaId,
+        areaName: item.areaName,
+        range: item.range,
+        lng: item.lon,
+        lat: item.lat,
+      });
+    });
+    setList(newList);
+  }, [areas]);
 
   const handleOk = () => {
     if (editType === 'edit') {
@@ -71,6 +86,7 @@ export default props => {
       setCenter(signAddrList);
       setInputValue(id);
       form.setFieldsValue({
+        areaId: signAddrList.areaId || undefined,
         areaName: signAddrList.name,
         lng: signAddrList.location.lng,
         lat: signAddrList.location.lat,
@@ -116,6 +132,7 @@ export default props => {
             setInputValue(poiList.pois[0].id);
             setCenter(poiList.pois[0]);
             form.setFieldsValue({
+              areaId: poiList.pois[0].areaId || undefined,
               areaName: poiList.pois[0].name,
               lng: poiList.pois[0].location.lng,
               lat: poiList.pois[0].location.lat,
@@ -147,7 +164,7 @@ export default props => {
               查看地图
             </a>
           </span>
-          <span>{item.lon}米</span>
+          <span>{item.range}米</span>
           <span>
             <a
               style={{ marginLeft: 6 }}
@@ -239,6 +256,12 @@ export default props => {
           </Map>
         </div>
         <Form form={form} style={{ marginTop: '10vh' }}>
+          <Form.Item name="areaId" label="areaId" style={{ display: 'none' }}>
+            <Input
+              placeholder="请输入打卡名称"
+              disabled={editType === 'edit' ? true : false}
+            />
+          </Form.Item>
           <Form.Item
             name="areaName"
             rules={[{ required: true, message: '请输入打卡名称!' }]}

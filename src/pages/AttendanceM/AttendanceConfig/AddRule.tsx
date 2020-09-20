@@ -69,9 +69,19 @@ export default props => {
       console.log(res);
       if (res.status === 200) {
         setRuleDetail(res.obj);
+        setRuleType(res.obj.ruleType);
+        setPhoneClock(res.obj.enablePhoneClock);
+
         form.setFieldsValue({
           ruleName: res.obj.ruleName,
           ruleType: res.obj.ruleType,
+          enablePhoneClock: [res.obj.enablePhoneClock],
+          effectiveTime: res.obj.effectiveTime,
+          clockOutOfRange: res.obj?.rulePhone?.clockOutOfRange,
+          phoneTips: {
+            goWorkRemind: res.obj?.rulePhone?.goWorkRemind,
+            offWorkRemind: res.obj?.rulePhone?.offWorkRemind,
+          },
         });
       }
     }
@@ -79,7 +89,6 @@ export default props => {
   }, []);
 
   const handleChangeUserList = list => {
-    console.log('value');
     setUserList(list);
   };
 
@@ -98,6 +107,9 @@ export default props => {
       data.clockTimeList?.map(item => {
         let clockTimeListObj: IMemberList | any = {};
         let day = item.day;
+        if (item.clockTimeId) {
+          clockTimeListObj.clockTimeId = item.clockTimeId;
+        }
         clockTimeListObj['monday'] = day.indexOf('monday') > -1 ? 1 : 0;
         clockTimeListObj['tuesday'] = day.indexOf('tuesday') > -1 ? 1 : 0;
         clockTimeListObj['wednesday'] = day.indexOf('wednesday') > -1 ? 1 : 0;
@@ -106,8 +118,8 @@ export default props => {
         clockTimeListObj['saturday'] = day.indexOf('saturday') > -1 ? 1 : 0;
         clockTimeListObj['sunday'] = day.indexOf('sunday') > -1 ? 1 : 0;
         clockTimeListObj.clockPeriods = {
-          endTime: moment(item.clockPeriods[0]).format('HH:mm:ss'),
-          startTime: moment(item.clockPeriods[1]).format('HH:mm:ss'),
+          endTime: moment(item.clockPeriods[0]).format('HH:mm'),
+          startTime: moment(item.clockPeriods[1]).format('HH:mm'),
         };
         clockTimeListObj.breakTimeCalculation = item.rest.breakTimeCalculation;
         clockTimeListObj.breakTimeStart = moment(
@@ -130,18 +142,19 @@ export default props => {
         let scheduleListObj: any = {};
         (scheduleListObj.name = item.name),
           (scheduleListObj.clockPeriods = {
-            endTime: moment(item.clockPeriods[0]).format('HH:mm:ss'),
-            startTime: moment(item.clockPeriods[1]).format('HH:mm:ss'),
+            endTime: moment(item.clockPeriods[0]).format('HH:mm'),
+            startTime: moment(item.clockPeriods[1]).format('HH:mm'),
           });
         scheduleListObj.breakTimeCalculation = item.breakTimeCalculation;
         scheduleListObj.breakTimeStart = moment(
           item['breakTimeStart-breakTimeEnd'][0],
-        ).format('HH:mm:ss');
+        ).format('HH:mm');
         scheduleListObj.breakTimeEnd = moment(
           item['breakTimeStart-breakTimeEnd'][1],
-        ).format('HH:mm:ss');
+        ).format('HH:mm');
         scheduleListObj.startLimit = item.itemList.startLimit;
         scheduleListObj.endLimit = item.itemList.endLimit;
+        item.scheduleId ? (scheduleListObj.scheduleId = item.scheduleId) : '';
         scheduleList.push(scheduleListObj);
       });
       // 人员排班
@@ -199,14 +212,16 @@ export default props => {
           subdata = {
             ruleName,
             ruleType,
-            // clockTimeList:clockTimeList||[],
-            enablePhoneClock,
+            enablePhoneClock: enablePhoneClock,
             effectiveTime,
             scheduleList,
             scheduleDetailList,
             rulePhone: {
               areas,
               wifis,
+              clockOutOfRange: data.clockOutOfRange,
+              goWorkRemind: data.phoneTips.goWorkRemind,
+              offWorkRemind: data.phoneTips.offWorkRemind,
             },
             memberList,
           };
@@ -214,14 +229,11 @@ export default props => {
           subdata = {
             ruleName,
             ruleType,
-            // clockTimeList:clockTimeList||[],
-            enablePhoneClock,
+            enablePhoneClock: enablePhoneClock,
             effectiveTime,
             scheduleList,
             scheduleDetailList,
             memberList,
-            // areas,
-            // wifis
           };
         }
       } else {
@@ -230,32 +242,35 @@ export default props => {
             ruleName,
             ruleType,
             clockTimeList: clockTimeList || [],
-            enablePhoneClock,
+            enablePhoneClock: enablePhoneClock,
             effectiveTime,
             memberList,
             rulePhone: {
               areas,
               wifis,
+              clockOutOfRange: data.clockOutOfRange,
+              goWorkRemind: data.phoneTips.goWorkRemind,
+              offWorkRemind: data.phoneTips.offWorkRemind,
             },
-            // scheduleList,
-            // scheduleDetailList,
           };
         } else {
           subdata = {
             ruleName,
             ruleType,
             clockTimeList: clockTimeList || [],
-            enablePhoneClock,
+            enablePhoneClock: enablePhoneClock,
             effectiveTime,
             memberList,
-            // scheduleList,
-            // scheduleDetailList,
-            // areas,
-            // wifis
           };
         }
       }
-      let json: GlobalResParams<string> = await saveRule(subdata);
+      let api = saveRule;
+      if (ruleId) {
+        api = updateRule;
+        subdata.ruleId = ruleId;
+      }
+
+      let json: GlobalResParams<string> = await api(subdata);
       if (json.status === 200) {
         notification['success']({
           message: json.msg,
@@ -331,7 +346,8 @@ export default props => {
           >
             <AddSchedulingList
               {...props}
-              ruleDetail={ruleDetail}
+              scheduleList={ruleDetail?.scheduleList}
+              ruleId={ruleId}
               userList={() => {
                 let newUserList: any = [];
                 userList?.map(item => {
@@ -348,10 +364,13 @@ export default props => {
           <Form.Item
             label="打卡时间"
             name="clockTimeList"
-            rules={[{ required: true, message: '请输入用户名称!' }]}
+            rules={[{ required: true, message: '请添加打卡时间!' }]}
             style={{ width: '82vw', marginBottom: 20 }}
           >
-            <DailyAttendance />
+            <DailyAttendance
+              {...props}
+              clockTimeList={ruleDetail?.clockTimeList}
+            />
           </Form.Item>
         ) : null}
         <Form.Item
@@ -381,7 +400,7 @@ export default props => {
             name="areas"
             rules={[{ required: true, message: '请输入用户名称!' }]}
           >
-            <AreasList {...props} />
+            <AreasList {...props} areas={ruleDetail?.rulePhone?.areas} />
           </Form.Item>
         ) : null}
         {phoneClock ? (
@@ -390,7 +409,7 @@ export default props => {
             name="wifis"
             rules={[{ required: true, message: '请输入用户名称!' }]}
           >
-            <Wifi {...props} />
+            <Wifi {...props} wifis={ruleDetail?.rulePhone?.wifis} />
           </Form.Item>
         ) : null}
         {phoneClock ? (

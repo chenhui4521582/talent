@@ -8,27 +8,88 @@ import '../styles/scheduling.less';
 
 const { Option } = Select;
 export default props => {
+  const { clockTimeList } = props;
   const [form] = Form.useForm();
   const [editType, setEditType] = useState<'edit' | 'add'>();
   const [list, setList] = useState<any>();
+  const [index, setIndex] = useState<number>();
+  const [days, setDays] = useState<any[]>([]);
 
   useEffect(() => {
-    list && props.onChange(list);
+    list && list.length && props.onChange(list);
+    let arr: any = [];
+    list?.map((item, indexs) => {
+      arr = arr.concat(item.day);
+    });
+    setDays([...new Set(arr)]);
   }, [list]);
+
+  useEffect(() => {
+    let newList = JSON.parse(JSON.stringify(list || []));
+    clockTimeList?.map(item => {
+      let obj: any = {};
+      let day: any = [];
+      if (item.monday) {
+        day.push('monday');
+      } else if (item.tuesday) {
+        day.push('tuesday');
+      } else if (item.wednesday) {
+        day.push('wednesday');
+      } else if (item.thursday) {
+        day.push('thursday');
+      } else if (item.friday) {
+        day.push('friday');
+      } else if (item.saturday) {
+        day.push('saturday');
+      } else if (item.sunday) {
+        day.push('sunday');
+      }
+      obj.clockTimeId = item.clockTimeId;
+      obj.day = day;
+      obj.clockPeriods = [
+        moment('2019-02-13 ' + item?.clockPeriods?.startTime + ':00'),
+        moment('2019-02-13 ' + item?.clockPeriods?.endTime + ':00'),
+      ];
+      obj.flex = {
+        flexible: item.flexible,
+        leaveEarly: item.leaveEarly,
+        leaveLater: item.leaveLater,
+      };
+      obj.rest = {
+        breakTimeCalculation: item.breakTimeCalculation,
+        'breakTimeStart-breakTimeEnd': [
+          moment('2019-02-13 ' + item.breakTimeStart + ':00'),
+          moment('2019-02-13 ' + item.breakTimeEnd + ':00'),
+        ],
+      };
+      obj.itemList = {
+        endLimit: item.endLimit,
+        startLimit: item.startLimit,
+      };
+      newList.push(obj);
+    });
+    setList(newList);
+  }, [clockTimeList]);
 
   const handleOk = () => {
     form.validateFields().then(value => {
       let newList = JSON.parse(JSON.stringify(list || []));
-      console.log(value);
-      newList.push(value);
+      if (editType === 'add') {
+        newList.push(value);
+      } else {
+        if (index || index === 0) {
+          newList[index] = value;
+        }
+      }
       setList(newList);
       setEditType(undefined);
+      setIndex(undefined);
       form.resetFields();
     });
   };
 
   const renderList = useMemo(() => {
-    return list?.map((item, index) => {
+    return list?.map((item, indexs) => {
       let str: string[] = [];
       item.day?.map(day => {
         if (day === 'monday') {
@@ -51,15 +112,16 @@ export default props => {
         <div className="scheduling-box-one-item" key={index}>
           <span>{str}</span>
           <span>
-            {moment(item.clockPeriods[0]).format('HH:mm:ss') +
+            {moment(item.clockPeriods[0]).format('HH:mm') +
               '——' +
-              moment(item.clockPeriods[1]).format('HH:mm:ss')}
+              moment(item.clockPeriods[1]).format('HH:mm')}
           </span>
           <span>
             <a
               onClick={() => {
                 console.log(item);
                 setEditType('edit');
+                setIndex(indexs);
                 form.setFieldsValue(item);
               }}
             >
@@ -80,6 +142,12 @@ export default props => {
       );
     });
   }, [list]);
+
+  const handleDisable = value => {
+    if (editType === 'add') {
+      return days.indexOf(value) > -1;
+    }
+  };
 
   return (
     <>
@@ -111,28 +179,54 @@ export default props => {
       >
         <Form form={form}>
           <Form.Item
+            label="clockTimeId"
+            name="clockTimeId"
+            style={{ display: 'none' }}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
             label="工作日"
             name="day"
-            rules={[{ required: true, message: '请输入用户名称!' }]}
+            rules={[{ required: true, message: '请选择工作日!' }]}
             style={{ marginBottom: 40 }}
           >
             <Checkbox.Group>
-              <Checkbox value="monday">星期一</Checkbox>
-              <Checkbox value="tuesday">星期二</Checkbox>
-              <Checkbox value="wednesday">星期三</Checkbox>
-              <Checkbox value="thursday">星期四</Checkbox>
-              <Checkbox value="friday">星期五</Checkbox>
-              <Checkbox value="saturday">星期六</Checkbox>
-              <Checkbox value="sunday">星期天</Checkbox>
+              <Checkbox value="monday" disabled={handleDisable('monday')}>
+                星期一
+              </Checkbox>
+              <Checkbox value="tuesday" disabled={handleDisable('tuesday')}>
+                星期二
+              </Checkbox>
+              <Checkbox value="wednesday" disabled={handleDisable('wednesday')}>
+                星期三
+              </Checkbox>
+              <Checkbox value="thursday" disabled={handleDisable('wednesday')}>
+                星期四
+              </Checkbox>
+              <Checkbox value="friday" disabled={handleDisable('friday')}>
+                星期五
+              </Checkbox>
+              <Checkbox value="saturday" disabled={handleDisable('saturday')}>
+                星期六
+              </Checkbox>
+              <Checkbox value="sunday" disabled={handleDisable('sunday')}>
+                星期天
+              </Checkbox>
             </Checkbox.Group>
           </Form.Item>
           <Form.Item
             label="打卡时间"
             name="clockPeriods"
-            rules={[{ required: true, message: '请输入用户名称!' }]}
+            rules={[{ required: true, message: '请输入打卡时间!' }]}
             style={{ marginBottom: 40 }}
           >
-            <RangePicker allowClear={true} picker="time" locale={locale} />
+            <RangePicker
+              format="HH:mm"
+              allowClear={true}
+              picker="time"
+              locale={locale}
+            />
           </Form.Item>
 
           <Form.Item label="休息时间" name="rest" style={{ marginBottom: 40 }}>
@@ -153,7 +247,12 @@ export default props => {
                 noStyle
                 initialValue={0}
               >
-                <RangePicker allowClear={true} picker="time" locale={locale} />
+                <RangePicker
+                  format="HH:mm"
+                  allowClear={true}
+                  picker="time"
+                  locale={locale}
+                />
               </Form.Item>
             </Input.Group>
           </Form.Item>
@@ -176,6 +275,7 @@ export default props => {
                 rules={[{ required: true, message: '请选择时间段!' }]}
                 label="最多早到早走"
                 initialValue={0}
+                style={{ marginTop: 10 }}
               >
                 <Select placeholder="请选择" style={{ minWidth: 200 }}>
                   <Option value={0}>0分钟</Option>
@@ -194,7 +294,7 @@ export default props => {
                 rules={[{ required: true, message: '请选择时间段!' }]}
                 label="最多晚到晚走"
                 initialValue={0}
-                style={{ paddingLeft: 20 }}
+                style={{ paddingLeft: 20, marginTop: 10 }}
               >
                 <Select placeholder="请选择" style={{ minWidth: 200 }}>
                   <Option value={0}>0分钟</Option>

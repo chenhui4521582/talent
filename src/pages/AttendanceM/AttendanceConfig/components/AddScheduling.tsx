@@ -17,6 +17,13 @@ export default forwardRef((props, formRef) => {
   return (
     <Form form={form}>
       <Form.Item
+        label="scheduleId"
+        name="scheduleId"
+        style={{ width: 400, marginBottom: 40, display: 'none' }}
+      >
+        <Input placeholder="规则名称" />
+      </Form.Item>
+      <Form.Item
         label="班次名称"
         name="name"
         rules={[{ required: true, message: '请输入班次名称!' }]}
@@ -31,6 +38,7 @@ export default forwardRef((props, formRef) => {
         rules={[{ required: true, message: '请输入打卡时间!' }]}
       >
         <RangePicker
+          format="HH:mm"
           allowClear={true}
           picker="time"
           locale={locale}
@@ -44,7 +52,12 @@ export default forwardRef((props, formRef) => {
         rules={[{ required: true, message: '请输入休息时间!' }]}
         style={{ width: 400, marginBottom: 40 }}
       >
-        <RangePicker allowClear={true} picker="time" locale={locale} />
+        <RangePicker
+          format="HH:mm"
+          allowClear={true}
+          picker="time"
+          locale={locale}
+        />
       </Form.Item>
       <Form.Item
         label="是否开启"

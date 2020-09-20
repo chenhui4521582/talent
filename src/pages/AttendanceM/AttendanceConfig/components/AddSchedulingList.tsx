@@ -18,17 +18,50 @@ import '../styles/scheduling.less';
 
 const { Option } = Select;
 export default props => {
-  const { userList } = props;
+  const { userList, scheduleList, ruleId } = props;
   const [visibleDate, setVisibleDate] = useState<boolean>(false);
   const [editType, setEditType] = useState<'edit' | 'add'>();
   const [list, setList] = useState<any>([]);
   const [detail, setDetail] = useState<any>();
+  const [index, setIndex] = useState<number>();
   const ref = useRef<any>();
   const formRef = useRef<any>();
 
   useEffect(() => {
     list && list.length && props.onChange({ list: list, detail: detail });
   }, [list, detail]);
+
+  useEffect(() => {
+    let newList = JSON.parse(JSON.stringify(list || []));
+    scheduleList?.map(item => {
+      let obj: any = {};
+      obj.name = item.name;
+      obj.scheduleId = item.scheduleId;
+      obj.clockPeriods = [
+        item?.clockPeriods?.startTime
+          ? moment('2019-02-13 ' + item?.clockPeriods?.startTime + ':00')
+          : undefined,
+        item?.clockPeriods?.endTime
+          ? moment('2019-02-13 ' + item?.clockPeriods?.endTime + ':00')
+          : undefined,
+      ];
+      obj.breakTimeCalculation = item.breakTimeCalculation;
+      obj['breakTimeStart-breakTimeEnd'] = [
+        item.breakTimeStart
+          ? moment('2019-02-13 ' + item.breakTimeStart + ':00')
+          : undefined,
+        item.breakTimeEnd
+          ? moment('2019-02-13 ' + item.breakTimeEnd + ':00')
+          : undefined,
+      ];
+      obj.itemList = {
+        endLimit: item.endLimit,
+        startLimit: item.startLimit,
+      };
+      newList.push(obj);
+    });
+    setList(newList);
+  }, [scheduleList]);
 
   const handleDetailOk = () => {
     let form = formRef.current.getvalue;
@@ -40,34 +73,43 @@ export default props => {
 
   const handleOk = () => {
     let form = ref.current.getvalue;
-    console.log(form);
+    let newList = Object.assign([], list);
     form.validateFields().then(value => {
-      let newList = JSON.parse(JSON.stringify(list));
-      console.log(value);
-      newList.push(value);
+      if (editType === 'add') {
+        newList.push(value);
+      } else {
+        if (index || index === 0) {
+          newList.splice(index, 1, value);
+        }
+      }
+
       setList(newList);
       setEditType(undefined);
+      setIndex(undefined);
       form.resetFields();
     });
   };
 
   const renderList = useMemo(() => {
-    console.log(list);
-    return list.map((item, index) => {
+    return list.map((item, indexs) => {
+      console.log(list);
+      console.log('list');
       return (
-        <div className="scheduling-box-one-item" key={index}>
+        <div className="scheduling-box-one-item" key={indexs}>
           <span>{item.name}</span>
           <span>
-            {moment(item.clockPeriods[0]).format('HH:mm:ss') +
+            {moment(item.clockPeriods[0]).format('HH:mm') +
               '——' +
-              moment(item.clockPeriods[1]).format('HH:mm:ss')}
+              moment(item.clockPeriods[1]).format('HH:mm')}
           </span>
           <span>
             <a
               onClick={() => {
-                console.log(item);
                 setEditType('edit');
-                ref.current.getvalue.setFieldsValue(item);
+                setTimeout(() => {
+                  setIndex(indexs);
+                  ref.current?.getvalue?.setFieldsValue(item);
+                }, 200);
               }}
             >
               编辑
@@ -75,7 +117,7 @@ export default props => {
             <a
               style={{ marginLeft: 6 }}
               onClick={() => {
-                let newList = JSON.parse(JSON.stringify(list));
+                let newList = Object.assign([], list);
                 newList.splice(index, 1);
                 setList(newList);
               }}
@@ -99,7 +141,7 @@ export default props => {
         >
           添加
         </a>
-        {list && list.length && userList() && userList().length ? (
+        {list && list.length ? (
           <a
             style={{ padding: '0px 12px', lineHeight: '40px' }}
             onClick={() => {
@@ -123,7 +165,9 @@ export default props => {
           handleOk();
         }}
         onCancel={() => {
-          ref.current.getvalue.resetFields();
+          setTimeout(() => {
+            ref.current.getvalue.resetFields();
+          }, 200);
           setEditType(undefined);
         }}
       >
@@ -139,12 +183,12 @@ export default props => {
         visible={visibleDate}
         onOk={handleDetailOk}
         onCancel={() => {
-          formRef.current.getvalue.resetFields();
+          // formRef.current.getvalue.resetFields();
           setVisibleDate(false);
         }}
       >
         <SchedulingUser
-          ruleId={props.ruleId}
+          ruleId={ruleId}
           userList={userList()}
           list={list}
           ref={formRef}
@@ -163,24 +207,14 @@ const SchedulingUser = forwardRef((props: any, formRef) => {
   const [dateList, setDateList] = useState<any[]>();
   const [page, setPage] = useState<number>(1);
   const [values, setValues] = useState<any>();
+  const [userDetail, setUserDetail] = useState<any>();
+  const [ownUserList, setOwnUserList] = useState<any[]>();
 
   useImperativeHandle(formRef, () => {
     return {
       getvalue: form,
     };
   });
-
-  const getWeek = date => {
-    let week;
-    if (date.getDay() == 0) week = '日';
-    if (date.getDay() == 1) week = '一';
-    if (date.getDay() == 2) week = '二';
-    if (date.getDay() == 3) week = '三';
-    if (date.getDay() == 4) week = '四';
-    if (date.getDay() == 5) week = '五';
-    if (date.getDay() == 6) week = '六';
-    return week;
-  };
 
   useEffect(() => {
     if (year && month) {
@@ -195,19 +229,68 @@ const SchedulingUser = forwardRef((props: any, formRef) => {
         arrDate.push(obj);
       }
       setDateList(arrDate);
-      console.log(arrDate);
       async function getDetail() {
         let res: GlobalResParams<any> = await getScheduleDetail(
           ruleId,
           year + '-' + month,
         );
-        console.log(res);
         if (res.status === 200) {
+          setUserDetail(res.obj);
         }
       }
       getDetail();
     }
   }, [month, year]);
+
+  useEffect(() => {
+    if (!userDetail) {
+      return;
+    }
+    let newUserList = JSON.parse(JSON.stringify(ownUserList || []));
+    let obj: any = {};
+    for (let key in userDetail) {
+      newUserList.push({
+        code: key.split(',')[0],
+        name: key.split(',')[1],
+      });
+
+      userDetail[key].map(item => {
+        list.map(listItem => {
+          if (listItem.scheduleId === item.valueId) {
+            obj[item.data + '|' + item.time + '|' + key.split(',')[0]] =
+              listItem.name;
+          }
+        });
+      });
+    }
+    console.log(obj);
+    form.setFieldsValue(obj);
+    setValues(obj);
+    setOwnUserList([...new Set(newUserList)]);
+  }, [userDetail, list]);
+
+  const getWeek = date => {
+    let week;
+    if (date.getDay() == 0) week = '日';
+    if (date.getDay() == 1) week = '一';
+    if (date.getDay() == 2) week = '二';
+    if (date.getDay() == 3) week = '三';
+    if (date.getDay() == 4) week = '四';
+    if (date.getDay() == 5) week = '五';
+    if (date.getDay() == 6) week = '六';
+    return week;
+  };
+
+  const handleStatisticsValue = (dataString, value) => {
+    let num = 0;
+    // let values = form.getFieldsValue();
+    for (let key in values) {
+      if (key.indexOf(dataString) > -1 && values[key] === value) {
+        num += 1;
+      }
+    }
+    return num;
+  };
 
   const renderTableOne = useMemo(() => {
     return (
@@ -257,10 +340,10 @@ const SchedulingUser = forwardRef((props: any, formRef) => {
   }, [month, year]);
 
   const renderUserList = useMemo(() => {
-    console.log(userList);
-
     let arr: any = [];
-    userList.map((items, indexs) => {
+    let newUserList = JSON.parse(JSON.stringify(ownUserList || []));
+    newUserList = newUserList.concat(userList || []);
+    newUserList?.map((items, indexs) => {
       if (indexs < page * 6 && indexs >= (page - 1) * 6) {
         arr.push(
           <div key={indexs} className="schedul-table-one-item">
@@ -272,11 +355,11 @@ const SchedulingUser = forwardRef((props: any, formRef) => {
                   name={
                     item.day +
                     '|' +
-                    year +
+                    (year < 10 ? '0' + year : year) +
                     '-' +
-                    month +
+                    (month < 10 ? '0' + month : month) +
                     '-' +
-                    item.date +
+                    (item.date < 10 ? '0' + item.date : item.date) +
                     '|' +
                     items.code
                   }
@@ -288,11 +371,7 @@ const SchedulingUser = forwardRef((props: any, formRef) => {
                 >
                   <Select style={{ padding: '0 2px' }}>
                     {list.map(times => {
-                      return (
-                        <Option value={times.id || times.name}>
-                          {times.name}
-                        </Option>
-                      );
+                      return <Option value={times.name}>{times.name}</Option>;
                     })}
                   </Select>
                 </Form.Item>
@@ -303,19 +382,7 @@ const SchedulingUser = forwardRef((props: any, formRef) => {
       }
     });
     return arr;
-  }, [dateList, userList, month, year, page]);
-
-  const handleStatisticsValue = (dataString, value) => {
-    let num = 0;
-    let values = form.getFieldsValue();
-    console.log(values);
-    for (let key in values) {
-      if (key.indexOf(dataString) > -1 && values[key] === value) {
-        num += 1;
-      }
-    }
-    return num;
-  };
+  }, [dateList, userList, month, year, page, ownUserList]);
 
   const renderStatistics = useMemo(() => {
     return list.map((items, indexs) => {
@@ -326,8 +393,14 @@ const SchedulingUser = forwardRef((props: any, formRef) => {
             return (
               <span>
                 {handleStatisticsValue(
-                  item.day + '|' + year + '-' + month + '-' + item.date,
-                  items.id || items.name,
+                  item.day +
+                    '|' +
+                    (year < 10 ? '0' + year : year) +
+                    '-' +
+                    (month < 10 ? '0' + month : month) +
+                    '-' +
+                    (item.date < 10 ? '0' + item.date : item.date),
+                  items.name,
                 )}
               </span>
             );
@@ -335,7 +408,7 @@ const SchedulingUser = forwardRef((props: any, formRef) => {
         </div>
       );
     });
-  }, [list, values, dateList, month, year, page]);
+  }, [list, values, dateList, month, year, page, userDetail]);
 
   return (
     <>
@@ -343,8 +416,9 @@ const SchedulingUser = forwardRef((props: any, formRef) => {
       <Form
         form={form}
         onValuesChange={value => {
+          console.log(form.getFieldsValue());
           setTimeout(() => {
-            setValues(value);
+            setValues(form.getFieldsValue());
           }, 400);
         }}
       >
@@ -353,7 +427,7 @@ const SchedulingUser = forwardRef((props: any, formRef) => {
           {renderUserList}
           <Pagination
             defaultCurrent={1}
-            total={userList.length}
+            total={ownUserList?.length || 0}
             hideOnSinglePage
             current={page}
             pageSize={6}
@@ -372,22 +446,3 @@ const SchedulingUser = forwardRef((props: any, formRef) => {
     </>
   );
 });
-
-// scheduleList:{
-//   name:''
-//   clockPeriods:[{
-//     startTime:''
-//     endTime:''
-//    }
-//   ]
-//   breakTimeCalculation:休息时间是否开启
-//   breakTimeStart:休息开始时间
-//   breakTimeEnd:休息结束时间
-//   scheduleDetailLis:[
-//     {
-//       time:上班日期
-//       data:星期
-//       value:排班
-//     }
-//   ]
-// }

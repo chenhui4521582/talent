@@ -6,6 +6,7 @@ import moment from 'moment';
 import '../styles/scheduling.less';
 const { Option } = Select;
 export default props => {
+  const { wifis } = props;
   const [form] = Form.useForm();
   const [editType, setEditType] = useState<'edit' | 'add'>();
   const [list, setList] = useState<any>([]);
@@ -13,6 +14,23 @@ export default props => {
   useEffect(() => {
     list && list.length && props.onChange(list);
   }, [list]);
+
+  useEffect(() => {
+    let newList = JSON.parse(JSON.stringify(list || []));
+    wifis?.map(item => {
+      let obj: any = {};
+      item?.wifiCode?.split(':')?.map((code, index) => {
+        obj[index] = code;
+      });
+
+      newList.push({
+        wifiCode: obj,
+        wifiId: item.wifiId,
+        wifiName: item.wifiName,
+      });
+    });
+    setList(newList);
+  }, [wifis]);
 
   const handleOk = () => {
     if (editType === 'edit') {
@@ -85,6 +103,9 @@ export default props => {
         }}
       >
         <Form form={form}>
+          <Form.Item name="wifiId" label="wifiId" style={{ display: 'none' }}>
+            <Input placeholder="请输入wifi名称" />
+          </Form.Item>
           <Form.Item
             name="wifiName"
             rules={[{ required: true, message: '请输入打卡名称!' }]}
