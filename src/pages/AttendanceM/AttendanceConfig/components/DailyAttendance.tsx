@@ -146,6 +146,8 @@ export default props => {
   const handleDisable = value => {
     if (editType === 'add') {
       return days.indexOf(value) > -1;
+    } else {
+      return false;
     }
   };
 

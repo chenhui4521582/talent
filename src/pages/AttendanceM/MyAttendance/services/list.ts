@@ -47,3 +47,10 @@ export async function listAttendanceTime(month: string, day: string) {
     data: { month, day },
   });
 }
+
+export async function listMyRecordMock(month: string) {
+  return request(`/api/currentUser`, {
+    method: 'GET',
+    data: { month },
+  });
+}
