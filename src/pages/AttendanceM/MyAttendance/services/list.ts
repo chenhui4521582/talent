@@ -1,17 +1,5 @@
 import request from '@/utils/request';
 
-//endDate （0门禁 1手机）
-export interface IListMyRecord {
-  attendanceTime: IAttendanceTime[];
-  currentMonthRecord: IAttendanceTime[];
-  date: string;
-  endDate: string;
-  endMethod: 0 | 1;
-  ruleId: number;
-  startDate: string;
-  startMethod: string;
-}
-
 export interface IAttendanceTime {
   endTime: String;
   startTime: String;

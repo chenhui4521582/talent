@@ -19,42 +19,10 @@ for (let i = 0; i < 12; i++) {
   monthArr.push(i + 1);
 }
 
-const option = {
-  title: {
-    text: '上下班统计次数',
-    subtext: '',
-    left: 'left',
-  },
-  tooltip: {
-    trigger: 'item',
-    formatter: '{a} <br/>{b} : {c} ({d}%)',
-  },
-  series: [
-    {
-      name: '访问来源',
-      type: 'pie',
-      radius: ['40%', '60%'],
-      emphasis: {
-        itemStyle: {
-          shadowBlur: 10,
-          shadowOffsetX: 0,
-          shadowColor: 'rgba(0, 0, 0, 0.5)',
-        },
-      },
-      data: [
-        { value: 335, name: '直接访问' },
-        { value: 310, name: '邮件营销' },
-        { value: 234, name: '联盟广告' },
-        { value: 135, name: '视频广告' },
-        { value: 1548, name: '搜索引擎' },
-      ],
-    },
-  ],
-};
-
 export default () => {
   const [selectYear, setSelectYear] = useState<number>(year);
   const [selectMonth, setSelectMonth] = useState<number>(month);
+  const [detali, setDetail] = useState<any>();
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -69,8 +37,49 @@ export default () => {
     let res: GlobalResParams<any> = await listMyMonthRecord(
       selectYear.toString() + '-' + month.toString(),
     );
-    console.log(ref);
+    if (res.status === 200) {
+      setDetail(res.obj);
+    }
+
+    let days = new Date(selectYear, selectMonth, 0).getDate();
+    let num =
+      days - res.obj?.clockStatistics?.abnormalEquipment ||
+      0 - res.obj?.clockStatistics?.abnormalLocation ||
+      0 - res.obj?.clockStatistics?.absent ||
+      0 - res.obj?.clockStatistics?.absenteeism ||
+      0 - res.obj?.clockStatistics?.later ||
+      0 - res.obj?.clockStatistics?.leaveEarly ||
+      0;
     const Chart = echarts.init((ref?.current as unknown) as HTMLDivElement);
+
+    let option = {
+      title: {
+        text: '上下班统计次数',
+        subtext: '',
+        left: 'left',
+      },
+      tooltip: {
+        trigger: 'item',
+        formatter: '{b} : {c} ({d}%)',
+      },
+      series: [
+        {
+          type: 'pie',
+          radius: ['40%', '60%'],
+          emphasis: {
+            itemStyle: {
+              shadowBlur: 10,
+              shadowOffsetX: 0,
+              shadowColor: 'rgba(0, 0, 0, 0.5)',
+            },
+          },
+          data: [
+            { value: days - num, name: '异常' },
+            { value: num, name: '正常' },
+          ],
+        },
+      ],
+    };
     Chart.setOption(option as any);
   };
 
@@ -83,6 +92,344 @@ export default () => {
     console.log(value);
     setSelectMonth(value);
   };
+
+  const renderClockStatistics = useMemo(() => {
+    let item = detali?.clockStatistics;
+    return (
+      <>
+        <div
+          style={{
+            display: 'flex',
+            flex: '0 0 9.5vw',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexDirection: 'column',
+          }}
+        >
+          <span
+            style={{ color: item?.later || item?.later === '0' ? 'red' : '' }}
+          >
+            {item?.later || 0}{' '}
+          </span>
+          <span>迟到</span>
+        </div>
+        <div
+          style={{
+            display: 'flex',
+            flex: '0 0  9.5vw',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexDirection: 'column',
+          }}
+        >
+          <span
+            style={{
+              color: item?.leaveEarly || item?.leaveEarly === '0' ? 'red' : '',
+            }}
+          >
+            {item?.leaveEarly || 0}
+          </span>
+          <span>早退</span>
+        </div>
+        <div
+          style={{
+            display: 'flex',
+            flex: '0 0  9.5vw',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexDirection: 'column',
+          }}
+        >
+          <span
+            style={{
+              color:
+                item?.absenteeism || item?.absenteeism === '0' ? 'red' : '',
+            }}
+          >
+            {item?.absenteeism || 0}{' '}
+          </span>
+          <span>旷工</span>
+        </div>
+        <div
+          style={{
+            display: 'flex',
+            flex: '0 0  9.5vw',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexDirection: 'column',
+          }}
+        >
+          <span
+            style={{ color: item?.absent || item?.absent === '0' ? 'red' : '' }}
+          >
+            {item?.absent || 0}{' '}
+          </span>
+          <span>缺卡</span>
+        </div>
+        <div
+          style={{
+            display: 'flex',
+            flex: '0 0  9.5vw',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexDirection: 'column',
+          }}
+        >
+          <span
+            style={{
+              color:
+                item?.abnormalLocation || item?.abnormalLocation === '0'
+                  ? 'red'
+                  : '',
+            }}
+          >
+            {item?.abnormalLocation || 0}{' '}
+          </span>
+          <span>地点异常</span>
+        </div>
+        <div
+          style={{
+            display: 'flex',
+            flex: '0 0  9.5vw',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexDirection: 'column',
+          }}
+        >
+          <span
+            style={{
+              color:
+                item?.abnormalEquipment || item?.abnormalEquipment === '0'
+                  ? 'red'
+                  : '',
+            }}
+          >
+            {item?.abnormalEquipment || 0}{' '}
+          </span>
+          <span>设备异常</span>
+        </div>
+      </>
+    );
+  }, [detali]);
+
+  const renderOvertimeStatistics = useMemo(() => {
+    return (
+      <>
+        <div
+          style={{
+            display: 'flex',
+            flex: '1',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexDirection: 'column',
+          }}
+        >
+          <span>{detali?.overtimeStatistics?.workingdayOvertime}</span>
+          <span> 工作日加班</span>
+        </div>
+        <div
+          style={{
+            display: 'flex',
+            flex: '1',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexDirection: 'column',
+          }}
+        >
+          <span>{detali?.overtimeStatistics?.offdayOvertime}</span>
+          <span> 休息日加班</span>
+        </div>
+        <div
+          style={{
+            display: 'flex',
+            flex: '1',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexDirection: 'column',
+          }}
+        >
+          <span>{detali?.overtimeStatistics?.holidayOvertime}</span>
+          <span>节假日加班</span>
+        </div>
+      </>
+    );
+  }, [detali]);
+
+  const renderLeaveModel = useMemo(() => {
+    return (
+      <>
+        <div
+          style={{
+            display: 'flex',
+            flex: '0 0 12vw',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexDirection: 'column',
+            margin: '20px',
+          }}
+        >
+          <span>{detali?.leaveStatistics?.abortionLeave}</span>
+          <span> 流产假</span>
+        </div>
+        <div
+          style={{
+            display: 'flex',
+            flex: '0 0 12vw',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexDirection: 'column',
+            margin: '20px',
+          }}
+        >
+          <span>{detali?.leaveStatistics?.annualLeave}</span>
+          <span> 年假</span>
+        </div>
+        <div
+          style={{
+            display: 'flex',
+            flex: '0 0 12vw',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexDirection: 'column',
+            margin: '20px',
+          }}
+        >
+          <span>{detali?.leaveStatistics?.bereavementLeave}</span>
+          <span>丧假</span>
+        </div>
+        <div
+          style={{
+            display: 'flex',
+            flex: '0 0 12vw',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexDirection: 'column',
+            margin: '20px',
+          }}
+        >
+          <span>{detali?.leaveStatistics?.breastfeedingLeave}</span>
+          <span>哺乳假</span>
+        </div>
+        <div
+          style={{
+            display: 'flex',
+            flex: '0 0 12vw',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexDirection: 'column',
+            margin: '20px',
+          }}
+        >
+          <span>{detali?.leaveStatistics?.businessTrip}</span>
+          <span>出差 </span>
+        </div>
+        <div
+          style={{
+            display: 'flex',
+            flex: '0 0 12vw',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexDirection: 'column',
+            margin: '20px',
+          }}
+        >
+          <span>{detali?.leaveStatistics?.goOut}</span>
+          <span>外出</span>
+        </div>
+        <div
+          style={{
+            display: 'flex',
+            flex: '0 0 12vw',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexDirection: 'column',
+            margin: '20px',
+          }}
+        >
+          <span>{detali?.leaveStatistics?.makeUp}</span>
+          <span> 补打卡</span>
+        </div>
+        <div
+          style={{
+            display: 'flex',
+            flex: '0 0 12vw',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexDirection: 'column',
+            margin: '20px',
+          }}
+        >
+          <span>{detali?.leaveStatistics?.maritalLeave}</span>
+          <span>婚假</span>
+        </div>
+        <div
+          style={{
+            display: 'flex',
+            flex: '0 0 12vw',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexDirection: 'column',
+            margin: '20px',
+          }}
+        >
+          <span>{detali?.leaveStatistics?.maternityLeave}</span>
+          <span>产检假</span>
+        </div>
+        <div
+          style={{
+            display: 'flex',
+            flex: '0 0 12vw',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexDirection: 'column',
+            margin: '20px',
+          }}
+        >
+          <span>{detali?.leaveStatistics?.personalLeave}</span>
+          <span>事假</span>
+        </div>
+        <div
+          style={{
+            display: 'flex',
+            flex: '0 0 12vw',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexDirection: 'column',
+            margin: '20px',
+          }}
+        >
+          <span>{detali?.leaveStatistics?.restLeave}</span>
+          <span>调休</span>
+        </div>
+        <div
+          style={{
+            display: 'flex',
+            flex: '0 0 12vw',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexDirection: 'column',
+            margin: '20px',
+          }}
+        >
+          <span>{detali?.leaveStatistics?.sickLeave}</span>
+          <span>病假</span>
+        </div>
+        <div
+          style={{
+            display: 'flex',
+            flex: '0 0 12vw',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexDirection: 'column',
+            margin: '20px',
+          }}
+        >
+          <span>{detali?.leaveStatistics?.otherLeave}</span>
+          <span>其他</span>
+        </div>
+      </>
+    );
+  }, [detali]);
 
   return (
     <Card title="打卡月报">
@@ -127,8 +474,11 @@ export default () => {
                 width: '30vw',
                 height: '30vh',
                 display: 'flex',
+                flexWrap: 'wrap',
               }}
-            ></div>
+            >
+              {renderClockStatistics}
+            </div>
           </div>
         </div>
 
@@ -141,8 +491,11 @@ export default () => {
               border: '1px dashed #d9d9d9',
               width: '30vw',
               height: '10vh',
+              display: 'flex',
             }}
-          ></div>
+          >
+            {renderOvertimeStatistics}
+          </div>
         </div>
 
         <div style={{ padding: 10 }}>
@@ -152,10 +505,14 @@ export default () => {
           <div
             style={{
               border: '1px dashed #d9d9d9',
-              width: '74vw',
-              height: '10vh',
+              width: '73vw',
+              minHeight: '10vh',
+              display: 'flex',
+              flexWrap: 'wrap',
             }}
-          ></div>
+          >
+            {renderLeaveModel}
+          </div>
         </div>
       </div>
     </Card>
