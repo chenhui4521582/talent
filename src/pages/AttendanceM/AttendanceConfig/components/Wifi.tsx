@@ -50,7 +50,6 @@ export default props => {
   };
 
   const renderList = useMemo(() => {
-    console.log(list);
     return list.map((item, index) => {
       return (
         <div className="scheduling-box-one-item" key={index}>
