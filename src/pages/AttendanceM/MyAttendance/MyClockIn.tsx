@@ -5,7 +5,6 @@ import locale from 'antd/lib/calendar/locale/zh_CN.js';
 import { listMyRecord } from './services/list';
 import { GlobalResParams } from '@/types/ITypes';
 import calendar from 'solarday2lunarday';
-import moment from 'moment';
 import './styles/myclockin.less';
 
 // 上班打卡方式

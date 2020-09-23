@@ -24,18 +24,18 @@ export async function upGlobalConfig(params) {
 }
 
 // 查看节假日配置
-export async function listHoliday(params) {
+export async function listHoliday(month) {
   return request(`/api/attendance/globalConfig/listHoliday`, {
     method: 'POST',
-    data: params,
+    data: { month },
   });
 }
 
 // 删除节日配置
-export async function removeHoliday(params) {
+export async function removeHoliday(holidayId) {
   return request(`/api/attendance/globalConfig/removeHoliday`, {
     method: 'POST',
-    data: params,
+    data: { holidayId },
   });
 }
 
