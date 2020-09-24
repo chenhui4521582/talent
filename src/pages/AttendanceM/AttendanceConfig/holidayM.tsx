@@ -22,6 +22,7 @@ import {
 } from './services/globalConfig';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { GlobalResParams } from '@/types/ITypes';
+import moment from 'moment';
 import './styles/holiday.less';
 
 const { TextArea } = Input;
@@ -136,7 +137,7 @@ export default () => {
       let api = updateHoliday;
       if (!value.holidayId) {
         api = addHoliday;
-        obj.date = selectDay;
+        obj.date = moment(selectDay);
       } else {
         obj.holidayId = value.holidayId;
       }
@@ -233,7 +234,9 @@ export default () => {
           form={form1}
           style={{ marginLeft: '3vw', float: 'left', width: '25vw' }}
         >
-          <Form.Item name="holidayId" style={{ display: 'none' }}></Form.Item>
+          <Form.Item name="holidayId" style={{ display: 'none' }}>
+            <Input />
+          </Form.Item>
           <Form.Item
             label="福利类型"
             name="welfareType"
@@ -247,7 +250,7 @@ export default () => {
           <Form.Item
             label="提前下班时长"
             name="earlyOffHour"
-            rules={[{ required: true, message: '请选择福利类型!' }]}
+            rules={[{ required: true, message: '请选择提前下班时长!' }]}
             style={{ width: '20vw' }}
           >
             <Select>
