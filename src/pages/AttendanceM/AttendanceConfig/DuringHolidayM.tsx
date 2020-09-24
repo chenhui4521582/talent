@@ -1,6 +1,5 @@
 // 假期管理
-import React, { useState, useEffect } from 'react';
-import { Link } from 'umi';
+import React, { useState } from 'react';
 import {
   Card,
   notification,
@@ -95,7 +94,7 @@ export default () => {
   const { TableContent, refresh } = useReq({
     queryMethod: listHolidayConfig,
     columns,
-    rowKeyName: 'id',
+    rowKeyName: 'typeId',
     cacheKey: '/attendance/holidayConfig/listHolidayConfig',
   });
 
@@ -134,6 +133,7 @@ export default () => {
           message: res.msg,
           description: '',
         });
+        setVisible(false);
         refresh();
       } else {
         notification['error']({
@@ -144,19 +144,7 @@ export default () => {
     });
   };
   return (
-    <Card
-      title="公告列表"
-      extra={
-        <Button
-          type="primary"
-          onClick={() => {
-            window.location.href = 'new';
-          }}
-        >
-          新增公告
-        </Button>
-      }
-    >
+    <Card title="假期管理">
       <TableContent />
 
       <Modal

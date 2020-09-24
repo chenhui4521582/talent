@@ -100,10 +100,15 @@ function Organization(props: tsProps, formRef) {
     let userKeyArr = userKeyList;
     let departListkey = departList;
 
-    const handleItem = list => {
+    const handleItem = (list, name) => {
       for (let i = 0; i < list.length; i++) {
         list[i].key = list[i].code;
         list[i].title = list[i].name;
+        if (list[i].level) {
+          list[i].organizationName = name + '/' + list[i].name;
+        } else {
+          list[i].organizationName = name;
+        }
         keyTitle.push({
           key: list[i].code,
           title: list[i].name,
@@ -134,12 +139,12 @@ function Organization(props: tsProps, formRef) {
           });
         }
         if (list[i].children) {
-          handleItem(list[i].children);
+          handleItem(list[i].children, list[i].organizationName);
         }
       }
     };
 
-    handleItem(data);
+    handleItem(data, '奖多多');
     setdepartList(departListkey);
     setUserKeyList(userKeyArr);
     setDataList(data);

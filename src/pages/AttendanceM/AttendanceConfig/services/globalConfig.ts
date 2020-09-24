@@ -56,10 +56,9 @@ export async function updateHoliday(params) {
 }
 
 // 假期管理列表
-export async function listHolidayConfig(params) {
+export async function listHolidayConfig() {
   return request(`/api/attendance/holidayConfig/listHolidayConfig`, {
     method: 'POST',
-    data: params,
   });
 }
 
@@ -81,7 +80,7 @@ export async function listVacationRecord(params) {
 
 // 发起扣假
 export async function saveVacationRecord(params) {
-  return request(`/api/attendance//vacation/saveVacationRecord`, {
+  return request(`/api/attendance/vacation/saveVacationRecord`, {
     method: 'POST',
     data: params,
   });
