@@ -284,25 +284,6 @@ export default props => {
 
           <Form layout="vertical" form={form}>
             <Row style={{ marginTop: 20 }}>
-              <Col>抄送通知</Col>
-              <Col style={{ marginLeft: 20 }}>
-                <Form.Item name="noticeStatus" initialValue={1}>
-                  <Radio.Group>
-                    <Radio value={1}>提交申请时抄送</Radio>
-                    <br />
-                    <Radio style={{ marginTop: 5 }} value={2}>
-                      审批通过后抄送
-                    </Radio>{' '}
-                    <br />
-                    <Radio style={{ marginTop: 5 }} value={3}>
-                      提交申请时和审批通过后都抄送
-                    </Radio>
-                  </Radio.Group>
-                </Form.Item>
-              </Col>
-            </Row>
-
-            <Row style={{ marginTop: 20 }}>
               <Col>异常处理</Col>
               <Col style={{ marginLeft: 20 }}>
                 <Form.Item

@@ -135,7 +135,7 @@ export default forwardRef((props: any, formRef) => {
 
 const FormItem = props => {
   const { list, Index, handleDelete, form } = props;
-  const [type, setType] = useState<number>(1);
+  const [type, setType] = useState<number>();
   const [itemList, setItemList] = useState<string>();
 
   useEffect(() => {
