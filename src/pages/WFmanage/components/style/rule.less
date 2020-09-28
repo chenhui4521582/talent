@@ -1,14 +1,15 @@
 .add-item {
-  float: left;
   margin: 16px 6px;
-  width: 90px;
-  height: 90px;
+  width: 60px;
+  height: 60px;
   display: inline-block;
   border-radius: 5px;
   border: 2px solid rgb(215, 215, 215);
   color: rgb(215, 215, 215);
   text-align: center;
   cursor: pointer;
+  position: relative;
+  vertical-align: top;
 }
 
 .item {
@@ -23,10 +24,22 @@
   .name {
     position: absolute;
     padding-right: '0 6px';
-    min-width: 4em;
-    text-align: center;
+    width: 60px;
     text-align: center;
     line-height: 1.5em;
     width: 100%;
+  }
+}
+.add-condition {
+  margin-top: 28px;
+  height: 60px;
+  display: inline-flex;
+  vertical-align: top;
+  color: rgb(153, 153, 153);
+  font-size: 36px;
+  span {
+    display: inline-flex;
+    height: 60px;
+    line-height: 10px;
   }
 }

@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import {
   Divider,
   Collapse,
@@ -25,6 +25,7 @@ import MoveInOz from '@/pages/Framework/components/MoveInOz';
 import Assembly from './Assembly';
 import SystemLabel from './SystemLabel';
 import Card from './Card';
+import Condition from './Condition';
 
 import './style/rule.less';
 
@@ -100,6 +101,8 @@ export default props => {
 
   const [form] = Form.useForm();
   const [nameForm] = Form.useForm();
+  const ref = useRef<any>();
+
   const [labelList, setLabelList] = useState<tsLabel[]>();
   const [edit, setEdit] = useState<boolean>(false);
   const [visible, setVisible] = useState<boolean>(false);
@@ -112,6 +115,9 @@ export default props => {
   const [param, setParam] = useState<IFile[]>([]);
   const [controlList, setControlList] = useState<IListItem[]>();
   const [isFiles, setIsFiles] = useState<boolean>(false);
+  const [conditionVisable, setConditionVisable] = useState<
+    '新增' | '编辑' | undefined
+  >('新增');
 
   useEffect(() => {
     async function getLable() {
@@ -471,6 +477,15 @@ export default props => {
     });
   };
 
+  // 条件的ok
+  const handleCondition = () => {
+    let conditionForm = ref?.current?.getvalue();
+    console.log(conditionForm.getFieldsValue());
+    conditionForm.validateFields().then(async value => {
+      console.log(value);
+    });
+  };
+
   const renderModalBottom = useMemo(() => {
     switch (type) {
       case 1:
@@ -622,30 +637,60 @@ export default props => {
 
   return (
     <div>
-      <div ref={drop} style={{ float: 'left' }}>
-        {list?.map((item, index) => {
-          return (
-            <Card
-              key={index}
-              index={index}
-              moveCard={moveCard}
-              {...item}
-              item={item}
-              handleEditShowmodal={handleEditShowmodal}
-              handleShowName={handleShowName}
-              handleRemove={handleRemove}
-              setCardIndex={setCardIndex}
+      <div>
+        <div
+          ref={drop}
+          style={{ float: 'left', height: 'auto', whiteSpace: 'nowrap' }}
+        >
+          {list?.map((item, index) => {
+            return (
+              <>
+                <Card
+                  key={index}
+                  index={index}
+                  moveCard={moveCard}
+                  {...item}
+                  item={item}
+                  handleEditShowmodal={handleEditShowmodal}
+                  handleShowName={handleShowName}
+                  handleRemove={handleRemove}
+                  setCardIndex={setCardIndex}
+                />
+                {index < list.length - 1 ? (
+                  <span className="add-condition">
+                    <span>...</span>
+                    <PlusOutlined
+                      style={{
+                        border: '2px solid #999',
+                        fontSize: 22,
+                        padding: 2,
+                        height: 28,
+                        width: 28,
+                        textAlign: 'center',
+                        lineHeight: 26,
+                        borderRadius: '28px 28px',
+                        margin: 3,
+                        cursor: 'pointer',
+                      }}
+                      onClick={() => {
+                        setConditionVisable('新增');
+                      }}
+                    />
+                    <span>...</span>
+                  </span>
+                ) : null}
+              </>
+            );
+          })}
+          <div className="add-item" onClick={handleAddShowModal}>
+            <PlusOutlined
+              style={{
+                marginTop: 10,
+                fontSize: 40,
+              }}
             />
-          );
-        })}
-      </div>
-      <div className="add-item" onClick={handleAddShowModal}>
-        <PlusOutlined
-          style={{
-            marginTop: 25,
-            fontSize: 40,
-          }}
-        />
+          </div>
+        </div>
       </div>
       <Modal
         key={visible + ''}
@@ -752,6 +797,19 @@ export default props => {
             <Input placeholder="请输入节点名称" />
           </Form.Item>
         </Form>
+      </Modal>
+      <Modal
+        title="条件分支设置"
+        visible={!!conditionVisable}
+        okText="确认"
+        cancelText="返回"
+        onCancel={() => {
+          setConditionVisable(undefined);
+        }}
+        onOk={handleCondition}
+        width="40vw"
+      >
+        <Condition {...props} ref={ref} />
       </Modal>
     </div>
   );

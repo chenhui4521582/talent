@@ -110,10 +110,9 @@ const Card: React.FC<tsStep & IProps> = ({
     color: '#ffffff',
     opacity: isDragging ? 0.2 : 1,
     padding: '20px 0px',
-    width: 90,
-    height: 90,
+    width: 60,
+    height: 60,
     display: 'inline-block',
-    float: 'left',
     position: 'relative',
     borderRadius: 5,
   };
@@ -135,7 +134,7 @@ const Card: React.FC<tsStep & IProps> = ({
       <p
         style={{
           position: 'absolute',
-          width: 88,
+          width: 58,
           padding: '0 15px 0 15px',
           height: 'auto',
           bottom: 4,

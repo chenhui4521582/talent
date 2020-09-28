@@ -1,5 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import { Card, Button, Divider, Row, Col, Radio, notification } from 'antd';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
+import {
+  Card,
+  Button,
+  Divider,
+  Row,
+  Col,
+  Radio,
+  notification,
+  Form,
+  Modal,
+} from 'antd';
 import {
   updateRolu,
   saveRolu,
@@ -12,6 +22,7 @@ import { GlobalResParams } from '@/types/ITypes';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import GridLayout from './components/GridLayout';
+import Organization from '@/pages/Framework/components/Organization';
 interface tsGetId {
   id: string;
   isDefault: string;
@@ -28,6 +39,11 @@ export default props => {
   const [addOrChange, setAddOrChange] = useState<'add' | 'change'>('change');
   const [controlModels, setControlModels] = useState<any[]>();
   const [formId, setFormId] = useState<string>();
+  const [visible, setVisible] = useState<boolean>(false);
+  const [userShow, setUserShow] = useState<boolean>(false);
+  const [selectUserKey, setSelectUserKey] = useState<string[]>([]);
+  const [form] = Form.useForm();
+  const ref = useRef<any>();
   let archiveControlParams: any = [];
 
   useEffect(() => {
@@ -202,69 +218,157 @@ export default props => {
     data2 = value;
   };
 
-  // 模态框下面主体
-  return (
-    <DndProvider backend={HTML5Backend}>
-      <Card
-        title="规则设置"
-        extra={<Button type="primary" onClick={submitData}>{`保存`}</Button>}
-      >
-        <h4 style={{ margin: '15px 0' }}>{fromName}</h4>
-        <Divider />
-        <Row>
-          <Col>默认审批人</Col>
-          <Col span={18} offset={1}>
-            <GridLayout
-              {...props}
-              ruleList={listOne}
-              change={getdata1}
-              controlModels={controlModels}
-              getArchiveControlParams={getArchiveControlParams}
-            />
-          </Col>
-        </Row>
+  const handleUserOk = () => {
+    console.log(ref.current.getvalue());
+    form.setFieldsValue({ illegalUser: ref.current.getvalue() });
+    setVisible(false);
+  };
 
-        {/* <Row>
-          <Col>默认抄送人</Col>
-          <Col span={18} offset={1}>
-            <GridLayout {...props} ruleList={listTwo} change={getdata2} />
-          </Col>
-        </Row>
-        <Divider /> */}
-
-        {/* <Row style={{ marginTop: 20 }}>
-          <Col>抄送通知</Col>
-          <Col style={{ marginLeft: 20 }}>
-            <Radio.Group
-              onChange={e => {
-                const { value } = e.target;
-                setStepType(value);
-              }}
-              value={stepType}
-            >
-              <Radio value={1}>提交申请时抄送</Radio>
-              <br />
-              <Radio style={{ marginTop: 5 }} value={2}>
-                审批通过后抄送
-              </Radio>{' '}
-              <br />
-              <Radio style={{ marginTop: 5 }} value={3}>
-                提交申请时和审批通过后都抄送
-              </Radio>
-            </Radio.Group>
-          </Col>
-        </Row> */}
-        <div style={{ textAlign: 'center', marginTop: 20 }}>
-          <Button
+  const renderUser = useMemo(() => {
+    console.log(form.getFieldValue('illegalUser'));
+    let user = form.getFieldValue('illegalUser');
+    if (!user) {
+      return (
+        <a
+          onClick={() => {
+            setVisible(true);
+          }}
+        >
+          添加
+        </a>
+      );
+    } else {
+      return (
+        <>
+          <span
             onClick={() => {
-              window.history.go(-1);
+              setVisible(true);
             }}
           >
-            {' '}
-            返回{' '}
-          </Button>
-        </div>
-      </Card>
-    </DndProvider>
+            {user[0].title}
+          </span>
+          <a
+            style={{ marginLeft: 6 }}
+            onClick={() => {
+              setVisible(true);
+              setSelectUserKey([user[0].key]);
+            }}
+          >
+            修改
+          </a>
+        </>
+      );
+    }
+  }, [form.getFieldValue('illegalUser'), selectUserKey]);
+  return (
+    <>
+      <DndProvider backend={HTML5Backend}>
+        <Card
+          title="规则设置"
+          extra={<Button type="primary" onClick={submitData}>{`保存`}</Button>}
+        >
+          <h4 style={{ margin: '15px 0' }}>{fromName}</h4>
+          <Divider />
+          <Row>
+            <Col>默认审批人</Col>
+            <Col span={18} offset={1}>
+              <GridLayout
+                {...props}
+                ruleList={listOne}
+                change={getdata1}
+                controlModels={controlModels}
+                getArchiveControlParams={getArchiveControlParams}
+              />
+            </Col>
+          </Row>
+
+          <Form layout="vertical" form={form}>
+            <Row style={{ marginTop: 20 }}>
+              <Col>抄送通知</Col>
+              <Col style={{ marginLeft: 20 }}>
+                <Form.Item name="noticeStatus" initialValue={1}>
+                  <Radio.Group>
+                    <Radio value={1}>提交申请时抄送</Radio>
+                    <br />
+                    <Radio style={{ marginTop: 5 }} value={2}>
+                      审批通过后抄送
+                    </Radio>{' '}
+                    <br />
+                    <Radio style={{ marginTop: 5 }} value={3}>
+                      提交申请时和审批通过后都抄送
+                    </Radio>
+                  </Radio.Group>
+                </Form.Item>
+              </Col>
+            </Row>
+
+            <Row style={{ marginTop: 20 }}>
+              <Col>异常处理</Col>
+              <Col style={{ marginLeft: 20 }}>
+                <Form.Item
+                  name="illegalProcessType"
+                  initialValue={1}
+                  label="审批节点内成员离职、为空等情况的处理方式"
+                >
+                  <Radio.Group
+                    onChange={e => {
+                      console.log(e.target.value);
+                      if (e.target.value === 1) {
+                        setUserShow(false);
+                      } else {
+                        setUserShow(true);
+                      }
+                    }}
+                  >
+                    <Radio value={1}>自动同意</Radio>
+                    <br />
+                    <Radio style={{ marginTop: 5 }} value={2}>
+                      转交给固定人
+                    </Radio>
+                  </Radio.Group>
+                </Form.Item>
+              </Col>
+            </Row>
+            {userShow ? (
+              <Row style={{ marginTop: 20 }}>
+                <Col>异常处理人</Col>
+                <Col style={{ marginLeft: 20 }}>
+                  <Form.Item name="illegalUser">{renderUser}</Form.Item>
+                </Col>
+              </Row>
+            ) : null}
+          </Form>
+          <div style={{ textAlign: 'center', marginTop: 20 }}>
+            <Button
+              onClick={() => {
+                window.history.go(-1);
+              }}
+            >
+              {' '}
+              返回{' '}
+            </Button>
+          </div>
+        </Card>
+      </DndProvider>
+      <Modal
+        width="45vw"
+        title="成员或标签支持多选"
+        visible={visible}
+        okText="确认"
+        cancelText="返回"
+        onCancel={() => {
+          setVisible(false);
+        }}
+        onOk={handleUserOk}
+      >
+        <Organization
+          ref={ref}
+          onlySelectUser={true}
+          renderUser={true}
+          onlySelect={true}
+          selectKeys={selectUserKey}
+        />
+      </Modal>
+    </>
   );
 };
