@@ -31,12 +31,12 @@ export default props => {
   const [visible, setVisible] = useState<boolean>(false);
 
   const handelOk = () => {
-    setLaberList(ref1.current.getvalue());
-    setUserList(ref.current.getvalue());
+    setUserList(ref.current?.getvalue && ref.current.getvalue());
+    setLaberList(ref1.current?.getvalue && ref1.current.getvalue());
     props.onChange &&
       props.onChange({
-        userList: ref.current.getvalue(),
-        laberList: ref1.current.getvalue(),
+        userList: ref.current?.getvalue && ref.current.getvalue(),
+        laberList: ref1.current?.getvalue && ref1.current.getvalue(),
       });
     setVisible(false);
   };

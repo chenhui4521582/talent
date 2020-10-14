@@ -7,6 +7,9 @@ export interface tsStepObj {
   controlModels?: any[];
 }
 export interface tsStep {
+  ruleSets?: any;
+  isCondition?: 1 | 0;
+  nextNodeId?: number;
   id: string;
   stepName: string;
   stepType: number;

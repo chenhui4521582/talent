@@ -61,6 +61,18 @@ interface IListItem {
   childName: string;
 }
 
+interface IruleSets {
+  fromNodeId: number; //起始id
+  toNodeId: number; //终点节点id
+  id?: number; // 主键id
+  isDefault: number; // 是否是默认流程
+  name: number; //名称
+  priority: number; //优先级
+  resRuleCurdParams: any[]; // 条件的内容
+  resStepId: number; //起始主键id
+  resNextStepId: number; // 终点id
+}
+
 const levelList = [
   '直接上级',
   '第二上级',
@@ -93,8 +105,14 @@ let systemObj;
 // specifiedLevel
 
 export default props => {
-  const { ruleList, controlModels, change, getArchiveControlParams } = props;
-  const [list, setList] = useState<tsStep[]>();
+  const {
+    ruleList,
+    controlModels,
+    change,
+    getArchiveControlParams,
+    propsRuleSets,
+  } = props;
+  const [list, setList] = useState<tsStep[] | any>();
   const [, drop] = useDrop({
     accept: ItemTypes.Card,
   });
@@ -117,7 +135,11 @@ export default props => {
   const [isFiles, setIsFiles] = useState<boolean>(false);
   const [conditionVisable, setConditionVisable] = useState<
     '新增' | '编辑' | undefined
-  >('新增');
+  >();
+  const [ruleSets, setruleSets] = useState<any | IruleSets[]>([]);
+  const [ruleItem, setRuleItem] = useState<any>();
+  const [selectRule, setSelectRule] = useState<any>();
+  const [data, setData] = useState<any[]>([]);
 
   useEffect(() => {
     async function getLable() {
@@ -146,8 +168,117 @@ export default props => {
   }, []);
 
   useEffect(() => {
-    setList(sortTypeList(ruleList));
+    console.log(ruleList);
+    let newList = JSON.parse(JSON.stringify(sortTypeList(ruleList)));
+    let obj = {
+      ruleList: [
+        {
+          list: newList,
+        },
+      ],
+    };
+    console.log([obj]);
+    let arr = [obj];
+    const droopData = data => {
+      let newData = data;
+      function handleData(listItem, poi) {
+        listItem.map((item, index) => {
+          item.poi = poi + '-' + index;
+          {
+            item.ruleList?.map((ruleItem, ruleItemIndex) => {
+              {
+                handleData(ruleItem?.list, item.poi + '-' + ruleItemIndex);
+              }
+            });
+          }
+        });
+      }
+
+      return handleData(newData, 0);
+    };
+    droopData(arr);
+    console.log('arr');
+    console.log(arr);
+    setList(arr);
   }, [ruleList]);
+
+  useEffect(() => {
+    let arr: any = [];
+    if (ruleSets?.length) {
+      list?.map((listItem, index) => {
+        let obj: any = {
+          ...listItem,
+        };
+        let arrRule: any = [];
+        if (listItem.isCondition) {
+          // 挑件是条件节点的
+          ruleSets?.map(item => {
+            if (item.fromNodeId === index) {
+              console.log(item.fromNodeId);
+              arrRule.push(item);
+              console.log(arrRule);
+            }
+          });
+
+          obj.ruleList = arrRule;
+        }
+
+        arr.push(obj);
+      });
+
+      console.log(arr);
+    } else {
+      arr = list;
+    }
+
+    function handlePush(items) {
+      let lists: any = [];
+      function handleCpush(item) {
+        arr?.map((arritem, index) => {
+          if (item.nextNodeId === index) {
+            //连续找到下个节点
+            lists.push(arritem);
+            if (arritem.nextNodeId) {
+              // handlePush(arritem);
+              console.log('handleCpush(arritem)');
+              console.log(handleCpush(arritem));
+              lists.concat(handleCpush(arritem));
+            }
+            arr.splice(index, 1);
+          }
+        });
+      }
+      handleCpush(items);
+      return lists;
+    }
+
+    function handleData(datas) {
+      datas?.map(item => {
+        if (item?.ruleList?.length) {
+          item?.ruleList?.map(ruleItem => {
+            ruleItem.list = [];
+            arr?.map((arritem, index) => {
+              if (ruleItem.toNodeId === index) {
+                //连续找到下个节点
+                ruleItem.list.push(arritem);
+                ruleItem.list = ruleItem.list.concat(handlePush(arritem));
+                datas.splice(index, 1);
+              }
+            });
+          });
+        }
+      });
+      console.log('datas');
+      console.log(datas);
+      return datas;
+    }
+
+    setData(handleData(arr));
+  }, [ruleSets]);
+
+  useEffect(() => {
+    setruleSets(propsRuleSets);
+  }, [propsRuleSets]);
 
   useEffect(() => {
     change && change(list);
@@ -423,7 +554,6 @@ export default props => {
       },
     });
   };
-
   // 类型
   const rendType1 = () => {
     return (
@@ -477,12 +607,179 @@ export default props => {
     });
   };
 
-  // 条件的ok
+  // 新增分支显示modal
+  const handleShowBranch = (type, index: number, item) => {
+    setRuleItem(item);
+    if (type === '新增') {
+      setConditionVisable('新增');
+    } else {
+      setConditionVisable('编辑');
+    }
+  };
+
+  //编辑分支
+  const handleEditBranch = (item, index: number) => {
+    console.log('编辑分支');
+    console.log(selectRule);
+    console.log(index);
+    let ruleItem = item?.ruleList[index];
+    let obj = {
+      name: ruleItem.name,
+      priority: ruleItem.priority,
+      resRuleCurdParams: ruleItem.resRuleCurdParams,
+    };
+    setSelectRule(obj);
+    setConditionVisable('编辑');
+  };
+
+  // 条件分支的ok
   const handleCondition = () => {
     let conditionForm = ref?.current?.getvalue();
     console.log(conditionForm.getFieldsValue());
+
+    function handleType(str) {
+      switch (str) {
+        case 'applicant':
+          return 1;
+        case 'number':
+          return 2;
+        case 'select':
+          return 3;
+        case 'multiple':
+          return 4;
+        case 'text':
+          return 5;
+        case 'areatext':
+          return 5;
+      }
+    }
     conditionForm.validateFields().then(async value => {
+      console.log('value');
       console.log(value);
+      console.log(value.type);
+      console.log(ruleItem);
+      let newItem: IruleSets | any;
+      let newList = JSON.parse(JSON.stringify(list));
+      let resRuleCurdParamsArr: any = [];
+      for (let key in value) {
+        if (key === 'priority' || key === 'name') {
+        } else {
+          let resRuleCurdParams: any;
+          if (conditionVisable === '编辑') {
+            resRuleCurdParams = {
+              id: value.id,
+            };
+          }
+          resRuleCurdParams = {
+            comparetor: value[key].comparetor,
+            type: handleType(value[key].type.split('&&')[1]),
+            refResFormControl: value[key].type.split('&&')[0],
+            value: value[key].value,
+          };
+          if (value.type === 'applicant') {
+            let memberTagIds: any = [];
+            let userCodes: any = [];
+            value.value.laberList.map(item => {
+              memberTagIds.push(item.key);
+            });
+            value.value.userList.map(item => {
+              userCodes.push(item.id);
+            });
+            resRuleCurdParams.value = {
+              memberTagIds: memberTagIds.join(','),
+              userCodes: value.value.userList.join(','),
+            };
+          }
+          resRuleCurdParamsArr.push(resRuleCurdParams);
+        }
+        newItem = {
+          name: value.name,
+          priority: value.priority,
+          resRuleCurdParams: resRuleCurdParamsArr,
+        };
+      }
+
+      if (conditionVisable === '新增') {
+        let poi = ruleItem.poi;
+        let pItem: any = {};
+        let poiArr = poi.split('-');
+        let poipStr = poiArr.pop();
+        let ruleIndex = poi.split('-')[poi.split('-').length - 2];
+        poipStr = poiArr.pop();
+        // poipStr = poiArr.pop()
+        poipStr = poiArr.join('-');
+        console.log('poipStr');
+        console.log(poipStr);
+        const droopData = data => {
+          let newData = data;
+          function handleData(listItem, i) {
+            listItem?.map((item, index) => {
+              console.log(item.poi);
+              if (poipStr === item.poi) {
+                pItem = item;
+                item?.ruleList[ruleIndex]?.list.map((cItem, cItemIndex) => {
+                  if (cItem.poi === poi) {
+                    let myList = item.ruleList[ruleIndex].list.splice(
+                      cItemIndex + 1,
+                      item.ruleList[ruleIndex].list.length - 1,
+                    );
+                    let pList = item.ruleList[ruleIndex].list.splice(
+                      0,
+                      cItemIndex + 1,
+                    );
+                    console.log(myList);
+                    console.log(pList);
+                    newItem.list = myList;
+                    item.ruleList[ruleIndex].list = pList;
+                  }
+                });
+                console.log('pItem');
+                console.log(pItem);
+                console.log(pItem.ruleList[ruleIndex]);
+              }
+              if (item.poi === poi) {
+                item.ruleList = [newItem];
+                item.ruleList.push({
+                  ...newItem,
+                  list: [],
+                  name: '条件' + item.ruleList.length + 1,
+                });
+              } else {
+                {
+                  item.ruleList?.map((ruleItem, ruleItemIndex) => {
+                    {
+                      handleData(ruleItem?.list, ruleItemIndex);
+                    }
+                  });
+                }
+              }
+            });
+          }
+          return handleData(newData, 0);
+        };
+
+        droopData(newList);
+
+        const droopData1 = data => {
+          let newData = data;
+          function handleData(listItem, poi) {
+            listItem.map((item, index) => {
+              item.poi = poi + '-' + index;
+              {
+                item.ruleList?.map((ruleItem, ruleItemIndex) => {
+                  handleData(ruleItem?.list, item.poi + '-' + ruleItemIndex);
+                });
+              }
+            });
+          }
+          return handleData(newData, 0);
+        };
+        droopData1(newList);
+
+        setList(newList);
+      } else {
+      }
+      setConditionVisable(undefined);
     });
   };
 
@@ -635,16 +932,38 @@ export default props => {
     }
   }, [type, selectObj]);
 
-  return (
-    <div>
-      <div>
-        <div
-          ref={drop}
-          style={{ float: 'left', height: 'auto', whiteSpace: 'nowrap' }}
-        >
-          {list?.map((item, index) => {
-            return (
-              <>
+  const droopData = data => {
+    let newData = JSON.parse(JSON.stringify(data || []));
+    function handleData(listItem, poi) {
+      let show = true;
+      return listItem?.map((item, index) => {
+        item.poi = poi + '-' + index;
+        item?.ruleList &&
+          item?.ruleList[0]?.list?.map(oneItem => {
+            if (oneItem?.ruleList?.length >= 2) {
+              show = false;
+            } else {
+              show = true;
+              return;
+            }
+          });
+        return (
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              alignItems: 'center',
+              height: 'auto',
+            }}
+          >
+            {item.stepName ? (
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                }}
+              >
                 <Card
                   key={index}
                   index={index}
@@ -656,7 +975,7 @@ export default props => {
                   handleRemove={handleRemove}
                   setCardIndex={setCardIndex}
                 />
-                {index < list.length - 1 ? (
+                {index < listItem.length - 1 ? (
                   <span className="add-condition">
                     <span>...</span>
                     <PlusOutlined
@@ -673,25 +992,122 @@ export default props => {
                         cursor: 'pointer',
                       }}
                       onClick={() => {
-                        setConditionVisable('新增');
+                        handleShowBranch('新增', index, item);
                       }}
                     />
                     <span>...</span>
                   </span>
                 ) : null}
-              </>
-            );
-          })}
-          <div className="add-item" onClick={handleAddShowModal}>
-            <PlusOutlined
+              </div>
+            ) : null}
+            <div
               style={{
-                marginTop: 10,
-                fontSize: 40,
+                display: 'flex',
+                flexDirection: 'row',
               }}
-            />
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                }}
+              >
+                {item.ruleList?.length > 1 ? (
+                  <div
+                    style={{
+                      border: '1px solid #ccc',
+                      borderRadius: '5px 5px',
+                      width: '5em',
+                      height: '1.5em',
+                      textAlign: 'center',
+                      lineHeight: '1.5em',
+                    }}
+                  >
+                    <a>新增条件</a>
+                  </div>
+                ) : null}
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                  }}
+                >
+                  {item.ruleList?.map((ruleItem, ruleItemIndex) => {
+                    if (!ruleItem?.list?.length || !ruleItem?.list) {
+                      show = true;
+                    }
+                    return (
+                      <div
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                        }}
+                      >
+                        {item.stepName ? (
+                          <div
+                            style={{
+                              backgroundColor: 'red',
+                              width: '110px',
+                              height: '70px',
+                              margin: '20px',
+                              borderRadius: '5px 5px',
+                            }}
+                            onClick={() => {
+                              handleEditBranch(item, ruleItemIndex);
+                            }}
+                          >
+                            {ruleItem.name}
+                          </div>
+                        ) : null}
+                        <div
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                          }}
+                        >
+                          {handleData(
+                            ruleItem?.list,
+                            item.poi + '-' + ruleItemIndex,
+                          )}
+                        </div>
+                        {show ? (
+                          <div
+                            className="add-item"
+                            onClick={handleAddShowModal}
+                          >
+                            <PlusOutlined
+                              style={{
+                                marginTop: 10,
+                                fontSize: 40,
+                              }}
+                            />
+                          </div>
+                        ) : null}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
+        );
+      });
+    }
+    return handleData(newData, 0);
+  };
+
+  const renderBranchBox = useMemo(() => {
+    console.log('list');
+    console.log(list);
+    console.log('list');
+    return droopData(list);
+  }, [list, ruleSets, data]);
+
+  return (
+    <div style={{ overflowX: 'auto', minHeight: '150px' }}>
+      {renderBranchBox}
       <Modal
         key={visible + ''}
         width="56vw"
@@ -809,7 +1225,12 @@ export default props => {
         onOk={handleCondition}
         width="40vw"
       >
-        <Condition {...props} ref={ref} />
+        <Condition
+          key={conditionVisable}
+          {...props}
+          ref={ref}
+          selectRule={selectRule}
+        />
       </Modal>
     </div>
   );

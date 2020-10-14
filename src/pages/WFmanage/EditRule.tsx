@@ -269,9 +269,9 @@ export default props => {
         >
           <h4 style={{ margin: '15px 0' }}>{fromName}</h4>
           <Divider />
-          <Row>
-            <Col>默认审批人</Col>
-            <Col span={18} offset={1}>
+          <Row style={{ height: 'auto' }}>
+            <Col style={{ marginTop: 14 }}>默认审批人</Col>
+            <Col span={18}>
               <GridLayout
                 {...props}
                 ruleList={listOne}

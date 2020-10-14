@@ -29,10 +29,11 @@ interface IListItem {
 }
 
 export default forwardRef((props: any, formRef) => {
+  const { selectRule } = props;
   const [form] = Form.useForm();
   const [formItemList, setFormItemList] = useState<any[]>();
   const [controlList, setControlList] = useState<IListItem[]>();
-  const [numberList, setNumberList] = useState<number[]>();
+  const [numberList, setNumberList] = useState<any[]>();
   const [formList, setFormList] = useState<any>();
 
   useEffect(() => {
@@ -63,7 +64,13 @@ export default forwardRef((props: any, formRef) => {
       }
     }
     getControlList();
-  }, []);
+  }, [selectRule]);
+
+  useEffect(() => {
+    if (selectRule?.resRuleCurdParams) {
+      setNumberList(selectRule.resRuleCurdParams);
+    }
+  }, [selectRule]);
 
   useImperativeHandle(formRef, () => {
     return {
@@ -87,18 +94,20 @@ export default forwardRef((props: any, formRef) => {
 
   const renderFormItem = useMemo(() => {
     console.log(numberList);
+
     return numberList?.map((item, index) => {
       return (
         <FormItem
-          key={index}
+          key={controlList}
           list={controlList}
           Index={index}
           handleDelete={handleDelete}
           form={form}
+          selectRule={item}
         />
       );
     });
-  }, [numberList]);
+  }, [numberList, controlList, selectRule]);
 
   return (
     <>
@@ -108,6 +117,7 @@ export default forwardRef((props: any, formRef) => {
             <Form.Item
               name="name"
               rules={[{ required: true, message: '请输入条件名称!' }]}
+              initialValue={selectRule ? selectRule.name : undefined}
             >
               <Input />
             </Form.Item>
@@ -116,6 +126,7 @@ export default forwardRef((props: any, formRef) => {
             <Form.Item
               name="priority"
               rules={[{ required: true, message: '请选择优先级!' }]}
+              initialValue={selectRule ? selectRule.priority : undefined}
             >
               <Select placeholder="请选择优先级" allowClear>
                 <Option value={1}>优先级1</Option>
@@ -134,7 +145,7 @@ export default forwardRef((props: any, formRef) => {
 });
 
 const FormItem = props => {
-  const { list, Index, handleDelete, form } = props;
+  const { list, Index, handleDelete, form, selectRule } = props;
   const [type, setType] = useState<number>();
   const [itemList, setItemList] = useState<string>();
 
@@ -148,7 +159,41 @@ const FormItem = props => {
     }
   }, [type]);
 
-  const renderForm = useMemo(() => {
+  const handleType1 = str => {
+    switch (str) {
+      case 1:
+        return 'applicant';
+      case 2:
+        return 'number';
+      case 3:
+        return 'select';
+      case 4:
+        return 'multiple';
+      case '5':
+        return 'areatext';
+    }
+  };
+
+  useEffect(() => {
+    let obj: any = {};
+    console.log('-------------selectRule--------------------');
+    console.log(selectRule);
+    if (selectRule.refResFormControl && selectRule.type && selectRule.value) {
+      obj[Index] = {
+        comparetor: selectRule.comparetor,
+        value: selectRule.value,
+        type:
+          selectRule.refResFormControl + '&&' + handleType1(selectRule.type),
+      };
+      // setType(parseInt(selectRule.type))
+      onChange(
+        selectRule.refResFormControl + '&&' + handleType1(selectRule.type),
+      );
+      form.setFieldsValue(obj);
+    }
+  }, [selectRule]);
+
+  const renderForm = () => {
     switch (type) {
       // 申请人
       case 1:
@@ -172,6 +217,11 @@ const FormItem = props => {
                 rules={[{ required: true, message: '请选择!' }]}
               >
                 <LabelOrUser {...props} />
+              </Form.Item>
+            </Col>
+            <Col span={10} offset={1} hidden>
+              <Form.Item name={[Index, 'id']}>
+                <Input />
               </Form.Item>
             </Col>
           </>
@@ -202,6 +252,11 @@ const FormItem = props => {
                 rules={[{ required: true, message: '请输入!' }]}
               >
                 <InputNumber />
+              </Form.Item>
+            </Col>
+            <Col span={10} offset={1} hidden>
+              <Form.Item name={[Index, 'id']}>
+                <Input />
               </Form.Item>
             </Col>
           </>
@@ -235,6 +290,11 @@ const FormItem = props => {
                 </Radio.Group>
               </Form.Item>
             </Col>
+            <Col span={10} offset={1} hidden>
+              <Form.Item name={[Index, 'id']}>
+                <Input />
+              </Form.Item>
+            </Col>
           </>
         );
       // 多选
@@ -266,6 +326,11 @@ const FormItem = props => {
                 </Checkbox.Group>
               </Form.Item>
             </Col>
+            <Col span={10} offset={1} hidden>
+              <Form.Item name={[Index, 'id']}>
+                <Input />
+              </Form.Item>
+            </Col>
           </>
         );
       // 文本
@@ -291,26 +356,43 @@ const FormItem = props => {
                 <Input />
               </Form.Item>
             </Col>
+            <Col span={10} offset={1} hidden>
+              <Form.Item name={[Index, 'id']}>
+                <Input />
+              </Form.Item>
+            </Col>
           </>
         );
       default:
         return null;
     }
-  }, [type, itemList]);
+  };
 
   const onChange = values => {
     let type = values?.split('&&')[1];
-    console.log(type);
+    console.log(values);
     if (type === 'applicant') {
       setType(1);
     } else if (type === 'number') {
       setType(2);
     } else if (type === 'select') {
       setType(3);
-      setItemList(values?.split('&&')[2]);
+      let itemLists: any = '';
+      list?.map(item => {
+        if (item.id == values?.split('&&')[0]) {
+          itemLists = item.itemList;
+        }
+      });
+      setItemList(itemLists);
     } else if (type === 'multiple') {
       setType(4);
-      setItemList(values?.split('&&')[2]);
+      let itemLists: any = '';
+      list?.map(item => {
+        if (item.id == values?.split('&&')[0]) {
+          itemLists = item.itemList;
+        }
+      });
+      setItemList(itemLists);
     } else if (type === 'areatext' || type === 'text') {
       setType(5);
     }
@@ -325,12 +407,12 @@ const FormItem = props => {
       return '单选框';
     } else if (type === 'multiple') {
       return '多选框';
-    } else if (type === 'areatext' || type === 'text') {
+    } else if (type === 'areatext') {
       return '文本框';
     }
   };
 
-  return (
+  return list?.length ? (
     <>
       <Row>
         <Col>
@@ -353,13 +435,7 @@ const FormItem = props => {
                 return (
                   <Option
                     key={item.id}
-                    value={
-                      item.id +
-                      '&&' +
-                      item.baseControlType +
-                      '&&' +
-                      item.itemList
-                    }
+                    value={item.id + '&&' + item.baseControlType}
                   >
                     {item.childName}({item.name}) (
                     {handleType(item.baseControlType)})
@@ -369,8 +445,8 @@ const FormItem = props => {
             </Select>
           </Form.Item>
         </Col>
-        {renderForm}
+        {renderForm()}
       </Row>
     </>
-  );
+  ) : null;
 };
