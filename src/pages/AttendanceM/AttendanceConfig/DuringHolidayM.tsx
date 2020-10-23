@@ -42,28 +42,36 @@ export default () => {
       align: 'center',
     },
     {
-      title: '备注',
+      title: '说明',
       dataIndex: 'remark',
       key: 'remark',
       align: 'center',
       width: '26vw',
     },
     {
-      title: '最小休假单位',
+      title: '最小休假时长',
       dataIndex: 'minUnit',
       key: 'minUnit',
       align: 'center',
       render: (_, record) => {
-        return <span>{record.minUnit === 1 ? record.min + '天' : '小时'}</span>;
+        return (
+          <span>
+            {record.unit === 1 ? record.min + '天' : record.min + '小时'}
+          </span>
+        );
       },
     },
     {
-      title: '最大休假单位',
+      title: '最大休假时长',
       dataIndex: 'maxUnit',
       key: 'maxUnit',
       align: 'center',
       render: (_, record) => {
-        return <span>{record.maxUnit === 1 ? record.max + '天' : '小时'}</span>;
+        return (
+          <span>
+            {record.unit === 1 ? record.max + '天' : record.max + '小时'}
+          </span>
+        );
       },
     },
     {
@@ -103,14 +111,10 @@ export default () => {
       typeId: record.typeId,
       name: record.name,
       remark: record.remark,
-      minObj: {
-        min: record.min,
-        minUnit: record.minUnit,
-      },
-      maxObj: {
-        max: record.max,
-        maxUnit: record.maxUnit,
-      },
+      min: record.min,
+      max: record.max,
+      unit: record.unit,
+      type: record.type,
     };
     form.setFieldsValue(value);
     setVisible(true);
@@ -122,10 +126,10 @@ export default () => {
         typeId: value.typeId,
         name: value.name,
         remark: value.remark,
-        min: value.minObj.min,
-        minUnit: value.minObj.minUnit,
-        max: value.maxObj.max,
-        maxUnit: value.maxObj.maxUnit,
+        min: value.min,
+        unit: value.unit,
+        max: value.max,
+        type: value.type,
       };
       let res: GlobalResParams<string> = await updateHolidayConfig(obj);
       if (res.status === 200) {
@@ -179,53 +183,46 @@ export default () => {
               style={{ height: '12vh' }}
             />
           </Form.Item>
-          <Form.Item name="minObj" label="最小单位">
-            <Input.Group compact>
-              <Form.Item
-                noStyle
-                name={['minObj', 'min']}
-                rules={[{ required: true, message: '请输入!' }]}
-              >
-                <InputNumber
-                  placeholder="请输入"
-                  style={{ width: 120, marginRight: 20 }}
-                />
-              </Form.Item>
-              <Form.Item
-                noStyle
-                name={['minObj', 'minUnit']}
-                rules={[{ required: true, message: '请选择!' }]}
-              >
-                <Select style={{ width: 120 }}>
-                  <Option value={0}>小时</Option>
-                  <Option value={1}>天</Option>
-                </Select>
-              </Form.Item>
-            </Input.Group>
+          <Form.Item
+            name="min"
+            label="最小休假"
+            rules={[{ required: true, message: '请输入!' }]}
+          >
+            <InputNumber placeholder="请输入" style={{ width: '100%' }} />
           </Form.Item>
-          <Form.Item name="maxObj" label="最小单位">
-            <Input.Group compact>
-              <Form.Item
-                noStyle
-                name={['maxObj', 'max']}
-                rules={[{ required: true, message: '请输入!' }]}
-              >
-                <InputNumber
-                  placeholder="请输入"
-                  style={{ width: 120, marginRight: 20 }}
-                />
-              </Form.Item>
-              <Form.Item
-                noStyle
-                name={['maxObj', 'maxUnit']}
-                rules={[{ required: true, message: '请选择!' }]}
-              >
-                <Select style={{ width: 120 }}>
-                  <Option value={0}>小时</Option>
-                  <Option value={1}>天</Option>
-                </Select>
-              </Form.Item>
-            </Input.Group>
+          <Form.Item
+            name="max"
+            label="最大休假"
+            rules={[{ required: true, message: '请输入!' }]}
+          >
+            <InputNumber
+              style={{ width: '100%' }}
+              placeholder="请输入"
+              // style={{ width: 120, marginRight: 20 }}
+            />
+          </Form.Item>
+          <Form.Item
+            name="unit"
+            label="请假单位"
+            rules={[{ required: true, message: '请选择!' }]}
+          >
+            <Select
+              placeholder="请选择"
+              // style={{ width: 120, marginRight: 20 }}
+            >
+              <Option value={0}>小时</Option>
+              <Option value={1}>天</Option>
+            </Select>
+          </Form.Item>
+          <Form.Item
+            name="type"
+            label="计算休假方式"
+            rules={[{ required: true, message: '请输入名称!' }]}
+          >
+            <Select placeholder="请选择">
+              <Option value={2}>自然日</Option>
+              <Option value={1}>工作日</Option>
+            </Select>
           </Form.Item>
         </Form>
       </Modal>

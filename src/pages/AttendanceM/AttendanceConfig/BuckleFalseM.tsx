@@ -316,8 +316,8 @@ const UserListTable = props => {
     },
     {
       title: '工号',
-      key: 'JR100175',
-      dataIndex: 'JR100175',
+      key: 'employeeId',
+      dataIndex: 'employeeId',
       align: 'center',
     },
     {

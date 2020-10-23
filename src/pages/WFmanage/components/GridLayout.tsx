@@ -125,7 +125,7 @@ export default props => {
   const [edit, setEdit] = useState<boolean>(false);
   const [visible, setVisible] = useState<boolean>(false);
   const [type, setType] = useState<number | undefined>(1);
-  const [selectObj, setSelectObj] = useState<tsStep>();
+  const [selectObj, setSelectObj] = useState<any>();
   const [name, setName] = useState<string>();
   const [cardIndex, setCardIndex] = useState<number>();
   const [handleList, setHandleList] = useState<tsRolrLable[]>();
@@ -136,7 +136,6 @@ export default props => {
   const [conditionVisable, setConditionVisable] = useState<
     '新增' | '编辑' | undefined
   >();
-  const [ruleSets, setruleSets] = useState<any | IruleSets[]>([]);
   const [ruleItem, setRuleItem] = useState<any>();
   const [selectRule, setSelectRule] = useState<any>();
   const [data, setData] = useState<any[]>([]);
@@ -168,117 +167,61 @@ export default props => {
   }, []);
 
   useEffect(() => {
-    console.log(ruleList);
-    let newList = JSON.parse(JSON.stringify(sortTypeList(ruleList)));
-    let obj = {
-      ruleList: [
-        {
-          list: newList,
-        },
-      ],
-    };
-    console.log([obj]);
-    let arr = [obj];
-    const droopData = data => {
-      let newData = data;
-      function handleData(listItem, poi) {
-        listItem.map((item, index) => {
-          item.poi = poi + '-' + index;
-          {
-            item.ruleList?.map((ruleItem, ruleItemIndex) => {
-              {
-                handleData(ruleItem?.list, item.poi + '-' + ruleItemIndex);
-              }
-            });
-          }
-        });
-      }
-
-      return handleData(newData, 0);
-    };
-    droopData(arr);
-    console.log('arr');
-    console.log(arr);
-    setList(arr);
-  }, [ruleList]);
-
-  useEffect(() => {
-    let arr: any = [];
-    if (ruleSets?.length) {
-      list?.map((listItem, index) => {
-        let obj: any = {
-          ...listItem,
+    let propsList = ruleList?.steps || [];
+    let propsRuleSets = ruleList?.ruleSets || [];
+    if (propsRuleSets.length === 0) {
+      if (propsList?.length) {
+        let newList = JSON.parse(JSON.stringify(propsList || []));
+        let obj = {
+          ruleList: [
+            {
+              list: newList,
+            },
+          ],
         };
-        let arrRule: any = [];
-        if (listItem.isCondition) {
-          // 挑件是条件节点的
-          ruleSets?.map(item => {
-            if (item.fromNodeId === index) {
-              console.log(item.fromNodeId);
-              arrRule.push(item);
-              console.log(arrRule);
-            }
-          });
-
-          obj.ruleList = arrRule;
-        }
-
-        arr.push(obj);
-      });
-
-      console.log(arr);
-    } else {
-      arr = list;
-    }
-
-    function handlePush(items) {
-      let lists: any = [];
-      function handleCpush(item) {
-        arr?.map((arritem, index) => {
-          if (item.nextNodeId === index) {
-            //连续找到下个节点
-            lists.push(arritem);
-            if (arritem.nextNodeId) {
-              // handlePush(arritem);
-              console.log('handleCpush(arritem)');
-              console.log(handleCpush(arritem));
-              lists.concat(handleCpush(arritem));
-            }
-            arr.splice(index, 1);
-          }
-        });
-      }
-      handleCpush(items);
-      return lists;
-    }
-
-    function handleData(datas) {
-      datas?.map(item => {
-        if (item?.ruleList?.length) {
-          item?.ruleList?.map(ruleItem => {
-            ruleItem.list = [];
-            arr?.map((arritem, index) => {
-              if (ruleItem.toNodeId === index) {
-                //连续找到下个节点
-                ruleItem.list.push(arritem);
-                ruleItem.list = ruleItem.list.concat(handlePush(arritem));
-                datas.splice(index, 1);
+        let arr = [obj];
+        const droopData = data => {
+          let newData = data;
+          function handleData(listItem, poi) {
+            listItem.map((item, index) => {
+              item.poi = poi + '-' + index;
+              {
+                item.ruleList?.map((ruleItem, ruleItemIndex) => {
+                  {
+                    handleData(ruleItem?.list, item.poi + '-' + ruleItemIndex);
+                  }
+                });
               }
             });
-          });
-        }
-      });
-      console.log('datas');
-      console.log(datas);
-      return datas;
+          }
+          return handleData(newData, 0);
+        };
+        droopData(arr);
+        setList(arr);
+      } else {
+        let obj = {
+          ruleList: [
+            {
+              list: [],
+            },
+          ],
+        };
+        let arr = [obj];
+        setList(arr);
+      }
+    } else {
+      let obj = {
+        ruleList: [
+          {
+            list: handleProps(propsList, propsRuleSets),
+          },
+        ],
+      };
+      let arr = [obj];
+      console.log(arr);
+      setList(arr);
     }
-
-    setData(handleData(arr));
-  }, [ruleSets]);
-
-  useEffect(() => {
-    setruleSets(propsRuleSets);
-  }, [propsRuleSets]);
+  }, [ruleList]);
 
   useEffect(() => {
     change && change(list);
@@ -288,6 +231,76 @@ export default props => {
       }
     });
   }, [list]);
+  console.log('list');
+  console.log(list);
+
+  const handleProps = (propsList, propsRuleSets) => {
+    propsList = propsList.sort(compare('stepNumber'));
+    let newList = JSON.parse(JSON.stringify(propsList || []));
+    let newRuleList = JSON.parse(JSON.stringify(propsRuleSets || []));
+    let removeArr: any = [];
+    let list1: any = [];
+    newList?.map((item, index) => {
+      let itemRuleList: any = [];
+      newRuleList.map((itemRule, itemRuleIndex) => {
+        if (item.nodeId === itemRule.fromNodeId) {
+          newList.map((twoItem, twoItemIndex) => {
+            if (itemRule.toNodeId === twoItem.nodeId) {
+              removeArr.push(twoItem);
+              let itemRuleList = handleRuleItemList(twoItem) || [];
+              itemRuleList.unshift(twoItem);
+              itemRule.list = itemRuleList;
+              // newList.splice(twoItemIndex,1)
+            }
+          });
+          itemRuleList.push(itemRule);
+        }
+      });
+      if (itemRuleList.length) {
+        item.ruleList = itemRuleList;
+      }
+      list1.push(item);
+    });
+
+    function handleRuleItemList(nextItem) {
+      let ruleListList: any = [];
+      function handleRuleItemList1(nextItem) {
+        newList.map((twoItem, index) => {
+          if (nextItem.nextNodeId === twoItem.nodeId) {
+            removeArr.push(twoItem);
+            ruleListList.push(twoItem);
+            if (twoItem.nextNodeId) {
+              handleRuleItemList1(twoItem);
+            }
+          }
+        });
+      }
+      handleRuleItemList1(nextItem);
+      return ruleListList;
+    }
+
+    removeArr.map(item => {
+      list1.map((item1, index) => {
+        if (item.nodeId === item1.nodeId) {
+          list1.splice(index, 1);
+        }
+      });
+    });
+    return list1;
+  };
+  const compare = (name: string) => {
+    return (a, b) => {
+      let v1 = a[name];
+      let v2 = b[name];
+      if (v2 > v1) {
+        return -1;
+      } else if (v2 < v1) {
+        return 1;
+      } else {
+        return 0;
+      }
+    };
+  };
 
   const moveCard = (index, index1) => {
     let newList = JSON.parse(JSON.stringify(list));
@@ -304,29 +317,7 @@ export default props => {
       item.stepNumber = index;
     });
 
-    setList(sortTypeList(newList));
-  };
-
-  const sortTypeList = listp => {
-    listp?.map(item => {
-      if (item.type === 6) {
-        item.stepNumber = 100000000;
-      }
-    });
-    const compare = (name: string) => {
-      return (a, b) => {
-        let v1 = a[name];
-        let v2 = b[name];
-        if (v2 > v1) {
-          return -1;
-        } else if (v2 < v1) {
-          return 1;
-        } else {
-          return 0;
-        }
-      };
-    };
-    return listp.sort(compare('stepNumber'));
+    setList(newList);
   };
 
   const handleHiddleModal = () => {
@@ -355,8 +346,6 @@ export default props => {
       if (type === 6) {
         paramForm.validateFields().then(value1 => {
           getArchiveControlParams(value1);
-          listObj.push(obj);
-          setList(sortTypeList(listObj));
           form.setFieldsValue({
             type: undefined,
             specifiedLevel: undefined,
@@ -364,6 +353,45 @@ export default props => {
             labelId: undefined,
           });
           setType(1);
+          let archiveControlParams: any = [];
+          for (let key in value1) {
+            if (value1.id) {
+              archiveControlParams.push({
+                resApprArchiveDemandId: key,
+                resFormControlId: value1[key],
+                id: value1.id,
+              });
+            } else {
+              archiveControlParams.push({
+                resApprArchiveDemandId: key,
+                resFormControlId: value1[key],
+              });
+            }
+          }
+
+          obj.archiveControlParams = archiveControlParams;
+          obj.ruleList = ruleItem[ruleItem.index]?.ruleList;
+
+          let newList = JSON.parse(JSON.stringify(list));
+          const droopData1 = data => {
+            let newData = data;
+            function handleData(listItem, poi) {
+              listItem.map((item, index) => {
+                item.poi = poi + '-' + index;
+                if (item.poi === ruleItem.poi) {
+                  // obj.poi=item.poi
+                  // item=obj
+                  item?.ruleList[ruleItem.index]?.list?.push(obj);
+                }
+                item.ruleList?.map((ruleItem, ruleItemIndex) => {
+                  handleData(ruleItem?.list, item.poi + '-' + ruleItemIndex);
+                });
+              });
+            }
+            return handleData(newData, 0);
+          };
+          droopData1(newList);
+          setList(newList);
           setVisible(false);
         });
       } else {
@@ -372,7 +400,7 @@ export default props => {
             obj.userCodeList = userkeyList.join(',');
           } else {
             message.warning('请选择指定成员');
-            return;
+            // return;
           }
         } else if (type === 5) {
           if (systemObj?.input && systemObj?.audo) {
@@ -380,11 +408,29 @@ export default props => {
             obj.sysLabelId = systemObj?.audo;
           } else {
             message.warning('请选择系统标签以及标签参数');
-            return;
+            // return;
           }
         }
-        listObj.push(obj);
-        setList(sortTypeList(listObj));
+
+        let newList = JSON.parse(JSON.stringify(list));
+        const droopData1 = data => {
+          let newData = data;
+          function handleData(listItem, poi) {
+            listItem.map((item, index) => {
+              item.poi = poi + '-' + index;
+              if (item.poi === ruleItem.poi) {
+                item?.ruleList[ruleItem.index]?.list?.push(obj);
+              }
+              item.ruleList?.map((ruleItem, ruleItemIndex) => {
+                handleData(ruleItem?.list, item.poi + '-' + ruleItemIndex);
+              });
+            });
+          }
+          return handleData(newData, 0);
+        };
+        droopData1(newList);
+        setList(newList);
+
         form.setFieldsValue({
           type: undefined,
           specifiedLevel: undefined,
@@ -398,14 +444,25 @@ export default props => {
   };
 
   const handleObjList = value => {
-    let newList: tsStep[] = [];
-    list?.map(item => {
-      if (item.id + '' === selectObj?.id + '') {
-        Object.assign(item, value);
+    let newList = JSON.parse(JSON.stringify(list));
+    const droopData1 = data => {
+      let newData = data;
+      function handleData(listItem, poi) {
+        listItem.map((item, index) => {
+          item.poi = poi + '-' + index;
+          if (item.poi === selectObj?.poi) {
+            Object.assign(item, value);
+          }
+          item.ruleList?.map((ruleItem, ruleItemIndex) => {
+            handleData(ruleItem?.list, item.poi + '-' + ruleItemIndex);
+          });
+        });
       }
-      newList.push(item);
-    });
-    setList(sortTypeList(newList));
+      return handleData(newData, 0);
+    };
+    droopData1(newList);
+    setList(newList);
+
     if (type === 6) {
       paramForm.validateFields().then(value => {
         getArchiveControlParams(value);
@@ -494,7 +551,8 @@ export default props => {
     // systemObj
   };
   // AddshowModal
-  const handleAddShowModal = () => {
+  const handleAddShowModal = (ruleItem, index) => {
+    setRuleItem({ ...ruleItem, index });
     form.setFieldsValue({
       type: 1,
       specifiedLevel: undefined,
@@ -535,7 +593,7 @@ export default props => {
     setVisible(true);
   };
   // 删除
-  const handleRemove = (item: tsStep) => {
+  const handleRemove = items => {
     Modal.confirm({
       title: '确定删除?',
       okText: '确定',
@@ -543,14 +601,24 @@ export default props => {
       okType: 'danger' as any,
       cancelText: '取消',
       onOk: async () => {
-        let newList: tsStep[] = [];
-        list?.map(item1 => {
-          if (item1.id + '' === item.id + '') {
-          } else {
-            newList.push(item1);
+        let newList = JSON.parse(JSON.stringify(list));
+        const droopData1 = data => {
+          let newData = data;
+          function handleData(listItem, poi) {
+            listItem.map((item, index) => {
+              item.poi = poi + '-' + index;
+              if (item.poi === items.poi) {
+                listItem.splice(index, 1);
+              }
+              item.ruleList?.map((ruleItem, ruleItemIndex) => {
+                handleData(ruleItem?.list, item.poi + '-' + ruleItemIndex);
+              });
+            });
           }
-        });
-        setList(sortTypeList(newList));
+          return handleData(newData, 0);
+        };
+        droopData1(newList);
+        setList(newList);
       },
     });
   };
@@ -595,13 +663,24 @@ export default props => {
   // name modal的ok
   const handleName = () => {
     nameForm.validateFields().then(fromSubData => {
-      let newListObj: tsStep[] = JSON.parse(JSON.stringify(list));
-      newListObj?.map(item => {
-        if (selectObj?.id + '' === item.id.toString()) {
-          item.stepName = fromSubData.name;
+      let newList = JSON.parse(JSON.stringify(list));
+      const droopData1 = data => {
+        let newData = data;
+        function handleData(listItem, poi) {
+          listItem.map((item, index) => {
+            item.poi = poi + '-' + index;
+            if (item.poi === selectObj?.poi) {
+              item.stepName = fromSubData.name;
+            }
+            item.ruleList?.map((ruleItem, ruleItemIndex) => {
+              handleData(ruleItem?.list, item.poi + '-' + ruleItemIndex);
+            });
+          });
         }
-      });
-      setList(sortTypeList(newListObj));
+        return handleData(newData, 0);
+      };
+      droopData1(newList);
+      setList(newList);
       setSelectObj(undefined);
       setName(undefined);
     });
@@ -610,6 +689,7 @@ export default props => {
   // 新增分支显示modal
   const handleShowBranch = (type, index: number, item) => {
     setRuleItem(item);
+    setSelectRule({ rule: item.ruleList });
     if (type === '新增') {
       setConditionVisable('新增');
     } else {
@@ -619,14 +699,13 @@ export default props => {
 
   //编辑分支
   const handleEditBranch = (item, index: number) => {
-    console.log('编辑分支');
-    console.log(selectRule);
-    console.log(index);
     let ruleItem = item?.ruleList[index];
     let obj = {
       name: ruleItem.name,
       priority: ruleItem.priority,
       resRuleCurdParams: ruleItem.resRuleCurdParams,
+      selectItem: item,
+      index: index,
     };
     setSelectRule(obj);
     setConditionVisable('编辑');
@@ -635,7 +714,6 @@ export default props => {
   // 条件分支的ok
   const handleCondition = () => {
     let conditionForm = ref?.current?.getvalue();
-    console.log(conditionForm.getFieldsValue());
 
     function handleType(str) {
       switch (str) {
@@ -654,10 +732,6 @@ export default props => {
       }
     }
     conditionForm.validateFields().then(async value => {
-      console.log('value');
-      console.log(value);
-      console.log(value.type);
-      console.log(ruleItem);
       let newItem: IruleSets | any;
       let newList = JSON.parse(JSON.stringify(list));
       let resRuleCurdParamsArr: any = [];
@@ -665,29 +739,17 @@ export default props => {
         if (key === 'priority' || key === 'name') {
         } else {
           let resRuleCurdParams: any;
-          if (conditionVisable === '编辑') {
-            resRuleCurdParams = {
-              id: value.id,
-            };
-          }
           resRuleCurdParams = {
             comparetor: value[key].comparetor,
             type: handleType(value[key].type.split('&&')[1]),
             refResFormControl: value[key].type.split('&&')[0],
             value: value[key].value,
+            id: value.id,
           };
-          if (value.type === 'applicant') {
-            let memberTagIds: any = [];
-            let userCodes: any = [];
-            value.value.laberList.map(item => {
-              memberTagIds.push(item.key);
-            });
-            value.value.userList.map(item => {
-              userCodes.push(item.id);
-            });
+          if (value[key].type.indexOf('applicant') > -1) {
             resRuleCurdParams.value = {
-              memberTagIds: memberTagIds.join(','),
-              userCodes: value.value.userList.join(','),
+              memberTagIds: value[key]?.value?.memberTagIds,
+              userCodes: value[key]?.value?.userCodes,
             };
           }
           resRuleCurdParamsArr.push(resRuleCurdParams);
@@ -700,86 +762,165 @@ export default props => {
       }
 
       if (conditionVisable === '新增') {
-        let poi = ruleItem.poi;
-        let pItem: any = {};
-        let poiArr = poi.split('-');
-        let poipStr = poiArr.pop();
-        let ruleIndex = poi.split('-')[poi.split('-').length - 2];
-        poipStr = poiArr.pop();
-        // poipStr = poiArr.pop()
-        poipStr = poiArr.join('-');
-        console.log('poipStr');
-        console.log(poipStr);
-        const droopData = data => {
-          let newData = data;
-          function handleData(listItem, i) {
-            listItem?.map((item, index) => {
-              console.log(item.poi);
-              if (poipStr === item.poi) {
-                pItem = item;
-                item?.ruleList[ruleIndex]?.list.map((cItem, cItemIndex) => {
-                  if (cItem.poi === poi) {
-                    let myList = item.ruleList[ruleIndex].list.splice(
-                      cItemIndex + 1,
-                      item.ruleList[ruleIndex].list.length - 1,
-                    );
-                    let pList = item.ruleList[ruleIndex].list.splice(
-                      0,
-                      cItemIndex + 1,
-                    );
-                    console.log(myList);
-                    console.log(pList);
-                    newItem.list = myList;
-                    item.ruleList[ruleIndex].list = pList;
-                  }
-                });
-                console.log('pItem');
-                console.log(pItem);
-                console.log(pItem.ruleList[ruleIndex]);
-              }
-              if (item.poi === poi) {
-                item.ruleList = [newItem];
-                item.ruleList.push({
-                  ...newItem,
-                  list: [],
-                  name: '条件' + item.ruleList.length + 1,
-                });
-              } else {
-                {
-                  item.ruleList?.map((ruleItem, ruleItemIndex) => {
-                    {
-                      handleData(ruleItem?.list, ruleItemIndex);
+        if (!ruleItem?.ruleList || !ruleItem?.ruleList?.length) {
+          let poi = ruleItem.poi;
+          let pItem: any = {};
+          let poiArr = poi.split('-');
+          let poipStr = poiArr.pop();
+          let ruleIndex = poi.split('-')[poi.split('-').length - 2];
+          poipStr = poiArr.pop();
+          // poipStr = poiArr.pop()
+          poipStr = poiArr.join('-');
+          const droopData = data => {
+            let newData = data;
+            function handleData(listItem, i) {
+              listItem?.map((item, index) => {
+                if (poipStr === item.poi) {
+                  pItem = item;
+                  item?.ruleList[ruleIndex]?.list.map((cItem, cItemIndex) => {
+                    if (cItem.poi === poi) {
+                      let myList = item.ruleList[ruleIndex].list.splice(
+                        cItemIndex + 1,
+                        item.ruleList[ruleIndex].list.length - 1,
+                      );
+                      let pList = item.ruleList[ruleIndex].list.splice(
+                        0,
+                        cItemIndex + 1,
+                      );
+                      newItem.list = myList;
+                      item.ruleList[ruleIndex].list = pList;
                     }
                   });
                 }
-              }
-            });
-          }
-          return handleData(newData, 0);
-        };
+                if (item.poi === poi) {
+                  item.ruleList = [newItem];
+                  item.ruleList.push({
+                    ...newItem,
+                    list: [],
+                    name: '条件' + item.ruleList.length + 1,
+                  });
+                } else {
+                  {
+                    item.ruleList?.map((ruleItem, ruleItemIndex) => {
+                      {
+                        handleData(ruleItem?.list, ruleItemIndex);
+                      }
+                    });
+                  }
+                }
+              });
+            }
+            return handleData(newData, 0);
+          };
 
-        droopData(newList);
+          droopData(newList);
 
-        const droopData1 = data => {
+          const droopData1 = data => {
+            let newData = data;
+            function handleData(listItem, poi) {
+              listItem.map((item, index) => {
+                item.poi = poi + '-' + index;
+                {
+                  item.ruleList?.map((ruleItem, ruleItemIndex) => {
+                    handleData(ruleItem?.list, item.poi + '-' + ruleItemIndex);
+                  });
+                }
+              });
+            }
+            return handleData(newData, 0);
+          };
+          droopData1(newList);
+
+          setList(newList);
+        } else {
+          const droopData1 = data => {
+            let newData = data;
+            function handleData(listItem, poi) {
+              listItem.map((item, index) => {
+                item.poi = poi + '-' + index;
+                if (item.poi === ruleItem.poi) {
+                  newItem.list = [];
+                  item.ruleList.push(newItem);
+                }
+                item.ruleList?.map((ruleItem, ruleItemIndex) => {
+                  handleData(ruleItem?.list, item.poi + '-' + ruleItemIndex);
+                });
+              });
+            }
+            return handleData(newData, 0);
+          };
+          droopData1(newList);
+
+          setList(newList);
+        }
+      } else {
+        const droopData2 = data => {
           let newData = data;
           function handleData(listItem, poi) {
             listItem.map((item, index) => {
               item.poi = poi + '-' + index;
-              {
-                item.ruleList?.map((ruleItem, ruleItemIndex) => {
-                  handleData(ruleItem?.list, item.poi + '-' + ruleItemIndex);
-                });
+              if (item.poi === selectRule?.selectItem.poi) {
+                newItem.list = item.ruleList[selectRule?.index].list;
+                item.ruleList[selectRule?.index] = newItem;
               }
+
+              item.ruleList?.map((ruleItem, ruleItemIndex) => {
+                handleData(ruleItem?.list, item.poi + '-' + ruleItemIndex);
+              });
             });
           }
           return handleData(newData, 0);
         };
-        droopData1(newList);
+        droopData2(newList);
 
         setList(newList);
-      } else {
       }
       setConditionVisable(undefined);
+    });
+  };
+
+  // 删除条件分支
+  const handleRemoveRule = (indexs, items) => {
+    Modal.confirm({
+      title: '确定删除该分支?',
+      okText: '确定',
+      icon: <ExclamationCircleOutlined />,
+      okType: 'danger' as any,
+      cancelText: '取消',
+      onOk: async () => {
+        let newList = JSON.parse(JSON.stringify(list));
+        let newList1 = JSON.parse(JSON.stringify(list));
+        const droopData1 = data => {
+          let newData = data;
+          function handleData(listItem, poi, pItem, pItemRuleIndex) {
+            listItem.map((item, index) => {
+              item.poi = poi + '-' + index;
+              if (item.poi === items.poi) {
+                item.ruleList.splice(indexs, 1);
+                if (item.ruleList?.length === 1) {
+                  let arr = pItem.ruleList[pItemRuleIndex].list.concat(
+                    item.ruleList[0].list,
+                  );
+                  pItem.ruleList[pItemRuleIndex].list = arr;
+                  item.ruleList = [];
+                  return;
+                }
+              }
+              item.ruleList?.map((ruleItem, ruleItemIndex) => {
+                handleData(
+                  ruleItem?.list,
+                  item.poi + '-' + ruleItemIndex,
+                  item,
+                  ruleItemIndex,
+                );
+              });
+            });
+          }
+          return handleData(newData, 0, {}, 0);
+        };
+        droopData1(newList);
+        setList(newList);
+      },
     });
   };
 
@@ -1022,6 +1163,10 @@ export default props => {
                       height: '1.5em',
                       textAlign: 'center',
                       lineHeight: '1.5em',
+                      cursor: 'pointer',
+                    }}
+                    onClick={() => {
+                      handleShowBranch('新增', index, item);
                     }}
                   >
                     <a>新增条件</a>
@@ -1034,9 +1179,19 @@ export default props => {
                   }}
                 >
                   {item.ruleList?.map((ruleItem, ruleItemIndex) => {
-                    if (!ruleItem?.list?.length || !ruleItem?.list) {
-                      show = true;
-                    }
+                    // if (!ruleItem?.list?.length || !ruleItem?.list) {
+                    //   show = true;
+                    // }
+                    item?.ruleList &&
+                      ruleItem?.list?.map(oneItem => {
+                        if (oneItem?.ruleList?.length >= 2) {
+                          show = false;
+                        } else {
+                          show = true;
+                          return;
+                        }
+                      });
+
                     return (
                       <div
                         style={{
@@ -1048,6 +1203,7 @@ export default props => {
                         {item.stepName ? (
                           <div
                             style={{
+                              position: 'relative',
                               backgroundColor: 'red',
                               width: '110px',
                               height: '70px',
@@ -1059,6 +1215,21 @@ export default props => {
                             }}
                           >
                             {ruleItem.name}
+                            <span
+                              style={{
+                                position: 'absolute',
+                                right: '7px',
+                                top: '7px',
+                                cursor: 'pointer',
+                              }}
+                              onClick={e => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                handleRemoveRule(ruleItemIndex, item);
+                              }}
+                            >
+                              X
+                            </span>
                           </div>
                         ) : null}
                         <div
@@ -1075,7 +1246,9 @@ export default props => {
                         {show ? (
                           <div
                             className="add-item"
-                            onClick={handleAddShowModal}
+                            onClick={() => {
+                              handleAddShowModal(item, ruleItemIndex);
+                            }}
                           >
                             <PlusOutlined
                               style={{
@@ -1099,17 +1272,14 @@ export default props => {
   };
 
   const renderBranchBox = useMemo(() => {
-    console.log('list');
-    console.log(list);
-    console.log('list');
     return droopData(list);
-  }, [list, ruleSets, data]);
+  }, [list, data]);
 
   return (
-    <div style={{ overflowX: 'auto', minHeight: '150px' }}>
+    <div style={{ overflowX: 'auto', minHeight: '150px', width: '80vw' }}>
       {renderBranchBox}
       <Modal
-        key={visible + ''}
+        // key={visible + ''}
         width="56vw"
         title="设置"
         visible={visible}
@@ -1216,6 +1386,7 @@ export default props => {
       </Modal>
       <Modal
         title="条件分支设置"
+        key={!conditionVisable + ''}
         visible={!!conditionVisable}
         okText="确认"
         cancelText="返回"
@@ -1226,7 +1397,7 @@ export default props => {
         width="40vw"
       >
         <Condition
-          key={conditionVisable}
+          key={!conditionVisable}
           {...props}
           ref={ref}
           selectRule={selectRule}

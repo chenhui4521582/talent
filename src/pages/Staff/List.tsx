@@ -131,11 +131,10 @@ export default () => {
   useEffect(() => {
     watermark.set('水印文本', {
       l: 300,
-      h: 150,
       top: '10px',
       left: '0px',
-      width: '100%',
-      height: '100%',
+      // w: '80vw',
+      // h: '80vh',
     });
     return () => {
       watermark.remove();

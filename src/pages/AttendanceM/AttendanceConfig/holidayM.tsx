@@ -57,17 +57,13 @@ export default () => {
   }
 
   const onSelect = value => {
+    // alert(value.format('YYYY-MM-DD'))
     setSelectDay(value.format('YYYY-MM-DD'));
     let id = undefined;
     detail?.map(item => {
       if (item.date === value.format('YYYY-MM-DD')) {
-        item.age = {
-          smallestAge: item.smallestAge,
-          biggestAge: item.biggestAge,
-        };
         id = item.holidayId;
         form1.setFieldsValue(item);
-        form2.setFieldsValue(item);
 
         let newType: any = undefined;
         if (item.welfare === 1) {
@@ -109,9 +105,17 @@ export default () => {
         {selectItem ? (
           <div>
             {selectItem?.welfare ? (
-              <span>福利</span>
+              <>
+                <div style={{ color: '#FF6600' }}>福利</div>
+                <span style={{ color: '#ccc' }}>{day.IDayCn}</span>
+              </>
             ) : (
-              <span style={{ color: '#ccc' }}>{day.IDayCn}</span>
+              <>
+                {selectItem.workStatus === 1 ? (
+                  <div style={{ color: 'rgba(0, 153, 204, 1)' }}>休</div>
+                ) : null}
+                <span style={{ color: '#ccc' }}>{day.IDayCn}</span>
+              </>
             )}
           </div>
         ) : (
@@ -137,20 +141,25 @@ export default () => {
       let api = updateHoliday;
       if (!value.holidayId) {
         api = addHoliday;
-        obj.date = moment(selectDay);
+        obj.date = new Date(selectDay);
       } else {
         obj.holidayId = value.holidayId;
       }
-      obj.workStatus = type === 2 ? 1 : 0;
-      obj.welfare = type === 3 ? 1 : 0;
-      obj.welfareType = value.welfareType;
-      obj.welfareDescription = value.welfareDescription;
-      obj.earlyOffHour = value.earlyOffHour;
-      obj.childAgeLimit = value.childAgeLimit;
-      obj.gender = value.gender;
-      obj.smallestAge = value.age.smallestAge;
-      obj.biggestAge = value.age.biggestAge;
+      if (type === 1) {
+        obj.workStatus = 1;
+      }
 
+      if (type === 2) {
+        obj.workStatus = 0;
+      }
+
+      if (type === 3) {
+        obj.workStatus = 0;
+        obj.welfare = 1;
+        obj.welfareType = value.welfareType;
+        obj.earlyOffHour = value.earlyOffHour;
+      }
+      obj.welfareDescription = value.welfareDescription;
       let json: GlobalResParams<string> = await api(obj);
       if (json.status === 200) {
         notification['success']({
@@ -225,55 +234,58 @@ export default () => {
   }, [detail, selectDay, type]);
 
   const renderForm = useMemo(() => {
-    if (!type || type === 1 || type === 2) {
-      return null;
-    }
     return (
       <div style={{ float: 'left', width: '60vw', marginTop: 20 }}>
         <Form
           form={form1}
-          style={{ marginLeft: '3vw', float: 'left', width: '25vw' }}
+          style={{ float: 'left', width: '25vw', marginTop: 20 }}
         >
           <Form.Item name="holidayId" style={{ display: 'none' }}>
             <Input />
           </Form.Item>
-          <Form.Item
-            label="福利类型"
-            name="welfareType"
-            rules={[{ required: true, message: '请选择福利类型!' }]}
-            style={{ width: '20vw' }}
-          >
-            <Select>
-              <Option value={1}>提前下班</Option>
-            </Select>
-          </Form.Item>
-          <Form.Item
-            label="提前下班时长"
-            name="earlyOffHour"
-            rules={[{ required: true, message: '请选择提前下班时长!' }]}
-            style={{ width: '20vw' }}
-          >
-            <Select>
-              <Option value={1}>1小时</Option>
-              <Option value={2}>2小时</Option>
-              <Option value={3}>3小时</Option>
-              <Option value={4}>4小时</Option>
-              <Option value={5}>5小时</Option>
-              <Option value={6}>6小时</Option>
-              <Option value={7}>7小时</Option>
-              <Option value={8}>8小时</Option>
-            </Select>
-          </Form.Item>
+          {type === 3 ? (
+            <Form.Item
+              label="福利类型"
+              name="welfareType"
+              rules={[{ required: true, message: '请选择福利类型!' }]}
+              style={{ width: '20vw' }}
+            >
+              <Select>
+                <Option value={1}>提前下班</Option>
+              </Select>
+            </Form.Item>
+          ) : null}
+          {type === 3 ? (
+            <Form.Item
+              label="提前下班时长"
+              name="earlyOffHour"
+              rules={[{ required: true, message: '请选择提前下班时长!' }]}
+              style={{ width: '20vw' }}
+            >
+              <Select>
+                <Option value={1}>1小时</Option>
+                <Option value={2}>2小时</Option>
+                <Option value={3}>3小时</Option>
+                <Option value={4}>4小时</Option>
+                <Option value={5}>5小时</Option>
+                <Option value={6}>6小时</Option>
+                <Option value={7}>7小时</Option>
+                <Option value={8}>8小时</Option>
+              </Select>
+            </Form.Item>
+          ) : null}
 
-          <Form.Item
-            label="说明"
-            name="welfareDescription"
-            style={{ width: '20vw' }}
-          >
-            <TextArea />
-          </Form.Item>
+          {type ? (
+            <Form.Item
+              label="说明"
+              name="welfareDescription"
+              style={{ width: '20vw' }}
+            >
+              <TextArea />
+            </Form.Item>
+          ) : null}
         </Form>
-        <Form
+        {/* <Form
           form={form2}
           style={{ marginLeft: '3vw', float: 'left', width: '25vw' }}
         >
@@ -314,6 +326,7 @@ export default () => {
             <span style={{ marginLeft: 8 }}>周岁及以下</span>
           </Form.Item>
         </Form>
+   */}
       </div>
     );
   }, [type]);

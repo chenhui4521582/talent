@@ -9,6 +9,7 @@ import {
   Radio,
   Checkbox,
   notification,
+  Divider,
 } from 'antd';
 import moment from 'moment';
 import AddUserList from './components/AddUserList';
@@ -85,7 +86,9 @@ export default props => {
         });
       }
     }
-    getDetail();
+    if (ruleId) {
+      getDetail();
+    }
   }, []);
 
   const handleChangeUserList = list => {
@@ -124,10 +127,10 @@ export default props => {
         clockTimeListObj.breakTimeCalculation = item.rest.breakTimeCalculation;
         clockTimeListObj.breakTimeStart = moment(
           item.rest['breakTimeStart-breakTimeEnd'][0],
-        ).format('HH:mm:ss');
+        ).format('HH:mm');
         clockTimeListObj.breakTimeEnd = moment(
           item.rest['breakTimeStart-breakTimeEnd'][1],
-        ).format('HH:mm:ss');
+        ).format('HH:mm');
         clockTimeListObj.flexible = item.flex.flexible;
         clockTimeListObj.leaveEarly = item.flex.leaveEarly;
         clockTimeListObj.leaveLater = item.flex.leaveLater;
@@ -145,16 +148,20 @@ export default props => {
             endTime: moment(item.clockPeriods[0]).format('HH:mm'),
             startTime: moment(item.clockPeriods[1]).format('HH:mm'),
           });
-        scheduleListObj.breakTimeCalculation = item.breakTimeCalculation;
+        scheduleListObj.breakTimeCalculation = item.rest.breakTimeCalculation;
         scheduleListObj.breakTimeStart = moment(
-          item['breakTimeStart-breakTimeEnd'][0],
+          item.rest['breakTimeStart-breakTimeEnd'][0],
         ).format('HH:mm');
         scheduleListObj.breakTimeEnd = moment(
-          item['breakTimeStart-breakTimeEnd'][1],
+          item.rest['breakTimeStart-breakTimeEnd'][1],
         ).format('HH:mm');
+        scheduleListObj.flexible = item.flex.flexible;
+        scheduleListObj.leaveEarly = item.flex.leaveEarly;
+        scheduleListObj.leaveLater = item.flex.leaveLater;
         scheduleListObj.startLimit = item.itemList.startLimit;
         scheduleListObj.endLimit = item.itemList.endLimit;
         item.scheduleId ? (scheduleListObj.scheduleId = item.scheduleId) : '';
+
         scheduleList.push(scheduleListObj);
       });
       // 人员排班
@@ -287,12 +294,12 @@ export default props => {
   };
 
   return (
-    <Card title="新增规则">
+    <Card title={ruleId ? '编辑规则' : '新增规则'}>
       <Form form={form}>
         <Form.Item
           label="规则名称"
           name="ruleName"
-          rules={[{ required: true, message: '请输入用户名称!' }]}
+          rules={[{ required: true, message: '请输入规则名称!' }]}
           style={{ width: 400, marginBottom: 40 }}
         >
           <Input placeholder="规则名称" />
@@ -301,7 +308,7 @@ export default props => {
         <Form.Item
           label="规则类型"
           name="ruleType"
-          rules={[{ required: true, message: '请输入用户名称!' }]}
+          rules={[{ required: true, message: '请选择规则类型!' }]}
           style={{ width: 400, marginBottom: 20 }}
           initialValue={0}
         >
@@ -318,7 +325,7 @@ export default props => {
             </Radio>
           </Radio.Group>
         </Form.Item>
-
+        <Divider style={{ margin: '30px 0' }} />
         <Form.Item
           label="打卡人员"
           name="memberList"
@@ -336,12 +343,12 @@ export default props => {
             handleChangeUserList={handleChangeUserList}
           />
         </Form.Item>
-
+        <Divider style={{ margin: '30px 0' }} />
         {ruleType === 1 ? (
           <Form.Item
             label="排班设置"
             name="scheduleList"
-            rules={[{ required: true, message: '请输入用户名称!' }]}
+            rules={[{ required: true, message: '请填写排班设置!' }]}
             style={{ width: '82vw', marginBottom: 20, minHeight: '40px' }}
           >
             <AddSchedulingList
@@ -373,6 +380,7 @@ export default props => {
             />
           </Form.Item>
         ) : null}
+        <Divider style={{ margin: '30px 0' }} />
         <Form.Item
           label="手机打卡"
           name="enablePhoneClock"
@@ -398,6 +406,7 @@ export default props => {
           <Form.Item
             label="位置"
             name="areas"
+            style={{ marginLeft: 30 }}
             rules={[{ required: true, message: '请输入用户名称!' }]}
           >
             <AreasList {...props} areas={ruleDetail?.rulePhone?.areas} />
@@ -407,11 +416,13 @@ export default props => {
           <Form.Item
             label="wifi"
             name="wifis"
+            style={{ marginLeft: 30 }}
             rules={[{ required: true, message: '请输入用户名称!' }]}
           >
             <Wifi {...props} wifis={ruleDetail?.rulePhone?.wifis} />
           </Form.Item>
         ) : null}
+        {phoneClock ? <Divider style={{ margin: '30px 0' }} /> : null}
         {phoneClock ? (
           <Form.Item
             label="手机提醒"
@@ -450,6 +461,7 @@ export default props => {
             </Input.Group>
           </Form.Item>
         ) : null}
+        {phoneClock ? <Divider style={{ margin: '30px 0' }} /> : null}
         {phoneClock ? (
           <Form.Item
             label="范围外打卡"
@@ -466,6 +478,7 @@ export default props => {
             </Radio.Group>
           </Form.Item>
         ) : null}
+        <Divider style={{ margin: '30px 0' }} />
         <Form.Item
           label="规则生效"
           name="effectiveTime"

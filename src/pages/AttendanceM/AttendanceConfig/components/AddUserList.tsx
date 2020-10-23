@@ -2,38 +2,94 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Modal } from 'antd';
 import { DeleteOutlined } from '@ant-design/icons';
+import { useOrganization, usetDefaultOrganization } from '@/models/global';
 import AddUser from './AddUser';
-
 export default props => {
   const { ruleDetail, handleChangeUserList } = props;
   const [visible, setVisible] = useState<boolean>(false);
   const [list, setList] = useState<any>();
   const [userList, setUserList] = useState<any>();
   const ref = useRef<any>();
+  const { organizationJson } = useOrganization();
 
   useEffect(() => {
-    let newList = JSON.parse(JSON.stringify(list || []));
+    let newList: any = [];
+    let newList1: any = [];
+    let data = handleList1(organizationJson);
+    const handleddata1 = sItem => {
+      let select = {};
+      const handleddata = data => {
+        data?.map(item => {
+          if (item.code === sItem.code) {
+            select = item;
+            return;
+          } else {
+            if (item.children) {
+              handleddata(item.children);
+            }
+          }
+        });
+      };
+      handleddata(data);
+      return select;
+    };
+
     ruleDetail?.memberList?.map(item => {
+      let userObj: any = {};
       newList.push({
         codeName: item.codeName,
         code: item.code,
         type: item.type,
       });
+      if (item.type) {
+        item.name = item.codeName;
+        newList1 = newList1.concat(handleList(handleddata1(item)));
+        setUserList(newList1);
+      } else {
+        item.name = item.codeName;
+        userObj[item.code] = [item];
+        newList1.push(userObj);
+        setUserList(newList1);
+      }
     });
+
     setList(newList);
-  }, [ruleDetail]);
+  }, [ruleDetail, organizationJson]);
 
   useEffect(() => {
     handleChangeUserList(userList);
     list && list.length && props.onChange(list);
   }, [list]);
 
+  const handleList1 = data => {
+    const handleItem = list => {
+      for (let i = 0; i < list.length; i++) {
+        list[i].key = list[i].code;
+        list[i].title = list[i].name;
+        if (list[i].memberList && list[i].memberList.length) {
+          if (list[i].memberList) {
+            if (list[i].children) {
+              list[i].children = list[i]?.children?.concat(list[i]?.memberList);
+            } else {
+              list[i].children = list[i]?.memberList;
+            }
+          }
+        }
+        if (list[i].children) {
+          handleItem(list[i].children);
+        }
+      }
+    };
+    handleItem(data);
+    return data;
+  };
+
   const handleOk = () => {
-    let newList = JSON.parse(JSON.stringify(list || []));
+    let newList: any = [];
     ref.current.getvalue()?.map(item => {
       newList.push({
         code: item.key,
-        codeName: item.name,
+        codeName: item.name || item.title,
         type: item.level ? 1 : 0,
       });
     });
@@ -41,7 +97,7 @@ export default props => {
     setVisible(false);
 
     let newArr: any = [];
-    let newUserList = JSON.parse(JSON.stringify(userList || []));
+    let newUserList: any = [];
     ref.current.getvalue().map(item => {
       let userObj: any = {};
 
@@ -59,24 +115,28 @@ export default props => {
   };
 
   const handleList = data => {
-    let userObj: any = {};
-    let newArr: any = [];
-    let newUserList = JSON.parse(JSON.stringify(userList || []));
-    const handleItem = list => {
-      for (let i = 0; i < list.length; i++) {
-        if (!list[i].level) {
-          newArr.push(list[i]);
+    if (data?.children) {
+      let userObj: any = {};
+      let newArr: any = [];
+      let newUserList = JSON.parse(JSON.stringify(userList || []));
+      const handleItem = list => {
+        for (let i = 0; i < list?.length; i++) {
+          if (!list[i].level) {
+            newArr.push(list[i]);
+          }
+          if (list[i].children) {
+            handleItem(list[i].children);
+          }
         }
-        if (list[i].children) {
-          handleItem(list[i].children);
-        }
-      }
-    };
+      };
 
-    handleItem(data.children);
-    userObj[data.code] = newArr;
-    newUserList.push(userObj);
-    return newUserList;
+      handleItem(data?.children);
+      userObj[data.code] = newArr;
+      newUserList.push(userObj);
+      return newUserList;
+    } else {
+      return [];
+    }
   };
 
   const handleRemove = code => {
@@ -96,8 +156,16 @@ export default props => {
     });
     setUserList(newUserList);
   };
-
+  const handleSelectKeys = () => {
+    let arr: any = [];
+    list?.map(item => {
+      arr.push(item.code);
+    });
+    return arr;
+  };
   const renderList = useMemo(() => {
+    console.log(list);
+    console.log('list');
     return list?.map(item => {
       return (
         <div
@@ -152,7 +220,12 @@ export default props => {
         }}
         width="46vw"
       >
-        <AddUser key={visible + ''} renderUser={true} ref={ref} />
+        <AddUser
+          key={visible + ''}
+          renderUser={true}
+          ref={ref}
+          selectKeys={handleSelectKeys()}
+        />
       </Modal>
     </>
   );

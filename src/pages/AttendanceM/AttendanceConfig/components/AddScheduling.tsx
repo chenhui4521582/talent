@@ -45,40 +45,85 @@ export default forwardRef((props, formRef) => {
           style={{ marginBottom: 10 }}
         />
       </Form.Item>
+      <Form.Item label="休息时间" name="rest" style={{ marginBottom: 40 }}>
+        <Input.Group compact style={{ marginTop: 6 }}>
+          <Form.Item
+            name={['rest', 'breakTimeCalculation']}
+            // noStyle
+            style={{ display: 'block' }}
+            initialValue={0}
+          >
+            <Radio.Group>
+              <Radio value={0}>不开启</Radio>
+              <Radio value={1}>开启</Radio>
+            </Radio.Group>
+          </Form.Item>
+          <Form.Item
+            name={['rest', 'breakTimeStart-breakTimeEnd']}
+            rules={[{ required: true, message: '请选择休息时间!' }]}
+            noStyle
+            initialValue={0}
+          >
+            <RangePicker
+              format="HH:mm"
+              allowClear={true}
+              picker="time"
+              locale={locale}
+            />
+          </Form.Item>
+        </Input.Group>
+      </Form.Item>
 
-      <Form.Item
-        label="休息时间"
-        name="breakTimeStart-breakTimeEnd"
-        rules={[{ required: true, message: '请输入休息时间!' }]}
-        style={{ width: 400, marginBottom: 40 }}
-      >
-        <RangePicker
-          format="HH:mm"
-          allowClear={true}
-          picker="time"
-          locale={locale}
-        />
+      <Form.Item label="弹性上下班" name="flex" style={{ marginBottom: 40 }}>
+        <Input.Group compact style={{ marginTop: 6 }}>
+          <Form.Item name={['flex', 'flexible']} noStyle initialValue={0}>
+            <Radio.Group>
+              <Radio value={0}>不开启</Radio>
+              <Radio value={1}>开启</Radio>
+            </Radio.Group>
+          </Form.Item>
+          <br />
+          <Form.Item
+            name={['flex', 'leaveEarly']}
+            rules={[{ required: true, message: '请选择时间段!' }]}
+            label="最多早到早走"
+            initialValue={0}
+            style={{ marginTop: 10 }}
+          >
+            <Select placeholder="请选择" style={{ minWidth: 200 }}>
+              <Option value={0}>0分钟</Option>
+              <Option value={15}>15分钟</Option>
+              <Option value={30}>30分钟</Option>
+              <Option value={45}>45分钟</Option>
+              <Option value={60}>60分钟</Option>
+              <Option value={75}>75分钟</Option>
+              <Option value={90}>90分钟</Option>
+              <Option value={105}>105分钟</Option>
+              <Option value={120}>120分钟</Option>
+            </Select>
+          </Form.Item>
+          <Form.Item
+            name={['flex', 'leaveLater']}
+            rules={[{ required: true, message: '请选择时间段!' }]}
+            label="最多晚到晚走"
+            initialValue={0}
+            style={{ paddingLeft: 20, marginTop: 10 }}
+          >
+            <Select placeholder="请选择" style={{ minWidth: 200 }}>
+              <Option value={0}>0分钟</Option>
+              <Option value={15}>15分钟</Option>
+              <Option value={30}>30分钟</Option>
+              <Option value={45}>45分钟</Option>
+              <Option value={60}>60分钟</Option>
+              <Option value={75}>75分钟</Option>
+              <Option value={90}>90分钟</Option>
+              <Option value={105}>105分钟</Option>
+              <Option value={120}>120分钟</Option>
+            </Select>
+          </Form.Item>
+        </Input.Group>
       </Form.Item>
-      <Form.Item
-        label="是否开启"
-        name="breakTimeCalculation"
-        rules={[
-          {
-            required: true,
-            message: '请选择是否开启休息时间内不计算工作时长!',
-          },
-        ]}
-        style={{ width: 400, marginBottom: 40 }}
-      >
-        <Radio.Group>
-          <Radio value={0} style={{ display: 'block', marginBottom: 6 }}>
-            不开启（休息时间内不计算工作时长）
-          </Radio>
-          <Radio value={1} style={{ display: 'block', marginBottom: 6 }}>
-            开启（休息时间内计算工作时长）
-          </Radio>
-        </Radio.Group>
-      </Form.Item>
+
       <Form.Item label="打卡时间限制">
         <Input.Group compact>
           <Form.Item
@@ -91,7 +136,7 @@ export default forwardRef((props, formRef) => {
               <Option value={1}>三小时内</Option>
               <Option value={2}>二小时内</Option>
               <Option value={3}>一小时内</Option>
-              <Option value={4}>4三十分钟内</Option>
+              <Option value={4}>三十分钟内</Option>
               <Option value={5}>十五分钟内</Option>
             </Select>
           </Form.Item>

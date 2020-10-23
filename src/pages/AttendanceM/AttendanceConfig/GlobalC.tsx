@@ -9,6 +9,7 @@ import {
   notification,
   Input,
   Button,
+  Divider,
 } from 'antd';
 import { GlobalResParams } from '@/types/ITypes';
 import { upGlobalConfig, getGlobalConfig } from './services/globalConfig';
@@ -101,6 +102,7 @@ export default props => {
         <Form.Item label="白名单" name="whitelist" style={{ marginBottom: 40 }}>
           <Whitelist {...props} whitelist={detail?.whitelist} />
         </Form.Item>
+        <Divider style={{ margin: '30px 0' }} />
         <Form.Item
           label="补卡申请"
           name="makeObj"
@@ -115,7 +117,7 @@ export default props => {
             >
               <Checkbox.Group>
                 <Checkbox value={1}>
-                  开启{' '}
+                  开启
                   <span style={{ fontSize: 10, color: '#999' }}>
                     员工异常打卡时间提交申请，审批通过后修正正常
                   </span>
@@ -147,7 +149,7 @@ export default props => {
             </Form.Item>
             <Form.Item
               name={['makeObj', 'timeLimit']}
-              label="每月最多补卡次数"
+              label="允许补卡时限为"
               style={{
                 marginRight: 60,
                 display: 'inline-block',
@@ -165,6 +167,7 @@ export default props => {
             </Form.Item>
           </Input.Group>
         </Form.Item>
+        <Divider style={{ margin: '30px 0' }} />
         <Form.Item name="overtimeWay" label="加班方式">
           <Radio.Group>
             <Radio value={0}>以加班申请核算打卡记录</Radio>
@@ -177,6 +180,7 @@ export default props => {
             <Checkbox value={'offdayOvertime'}>允许非工作日加班</Checkbox>
           </Checkbox.Group>
         </Form.Item>
+        <Divider style={{ margin: '30px 0' }} />
         <Form.Item
           name="effectiveTime"
           label="规则生效时间"

@@ -14,6 +14,7 @@ interface tsProps {
   onlySelectUser?: boolean;
   renderDefault?: boolean;
   handleChange?: (value) => void;
+  selectKeys?: string[];
 }
 
 interface tsUserItem {
@@ -41,7 +42,7 @@ export interface tsListItem {
 }
 
 function Organization(props: tsProps, formRef) {
-  const { renderUser, renderDefault } = props;
+  const { renderUser, renderDefault, selectKeys } = props;
   const [dataList, setDataList] = useState<any>([]);
   const [searchValue, setSearchValue] = useState<string>('');
   const [expandedKeys, setExpandedKeys] = useState<string[]>(['奖多多集团']);
@@ -54,6 +55,13 @@ function Organization(props: tsProps, formRef) {
   const { organizationJson } = useOrganization();
   const { defaultGroupJson } = usetDefaultOrganization();
   const [selectItem, setSelectItem] = useState<any[]>([]);
+
+  useEffect(() => {
+    console.log(selectKeys);
+    console.log('selectKeys');
+    selectKeys && setCheckedKeys(selectKeys);
+  }, [selectKeys]);
+
   useEffect(() => {
     getJson();
   }, [organizationJson]);
@@ -145,6 +153,23 @@ function Organization(props: tsProps, formRef) {
     };
 
     handleItem(data, '奖多多');
+
+    if (selectKeys?.length && selectKeys) {
+      let selectArr: any = [];
+      let expandedKey = keyTitle
+        .map(item => {
+          if (selectKeys.indexOf(item.key) > -1) {
+            selectArr.push(item);
+            return getParentKey(item.key, data);
+          }
+          return null;
+        })
+        .filter((item, i, self) => item && self.indexOf(item) === i);
+      setCheckedKeys(selectKeys);
+      setExpandedKeys(expandedKey);
+      setAutoExpandParent(true);
+      setSelectItem(selectArr);
+    }
     setdepartList(departListkey);
     setUserKeyList(userKeyArr);
     setDataList(data);

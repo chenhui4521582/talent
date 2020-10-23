@@ -31,17 +31,23 @@ export default props => {
       let day: any = [];
       if (item.monday) {
         day.push('monday');
-      } else if (item.tuesday) {
+      }
+      if (item.tuesday) {
         day.push('tuesday');
-      } else if (item.wednesday) {
+      }
+      if (item.wednesday) {
         day.push('wednesday');
-      } else if (item.thursday) {
+      }
+      if (item.thursday) {
         day.push('thursday');
-      } else if (item.friday) {
+      }
+      if (item.friday) {
         day.push('friday');
-      } else if (item.saturday) {
+      }
+      if (item.saturday) {
         day.push('saturday');
-      } else if (item.sunday) {
+      }
+      if (item.sunday) {
         day.push('sunday');
       }
       obj.clockTimeId = item.clockTimeId;
@@ -235,7 +241,8 @@ export default props => {
             <Input.Group compact style={{ marginTop: 6 }}>
               <Form.Item
                 name={['rest', 'breakTimeCalculation']}
-                noStyle
+                // noStyle
+                style={{ display: 'block' }}
                 initialValue={0}
               >
                 <Radio.Group>
@@ -312,6 +319,7 @@ export default props => {
               </Form.Item>
             </Input.Group>
           </Form.Item>
+
           <Form.Item label="打卡时间限制">
             <Input.Group compact>
               <Form.Item
@@ -324,7 +332,7 @@ export default props => {
                   <Option value={1}>三小时内</Option>
                   <Option value={2}>二小时内</Option>
                   <Option value={3}>一小时内</Option>
-                  <Option value={4}>4三十分钟内</Option>
+                  <Option value={4}>三十分钟内</Option>
                   <Option value={5}>十五分钟内</Option>
                 </Select>
               </Form.Item>

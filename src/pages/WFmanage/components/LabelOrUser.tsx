@@ -22,27 +22,102 @@ import { DeleteOutlined } from '@ant-design/icons';
 import { GlobalResParams } from '@/types/ITypes';
 import { getLableList } from '@/pages/WFmanage/services/rule';
 import Organization from '@/pages/Framework/components/Organization';
+import { useOrganization, usetDefaultOrganization } from '@/models/global';
 const { TabPane } = Tabs;
 export default props => {
+  const { value } = props;
   const ref = useRef<any>();
   const ref1 = useRef<any>();
   const [userList, setUserList] = useState<any>();
   const [laberList, setLaberList] = useState<any>();
   const [visible, setVisible] = useState<boolean>(false);
+  const [val, setVal] = useState<any>();
+  const { organizationJson } = useOrganization();
+
+  useEffect(() => {
+    if (value?.memberTagIds || value?.userCodes) {
+      let laberListP: any = [];
+      let userListP: any = [];
+
+      const getApilableList = async () => {
+        let json: GlobalResParams<tsRolrLable[]> = await getLableList();
+        if (json.status === 200) {
+          json.obj?.map(item => {
+            if (value?.memberTagIds.split(',')?.indexOf(item.id + '') > -1) {
+              laberListP.push(item);
+            }
+          });
+        }
+
+        function handleDate(data) {
+          function handleDate1(data1) {
+            data1?.map(item => {
+              if (value?.userCodes.split(',')?.indexOf(item.code) > -1) {
+                item.title = item.name;
+                item.key = item.code;
+                userListP.push(item);
+              }
+              if (item.memberList && item.memberList?.length) {
+                item.children = item.memberList;
+              }
+              if (item.children) {
+                handleDate1(item.children);
+              }
+            });
+          }
+
+          handleDate1(data);
+        }
+        handleDate(organizationJson);
+
+        setUserList([...new Set(userListP)]);
+        setLaberList([...new Set(laberListP)]);
+        setVal(value);
+      };
+      getApilableList();
+    }
+  }, [value, organizationJson]);
 
   const handelOk = () => {
-    setUserList(ref.current?.getvalue && ref.current.getvalue());
-    setLaberList(ref1.current?.getvalue && ref1.current.getvalue());
+    let uList: any = [];
+    let lList: any = [];
+    ref.current?.getvalue &&
+      ref.current.getvalue()?.map(item => {
+        uList.push(item.key);
+      });
+    ref1.current?.getvalue &&
+      ref1.current.getvalue()?.map(item => {
+        lList.push(item.id + '');
+      });
     props.onChange &&
       props.onChange({
-        userList: ref.current?.getvalue && ref.current.getvalue(),
-        laberList: ref1.current?.getvalue && ref1.current.getvalue(),
+        userCodes: uList.join(','),
+        memberTagIds: lList.join(','),
       });
     setVisible(false);
   };
 
+  const handleRemove = id => {
+    let newLaberList = JSON.parse(JSON.stringify(laberList || []));
+    let newUserList = JSON.parse(JSON.stringify(userList || []));
+
+    newLaberList.map((item, index) => {
+      if (item.id == id) {
+        newLaberList.splice(index, 1);
+      }
+    });
+
+    newUserList.map((item, index) => {
+      if (item.key == id) {
+        newUserList.splice(index, 1);
+      }
+    });
+
+    setUserList(newUserList);
+    setLaberList(newLaberList);
+  };
+
   const renderUser = useMemo(() => {
-    console.log(userList);
     return userList?.map(item => {
       return (
         <div
@@ -64,13 +139,13 @@ export default props => {
             onClick={e => {
               e.preventDefault();
               e.stopPropagation();
-              // handleRemove(item.code);
+              handleRemove(item.key);
             }}
           />
         </div>
       );
     });
-  }, [userList]);
+  }, [userList, val]);
 
   const renderLabel = useMemo(() => {
     console.log(userList);
@@ -95,13 +170,13 @@ export default props => {
             onClick={e => {
               e.preventDefault();
               e.stopPropagation();
-              // handleRemove(item.code);
+              handleRemove(item.id);
             }}
           />
         </div>
       );
     });
-  }, [laberList]);
+  }, [laberList, val]);
 
   return (
     <>
@@ -129,10 +204,18 @@ export default props => {
       >
         <Tabs defaultActiveKey="1">
           <TabPane tab="组织架构" key="1">
-            <Organization ref={ref} onlySelectUser={true} renderUser={true} />
+            <Organization
+              ref={ref}
+              onlySelectUser={true}
+              renderUser={true}
+              selectKeys={val?.userCodes?.split(',') || []}
+            />
           </TabPane>
           <TabPane tab="角色标签" key="2">
-            <UserLeaber ref={ref1} />
+            <UserLeaber
+              ref={ref1}
+              value={val?.memberTagIds?.split(',') || []}
+            />
           </TabPane>
         </Tabs>
       </Modal>
@@ -147,7 +230,8 @@ interface tsRolrLable {
   updatedBy: string | null;
 }
 
-const UserLeaber = forwardRef((props, formRef) => {
+const UserLeaber = forwardRef((props: any, formRef) => {
+  const { value } = props;
   const [dataList, setDataList] = useState<tsRolrLable[]>([]);
   const [list, setList] = useState<string[]>([]);
 
@@ -155,6 +239,9 @@ const UserLeaber = forwardRef((props, formRef) => {
     getApilableList();
   }, []);
 
+  useEffect(() => {
+    value && value.length && setList(value || []);
+  }, [value]);
   useImperativeHandle(formRef, () => {
     let arr: tsRolrLable[] = [];
     dataList?.map(item => {

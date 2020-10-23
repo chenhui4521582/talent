@@ -35,7 +35,7 @@ export default () => {
 
   const getDetail = async () => {
     let res: GlobalResParams<any> = await listMyMonthRecord(
-      selectYear.toString() + '-' + month.toString(),
+      selectYear.toString() + '-' + selectMonth.toString(),
     );
     if (res.status === 200) {
       setDetail(res.obj);
@@ -109,7 +109,7 @@ export default () => {
           <span
             style={{ color: item?.later || item?.later === '0' ? 'red' : '' }}
           >
-            {item?.later || 0}{' '}
+            {item?.later || 0}
           </span>
           <span>迟到</span>
         </div>
@@ -224,7 +224,7 @@ export default () => {
             flexDirection: 'column',
           }}
         >
-          <span>{detali?.overtimeStatistics?.workingdayOvertime}</span>
+          <span>{detali?.overtimeStatistics?.workingdayOvertime || 0}</span>
           <span> 工作日加班</span>
         </div>
         <div
@@ -236,7 +236,7 @@ export default () => {
             flexDirection: 'column',
           }}
         >
-          <span>{detali?.overtimeStatistics?.offdayOvertime}</span>
+          <span>{detali?.overtimeStatistics?.offdayOvertime || 0}</span>
           <span> 休息日加班</span>
         </div>
         <div
@@ -248,7 +248,7 @@ export default () => {
             flexDirection: 'column',
           }}
         >
-          <span>{detali?.overtimeStatistics?.holidayOvertime}</span>
+          <span>{detali?.overtimeStatistics?.holidayOvertime || 0}</span>
           <span>节假日加班</span>
         </div>
       </>
@@ -268,7 +268,7 @@ export default () => {
             margin: '20px',
           }}
         >
-          <span>{detali?.leaveStatistics?.abortionLeave}</span>
+          <span>{detali?.leaveStatistics?.abortionLeave || 0}</span>
           <span> 流产假</span>
         </div>
         <div
@@ -281,7 +281,7 @@ export default () => {
             margin: '20px',
           }}
         >
-          <span>{detali?.leaveStatistics?.annualLeave}</span>
+          <span>{detali?.leaveStatistics?.annualLeave || 0}</span>
           <span> 年假</span>
         </div>
         <div
@@ -294,7 +294,7 @@ export default () => {
             margin: '20px',
           }}
         >
-          <span>{detali?.leaveStatistics?.bereavementLeave}</span>
+          <span>{detali?.leaveStatistics?.bereavementLeave || 0}</span>
           <span>丧假</span>
         </div>
         <div
@@ -307,7 +307,7 @@ export default () => {
             margin: '20px',
           }}
         >
-          <span>{detali?.leaveStatistics?.breastfeedingLeave}</span>
+          <span>{detali?.leaveStatistics?.breastfeedingLeave || 0}</span>
           <span>哺乳假</span>
         </div>
         <div
@@ -320,7 +320,7 @@ export default () => {
             margin: '20px',
           }}
         >
-          <span>{detali?.leaveStatistics?.businessTrip}</span>
+          <span>{detali?.leaveStatistics?.businessTrip || 0}</span>
           <span>出差 </span>
         </div>
         <div
@@ -333,7 +333,7 @@ export default () => {
             margin: '20px',
           }}
         >
-          <span>{detali?.leaveStatistics?.goOut}</span>
+          <span>{detali?.leaveStatistics?.goOut || 0}</span>
           <span>外出</span>
         </div>
         <div
@@ -346,7 +346,7 @@ export default () => {
             margin: '20px',
           }}
         >
-          <span>{detali?.leaveStatistics?.makeUp}</span>
+          <span>{detali?.leaveStatistics?.makeUp || 0}</span>
           <span> 补打卡</span>
         </div>
         <div
@@ -359,7 +359,7 @@ export default () => {
             margin: '20px',
           }}
         >
-          <span>{detali?.leaveStatistics?.maritalLeave}</span>
+          <span>{detali?.leaveStatistics?.maritalLeave || 0}</span>
           <span>婚假</span>
         </div>
         <div
@@ -372,7 +372,7 @@ export default () => {
             margin: '20px',
           }}
         >
-          <span>{detali?.leaveStatistics?.maternityLeave}</span>
+          <span>{detali?.leaveStatistics?.maternityLeave || 0}</span>
           <span>产检假</span>
         </div>
         <div
@@ -385,7 +385,7 @@ export default () => {
             margin: '20px',
           }}
         >
-          <span>{detali?.leaveStatistics?.personalLeave}</span>
+          <span>{detali?.leaveStatistics?.personalLeave || 0}</span>
           <span>事假</span>
         </div>
         <div
@@ -398,7 +398,7 @@ export default () => {
             margin: '20px',
           }}
         >
-          <span>{detali?.leaveStatistics?.restLeave}</span>
+          <span>{detali?.leaveStatistics?.restLeave || 0}</span>
           <span>调休</span>
         </div>
         <div
@@ -411,7 +411,7 @@ export default () => {
             margin: '20px',
           }}
         >
-          <span>{detali?.leaveStatistics?.sickLeave}</span>
+          <span>{detali?.leaveStatistics?.sickLeave || 0}</span>
           <span>病假</span>
         </div>
         <div
@@ -424,7 +424,7 @@ export default () => {
             margin: '20px',
           }}
         >
-          <span>{detali?.leaveStatistics?.otherLeave}</span>
+          <span>{detali?.leaveStatistics?.otherLeave || 0}</span>
           <span>其他</span>
         </div>
       </>
@@ -484,7 +484,7 @@ export default () => {
 
         <div style={{ padding: 10 }}>
           <p style={{ fontWeight: 700, color: '#000', fontSize: 18 }}>
-            加班统计 · 分钟
+            加班统计 · 小时
           </p>
           <div
             style={{

@@ -17,6 +17,9 @@ import {
   roluFormList,
   tsStep,
   tsStepObj,
+  listWithCondition,
+  saveWithConditon,
+  updateWithCondition,
 } from './services/rule';
 import { GlobalResParams } from '@/types/ITypes';
 import { DndProvider } from 'react-dnd';
@@ -57,19 +60,17 @@ export default props => {
       if (idRes.obj.length) {
         setFromName(idRes.obj[0].name);
         setFormId(idRes.obj[0].id);
-        let res: GlobalResParams<tsStepObj> = await roluFormList(
+        // let res: GlobalResParams<tsStepObj> = await roluFormList(
+        let res: GlobalResParams<any> = await listWithCondition(
           parseInt(idRes.obj[0].id),
         );
         if (res.status === 200) {
-          handleList(res.obj.stepModelList);
-          if (res.obj.stepModelList.length === 0) {
-            data2 = [];
-            data1 = [];
+          if (res.obj?.steps?.length === 0) {
             setAddOrChange('add');
+            handleList({});
           } else {
-            data1 = res.obj.stepModelList;
+            handleList(res.obj);
             setAddOrChange('change');
-            setControlModels(res.obj.controlModels);
           }
         }
       }
@@ -77,122 +78,165 @@ export default props => {
   }
 
   const handleList = data => {
-    let list1: tsStep[] = [];
-    let list2: tsStep[] = [];
-    data.map((item: tsStep) => {
-      if (item.stepType === 1) {
-        list1.push(item);
-      } else {
-        list2.push(item);
-      }
-    });
-    setListOne(list1.sort(compare('stepNumber')));
-    setListTwo(list2.sort(compare('stepNumber')));
-  };
-
-  const compare = (name: string) => {
-    return (a, b) => {
-      let v1 = a[name];
-      let v2 = b[name];
-      if (v2 > v1) {
-        return -1;
-      } else if (v2 < v1) {
-        return 1;
-      } else {
-        return 0;
-      }
-    };
+    setListOne(data);
   };
 
   const submitData = async () => {
-    let data: any = {};
-    let list1: any = [];
-    let list2: any = [];
-    data1.map((item: any) => {
-      item.stepType = 1;
-      if ((item.id + '')?.indexOf('add') > -1) {
-        delete item.id;
-      }
-      item.resApprovalId = formId;
-      list1.push(item);
-    });
-    data2.map((item: any) => {
-      item.stepType = 2;
-      if ((item.id + '').indexOf('add') > -1) {
-        delete item.id;
-      }
-      item.resApprovalId = formId;
-      list2.push(item);
-    });
-    list1 = list1.concat(list2);
-    list1.map((item, index) => {
-      if (item.type === 6) {
-        delete item.stepNumber;
-        delete item.resFormControlIds;
-      } else {
-        item.stepNumber = index + 1;
-      }
-    });
-    data.noticeStatus = 1;
+    console.log(data1);
+    // let newForm = ref.current.getvalue()
+    // console.log(newForm.get)
 
-    let newList = list1.concat(list2);
-    newList.map((item, i) => {
-      if (i === 0) {
-        item.nodeType = 1;
-      } else if (i === list1?.length - 1) {
-        item.nodeType = 3;
-      } else {
-        item.nodeType = 2;
+    form.validateFields().then(async fromSubData => {
+      console.log(fromSubData);
+      data1.autoType = fromSubData.autoType;
+      data1.illegalProcessType = fromSubData.illegalProcessType;
+      let illegalProcessorName: any = [];
+      let illegalProcessorNumber: any = [];
+      if (fromSubData.illegalProcessType === 2) {
+        fromSubData.illegalUser?.map(item => {
+          illegalProcessorName.push(item.title);
+          illegalProcessorNumber.push(item.key);
+        });
+        data1.illegalProcessorName = illegalProcessorName.join(',');
+        data1.illegalProcessorNumber = illegalProcessorNumber.join(',');
       }
-
-      if (item.type === 6) {
-        item.nodeType = 4;
-        if (list1.length >= 2) {
-          let obj = list1[list1.length - 2];
-          obj.nodeType = 3;
-          list1[list1.length - 2] = obj;
+      data1.noticeStatus = 1;
+      // let api = saveWithConditon;
+      let api = updateWithCondition;
+      if (addOrChange === 'add') {
+        api = saveWithConditon;
+      }
+      if (flag) {
+        flag = false;
+        setTimeout(() => {
+          flag = true;
+        }, 1000);
+        let res: GlobalResParams<string> = await api(data1);
+        if (res.status === 200) {
+          getDetail();
+          notification['success']({
+            message: res.msg,
+            description: '',
+          });
+        } else {
+          notification['error']({
+            message: res.msg,
+            description: '',
+          });
         }
       }
     });
-
-    let newControlModels = controlModels
-      ? JSON.parse(JSON.stringify(controlModels))
-      : null;
-    newControlModels?.map(item => {
-      delete item.controlShowName;
-    });
-
-    data.crudParam = newList;
-    data.archiveControlParams = newControlModels;
-
-    let api = updateRolu;
-    if (addOrChange === 'add') {
-      api = saveRolu;
-    }
-
-    if (flag) {
-      flag = false;
-      setTimeout(() => {
-        flag = true;
-      }, 1000);
-      let res: GlobalResParams<string> = await api(data);
-      if (res.status === 200) {
-        getDetail();
-        notification['success']({
-          message: res.msg,
-          description: '',
-        });
-      } else {
-        notification['error']({
-          message: res.msg,
-          description: '',
-        });
-      }
-    }
   };
 
   const getdata1 = value => {
-    data1 = value;
+    console.log(value);
+    // data1 = value;
+    let ruleSets: any = [];
+    let steps: any = [];
+
+    const droopData1 = data => {
+      let newData = data;
+      function handleData(listItem) {
+        listItem?.map((item, index) => {
+          if (item.poi != '0-0') {
+            steps.push({
+              ...item,
+              nextNodeId: listItem[index + 1]
+                ? listItem[index + 1].poi
+                : undefined,
+            });
+          }
+
+          item.ruleList?.map((ruleItem, ruleItemIndex) => {
+            if (item.poi != '0-0') {
+              ruleSets.push({
+                name: ruleItem.name,
+                priority: ruleItem.priority,
+                resRuleCurdParams: ruleItem.resRuleCurdParams,
+                isDefault: ruleItemIndex === 0 ? 1 : 0,
+                fromNodeId: item.poi,
+                toNodeId: item.poi + '-' + ruleItemIndex + '-' + '0',
+              });
+            }
+            handleData(ruleItem?.list);
+          });
+        });
+      }
+      return handleData(newData);
+    };
+    droopData1(value);
+    steps?.map((item, index) => {
+      if (item.nextNodeId === 'undefined' || item.nextNodeId) {
+        delete item.nextNodeId;
+      }
+      if (item?.id && item?.id?.toString().indexOf('add') > -1) {
+        item.nodeId = item.poi;
+        delete item.id;
+      }
+      if (item.ruleList >= 2) {
+        item.condition = 1;
+      } else {
+        item.condition = 0;
+      }
+
+      delete item.ruleList;
+      delete item.poi;
+      item.resApprovalId = formId;
+      item.nodeType = 2;
+      if (index === 0) {
+        item.nodeType = 1;
+      }
+
+      if (index === steps?.length - 1) {
+        item.nodeType = 3;
+      }
+
+      if (item.type === 6) {
+        if (index === steps?.length - 1) {
+          item = {
+            nodeType: 4,
+            archiveControlParams: item.archiveControlParams,
+            archiveId: item.archiveId,
+          };
+        } else {
+          steps[index - 1] = {
+            nodeType: 3,
+            archiveControlParams: item.archiveControlParams,
+            archiveId: item.archiveId,
+          };
+        }
+      } else {
+        delete item.archiveId;
+        delete item.archiveControlParams;
+      }
+      if (steps.length === 1) {
+        item.nodeType = 1;
+      }
+      if (steps.length === 2) {
+        steps[0].nodeType = 1;
+        steps[1].nodeType = 2;
+      }
+      if (item.type === 6) {
+        item.nodeType = 4;
+      }
+      item.stepType = 1;
+      item.stepNumber = index;
+    });
+
+    ruleSets?.map(item => {
+      item?.resRuleCurdParams?.map(items => {
+        items.value = JSON.stringify(items.value);
+      });
+      item = item;
+      item.resApprovalId = formId;
+    });
+
+    console.log(ruleSets);
+    console.log(steps);
+    data1 = {
+      ruleSets,
+      steps,
+    };
   };
 
   const getArchiveControlParams = value => {
@@ -212,10 +256,6 @@ export default props => {
       }
     }
     setControlModels(archiveControlParams);
-  };
-
-  const getdata2 = value => {
-    data2 = value;
   };
 
   const handleUserOk = () => {
@@ -269,7 +309,7 @@ export default props => {
         >
           <h4 style={{ margin: '15px 0' }}>{fromName}</h4>
           <Divider />
-          <Row style={{ height: 'auto' }}>
+          <Row style={{ height: 'auto', width: '80vw' }}>
             <Col style={{ marginTop: 14 }}>默认审批人</Col>
             <Col span={18}>
               <GridLayout
@@ -284,12 +324,36 @@ export default props => {
 
           <Form layout="vertical" form={form}>
             <Row style={{ marginTop: 20 }}>
+              <Col>自动审批</Col>
+              <Col style={{ marginLeft: 20 }}>
+                <Form.Item
+                  name="autoType"
+                  initialValue={1}
+                  label="当同一个审批人重复审批同一工作流时"
+                  rules={[{ required: true, message: '请选择!' }]}
+                >
+                  <Radio.Group>
+                    <Radio value={1} style={{ display: 'block' }}>
+                      每个节点都需要审批
+                    </Radio>
+                    <Radio style={{ marginTop: 5, display: 'block' }} value={2}>
+                      仅连续审批自动同意
+                    </Radio>
+                    <Radio style={{ marginTop: 5, display: 'block' }} value={3}>
+                      仅首个节点需审批，其余自动同意
+                    </Radio>
+                  </Radio.Group>
+                </Form.Item>
+              </Col>
+            </Row>
+            <Row style={{ marginTop: 20 }}>
               <Col>异常处理</Col>
               <Col style={{ marginLeft: 20 }}>
                 <Form.Item
                   name="illegalProcessType"
                   initialValue={1}
                   label="审批节点内成员离职、为空等情况的处理方式"
+                  rules={[{ required: true, message: '请选择!' }]}
                 >
                   <Radio.Group
                     onChange={e => {
@@ -314,7 +378,13 @@ export default props => {
               <Row style={{ marginTop: 20 }}>
                 <Col>异常处理人</Col>
                 <Col style={{ marginLeft: 20 }}>
-                  <Form.Item name="illegalUser">{renderUser}</Form.Item>
+                  <Form.Item
+                    name="illegalUser"
+                    label="请添加人员"
+                    rules={[{ required: true, message: '请选择!' }]}
+                  >
+                    {renderUser}
+                  </Form.Item>
                 </Col>
               </Row>
             ) : null}
@@ -333,7 +403,7 @@ export default props => {
       </DndProvider>
       <Modal
         width="45vw"
-        title="成员或标签支持多选"
+        title="选择异常处理人（只支持单选）"
         visible={visible}
         okText="确认"
         cancelText="返回"

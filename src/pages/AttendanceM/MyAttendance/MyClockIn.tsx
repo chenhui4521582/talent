@@ -21,7 +21,9 @@ const startStatus = {
   3: '迟到',
   4: '缺卡',
   5: '地点异常',
-  6: '设备异常7加班打卡8旷工',
+  6: '设备异常',
+  7: '加班打卡',
+  8: '旷工',
 };
 
 let now = new Date();
@@ -60,46 +62,52 @@ export default () => {
   };
 
   const dateCellRender = value => {
+    let html: any = (
+      <span>
+        <Badge color="#b8b8b8" />
+      </span>
+    );
     if (record?.currentMonthRecord && record?.currentMonthRecord?.length) {
-      return record?.currentMonthRecord?.map((item, index) => {
+      record?.currentMonthRecord?.map((item, index) => {
         if (value.format('YYYY-MM-DD') === handlenumTostring(item.date)) {
-          if (item.startStatus === 1) {
-            return (
+          if (startStatus[item.startStatus] && item.startStatus === 1) {
+            html = (
               <span key={index}>
                 <Badge color="#87d068" />
                 打卡正常
               </span>
             );
-          } else if (startStatus[item.startStatus]) {
-            return (
+          } else if (startStatus[item.startStatus] && item.startStatus != 1) {
+            html = (
               <span key={index}>
                 <Badge color="red" />
                 {startStatus[item.startStatus]}
               </span>
             );
-          } else {
-            return (
+          } else if (!startStatus[item.startStatus]) {
+            html = (
               <span>
                 <Badge color="#b8b8b8" />
-                暂无数据
+              </span>
+            );
+          } else {
+            html = (
+              <span>
+                <Badge color="#b8b8b8" />
+                暂无当天打卡信息
               </span>
             );
           }
-        } else {
-          return (
-            <span>
-              <Badge color="#b8b8b8" />
-            </span>
-          );
         }
       });
     } else {
-      return (
+      html = (
         <span>
           <Badge color="#b8b8b8" />
         </span>
       );
     }
+    return html;
   };
 
   const onChange = value => {
@@ -122,11 +130,19 @@ export default () => {
   };
 
   const renderDetail = useMemo(() => {
+    let HTML = (
+      <div
+        className="myclock-bottom"
+        style={{ alignItems: 'center', justifyContent: 'center' }}
+      >
+        暂无数据
+      </div>
+    );
     if (record?.currentMonthRecord && record?.currentMonthRecord?.length) {
-      return record?.currentMonthRecord.map((item, index) => {
+      record?.currentMonthRecord.map((item, index) => {
         if (selectItem === handlenumTostring(item.date)) {
           let day: any = calendar.solar2lunar(handlenumTostring(item.date));
-          return (
+          HTML = (
             <div className="myclock-bottom" key={index}>
               <div>
                 <h3>{handlenumTostring(item.date)}</h3>
@@ -137,40 +153,19 @@ export default () => {
                 <p>{incomeDetail(item.date)}</p>
               </div>
               <div>
-                <h3>{`上班时间（${record?.startDate} | ${record?.endDate}）`}</h3>
+                <h3>{`上班时间（${item?.startDate}）`}</h3>
                 <p>上班打卡：{item?.startDate}</p>
               </div>
               <div>
-                <h3>{`上班时间（${record?.startDate} | ${record?.endDate}）`}</h3>
-                <p>下班打卡：{item?.endDate}</p>
+                <h3>{`下班时间（ ${item?.endDate}）`}</h3>
+                {/* <p>下班打卡：{item?.endDate}</p> */}
               </div>
-              {/* <div>
-                <h3>外出打卡</h3>
-                <p>第1次打卡：10:30</p>
-              </div> */}
-            </div>
-          );
-        } else {
-          return (
-            <div
-              className="myclock-bottom"
-              style={{ alignItems: 'center', justifyContent: 'center' }}
-            >
-              暂无数据
             </div>
           );
         }
       });
-    } else {
-      return (
-        <div
-          className="myclock-bottom"
-          style={{ alignItems: 'center', justifyContent: 'center' }}
-        >
-          暂无数据
-        </div>
-      );
     }
+    return HTML;
   }, [selectItem]);
 
   return (

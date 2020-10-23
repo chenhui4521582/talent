@@ -226,7 +226,7 @@ export default () => {
           }}
         >
           <span>{detali?.overtimeStatistics?.avaliableOvertime || 0}</span>
-          <span> 有效加班时长</span>
+          <span> 当前可调休时长</span>
         </div>
         <div
           style={{

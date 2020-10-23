@@ -13,6 +13,7 @@ export interface IMenusparams {
 export interface ICurrentUserParams {
   businessCode: string;
   email: string;
+  employeeId: string;
   userName: string;
   phone: string;
 }

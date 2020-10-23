@@ -105,3 +105,27 @@ export async function getParam(id) {
     data: { id },
   });
 }
+
+// 获取详情 （带条件审批）
+export async function listWithCondition(resApprovalId) {
+  return request(`/api/talent/wfresapprstep/listWithCondition`, {
+    method: 'POST',
+    data: { resApprovalId },
+  });
+}
+
+// 保存（带条件审批）
+export async function saveWithConditon(params) {
+  return request(`/api/talent/wfresapprstep/saveWithConditon`, {
+    method: 'POST',
+    data: params,
+  });
+}
+
+// 更新（带条件审批）
+export async function updateWithCondition(params) {
+  return request(`/api/talent/wfresapprstep/updateWithCondition`, {
+    method: 'POST',
+    data: params,
+  });
+}

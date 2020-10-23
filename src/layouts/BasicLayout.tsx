@@ -20,7 +20,7 @@ import ChangeInfo from '@/components/BasicLayout/ChangeInfo';
 import ChangePwd from '@/components/BasicLayout/ChangePwd';
 import { GlobalResParams } from '@/types/ITypes';
 import { getMenuData } from '@/utils/menu';
-import { removeToken, getToken } from '@/utils/cookies';
+import { removeToken, getToken, setToken } from '@/utils/cookies';
 
 interface KeyParams {
   key: string;
@@ -45,6 +45,8 @@ export default (props: IRouteComponentProps) => {
 
   async function fetchCurrent() {
     let response: GlobalResParams<ICurrentUserParams> = await queryCurrent();
+    setToken('ods_user_userName', response.obj.userName, 24);
+    setToken('ods_user_employeeId', response.obj.employeeId, 24);
     setCurrentUser(response.obj);
   }
 

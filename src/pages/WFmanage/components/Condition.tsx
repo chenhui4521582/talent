@@ -58,7 +58,7 @@ export default forwardRef((props: any, formRef) => {
         newList.push({
           baseControlType: 'applicant',
           name: '申请人',
-          id: '申请人',
+          id: '',
         } as IListItem);
         setControlList(newList);
       }
@@ -93,8 +93,6 @@ export default forwardRef((props: any, formRef) => {
   };
 
   const renderFormItem = useMemo(() => {
-    console.log(numberList);
-
     return numberList?.map((item, index) => {
       return (
         <FormItem
@@ -129,7 +127,25 @@ export default forwardRef((props: any, formRef) => {
               initialValue={selectRule ? selectRule.priority : undefined}
             >
               <Select placeholder="请选择优先级" allowClear>
-                <Option value={1}>优先级1</Option>
+                {selectRule?.rule ? (
+                  <>
+                    {selectRule?.rule?.map((item, index) => {
+                      return (
+                        <Option key={index} value={index + 1}>
+                          优先级{index + 1}
+                        </Option>
+                      );
+                    })}
+                    <Option value={selectRule?.rule.length + 1}>
+                      优先级{selectRule?.rule.length + 1}
+                    </Option>
+                  </>
+                ) : (
+                  <>
+                    <Option value={1}>优先级1</Option>
+                    <Option value={2}>优先级2</Option>
+                  </>
+                )}
               </Select>
             </Form.Item>
           </Col>
@@ -169,27 +185,27 @@ const FormItem = props => {
         return 'select';
       case 4:
         return 'multiple';
-      case '5':
+      case 5:
         return 'areatext';
     }
   };
 
   useEffect(() => {
     let obj: any = {};
-    console.log('-------------selectRule--------------------');
-    console.log(selectRule);
-    if (selectRule.refResFormControl && selectRule.type && selectRule.value) {
+    if (selectRule.refResFormControl || selectRule.type || selectRule.value) {
       obj[Index] = {
-        comparetor: selectRule.comparetor,
         value: selectRule.value,
         type:
           selectRule.refResFormControl + '&&' + handleType1(selectRule.type),
+        comparetor: parseInt(selectRule.comparetor),
+        id: selectRule.id,
       };
-      // setType(parseInt(selectRule.type))
       onChange(
         selectRule.refResFormControl + '&&' + handleType1(selectRule.type),
       );
-      form.setFieldsValue(obj);
+      setTimeout(() => {
+        form.setFieldsValue(obj);
+      }, 1000);
     }
   }, [selectRule]);
 
@@ -216,7 +232,7 @@ const FormItem = props => {
                 name={[Index, 'value']}
                 rules={[{ required: true, message: '请选择!' }]}
               >
-                <LabelOrUser {...props} />
+                <LabelOrUser {...props} value={selectRule.value} />
               </Form.Item>
             </Col>
             <Col span={10} offset={1} hidden>
@@ -234,7 +250,6 @@ const FormItem = props => {
               <Form.Item
                 name={[Index, 'comparetor']}
                 rules={[{ required: true, message: '请选择!' }]}
-                initialValue={1}
               >
                 <Select placeholder="请选择优先级" allowClear>
                   <Option value={1}>等于</Option>
@@ -248,7 +263,7 @@ const FormItem = props => {
             </Col>
             <Col span={8} offset={1}>
               <Form.Item
-                name={[Index, 'comparetor']}
+                name={[Index, 'value']}
                 rules={[{ required: true, message: '请输入!' }]}
               >
                 <InputNumber />
@@ -370,7 +385,6 @@ const FormItem = props => {
 
   const onChange = values => {
     let type = values?.split('&&')[1];
-    console.log(values);
     if (type === 'applicant') {
       setType(1);
     } else if (type === 'number') {

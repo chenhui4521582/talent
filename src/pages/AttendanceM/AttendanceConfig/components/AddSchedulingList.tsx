@@ -26,7 +26,8 @@ export default props => {
   const [index, setIndex] = useState<number>();
   const ref = useRef<any>();
   const formRef = useRef<any>();
-
+  console.log('userList&&userList()');
+  console.log(userList && userList());
   useEffect(() => {
     list && list.length && props.onChange({ list: list, detail: detail });
   }, [list, detail]);
@@ -45,15 +46,19 @@ export default props => {
           ? moment('2019-02-13 ' + item?.clockPeriods?.endTime + ':00')
           : undefined,
       ];
-      obj.breakTimeCalculation = item.breakTimeCalculation;
-      obj['breakTimeStart-breakTimeEnd'] = [
-        item.breakTimeStart
-          ? moment('2019-02-13 ' + item.breakTimeStart + ':00')
-          : undefined,
-        item.breakTimeEnd
-          ? moment('2019-02-13 ' + item.breakTimeEnd + ':00')
-          : undefined,
-      ];
+      obj.flex = {
+        flexible: item.flexible,
+        leaveEarly: item.leaveEarly,
+        leaveLater: item.leaveLater,
+      };
+      obj.rest = {
+        breakTimeCalculation: item.breakTimeCalculation,
+        'breakTimeStart-breakTimeEnd': [
+          moment('2019-02-13 ' + item.breakTimeStart + ':00'),
+          moment('2019-02-13 ' + item.breakTimeEnd + ':00'),
+        ],
+      };
+
       obj.itemList = {
         endLimit: item.endLimit,
         startLimit: item.startLimit,
@@ -68,6 +73,7 @@ export default props => {
     form.validateFields().then(value => {
       setDetail(value);
       setVisibleDate(false);
+      // formRef.current?.getvalue?.resetFields();
     });
   };
 
@@ -86,7 +92,7 @@ export default props => {
       setList(newList);
       setEditType(undefined);
       setIndex(undefined);
-      form.resetFields();
+      // form.resetFields();
     });
   };
 
@@ -183,11 +189,12 @@ export default props => {
         visible={visibleDate}
         onOk={handleDetailOk}
         onCancel={() => {
-          // formRef.current.getvalue.resetFields();
+          // formRef.current?.getvalue?.resetFields();
           setVisibleDate(false);
         }}
       >
         <SchedulingUser
+          // key={!!visibleDate+'1'}
           ruleId={ruleId}
           userList={userList()}
           list={list}
@@ -246,7 +253,7 @@ const SchedulingUser = forwardRef((props: any, formRef) => {
     if (!userDetail) {
       return;
     }
-    let newUserList = JSON.parse(JSON.stringify(ownUserList || []));
+    let newUserList: any = [];
     let obj: any = {};
     for (let key in userDetail) {
       newUserList.push({
@@ -266,6 +273,19 @@ const SchedulingUser = forwardRef((props: any, formRef) => {
     console.log(obj);
     form.setFieldsValue(obj);
     setValues(obj);
+
+    newUserList = newUserList.concat(userList || []);
+    let result: any = [];
+    let obj1: any = {};
+    for (let i = 0; i < newUserList.length; i++) {
+      if (!obj1[newUserList[i].code]) {
+        result.push(newUserList[i]);
+        obj1[newUserList[i].code] = true;
+      }
+    }
+    console.log(result);
+    newUserList = result;
+
     setOwnUserList([...new Set(newUserList)]);
   }, [userDetail, list]);
 
@@ -342,7 +362,8 @@ const SchedulingUser = forwardRef((props: any, formRef) => {
   const renderUserList = useMemo(() => {
     let arr: any = [];
     let newUserList = JSON.parse(JSON.stringify(ownUserList || []));
-    newUserList = newUserList.concat(userList || []);
+    console.log('newUserList');
+    console.log(newUserList);
     newUserList?.map((items, indexs) => {
       if (indexs < page * 6 && indexs >= (page - 1) * 6) {
         arr.push(
@@ -369,7 +390,7 @@ const SchedulingUser = forwardRef((props: any, formRef) => {
                     justifyContent: 'center',
                   }}
                 >
-                  <Select style={{ padding: '0 2px' }}>
+                  <Select style={{ padding: '0 2px' }} allowClear>
                     {list.map(times => {
                       return <Option value={times.name}>{times.name}</Option>;
                     })}
@@ -411,7 +432,7 @@ const SchedulingUser = forwardRef((props: any, formRef) => {
   }, [list, values, dateList, month, year, page, userDetail]);
 
   return (
-    <>
+    <div style={{ width: '2400px' }}>
       {renderTableHead}
       <Form
         form={form}
@@ -443,6 +464,6 @@ const SchedulingUser = forwardRef((props: any, formRef) => {
       <div className="schedul-table-one" style={{ marginTop: 30 }}>
         {renderStatistics}
       </div>
-    </>
+    </div>
   );
 });
