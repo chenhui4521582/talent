@@ -87,6 +87,14 @@ export default props => {
     // console.log(newForm.get)
 
     form.validateFields().then(async fromSubData => {
+      data1?.ruleSets?.map(item => {
+        item?.resRuleCurdParams?.map(items => {
+          items.value = JSON.stringify(items.value);
+        });
+        // item = item;
+        item.resApprovalId = formId;
+      });
+
       console.log(fromSubData);
       data1.autoType = fromSubData.autoType;
       data1.illegalProcessType = fromSubData.illegalProcessType;
@@ -102,6 +110,7 @@ export default props => {
       }
       data1.noticeStatus = 1;
       // let api = saveWithConditon;
+      console.log(data1);
       let api = updateWithCondition;
       if (addOrChange === 'add') {
         api = saveWithConditon;
@@ -166,7 +175,7 @@ export default props => {
     };
     droopData1(value);
     steps?.map((item, index) => {
-      if (item.nextNodeId === 'undefined' || item.nextNodeId) {
+      if (item.nextNodeId === 'undefined' || !item.nextNodeId) {
         delete item.nextNodeId;
       }
       if (item?.id && item?.id?.toString().indexOf('add') > -1) {
@@ -178,7 +187,7 @@ export default props => {
       } else {
         item.condition = 0;
       }
-
+      item.nodeId = item.poi;
       delete item.ruleList;
       delete item.poi;
       item.resApprovalId = formId;
@@ -224,10 +233,10 @@ export default props => {
     });
 
     ruleSets?.map(item => {
-      item?.resRuleCurdParams?.map(items => {
-        items.value = JSON.stringify(items.value);
-      });
-      item = item;
+      // item?.resRuleCurdParams?.map(items => {
+      //   items.value = JSON.stringify(items.value);
+      // });
+      // item = item;
       item.resApprovalId = formId;
     });
 

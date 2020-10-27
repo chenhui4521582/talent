@@ -28,7 +28,8 @@ export default props => {
   }, [list]);
 
   const handleOk = () => {
-    let newList = JSON.parse(JSON.stringify(list || []));
+    let newList = JSON.parse(JSON.stringify([]));
+    console.log(newList);
     ref.current.getvalue()?.map(item => {
       newList.push({
         userCode: item.key,

@@ -72,9 +72,26 @@ function Organization(props: tsProps, formRef) {
       Object.assign(list, newDefKey);
       console.log(arr);
       setCheckedKeys(arr);
-      setSelectItem(list);
     }
   }, [defKey]);
+
+  // useEffect(()=>{
+  //   let json = JSON.parse(JSON.stringify(dataList))
+  //   let arr:any = []
+  //   const handleItem = list => {
+  //     for (let i = 0; i < list.length; i++) {
+  //       if(checkedKeys?.indexOf(list[i].key)>-1){
+  //         arr.push(list[i])
+  //       }
+  //       if (list[i].children) {
+  //         handleItem(list[i].children);
+  //       }
+  //     }
+  //   };
+
+  //   handleItem(json)
+  //   // setSelectItem(arr);
+  // },[checkedKeys, organizationJson, dataList])
 
   async function getJson() {
     let list = organizationJson;
@@ -168,12 +185,8 @@ function Organization(props: tsProps, formRef) {
   useImperativeHandle(formRef, () => {
     let newSelectItem = [...selectItem];
     newSelectItem?.map(item => {
-      if (item.pos) {
-        let posOne = item.pos.split('-')[2]; // 一级
-        let posTwo = item.pos.split('-')[3]; // 二级
-        item.businessName = dataList[0].children[posOne].children[posTwo].name;
-        item.businessCode = dataList[0].children[posOne].children[posTwo].code;
-      }
+      item.businessName = item.nameStr.split('-')[3];
+      item.businessCode = item.codeStr.split('-')[3];
     });
 
     return {
@@ -227,90 +240,14 @@ function Organization(props: tsProps, formRef) {
       node: { key, children, level },
     } = e;
     console.log(e);
-    let list = JSON.parse(JSON.stringify(checkedKeys));
-    let selectItemArr = [...selectItem];
+    let list: any = [];
+    let selectItemArr: any = [];
     if (onlySelectUser) {
       if (userKeyList.indexOf(key) > -1) {
-        if (checked) {
-          if (key === '奖多多集团') {
-            children?.map(item => {
-              list.push(item.key);
-            });
-            selectItemArr = selectItemArr.concat(children);
-          } else {
-            selectItemArr.push(e.node);
-          }
-          list.push(key);
-        } else {
-          if (key === '奖多多集团') {
-            list.splice(
-              list.findIndex(item => item === '奖多多集团'),
-              1,
-            );
-            children?.map(items => {
-              list.splice(
-                list.findIndex(item => item === items.key),
-                1,
-              );
-              selectItemArr.splice(
-                selectItemArr.findIndex(item => item.key === items.key),
-                1,
-              );
-            });
-          } else {
-            list.splice(
-              list.findIndex(item => item === key),
-              1,
-            );
-            selectItemArr.splice(
-              selectItemArr.findIndex(item => item.key === key),
-              1,
-            );
-          }
-        }
-        setSelectItem([...new Set(selectItemArr)]);
-        setCheckedKeys([...new Set(list)]);
-      }
-    } else {
-      if (userKeyList.indexOf(key) > -1) {
-        if (checked) {
-          if (key === '奖多多集团') {
-            children?.map(item => {
-              list.push(item.key);
-            });
-            selectItemArr = selectItemArr.concat(children);
-          } else {
-            selectItemArr.push(e.node);
-          }
-          list.push(key);
-        } else {
-          if (key === '奖多多集团') {
-            list.splice(
-              list.findIndex(item => item === '奖多多集团'),
-              1,
-            );
-            children?.map(items => {
-              list.splice(
-                list.findIndex(item => item === items.key),
-                1,
-              );
-              selectItemArr.splice(
-                selectItemArr.findIndex(item => item.key === items.key),
-                1,
-              );
-            });
-          } else {
-            list.splice(
-              list.findIndex(item => item === key),
-              1,
-            );
-            selectItemArr.splice(
-              selectItemArr.findIndex(item => item.key === key),
-              1,
-            );
-          }
-        }
-
+        selectItemArr = e.checkedNodes;
+        selectItemArr.map(item => {
+          list.push(item.key);
+        });
         setSelectItem([...new Set(selectItemArr)]);
         setCheckedKeys([...new Set(list)]);
       }
@@ -336,9 +273,11 @@ function Organization(props: tsProps, formRef) {
   const Loop = data => {
     let loopdata = JSON.parse(JSON.stringify(data));
 
-    const handleItem = list => {
+    const handleItem = (list, codeStr, nameStr) => {
       for (let i = 0; i < list.length; i++) {
         list[i].key = list[i].code;
+        list[i].codeStr = codeStr + '-' + list[i].code;
+        list[i].nameStr = nameStr + '-' + list[i].name;
         if (searchValue.length && list[i].name.indexOf(searchValue) > -1) {
           const index = list[i].title.indexOf(searchValue);
           const beforeStr = list[i].title.substr(0, index);
@@ -354,30 +293,34 @@ function Organization(props: tsProps, formRef) {
           list[i].title = list[i].name;
         }
         if (list[i].children) {
-          handleItem(list[i].children);
+          handleItem(list[i].children, list[i].codeStr, list[i].nameStr);
         }
       }
     };
-    handleItem(loopdata);
+    handleItem(loopdata, '', '');
     return loopdata;
   };
 
   const renderSelect = () => {
-    return selectItem?.map((item, index) => {
-      return (
-        <div key={index} style={{ display: 'flex', cursor: 'pointer' }}>
-          <span>{item.name}</span>
-          <span
-            onClick={() => {
-              removeCheck(item.key);
-            }}
-            style={{ marginLeft: 10 }}
-          >
-            x
-          </span>
-        </div>
-      );
+    let arr: any = [];
+    keyTitleList.map((item, index) => {
+      if (checkedKeys?.indexOf(item.key) > -1) {
+        arr.push(
+          <div key={index} style={{ display: 'flex', cursor: 'pointer' }}>
+            <span>{item.title}</span>
+            <span
+              onClick={() => {
+                removeCheck(item.key);
+              }}
+              style={{ marginLeft: 10 }}
+            >
+              x
+            </span>
+          </div>,
+        );
+      }
     });
+    return arr;
   };
 
   return dataList.length ? (

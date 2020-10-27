@@ -121,8 +121,8 @@ export default props => {
         clockTimeListObj['saturday'] = day.indexOf('saturday') > -1 ? 1 : 0;
         clockTimeListObj['sunday'] = day.indexOf('sunday') > -1 ? 1 : 0;
         clockTimeListObj.clockPeriods = {
-          endTime: moment(item.clockPeriods[0]).format('HH:mm'),
-          startTime: moment(item.clockPeriods[1]).format('HH:mm'),
+          startTime: moment(item.clockPeriods[0]).format('HH:mm'),
+          endTime: moment(item.clockPeriods[1]).format('HH:mm'),
         };
         clockTimeListObj.breakTimeCalculation = item.rest.breakTimeCalculation;
         clockTimeListObj.breakTimeStart = moment(
@@ -145,8 +145,8 @@ export default props => {
         let scheduleListObj: any = {};
         (scheduleListObj.name = item.name),
           (scheduleListObj.clockPeriods = {
-            endTime: moment(item.clockPeriods[0]).format('HH:mm'),
-            startTime: moment(item.clockPeriods[1]).format('HH:mm'),
+            startTime: moment(item.clockPeriods[0]).format('HH:mm'),
+            endTime: moment(item.clockPeriods[1]).format('HH:mm'),
           });
         scheduleListObj.breakTimeCalculation = item.rest.breakTimeCalculation;
         scheduleListObj.breakTimeStart = moment(

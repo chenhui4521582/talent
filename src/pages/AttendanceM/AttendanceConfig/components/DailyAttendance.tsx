@@ -246,8 +246,8 @@ export default props => {
                 initialValue={0}
               >
                 <Radio.Group>
-                  <Radio value={0}>不开启</Radio>
-                  <Radio value={1}>开启</Radio>
+                  <Radio value={1}>不开启</Radio>
+                  <Radio value={0}>开启</Radio>
                 </Radio.Group>
               </Form.Item>
               <Form.Item

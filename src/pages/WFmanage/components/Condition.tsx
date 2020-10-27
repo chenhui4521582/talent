@@ -195,8 +195,9 @@ const FormItem = props => {
     if (selectRule.refResFormControl || selectRule.type || selectRule.value) {
       obj[Index] = {
         value: selectRule.value,
-        type:
-          selectRule.refResFormControl + '&&' + handleType1(selectRule.type),
+        type: selectRule.refResFormControl
+          ? selectRule.refResFormControl + '&&' + handleType1(selectRule.type)
+          : '' + '&&' + handleType1(selectRule.type),
         comparetor: parseInt(selectRule.comparetor),
         id: selectRule.id,
       };

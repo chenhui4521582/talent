@@ -30,6 +30,7 @@ export default props => {
   const [typeList, setTypeList] = useState<any[]>();
   const [form] = Form.useForm();
   const [userList, setUserList] = useState<any[]>();
+  const [unit, setUnit] = useState<number>();
 
   const columns: ColumnProps<any>[] = [
     {
@@ -147,7 +148,7 @@ export default props => {
 
       let obj = {
         date: new Date(),
-        unit: value.minObj.unit,
+        unit: unit,
         changeNumber: value.minObj.changeNumber,
         description: value.description,
         typeId: value.typeId,
@@ -161,6 +162,7 @@ export default props => {
           description: '',
         });
         setVisible(false);
+        form.resetFields();
         refresh();
       } else {
         notification['error']({
@@ -243,7 +245,16 @@ export default props => {
             label="扣假类型"
             rules={[{ required: true, message: '请选择!' }]}
           >
-            <Select style={{ width: 120 }}>
+            <Select
+              style={{ width: 120 }}
+              onChange={e => {
+                typeList?.map(item => {
+                  if (item.typeId === e) {
+                    setUnit(parseInt(item.unit));
+                  }
+                });
+              }}
+            >
               {typeList?.map(item => {
                 return (
                   <Option key={item.typeId} value={item.typeId}>
@@ -265,16 +276,13 @@ export default props => {
                   style={{ width: 120, marginRight: 20 }}
                 />
               </Form.Item>
-              <Form.Item
-                noStyle
-                name={['minObj', 'unit']}
-                rules={[{ required: true, message: '请选择!' }]}
-              >
-                <Select style={{ width: 120 }}>
-                  <Option value={0}>小时</Option>
-                  <Option value={1}>天</Option>
-                  <Option value={2}>分钟</Option>
-                </Select>
+              <Form.Item noStyle name={['minObj', 'unit']}>
+                <Input
+                  style={{ width: 120 }}
+                  value={unit === 0 ? '小时' : '天'}
+                  disabled
+                  placeholder={unit === 0 ? '小时' : '天'}
+                />
               </Form.Item>
             </Input.Group>
           </Form.Item>

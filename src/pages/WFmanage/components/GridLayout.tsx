@@ -218,6 +218,23 @@ export default props => {
         ],
       };
       let arr = [obj];
+      const droopData = data => {
+        let newData = data;
+        function handleData(listItem, poi) {
+          listItem?.map((item, index) => {
+            item.poi = poi + '-' + index;
+            {
+              item.ruleList?.map((ruleItem, ruleItemIndex) => {
+                {
+                  handleData(ruleItem?.list, item.poi + '-' + ruleItemIndex);
+                }
+              });
+            }
+          });
+        }
+        return handleData(newData, 0);
+      };
+      droopData(arr);
       console.log(arr);
       setList(arr);
     }
@@ -701,9 +718,9 @@ export default props => {
   const handleEditBranch = (item, index: number) => {
     let ruleItem = item?.ruleList[index];
     let obj = {
-      name: ruleItem.name,
-      priority: ruleItem.priority,
-      resRuleCurdParams: ruleItem.resRuleCurdParams,
+      name: ruleItem?.name,
+      priority: ruleItem?.priority,
+      resRuleCurdParams: ruleItem?.resRuleCurdParams,
       selectItem: item,
       index: index,
     };
@@ -796,14 +813,19 @@ export default props => {
                   item.ruleList = [newItem];
                   item.ruleList.push({
                     ...newItem,
+                    priority: undefined,
+                    resRuleCurdParams: undefined,
                     list: [],
-                    name: '条件' + item.ruleList.length + 1,
+                    name: '条件' + (item.ruleList.length + 1),
                   });
                 } else {
                   {
                     item.ruleList?.map((ruleItem, ruleItemIndex) => {
                       {
-                        handleData(ruleItem?.list, ruleItemIndex);
+                        handleData(
+                          ruleItem?.list,
+                          item.poi + '-' + ruleItemIndex,
+                        );
                       }
                     });
                   }
@@ -889,7 +911,6 @@ export default props => {
       cancelText: '取消',
       onOk: async () => {
         let newList = JSON.parse(JSON.stringify(list));
-        let newList1 = JSON.parse(JSON.stringify(list));
         const droopData1 = data => {
           let newData = data;
           function handleData(listItem, poi, pItem, pItemRuleIndex) {

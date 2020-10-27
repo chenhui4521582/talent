@@ -134,17 +134,17 @@ export default props => {
               }}
             >
               <Select style={{ width: 120 }}>
-                <Option value={100000}>无限制</Option>
-                <Option value={1}>1次</Option>
-                <Option value={2}>2次</Option>
-                <Option value={3}>3次</Option>
-                <Option value={4}>4次</Option>
-                <Option value={5}>5次</Option>
-                <Option value={6}>6次</Option>
-                <Option value={7}>7次</Option>
-                <Option value={8}>8次</Option>
-                <Option value={9}>9次</Option>
-                <Option value={10}>10次</Option>
+                <Option value={10000000}>无限制</Option>
+                <Option value={1}>1天</Option>
+                <Option value={2}>2天</Option>
+                <Option value={3}>3天</Option>
+                <Option value={4}>4天</Option>
+                <Option value={5}>5天</Option>
+                <Option value={6}>6天</Option>
+                <Option value={7}>7天</Option>
+                <Option value={8}>8天</Option>
+                <Option value={9}>9天</Option>
+                <Option value={10}>10天</Option>
               </Select>
             </Form.Item>
             <Form.Item
@@ -157,12 +157,12 @@ export default props => {
               }}
             >
               <Select style={{ width: 120 }}>
-                <Option value={100000}>无限制</Option>
+                <Option value={10000000}>无限制</Option>
                 <Option value={10}>10天</Option>
-                <Option value={20}>20次</Option>
-                <Option value={30}>30次</Option>
-                <Option value={60}>60次</Option>
-                <Option value={90}>90次</Option>
+                <Option value={20}>20天</Option>
+                <Option value={30}>30天</Option>
+                <Option value={60}>60天</Option>
+                <Option value={90}>90天</Option>
               </Select>
             </Form.Item>
           </Input.Group>
@@ -187,8 +187,8 @@ export default props => {
           style={{ paddingRight: 30 }}
         >
           <Radio.Group>
-            <Radio value={0}>明日生效</Radio>
             <Radio value={1}>立即生效</Radio>
+            <Radio value={0}>明日生效</Radio>
           </Radio.Group>
         </Form.Item>
       </Form>

@@ -35,44 +35,70 @@ export default props => {
   const { organizationJson } = useOrganization();
 
   useEffect(() => {
-    if (value?.memberTagIds || value?.userCodes) {
+    let value1: any;
+    if (value) {
+      if (Object.prototype.toString.call(value) === '[object Object]') {
+        value1 = value;
+      } else {
+        value1 = eval('(' + value + ')');
+      }
+    }
+    if (value1?.memberTagIds || value1?.userCodes) {
       let laberListP: any = [];
       let userListP: any = [];
 
       const getApilableList = async () => {
         let json: GlobalResParams<tsRolrLable[]> = await getLableList();
         if (json.status === 200) {
+          let arr: any = [];
+          if (value1?.memberTagIds) {
+            if (value1?.memberTagIds.split(',')) {
+              arr = value1?.memberTagIds.split(',');
+            } else {
+              arr = [value1.memberTagIds];
+            }
+          }
+
           json.obj?.map(item => {
-            if (value?.memberTagIds.split(',')?.indexOf(item.id + '') > -1) {
+            if (arr?.indexOf(item.id + '') > -1) {
               laberListP.push(item);
             }
           });
-        }
 
-        function handleDate(data) {
-          function handleDate1(data1) {
-            data1?.map(item => {
-              if (value?.userCodes.split(',')?.indexOf(item.code) > -1) {
-                item.title = item.name;
-                item.key = item.code;
-                userListP.push(item);
-              }
-              if (item.memberList && item.memberList?.length) {
-                item.children = item.memberList;
-              }
-              if (item.children) {
-                handleDate1(item.children);
-              }
-            });
+          let arr1: any = [];
+          if (value1?.userCodes) {
+            if (value1?.userCodes.split(',')) {
+              arr1 = value1?.userCodes.split(',');
+            } else {
+              arr1 = [value1.userCodes];
+            }
           }
-
-          handleDate1(data);
+          function handleDate(data) {
+            function handleDate1(data1) {
+              data1?.map(item => {
+                if (arr1?.indexOf(item.code) > -1) {
+                  item.title = item.name;
+                  item.key = item.code;
+                  userListP.push(item);
+                }
+                if (item.memberList && item.memberList?.length) {
+                  item.children = item.memberList;
+                }
+                if (item.children) {
+                  handleDate1(item.children);
+                }
+              });
+            }
+            handleDate1(data);
+          }
+          handleDate(organizationJson);
+          setUserList([...new Set(userListP)]);
+          setLaberList([...new Set(laberListP)]);
+          setVal({
+            memberTagIds: arr.join(','),
+            userCodes: arr1.join(','),
+          });
         }
-        handleDate(organizationJson);
-
-        setUserList([...new Set(userListP)]);
-        setLaberList([...new Set(laberListP)]);
-        setVal(value);
       };
       getApilableList();
     }

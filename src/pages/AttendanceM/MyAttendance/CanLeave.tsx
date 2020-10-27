@@ -96,11 +96,11 @@ export default () => {
           },
           data: [
             {
-              name: '当前可调休时长',
+              name: '当前可休时长',
               value: res.obj?.overtimeStatistics?.avaliableOvertime || 0,
             },
             {
-              name: '有效加班时长',
+              name: '累计加班时长',
               value: res.obj?.overtimeStatistics?.effectOvertime || 0,
             },
             {
@@ -108,20 +108,8 @@ export default () => {
               value: res.obj?.overtimeStatistics?.expiredOvertime || 0,
             },
             {
-              name: '节假日加班',
-              value: res.obj?.overtimeStatistics?.holidayOvertime || 0,
-            },
-            {
-              name: '休息日加班 ',
-              value: res.obj?.overtimeStatistics?.offdayOvertime || 0,
-            },
-            {
               name: '已用调休时长',
               value: res.obj?.overtimeStatistics?.usedOvertime || 0,
-            },
-            {
-              name: '工作日加班',
-              value: res.obj?.overtimeStatistics?.workingdayOvertime || 0,
             },
           ],
         },
@@ -226,7 +214,7 @@ export default () => {
           }}
         >
           <span>{detali?.overtimeStatistics?.avaliableOvertime || 0}</span>
-          <span> 当前可调休时长</span>
+          <span> 当前可休时长</span>
         </div>
         <div
           style={{
@@ -238,7 +226,7 @@ export default () => {
           }}
         >
           <span>{detali?.overtimeStatistics?.effectOvertime || 0}</span>
-          <span> 有效加班时长</span>
+          <span> 累计加班时长</span>
         </div>
         <div
           style={{
@@ -261,44 +249,8 @@ export default () => {
             flexDirection: 'column',
           }}
         >
-          <span>{detali?.overtimeStatistics?.holidayOvertime || 0}</span>
-          <span>节假日加班 </span>
-        </div>
-        <div
-          style={{
-            display: 'flex',
-            flex: '0 0 10vw',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexDirection: 'column',
-          }}
-        >
-          <span>{detali?.overtimeStatistics?.offdayOvertime || 0}</span>
-          <span>休息日加班</span>
-        </div>
-        <div
-          style={{
-            display: 'flex',
-            flex: '0 0 10vw',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexDirection: 'column',
-          }}
-        >
           <span>{detali?.overtimeStatistics?.usedOvertime || 0}</span>
           <span>已用调休时长</span>
-        </div>
-        <div
-          style={{
-            display: 'flex',
-            flex: '0 0 10vw',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexDirection: 'column',
-          }}
-        >
-          <span>{detali?.overtimeStatistics?.workingdayOvertime || 0}</span>
-          <span>工作日加班</span>
         </div>
       </>
     );

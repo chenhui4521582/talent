@@ -106,21 +106,24 @@ export default () => {
           <div>
             {selectItem?.welfare ? (
               <>
-                <div style={{ color: '#FF6600' }}>福利</div>
-                <span style={{ color: '#ccc' }}>{day.IDayCn}</span>
+                <div style={{ color: '#FF6600' }}>
+                  福利 {selectItem.earlyOffHour || 0}小时
+                </div>
+                <div style={{ color: '#ccc' }}>{day.IDayCn}</div>
               </>
             ) : (
               <>
                 {selectItem.workStatus === 1 ? (
                   <div style={{ color: 'rgba(0, 153, 204, 1)' }}>休</div>
-                ) : null}
+                ) : (
+                  <div style={{ color: '#ccc' }}>补班</div>
+                )}
                 <span style={{ color: '#ccc' }}>{day.IDayCn}</span>
               </>
             )}
           </div>
         ) : (
           <div>
-            {' '}
             {day.festivalName.length ? (
               <span style={{ color: '#FF6600' }}>{day.festivalName}</span>
             ) : (
