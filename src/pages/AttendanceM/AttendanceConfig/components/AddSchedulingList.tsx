@@ -26,8 +26,7 @@ export default props => {
   const [index, setIndex] = useState<number>();
   const ref = useRef<any>();
   const formRef = useRef<any>();
-  console.log('userList&&userList()');
-  console.log(userList && userList());
+  const [restType, setRestType] = useState<number>(0);
   useEffect(() => {
     list && list.length && props.onChange({ list: list, detail: detail });
   }, [list, detail]);
@@ -114,6 +113,8 @@ export default props => {
                 setEditType('edit');
                 setTimeout(() => {
                   setIndex(indexs);
+                  setRestType(item.rest.breakTimeCalculation);
+
                   ref.current?.getvalue?.setFieldsValue(item);
                 }, 200);
               }}
@@ -174,10 +175,11 @@ export default props => {
           setTimeout(() => {
             ref.current.getvalue.resetFields();
           }, 200);
+          setRestType(1);
           setEditType(undefined);
         }}
       >
-        <AddScheduling ref={ref} />
+        <AddScheduling ref={ref} propsType={restType} />
       </Modal>
       <Modal
         title="人员排班"

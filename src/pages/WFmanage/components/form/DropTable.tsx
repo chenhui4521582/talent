@@ -20,7 +20,7 @@ import {
   updateGroup,
 } from '../../services/form';
 import Edit from './Edit';
-import Temp from '@/pages/Workflow/Component';
+import Temp from '../Component';
 
 interface Iprops {
   fromItem: IForm;

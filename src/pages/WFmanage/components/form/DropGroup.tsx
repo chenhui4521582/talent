@@ -8,7 +8,7 @@ import {
 } from 'react-dnd';
 import { XYCoord } from 'dnd-core';
 import { IGroupItem, IItem, IForm } from '../../services/form';
-import Temp from '@/pages/Workflow/Component';
+import Temp from '../Component';
 import update from 'immutability-helper';
 import {
   EditOutlined,

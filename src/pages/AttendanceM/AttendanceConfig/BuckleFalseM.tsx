@@ -194,6 +194,7 @@ export default props => {
           type="primary"
           onClick={() => {
             setVisible(true);
+            form.resetFields();
           }}
         >
           发起扣假
@@ -208,9 +209,9 @@ export default props => {
         okText="确认"
         cancelText="取消"
         onOk={handleOk}
+        // maskClosable={false}
         onCancel={() => {
           setVisible(false);
-          form.resetFields();
         }}
       >
         <Form form={form}>

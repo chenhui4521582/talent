@@ -122,17 +122,25 @@ export default props => {
         : showValue
         ? showValue
         : undefined;
-    } else if (baseControlType === 'datetime') {
+    } else if (
+      baseControlType === 'datetime' ||
+      baseControlType === 'VacationStartTime' ||
+      baseControlType === 'VacationEndTime' ||
+      baseControlType === 'OverTimeStart' ||
+      baseControlType === 'OverTimeEnd' ||
+      baseControlType === 'OutCheckStartTime' ||
+      baseControlType === 'OutCheckEndTime'
+    ) {
       return showValue
-        ? moment(showValue, 'YYYY-MM-DD HH:mm:ss')
+        ? moment(showValue, 'YYYY-MM-DD HH:mm')
         : value
-        ? moment(value, 'YYYY-MM-DD HH:mm:ss')
+        ? moment(value, 'YYYY-MM-DD HH:mm')
         : '';
     } else if (baseControlType === 'date') {
       return showValue
-        ? moment(showValue, 'YYYY-MM-DD HH:mm:ss')
+        ? moment(showValue, 'YYYY-MM-DD')
         : value
-        ? moment(value, 'YYYY-MM-DD HH:mm:ss')
+        ? moment(value, 'YYYY-MM-DD')
         : '';
     } else if (baseControlType === 'select') {
       return showValue && value ? (showValue ? showValue : value) : undefined;
@@ -319,14 +327,20 @@ export default props => {
             value: item.defaultValue,
           });
         } else {
-          if (item.baseControlType === 'datetime') {
+          if (
+            item.baseControlType === 'datetime' ||
+            item.baseControlType === 'VacationStartTime' ||
+            item.baseControlType === 'VacationEndTime' ||
+            item.baseControlType === 'OverTimeStart' ||
+            item.baseControlType === 'OverTimeEnd' ||
+            item.baseControlType === 'OutCheckStartTime' ||
+            item.baseControlType === 'OutCheckEndTime'
+          ) {
             subList.push({
               id: item.id,
               multipleNumber: 1,
-              showValue: moment(valueArr.join(','))?.format(
-                'YYYY-MM-DD HH:mm:ss',
-              ),
-              value: moment(valueArr.join(','))?.format('YYYY-MM-DD HH:mm:ss'),
+              showValue: moment(valueArr.join(','))?.format('YYYY-MM-DD HH:mm'),
+              value: moment(valueArr.join(','))?.format('YYYY-MM-DD HH:mm'),
             });
           } else if (item.baseControlType === 'date') {
             subList.push({
@@ -396,11 +410,18 @@ export default props => {
               value: moment(fromSubData[key])?.format('YYYY-MM-DD') || '',
               multipleNumber: parseInt(key.split('-')[2]),
             });
-          } else if (key.split('-')[0] === 'datetime') {
+          } else if (
+            key.split('-')[0] === 'datetime' ||
+            key.split('-')[0] === 'VacationStartTime' ||
+            key.split('-')[0] === 'VacationEndTime' ||
+            key.split('-')[0] === 'OverTimeStart' ||
+            key.split('-')[0] === 'OverTimeEnd' ||
+            key.split('-')[0] === 'OutCheckStartTime' ||
+            key.split('-')[0] === 'OutCheckEndTime'
+          ) {
             subList.push({
               id: parseInt(key.split('-')[1]),
-              value:
-                moment(fromSubData[key])?.format('YYYY-MM-DD HH:mm:ss') || '',
+              value: moment(fromSubData[key])?.format('YYYY-MM-DD HH:mm') || '',
               multipleNumber: parseInt(key.split('-')[2]),
             });
           } else if (key.split('-')[0] === 'depGroup') {

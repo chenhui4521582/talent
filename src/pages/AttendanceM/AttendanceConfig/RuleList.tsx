@@ -16,11 +16,25 @@ export default () => {
       align: 'center',
     },
     {
-      title: '打卡类型',
+      title: '规则类型',
       dataIndex: 'clockTimeList',
       key: 'clockTimeList',
       align: 'center',
       render: (_, record) => {
+        if (record.ruleType === 0) {
+          return <span>固定时间上下班</span>;
+        } else {
+          return <span>按排班上下班</span>;
+        }
+      },
+    },
+    {
+      title: '打卡时间段',
+      dataIndex: 'clockTimeList',
+      key: 'clockTimeList',
+      align: 'center',
+      render: (_, record) => {
+        let html: any = [];
         if (record.ruleType === 0) {
           return record?.clockTimeList?.map((item, index) => {
             let str: any[] = [];
@@ -56,7 +70,39 @@ export default () => {
             );
           });
         } else {
-          return <div>按照班次上下班打卡</div>;
+          return record?.clockTimeList?.map((item, index) => {
+            let str: any[] = [];
+            let timeStr: any[] = [];
+            if (item.monday) {
+              str.push('星期一');
+            } else if (item.tuesday) {
+              str.push('星期二');
+            } else if (item.wednesday) {
+              str.push('星期三');
+            } else if (item.thursday) {
+              str.push('星期四');
+            } else if (item.friday) {
+              str.push('星期五');
+            } else if (item.saturday) {
+              str.push('星期六');
+            } else if (item.sunday) {
+              str.push('星期日');
+            }
+            timeStr.push(
+              '上班' +
+                item.clockPeriods.startTime +
+                '-' +
+                '下班' +
+                item.clockPeriods.endTime,
+            );
+            return (
+              <div key={index}>
+                {str.join(',')}
+                <br />
+                {timeStr.join(',')}
+              </div>
+            );
+          });
         }
       },
     },

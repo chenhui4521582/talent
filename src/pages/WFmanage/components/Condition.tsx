@@ -33,7 +33,7 @@ export default forwardRef((props: any, formRef) => {
   const [form] = Form.useForm();
   const [formItemList, setFormItemList] = useState<any[]>();
   const [controlList, setControlList] = useState<IListItem[]>();
-  const [numberList, setNumberList] = useState<any[]>();
+  const [numberList, setNumberList] = useState<any[]>([1]);
   const [formList, setFormList] = useState<any>();
 
   useEffect(() => {
@@ -88,8 +88,10 @@ export default forwardRef((props: any, formRef) => {
 
   const handleDelete = index => {
     let newList = JSON.parse(JSON.stringify(numberList || []));
-    newList?.splice(index, 1);
-    setNumberList(newList);
+    if (newList.length > 1) {
+      newList?.splice(index, 1);
+      setNumberList(newList);
+    }
   };
 
   const renderFormItem = useMemo(() => {
@@ -102,6 +104,7 @@ export default forwardRef((props: any, formRef) => {
           handleDelete={handleDelete}
           form={form}
           selectRule={item}
+          numberList={numberList}
         />
       );
     });
@@ -128,23 +131,11 @@ export default forwardRef((props: any, formRef) => {
             >
               <Select placeholder="请选择优先级" allowClear>
                 {selectRule?.rule ? (
-                  <>
-                    {selectRule?.rule?.map((item, index) => {
-                      return (
-                        <Option key={index} value={index + 1}>
-                          优先级{index + 1}
-                        </Option>
-                      );
-                    })}
-                    <Option value={selectRule?.rule.length + 1}>
-                      优先级{selectRule?.rule.length + 1}
-                    </Option>
-                  </>
+                  <Option value={selectRule.index}>
+                    优先级{selectRule.index}
+                  </Option>
                 ) : (
-                  <>
-                    <Option value={1}>优先级1</Option>
-                    <Option value={2}>优先级2</Option>
-                  </>
+                  <Option value={1}>优先级1</Option>
                 )}
               </Select>
             </Form.Item>
@@ -161,7 +152,7 @@ export default forwardRef((props: any, formRef) => {
 });
 
 const FormItem = props => {
-  const { list, Index, handleDelete, form, selectRule } = props;
+  const { list, Index, handleDelete, form, selectRule, numberList } = props;
   const [type, setType] = useState<number>();
   const [itemList, setItemList] = useState<string>();
 
@@ -430,16 +421,18 @@ const FormItem = props => {
   return list?.length ? (
     <>
       <Row>
-        <Col>
-          <a
-            style={{ lineHeight: '32px' }}
-            onClick={() => {
-              handleDelete(Index);
-            }}
-          >
-            删除
-          </a>
-        </Col>
+        {numberList?.length > 1 ? (
+          <Col>
+            <a
+              style={{ lineHeight: '32px' }}
+              onClick={() => {
+                handleDelete(Index);
+              }}
+            >
+              删除
+            </a>
+          </Col>
+        ) : null}
         <Col span={8} offset={1}>
           <Form.Item
             name={[Index, 'type']}

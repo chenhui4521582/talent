@@ -212,15 +212,15 @@ export default props => {
         : undefined;
     } else if (baseControlType === 'datetime') {
       return showValue
-        ? moment(showValue, 'YYYY-MM-DD HH:mm:ss')
+        ? moment(showValue, 'YYYY-MM-DD HH:mm')
         : value
-        ? moment(value, 'YYYY-MM-DD HH:mm:ss')
+        ? moment(value, 'YYYY-MM-DD HH:mm')
         : undefined;
     } else if (baseControlType === 'date') {
       return showValue
-        ? moment(showValue, 'YYYY-MM-DD HH:mm:ss')
+        ? moment(showValue, 'YYYY-MM-DD HH:mm')
         : value
-        ? moment(value, 'YYYY-MM-DD HH:mm:ss')
+        ? moment(value, 'YYYY-MM-DD HH:mm')
         : undefined;
     } else if (baseControlType === 'select') {
       return showValue || value ? (showValue ? showValue : value) : null;
@@ -433,7 +433,7 @@ export default props => {
               showValue: moment(valueArr.join(','))?.format(
                 'YYYY-MM-DD HH:mm:ss',
               ),
-              value: moment(valueArr.join(','))?.format('YYYY-MM-DD HH:mm:ss'),
+              value: moment(valueArr.join(','))?.format('YYYY-MM-DD HH:mm'),
             });
           } else if (item.baseControlType === 'date') {
             subList.push({
@@ -515,8 +515,7 @@ export default props => {
           } else if (key.split('-')[0] === 'datetime') {
             subList.push({
               resFormControlId: parseInt(key.split('-')[1]),
-              value:
-                moment(fromSubData[key])?.format('YYYY-MM-DD HH:mm:ss') || '',
+              value: moment(fromSubData[key])?.format('YYYY-MM-DD HH:mm') || '',
               multipleNumber: parseInt(key.split('-')[2]),
             });
           } else if (key.split('-')[0] === 'depGroup') {

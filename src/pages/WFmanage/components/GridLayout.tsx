@@ -9,7 +9,11 @@ import {
   Select,
   message,
 } from 'antd';
-import { PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+import {
+  PlusOutlined,
+  ExclamationCircleOutlined,
+  CloseOutlined,
+} from '@ant-design/icons';
 import update from 'immutability-helper';
 import {
   getFormSimple,
@@ -706,7 +710,7 @@ export default props => {
   // 新增分支显示modal
   const handleShowBranch = (type, index: number, item) => {
     setRuleItem(item);
-    setSelectRule({ rule: item.ruleList });
+    setSelectRule({ rule: item.ruleList, index: item?.ruleList?.length || 1 });
     if (type === '新增') {
       setConditionVisable('新增');
     } else {
@@ -786,7 +790,6 @@ export default props => {
           let poipStr = poiArr.pop();
           let ruleIndex = poi.split('-')[poi.split('-').length - 2];
           poipStr = poiArr.pop();
-          // poipStr = poiArr.pop()
           poipStr = poiArr.join('-');
           const droopData = data => {
             let newData = data;
@@ -805,6 +808,7 @@ export default props => {
                         cItemIndex + 1,
                       );
                       newItem.list = myList;
+                      newItem.isDefault = 0;
                       item.ruleList[ruleIndex].list = pList;
                     }
                   });
@@ -816,7 +820,8 @@ export default props => {
                     priority: undefined,
                     resRuleCurdParams: undefined,
                     list: [],
-                    name: '条件' + (item.ruleList.length + 1),
+                    name: '默认条件',
+                    isDefault: 1,
                   });
                 } else {
                   {
@@ -862,7 +867,8 @@ export default props => {
                 item.poi = poi + '-' + index;
                 if (item.poi === ruleItem.poi) {
                   newItem.list = [];
-                  item.ruleList.push(newItem);
+                  newItem.isDefault = 0;
+                  item.ruleList.splice(item.ruleList.length - 1, 0, newItem);
                 }
                 item.ruleList?.map((ruleItem, ruleItemIndex) => {
                   handleData(ruleItem?.list, item.poi + '-' + ruleItemIndex);
@@ -1225,32 +1231,69 @@ export default props => {
                           <div
                             style={{
                               position: 'relative',
-                              backgroundColor: 'red',
-                              width: '110px',
-                              height: '70px',
+                              backgroundColor: '#ff9102',
+                              color: '#fff',
+                              width: '130px',
+                              padding: '2px',
+                              height: '80px',
                               margin: '20px',
                               borderRadius: '5px 5px',
                             }}
                             onClick={() => {
-                              handleEditBranch(item, ruleItemIndex);
+                              ruleItem.isDefault === 0
+                                ? handleEditBranch(item, ruleItemIndex)
+                                : null;
                             }}
                           >
-                            {ruleItem.name}
-                            <span
-                              style={{
-                                position: 'absolute',
-                                right: '7px',
-                                top: '7px',
-                                cursor: 'pointer',
-                              }}
-                              onClick={e => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                handleRemoveRule(ruleItemIndex, item);
-                              }}
-                            >
-                              X
-                            </span>
+                            <p style={{ margin: '4px' }}>
+                              <span style={{ float: 'left' }}>
+                                {ruleItem.name}
+                              </span>
+                              {ruleItem.isDefault === 0 ? (
+                                <span style={{ float: 'right' }}>
+                                  优先级{ruleItem.priority}
+                                </span>
+                              ) : null}
+                            </p>
+                            <div style={{ clear: 'both' }} />
+                            {ruleItem.isDefault === 1 ? (
+                              <div style={{ fontSize: 10 }}>
+                                未满足其他条件分支的情况，将使用默认流程
+                              </div>
+                            ) : null}
+                            {ruleItem.isDefault != 1 &&
+                            ruleItem?.resRuleCurdParams?.length ? (
+                              <div
+                                style={{ fontSize: 10, textAlign: 'center' }}
+                              >
+                                <p>点击查看需满足的条件</p>
+                              </div>
+                            ) : null}
+                            {ruleItem.isDefault != 1 &&
+                            !ruleItem?.resRuleCurdParams?.length ? (
+                              <div
+                                style={{ fontSize: 10, textAlign: 'center' }}
+                              >
+                                请设置条件
+                              </div>
+                            ) : null}
+                            {ruleItem.isDefault === 0 ? (
+                              <span
+                                style={{
+                                  position: 'absolute',
+                                  right: '0px',
+                                  top: '-2px',
+                                  cursor: 'pointer',
+                                }}
+                                onClick={e => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  handleRemoveRule(ruleItemIndex, item);
+                                }}
+                              >
+                                <CloseOutlined />
+                              </span>
+                            ) : null}
                           </div>
                         ) : null}
                         <div

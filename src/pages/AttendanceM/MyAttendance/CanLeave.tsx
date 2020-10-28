@@ -44,28 +44,13 @@ export default () => {
           },
           data: [
             {
-              name: '当前剩余天数',
+              name: '剩余',
               value: res.obj?.annualLeaveStatistics?.currentLeft || 0,
             },
+
             {
-              name: '当前法定年假',
-              value: res.obj?.annualLeaveStatistics?.currentStatutory || 0,
-            },
-            {
-              name: '今年已休天数',
+              name: '已休',
               value: res.obj?.annualLeaveStatistics?.currentUsed || 0,
-            },
-            {
-              name: '当前福利年假',
-              value: res.obj?.annualLeaveStatistics?.currentWelfare || 0,
-            },
-            {
-              name: '当前年假天数',
-              value: res.obj?.annualLeaveStatistics?.currentYearTotal || 0,
-            },
-            {
-              name: '上年度剩余天数',
-              value: res.obj?.annualLeaveStatistics?.lastYear || 0,
             },
           ],
         },
@@ -100,15 +85,11 @@ export default () => {
               value: res.obj?.overtimeStatistics?.avaliableOvertime || 0,
             },
             {
-              name: '累计加班时长',
-              value: res.obj?.overtimeStatistics?.effectOvertime || 0,
-            },
-            {
-              name: '过期加班时长',
+              name: '已作废',
               value: res.obj?.overtimeStatistics?.expiredOvertime || 0,
             },
             {
-              name: '已用调休时长',
+              name: '已调休',
               value: res.obj?.overtimeStatistics?.usedOvertime || 0,
             },
           ],

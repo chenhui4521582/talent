@@ -231,7 +231,7 @@ function Organization(props: tsProps, formRef) {
     } = e;
     console.log(e);
     let list = JSON.parse(JSON.stringify(checkedKeys));
-    let selectItemArr = JSON.parse(JSON.stringify(selectItem));
+    let selectItemArr = selectItem;
     if (checked) {
       if (key === '奖多多集团') {
         children?.map(item => {

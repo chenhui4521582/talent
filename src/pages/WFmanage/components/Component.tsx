@@ -31,10 +31,10 @@ import {
 } from '@/models/global';
 import { saveFile } from '@/services/global';
 import { GlobalResParams } from '@/types/ITypes';
-import { myListPageWt, tsList } from './services/home';
+import { myListPageWt, tsList } from '@/pages/Workflow/services/home';
 
 import OzTreeSlect from '@/pages/Framework/components/OzTreeSlect';
-import DepGroup from './DepGroup';
+import DepGroup from '@/pages/Workflow/DepGroup';
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -879,7 +879,7 @@ const OverTimeTotal = props => {
   return <Input placeholder="销假共计时长" />;
 };
 
-// 控件名称="remainCardNumber" 当月剩余补卡次数
+// 控件名称="remainCardNumber"
 const RemainCardNumber = props => {
   return <Input placeholder="当月剩余补卡次数" />;
 };

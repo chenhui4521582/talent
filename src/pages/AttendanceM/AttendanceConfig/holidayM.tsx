@@ -46,26 +46,46 @@ export default () => {
   const [form1] = Form.useForm();
   const [form2] = Form.useForm();
   useEffect(() => {
-    getDetail();
+    getDetail(false);
   }, [param]);
 
-  async function getDetail() {
+  async function getDetail(flag) {
     let res: GlobalResParams<any> = await listHoliday(param);
     if (res.status === 200) {
       setDetail(res.obj);
+      let id = undefined;
+      res.obj?.map(item => {
+        if (item.date === selectDay) {
+          id = item.holidayId;
+          form1.setFieldsValue(item);
+          let newType: any = undefined;
+          if (item.welfare === 1 && item.workStatus === 0) {
+            newType = 3;
+          } else if (item.workStatus === 1) {
+            newType = 1;
+          } else {
+            newType = 2;
+          }
+          setType(newType);
+          return;
+        }
+      });
+      setSelectId(id);
+      if (!flag) {
+        setSelectDay(str);
+      }
     }
   }
 
   const onSelect = value => {
-    // alert(value.format('YYYY-MM-DD'))
     setSelectDay(value.format('YYYY-MM-DD'));
     let id = undefined;
+    let newType: any = undefined;
+    let formItem = undefined;
     detail?.map(item => {
       if (item.date === value.format('YYYY-MM-DD')) {
         id = item.holidayId;
-        form1.setFieldsValue(item);
-
-        let newType: any = undefined;
+        formItem = item;
         if (item.welfare === 1) {
           newType = 3;
         } else if (item.workStatus === 1) {
@@ -73,12 +93,15 @@ export default () => {
         } else {
           newType = 2;
         }
-        setType(newType);
-        return;
-      } else {
-        setType(undefined);
       }
     });
+    if (formItem) {
+      form1.setFieldsValue(formItem);
+    } else {
+      form1.resetFields();
+    }
+
+    setType(newType);
     setSelectId(id);
   };
 
@@ -100,7 +123,7 @@ export default () => {
     });
 
     return (
-      <div style={{ textAlign: 'center', marginTop: 10 }}>
+      <div style={{ textAlign: 'center', marginTop: 10, position: 'relative' }}>
         <div>{value.format('YYYY-MM-DD').split('-')[2]}</div>
         {selectItem ? (
           <div>
@@ -116,7 +139,7 @@ export default () => {
                 {selectItem.workStatus === 1 ? (
                   <div style={{ color: 'rgba(0, 153, 204, 1)' }}>休</div>
                 ) : (
-                  <div style={{ color: '#ccc' }}>补班</div>
+                  <div style={{ color: '#FF6600' }}>补班</div>
                 )}
                 <span style={{ color: '#ccc' }}>{day.IDayCn}</span>
               </>
@@ -144,16 +167,18 @@ export default () => {
       let api = updateHoliday;
       if (!value.holidayId) {
         api = addHoliday;
-        obj.date = new Date(selectDay);
+        obj.date = new Date(selectDay as any);
       } else {
         obj.holidayId = value.holidayId;
       }
       if (type === 1) {
         obj.workStatus = 1;
+        obj.earlyOffHour = -1;
       }
 
       if (type === 2) {
         obj.workStatus = 0;
+        obj.earlyOffHour = -1;
       }
 
       if (type === 3) {
@@ -169,7 +194,7 @@ export default () => {
           message: json.msg,
           description: '',
         });
-        getDetail();
+        getDetail(true);
       } else {
         notification['error']({
           message: json.msg,
@@ -189,7 +214,10 @@ export default () => {
       onOk: async () => {
         let res: GlobalResParams<string> = await removeHoliday(selectId);
         if (res.status === 200) {
-          getDetail();
+          getDetail(true);
+          form1.resetFields();
+          setType(undefined);
+          setSelectId(undefined);
           notification['success']({
             message: res.msg,
             description: '',
@@ -203,6 +231,7 @@ export default () => {
       },
     });
   };
+
   const renderBottom = useMemo(() => {
     let day: any = calendar.solar2lunar(selectDay);
     return (
@@ -218,8 +247,8 @@ export default () => {
           }}
         >
           <h3>
-            {selectDay.split('-')[0]}年{selectDay.split('-')[1]}月
-            {selectDay.split('-')[2]}日
+            {selectDay?.split('-')[0]}年{selectDay?.split('-')[1]}月
+            {selectDay?.split('-')[2]}日
           </h3>
           <p>农历{day.fullLunarMonthString}</p>
           <p>{day.ncWeek}</p>
@@ -332,7 +361,7 @@ export default () => {
    */}
       </div>
     );
-  }, [type]);
+  }, [type, selectDay, detail]);
 
   return (
     <Card title="节日配置">
@@ -342,6 +371,7 @@ export default () => {
         locale={locale}
         onSelect={onSelect}
         onChange={onChange}
+        value={moment(selectDay)}
       />
       <div className="holiday">
         {renderBottom}

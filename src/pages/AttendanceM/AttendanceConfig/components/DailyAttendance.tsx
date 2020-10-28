@@ -14,6 +14,7 @@ export default props => {
   const [list, setList] = useState<any>();
   const [index, setIndex] = useState<number>();
   const [days, setDays] = useState<any[]>([]);
+  const [restType, setRestType] = useState<number>(0);
 
   useEffect(() => {
     list && list.length && props.onChange(list);
@@ -128,6 +129,7 @@ export default props => {
                 console.log(item);
                 setEditType('edit');
                 setIndex(indexs);
+                setRestType(item?.rest?.breakTimeCalculation);
                 form.setFieldsValue(item);
               }}
             >
@@ -245,24 +247,28 @@ export default props => {
                 style={{ display: 'block' }}
                 initialValue={0}
               >
-                <Radio.Group>
-                  <Radio value={1}>不开启</Radio>
+                <Radio.Group
+                  onChange={(e: any) => {
+                    setRestType(e.target.value);
+                  }}
+                >
                   <Radio value={0}>开启</Radio>
+                  <Radio value={1}>不开启</Radio>
                 </Radio.Group>
               </Form.Item>
-              <Form.Item
-                name={['rest', 'breakTimeStart-breakTimeEnd']}
-                rules={[{ required: true, message: '请选择休息时间!' }]}
-                noStyle
-                initialValue={0}
-              >
-                <RangePicker
-                  format="HH:mm"
-                  allowClear={true}
-                  picker="time"
-                  locale={locale}
-                />
-              </Form.Item>
+              {restType === 0 ? (
+                <Form.Item
+                  name={['rest', 'breakTimeStart-breakTimeEnd']}
+                  rules={[{ required: true, message: '请选择休息时间!' }]}
+                >
+                  <RangePicker
+                    format="HH:mm"
+                    allowClear={true}
+                    picker="time"
+                    locale={locale}
+                  />
+                </Form.Item>
+              ) : null}
             </Input.Group>
           </Form.Item>
 
@@ -274,8 +280,8 @@ export default props => {
             <Input.Group compact style={{ marginTop: 6 }}>
               <Form.Item name={['flex', 'flexible']} noStyle initialValue={0}>
                 <Radio.Group>
-                  <Radio value={0}>不开启</Radio>
                   <Radio value={1}>开启</Radio>
+                  <Radio value={0}>不开启</Radio>
                 </Radio.Group>
               </Form.Item>
               <br />

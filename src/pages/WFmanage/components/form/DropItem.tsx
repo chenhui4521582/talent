@@ -6,7 +6,7 @@ import {
   useDrag,
   useDrop,
 } from 'react-dnd';
-import Temp from '@/pages/Workflow/Component';
+import Temp from '../Component';
 interface Iprops {
   groupItem: any;
   type: string;

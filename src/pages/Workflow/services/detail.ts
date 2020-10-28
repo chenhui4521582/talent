@@ -78,3 +78,59 @@ export function submit(params: any) {
     data: params,
   });
 }
+
+// 请假类型
+export function listHoliday(params: any) {
+  return request(`/api/talent/attendenceControl/listHoliday`, {
+    method: 'POST',
+    data: params,
+  });
+}
+
+// 当月剩余不卡次数 taskFormId time type userCode
+export function archiveReplaceCard(params: any) {
+  return request(`/api/talent/attendenceControl/archiveReplaceCard`, {
+    method: 'POST',
+    data: params,
+  });
+}
+
+// 出差/外出共计时长 outcheckTimeEnd  outcheckTimeStart
+export function getOutCheckTime(params: any) {
+  return request(`/api/talent/attendenceControl/getOutCheckTime`, {
+    method: 'POST',
+    data: params,
+  });
+}
+
+// 请假校验接口endTime  startTime  type  typeId  userCode
+export function listRelationFormPage(params: any) {
+  return request(`/api/talent/attendenceControl/listRelationFormPage`, {
+    method: 'POST',
+    data: params,
+  });
+}
+
+// 加班共计时长 overTimeEnd overTimeStart
+export function overTime(params: any) {
+  return request(`/api/talent/attendenceControl/overTime`, {
+    method: 'POST',
+    data: params,
+  });
+}
+
+// 获取请假天数 userCode
+export function getAvailableTime(params: any) {
+  return request(`/api/talent/attendenceControl/getAvailableTime`, {
+    method: 'POST',
+    data: params,
+  });
+}
+
+// 请假/销假共计时长计算 endTime startTime type typeId userCode
+export function vacationTime(params: any) {
+  return request(`/api/talent/attendenceControl/vacationTime`, {
+    method: 'POST',
+    data: params,
+  });
+}

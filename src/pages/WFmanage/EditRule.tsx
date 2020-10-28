@@ -9,6 +9,7 @@ import {
   notification,
   Form,
   Modal,
+  message,
 } from 'antd';
 import {
   updateRolu,
@@ -82,20 +83,28 @@ export default props => {
   };
 
   const submitData = async () => {
-    console.log(data1);
-    // let newForm = ref.current.getvalue()
-    // console.log(newForm.get)
-
     form.validateFields().then(async fromSubData => {
+      let warnStr: any = undefined;
       data1?.ruleSets?.map(item => {
+        if (item.isDefault !== 1) {
+          if (
+            !item?.resRuleCurdParams ||
+            !item.priority ||
+            !item?.resRuleCurdParams?.length
+          ) {
+            warnStr = '请编辑条件' + item.name + '后再提交';
+          }
+        }
         item?.resRuleCurdParams?.map(items => {
           items.value = JSON.stringify(items.value);
         });
         // item = item;
         item.resApprovalId = formId;
       });
-
-      console.log(fromSubData);
+      if (warnStr) {
+        message.warning(warnStr);
+        return;
+      }
       data1.autoType = fromSubData.autoType;
       data1.illegalProcessType = fromSubData.illegalProcessType;
       let illegalProcessorName: any = [];
@@ -162,7 +171,7 @@ export default props => {
                 name: ruleItem.name,
                 priority: ruleItem.priority,
                 resRuleCurdParams: ruleItem.resRuleCurdParams,
-                isDefault: ruleItemIndex === 0 ? 1 : 0,
+                isDefault: ruleItem.isDefault,
                 fromNodeId: item.poi,
                 toNodeId: item.poi + '-' + ruleItemIndex + '-' + '0',
               });
@@ -175,6 +184,8 @@ export default props => {
     };
     droopData1(value);
     steps?.map((item, index) => {
+      item.stepType = 1;
+      item.stepNumber = index;
       if (item.nextNodeId === 'undefined' || !item.nextNodeId) {
         delete item.nextNodeId;
       }
@@ -233,10 +244,6 @@ export default props => {
     });
 
     ruleSets?.map(item => {
-      // item?.resRuleCurdParams?.map(items => {
-      //   items.value = JSON.stringify(items.value);
-      // });
-      // item = item;
       item.resApprovalId = formId;
     });
 

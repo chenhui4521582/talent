@@ -38,7 +38,7 @@ export default () => {
   const [param, setParam] = useState<string>(
     year.toString() + '-' + month.toString(),
   );
-  const [selectItem, setSelectItem] = useState<any>(str);
+  const [selectItem, setSelectItem] = useState<any>();
   useEffect(() => {
     getListMyRecord(param);
   }, [param]);
@@ -47,6 +47,7 @@ export default () => {
     let res: GlobalResParams<any> = await listMyRecord(param);
     if (res.status === 200) {
       setRecord(res.obj);
+      setSelectItem(str);
     }
   };
 
@@ -115,6 +116,7 @@ export default () => {
   };
 
   const onSelect = value => {
+    // alert(value.format('YYYY-MM-DD'))
     setSelectItem(value.format('YYYY-MM-DD'));
   };
 
@@ -153,12 +155,10 @@ export default () => {
                 <p>{incomeDetail(item.date)}</p>
               </div>
               <div>
-                <h3>{`上班时间（${item?.startDate}）`}</h3>
-                <p>上班打卡：{item?.startDate}</p>
+                <h3>{`上班打卡时间（${item?.startDate || '未打卡'}）`}</h3>
               </div>
               <div>
-                <h3>{`下班时间（ ${item?.endDate}）`}</h3>
-                {/* <p>下班打卡：{item?.endDate}</p> */}
+                <h3>{`下班打卡时间（ ${item?.endDate || '未打卡'}）`}</h3>
               </div>
             </div>
           );

@@ -407,18 +407,13 @@ export default props => {
             label="位置"
             name="areas"
             style={{ marginLeft: 30 }}
-            rules={[{ required: true, message: '请输入用户名称!' }]}
+            rules={[{ required: true, message: '请编辑位置!' }]}
           >
             <AreasList {...props} areas={ruleDetail?.rulePhone?.areas} />
           </Form.Item>
         ) : null}
         {phoneClock ? (
-          <Form.Item
-            label="wifi"
-            name="wifis"
-            style={{ marginLeft: 30 }}
-            rules={[{ required: true, message: '请输入用户名称!' }]}
-          >
+          <Form.Item label="wifi" name="wifis" style={{ marginLeft: 30 }}>
             <Wifi {...props} wifis={ruleDetail?.rulePhone?.wifis} />
           </Form.Item>
         ) : null}
@@ -467,13 +462,14 @@ export default props => {
             label="范围外打卡"
             name="clockOutOfRange"
             rules={[{ required: true, message: '请选择范围外打卡!' }]}
+            initialValue={1}
           >
             <Radio.Group>
-              <Radio style={{ display: 'block' }} value={0}>
-                允许范围外打卡，记录为打卡异常
-              </Radio>
               <Radio style={{ display: 'block' }} value={1}>
                 不允许范围外打卡
+              </Radio>
+              <Radio style={{ display: 'block' }} value={0}>
+                允许范围外打卡，记录为打卡异常
               </Radio>
             </Radio.Group>
           </Form.Item>
@@ -483,6 +479,7 @@ export default props => {
           label="规则生效"
           name="effectiveTime"
           rules={[{ required: true, message: '请选择范围外打卡!' }]}
+          initialValue={0}
         >
           <Radio.Group>
             <Radio style={{ display: 'block' }} value={0}>

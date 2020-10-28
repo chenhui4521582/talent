@@ -1,18 +1,29 @@
 // 添加排班
-import React, { useImperativeHandle, forwardRef } from 'react';
+import React, {
+  useImperativeHandle,
+  forwardRef,
+  useState,
+  useEffect,
+} from 'react';
 import { Form, Input, TimePicker, Radio, Select } from 'antd';
 import locale from 'antd/lib/calendar/locale/zh_CN.js';
 
 const { RangePicker } = TimePicker;
 const { Option } = Select;
-export default forwardRef((props, formRef) => {
+export default forwardRef((props: any, formRef) => {
+  const { propsType } = props;
   const [form] = Form.useForm();
+  const [restType, setRestType] = useState<number>(0);
 
   useImperativeHandle(formRef, () => {
     return {
       getvalue: form,
     };
   });
+
+  useEffect(() => {
+    setRestType(propsType);
+  }, [propsType]);
 
   return (
     <Form form={form}>
@@ -39,6 +50,7 @@ export default forwardRef((props, formRef) => {
       >
         <RangePicker
           format="HH:mm"
+          order={false}
           allowClear={true}
           picker="time"
           locale={locale}
@@ -53,24 +65,28 @@ export default forwardRef((props, formRef) => {
             style={{ display: 'block' }}
             initialValue={0}
           >
-            <Radio.Group>
-              <Radio value={1}>不开启</Radio>
+            <Radio.Group
+              onChange={(e: any) => {
+                setRestType(e.target.value);
+              }}
+            >
               <Radio value={0}>开启</Radio>
+              <Radio value={1}>不开启</Radio>
             </Radio.Group>
           </Form.Item>
-          <Form.Item
-            name={['rest', 'breakTimeStart-breakTimeEnd']}
-            rules={[{ required: true, message: '请选择休息时间!' }]}
-            noStyle
-            initialValue={0}
-          >
-            <RangePicker
-              format="HH:mm"
-              allowClear={true}
-              picker="time"
-              locale={locale}
-            />
-          </Form.Item>
+          {restType === 0 ? (
+            <Form.Item
+              name={['rest', 'breakTimeStart-breakTimeEnd']}
+              rules={[{ required: true, message: '请选择休息时间!' }]}
+            >
+              <RangePicker
+                format="HH:mm"
+                allowClear={true}
+                picker="time"
+                locale={locale}
+              />
+            </Form.Item>
+          ) : null}
         </Input.Group>
       </Form.Item>
 
@@ -78,8 +94,8 @@ export default forwardRef((props, formRef) => {
         <Input.Group compact style={{ marginTop: 6 }}>
           <Form.Item name={['flex', 'flexible']} noStyle initialValue={0}>
             <Radio.Group>
-              <Radio value={0}>不开启</Radio>
               <Radio value={1}>开启</Radio>
+              <Radio value={0}>不开启</Radio>
             </Radio.Group>
           </Form.Item>
           <br />
