@@ -18,6 +18,11 @@ import {
   submit,
   tsDetail,
   tsLog,
+  getAvailableTime,
+  archiveReplaceCardNumber,
+  vacationTime,
+  overTime,
+  getOutCheckTime,
 } from './services/detail';
 import { tsFormChildlist } from './services/home';
 import { GlobalResParams } from '@/types/ITypes';
@@ -98,6 +103,7 @@ export default props => {
   const [logList, setLogList] = useState<tsLog[]>([]);
   const [btnObj, setBtnObj] = useState<tsBtn>();
   const [form] = Form.useForm();
+  const [userCode, setUserCode] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     getData();
@@ -105,6 +111,9 @@ export default props => {
 
   const getData = async () => {
     let idItem: any = [];
+    let applyUser: any = undefined;
+    let remainCardNumberId: any = undefined;
+    let time: any = undefined;
     let json: GlobalResParams<tsDetail> = await getDetail(formId);
     let btnJson: GlobalResParams<tsBtn> = await getButtonStatus(formId);
     let LogJson: GlobalResParams<tsLog[]> = await gefLogList(formId);
@@ -160,6 +169,45 @@ export default props => {
       setIdItemList(idItem);
       setTitle(obj.name);
       setFormList(data);
+      let vacationTimeId: any = undefined;
+      idItem.map(item => {
+        if (item.baseControlType === 'currUser') {
+          applyUser = item;
+        }
+        if (item.baseControlType === 'vacationTime') {
+          vacationTimeId = item.id;
+        }
+        if (item.baseControlType === 'remainCardNumber') {
+          remainCardNumberId = item.id;
+        }
+        if (item.baseControlType === 'currDate') {
+          time = item.defaultValue;
+        }
+      });
+
+      if (vacationTimeId) {
+        let json1: GlobalResParams<any> = await getAvailableTime({
+          userCode: applyUser?.defaultValue,
+        });
+        if (json1.status === 200) {
+          let obj = {};
+          obj[vacationTimeId] = json1.obj?.currentLeft;
+          console.log(obj);
+          form.setFieldsValue(obj);
+        }
+      }
+      if (remainCardNumberId) {
+        let json1: GlobalResParams<any> = await archiveReplaceCardNumber({
+          userCode: applyUser?.defaultValue,
+        });
+        if (json1.status === 200) {
+          let obj = {};
+          obj[remainCardNumberId] = json1.obj?.surplus;
+          console.log(obj);
+          form.setFieldsValue(obj);
+        }
+      }
+      setUserCode(applyUser?.defaultValue);
     }
 
     if (LogJson.status === 200) {
@@ -203,14 +251,24 @@ export default props => {
       baseControlType === 'positionLevel' ||
       baseControlType === 'positionMLevel' ||
       baseControlType === 'user' ||
-      baseControlType === 'wkTask'
+      baseControlType === 'wkTask' ||
+      baseControlType === 'vacationType' ||
+      baseControlType === 'addSignType'
     ) {
       return value
         ? value + '-$-' + showValue
         : showValue
         ? showValue
         : undefined;
-    } else if (baseControlType === 'datetime') {
+    } else if (
+      baseControlType === 'datetime' ||
+      baseControlType === 'VacationStartTime' ||
+      baseControlType === 'VacationEndTime' ||
+      baseControlType === 'OverTimeStart' ||
+      baseControlType === 'OverTimeEnd' ||
+      baseControlType === 'OutCheckStartTime' ||
+      baseControlType === 'OutCheckEndTime'
+    ) {
       return showValue
         ? moment(showValue, 'YYYY-MM-DD HH:mm')
         : value
@@ -218,9 +276,9 @@ export default props => {
         : undefined;
     } else if (baseControlType === 'date') {
       return showValue
-        ? moment(showValue, 'YYYY-MM-DD HH:mm')
+        ? moment(showValue, 'YYYY-MM-DD')
         : value
-        ? moment(value, 'YYYY-MM-DD HH:mm')
+        ? moment(value, 'YYYY-MM-DD')
         : undefined;
     } else if (baseControlType === 'select') {
       return showValue || value ? (showValue ? showValue : value) : null;
@@ -426,13 +484,19 @@ export default props => {
             });
           }
         } else {
-          if (item.baseControlType === 'datetime') {
+          if (
+            item.baseControlType === 'datetime' ||
+            item.baseControlType === 'VacationStartTime' ||
+            item.baseControlType === 'VacationEndTime' ||
+            item.baseControlType === 'OverTimeStart' ||
+            item.baseControlType === 'OverTimeEnd' ||
+            item.baseControlType === 'OutCheckStartTime' ||
+            item.baseControlType === 'OutCheckEndTime'
+          ) {
             subList.push({
               resFormControlId: item.resFormControlId,
               multipleNumber: 1,
-              showValue: moment(valueArr.join(','))?.format(
-                'YYYY-MM-DD HH:mm:ss',
-              ),
+              showValue: moment(valueArr.join(','))?.format('YYYY-MM-DD HH:mm'),
               value: moment(valueArr.join(','))?.format('YYYY-MM-DD HH:mm'),
             });
           } else if (item.baseControlType === 'date') {
@@ -512,7 +576,15 @@ export default props => {
               value: moment(fromSubData[key])?.format('YYYY-MM-DD') || '',
               multipleNumber: parseInt(key.split('-')[2]),
             });
-          } else if (key.split('-')[0] === 'datetime') {
+          } else if (
+            key.split('-')[0] === 'datetime' ||
+            key.split('-')[0] === 'VacationStartTime' ||
+            key.split('-')[0] === 'VacationEndTime' ||
+            key.split('-')[0] === 'OverTimeStart' ||
+            key.split('-')[0] === 'OverTimeEnd' ||
+            key.split('-')[0] === 'OutCheckStartTime' ||
+            key.split('-')[0] === 'OutCheckEndTime'
+          ) {
             subList.push({
               resFormControlId: parseInt(key.split('-')[1]),
               value: moment(fromSubData[key])?.format('YYYY-MM-DD HH:mm') || '',
@@ -568,7 +640,9 @@ export default props => {
             key.split('-')[0] === 'labor' ||
             key.split('-')[0] === 'cost' ||
             key.split('-')[0] === 'positionLevel' ||
-            key.split('-')[0] === 'positionMLevel'
+            key.split('-')[0] === 'positionMLevel' ||
+            key.split('-')[0] === 'wkTask' ||
+            key.split('-')[0] === 'vacationType'
           ) {
             subList.push({
               resFormControlId: parseInt(key.split('-')[1]),
@@ -705,9 +779,129 @@ export default props => {
     ) : null;
   }, [logList, mount]);
 
+  const onValuesChange = (changedValues, allValues) => {
+    let apiType: any = undefined; //1 请假销假
+    let beginTime: any = undefined;
+    let endTime: any = undefined;
+    let type: any = undefined; //  请假 销假
+    let typeId = undefined; //
+    let setFormId: any = undefined;
+    let api: any = undefined;
+    // let userCode userCode
+    console.log(changedValues);
+    console.log(allValues);
+    idItemList?.map((item, index) => {
+      if (
+        item.baseControlType === 'totalVacationTime' ||
+        item.baseControlType === 'totalReVacationTime'
+      ) {
+        setFormId = item.id;
+        // 请假销假 验证
+        apiType = 1;
+        if (item.baseControlType === 'totalVacationTime') {
+          type = 1;
+        } else {
+          type = 2;
+        }
+      }
+
+      if (item.baseControlType === 'overTimeTotal') {
+        // 加班
+        setFormId = item.id;
+        apiType = 2;
+      }
+
+      if (item.baseControlType === 'outCheckTime') {
+        // 出差外出
+        setFormId = item.id;
+        apiType = 3;
+      }
+
+      if (
+        item.baseControlType === 'vacationStartTime' ||
+        item.baseControlType === 'overTimeStart' ||
+        item.baseControlType === 'outCheckStartTime'
+      ) {
+        beginTime = allValues[item.id]
+          ? allValues[item.id]?.format('YYYY-MM-DD HH:mm:ss')
+          : undefined;
+      }
+
+      if (
+        item.baseControlType === 'vacationEndTime' ||
+        item.baseControlType === 'overTimeEnd' ||
+        item.baseControlType === 'outCheckEndTime'
+      ) {
+        endTime = allValues[item.id]
+          ? allValues[item.id]?.format('YYYY-MM-DD HH:mm:ss')
+          : undefined;
+      }
+
+      if (item.baseControlType === 'vacationType') {
+        typeId = allValues[item.id];
+      }
+    });
+
+    let objParam: any = undefined;
+    if (apiType === 1) {
+      api = vacationTime;
+      objParam = {
+        endTime: endTime,
+        startTime: beginTime,
+        type: type,
+        typeId: typeId,
+        userCode: userCode,
+      };
+
+      if (endTime && beginTime && type && typeId && userCode) {
+        getFormTotle(1);
+      }
+    } else if (apiType === 2) {
+      api = overTime;
+      objParam = {
+        overTimeEnd: endTime,
+        overTimeStart: beginTime,
+      };
+      if (endTime && beginTime) {
+        getFormTotle(2);
+      }
+    } else if (apiType === 3) {
+      api = getOutCheckTime;
+      objParam = {
+        outcheckTimeEnd: endTime,
+        outcheckTimeStart: beginTime,
+      };
+      if (endTime && beginTime) {
+        getFormTotle(3);
+      }
+    }
+    async function getFormTotle(paramsType) {
+      let json: GlobalResParams<any> = await api(objParam);
+      if (json.status === 200) {
+        if (paramsType === 1) {
+          let obj0 = {};
+          obj0[setFormId] = allValues;
+          console.log(obj0);
+          form.setFieldsValue(obj0);
+        }
+        if (paramsType === 2 && setFormId) {
+          let obj = {};
+          obj[setFormId] = json.obj?.hour;
+          console.log(obj);
+          form.setFieldsValue(obj);
+        }
+        if (paramsType === 3 && setFormId) {
+          let obj1: any = {};
+          obj1[setFormId] = json.obj?.hour;
+          console.log(obj1);
+          form.setFieldsValue(obj1);
+        }
+      }
+    }
+  };
   return (
     <Card title={`流程详情  /  ${title}`} className="home-detail">
-      <Form form={form}>
+      <Form form={form} onValuesChange={onValuesChange}>
         {fromContent}
         {btnRender}
       </Form>

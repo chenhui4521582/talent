@@ -57,7 +57,12 @@ export default forwardRef((props: any, formRef) => {
           style={{ marginBottom: 10 }}
         />
       </Form.Item>
-      <Form.Item label="休息时间" name="rest" style={{ marginBottom: 40 }}>
+      <Form.Item
+        label="休息时间"
+        name="rest"
+        style={{ marginBottom: 40 }}
+        rules={[{ required: true, message: '' }]}
+      >
         <Input.Group compact style={{ marginTop: 6 }}>
           <Form.Item
             name={['rest', 'breakTimeCalculation']}

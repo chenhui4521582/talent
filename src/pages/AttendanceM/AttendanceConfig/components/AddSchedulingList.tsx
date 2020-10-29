@@ -53,8 +53,12 @@ export default props => {
       obj.rest = {
         breakTimeCalculation: item.breakTimeCalculation,
         'breakTimeStart-breakTimeEnd': [
-          moment('2019-02-13 ' + item.breakTimeStart + ':00'),
-          moment('2019-02-13 ' + item.breakTimeEnd + ':00'),
+          item.breakTimeStart
+            ? moment('2019-02-13 ' + item.breakTimeStart + ':00')
+            : undefined,
+          item.breakTimeEnd
+            ? moment('2019-02-13 ' + item.breakTimeEnd + ':00')
+            : undefined,
         ],
       };
 

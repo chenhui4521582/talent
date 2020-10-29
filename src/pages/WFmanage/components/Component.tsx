@@ -32,7 +32,6 @@ import {
 import { saveFile } from '@/services/global';
 import { GlobalResParams } from '@/types/ITypes';
 import { myListPageWt, tsList } from '@/pages/Workflow/services/home';
-
 import OzTreeSlect from '@/pages/Framework/components/OzTreeSlect';
 import DepGroup from '@/pages/Workflow/DepGroup';
 
@@ -185,7 +184,7 @@ export default props => {
     case 'wkTask':
       return <WkTask {...props} />;
     // 请假/销假类型 vacationType
-    case 'VacationType':
+    case 'vacationType':
       return <VacationType {...props} />;
     // 请假/销假开始时间 vacationStartTime
     case 'vacationStartTime':
@@ -218,11 +217,14 @@ export default props => {
     case 'outCheckEndTime':
       return <OutCheckEndTime {...props} />;
     // 控件名称="outcheckTime", 出差/外出共计时长
-    case 'outcheckTime':
+    case 'outCheckTime':
       return <OutcheckTime {...props} />;
     //控件名称="vacationTime", 可休年假时长
     case 'vacationTime':
       return <VacationTime {...props} />;
+    // 补卡类型
+    case 'addSignType':
+      return <AddSignType {...props} />;
     default:
       return <></>;
   }
@@ -807,7 +809,8 @@ const WkTask = props => {
 
 // 请假/销假类型 vacationType
 const VacationType = props => {
-  return <Select placeholder="请选择类型"></Select>;
+  // return <Select placeholder="请选择类型"></Select>;
+  return <Input placeholder="类型" disabled />;
 };
 
 // 请假/销假开始时间 vacationStartTime
@@ -918,4 +921,10 @@ const OutcheckTime = props => {
 //控件名称="vacationTime", 可休年假时长
 const VacationTime = props => {
   return <Input placeholder="可休年假时长" />;
+};
+
+// 补卡类型
+const AddSignType = props => {
+  // return <Select placeholder="补卡类型" style={{ width: '100%', minWidth: '14vw' }} />;
+  return <Input placeholder="类型" disabled />;
 };

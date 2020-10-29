@@ -173,12 +173,12 @@ export default () => {
       }
       if (type === 1) {
         obj.workStatus = 1;
-        obj.earlyOffHour = -1;
+        obj.earlyOffHour = 0;
       }
 
       if (type === 2) {
         obj.workStatus = 0;
-        obj.earlyOffHour = -1;
+        obj.earlyOffHour = 0;
       }
 
       if (type === 3) {
@@ -293,6 +293,7 @@ export default () => {
               name="earlyOffHour"
               rules={[{ required: true, message: '请选择提前下班时长!' }]}
               style={{ width: '20vw' }}
+              initialValue={2}
             >
               <Select>
                 <Option value={1}>1小时</Option>

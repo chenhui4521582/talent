@@ -54,8 +54,12 @@ export default props => {
       obj.clockTimeId = item.clockTimeId;
       obj.day = day;
       obj.clockPeriods = [
-        moment('2019-02-13 ' + item?.clockPeriods?.startTime + ':00'),
-        moment('2019-02-13 ' + item?.clockPeriods?.endTime + ':00'),
+        item?.clockPeriods?.startTime
+          ? moment('2019-02-13 ' + item?.clockPeriods?.startTime + ':00')
+          : undefined,
+        item?.clockPeriods?.endTime
+          ? moment('2019-02-13 ' + item?.clockPeriods?.endTime + ':00')
+          : undefined,
       ];
       obj.flex = {
         flexible: item.flexible,
@@ -65,8 +69,12 @@ export default props => {
       obj.rest = {
         breakTimeCalculation: item.breakTimeCalculation,
         'breakTimeStart-breakTimeEnd': [
-          moment('2019-02-13 ' + item.breakTimeStart + ':00'),
-          moment('2019-02-13 ' + item.breakTimeEnd + ':00'),
+          item.breakTimeStart
+            ? moment('2019-02-13 ' + item.breakTimeStart + ':00')
+            : undefined,
+          item.breakTimeEnd
+            ? moment('2019-02-13 ' + item.breakTimeEnd + ':00')
+            : undefined,
         ],
       };
       obj.itemList = {
@@ -185,6 +193,7 @@ export default props => {
         }}
         onCancel={() => {
           setEditType(undefined);
+          form.resetFields();
         }}
       >
         <Form form={form}>
@@ -239,7 +248,12 @@ export default props => {
             />
           </Form.Item>
 
-          <Form.Item label="休息时间" name="rest" style={{ marginBottom: 40 }}>
+          <Form.Item
+            label="休息时间"
+            name="rest"
+            style={{ marginBottom: 40 }}
+            rules={[{ required: true, message: '' }]}
+          >
             <Input.Group compact style={{ marginTop: 6 }}>
               <Form.Item
                 name={['rest', 'breakTimeCalculation']}

@@ -32,7 +32,7 @@ import {
 import { saveFile } from '@/services/global';
 import { GlobalResParams } from '@/types/ITypes';
 import { myListPageWt, tsList } from './services/home';
-
+import { listHoliday, getAddSignTyp } from './services/detail';
 import OzTreeSlect from '@/pages/Framework/components/OzTreeSlect';
 import DepGroup from './DepGroup';
 
@@ -185,7 +185,7 @@ export default props => {
     case 'wkTask':
       return <WkTask {...props} />;
     // 请假/销假类型 vacationType
-    case 'VacationType':
+    case 'vacationType':
       return <VacationType {...props} />;
     // 请假/销假开始时间 vacationStartTime
     case 'vacationStartTime':
@@ -218,11 +218,15 @@ export default props => {
     case 'outCheckEndTime':
       return <OutCheckEndTime {...props} />;
     // 控件名称="outcheckTime", 出差/外出共计时长
-    case 'outcheckTime':
+    case 'outCheckTime':
       return <OutcheckTime {...props} />;
     //控件名称="vacationTime", 可休年假时长
     case 'vacationTime':
       return <VacationTime {...props} />;
+    // 补卡类型
+    case 'addSignType':
+      return <AddSignType {...props} />;
+
     default:
       return <></>;
   }
@@ -807,7 +811,32 @@ const WkTask = props => {
 
 // 请假/销假类型 vacationType
 const VacationType = props => {
-  return <Select placeholder="请选择类型"></Select>;
+  const [list, setList] = useState<any[]>([]);
+  useEffect(() => {
+    async function getList() {
+      let res: GlobalResParams<any[]> = await listHoliday();
+      if (res.status === 200) {
+        setList(res.obj);
+      }
+    }
+    getList();
+  }, []);
+
+  return (
+    <Select
+      style={{ width: '100%', minWidth: '14vw' }}
+      placeholder="请选择类型"
+      {...props}
+    >
+      {list?.map((item, index) => {
+        return (
+          <Select key={index} value={item.id + '-$-' + item.name}>
+            {item.name}
+          </Select>
+        );
+      })}
+    </Select>
+  );
 };
 
 // 请假/销假开始时间 vacationStartTime
@@ -839,13 +868,13 @@ const VacationEndTime = props => {
 // 请假共计时长 totalVacationTime
 const TotalVacationTime = props => {
   // 需要调接口
-  return <Input placeholder="请假共计时长" />;
+  return <Input {...props} placeholder="请假共计时长" />;
 };
 
 //销假共计时长 totalReVacationTime
 const TotalReVacationTime = props => {
   // 需要调接口
-  return <Input placeholder="销假共计时长" />;
+  return <Input {...props} placeholder="销假共计时长" />;
 };
 
 // 控件名称="overTimeStart", 加班开始时间
@@ -876,12 +905,12 @@ const OverTimeEnd = props => {
 
 // 控件名称="overTimeTotal", 加班共计时长
 const OverTimeTotal = props => {
-  return <Input placeholder="销假共计时长" />;
+  return <Input {...props} placeholder="销假共计时长" />;
 };
 
 // 控件名称="remainCardNumber" 当月剩余补卡次数
 const RemainCardNumber = props => {
-  return <Input placeholder="当月剩余补卡次数" />;
+  return <Input {...props} placeholder="当月剩余补卡次数" />;
 };
 
 // 控件名称="outCheckStartTime", 出差/外出打卡开始时间
@@ -912,10 +941,40 @@ const OutCheckEndTime = props => {
 
 // 控件名称="outcheckTime", 出差/外出共计时长
 const OutcheckTime = props => {
-  return <Input placeholder="共计时长" />;
+  return <Input {...props} placeholder="共计时长" />;
 };
 
 //控件名称="vacationTime", 可休年假时长
 const VacationTime = props => {
-  return <Input placeholder="可休年假时长" />;
+  return <Input {...props} placeholder="可休年假时长" disabled={true} />;
+};
+
+// 不卡类型
+const AddSignType = props => {
+  const [list, setList] = useState<any[]>([]);
+  useEffect(() => {
+    async function getList() {
+      let res: GlobalResParams<any[]> = await getAddSignTyp();
+      if (res.status === 200) {
+        setList(res.obj);
+      }
+    }
+    getList();
+  }, []);
+
+  return (
+    <Select
+      placeholder="请选择类型"
+      {...props}
+      style={{ width: '100%', minWidth: '14vw' }}
+    >
+      {list?.map((item, index) => {
+        return (
+          <Select key={index} value={item.code + '-$-' + item.desc}>
+            {item.desc}
+          </Select>
+        );
+      })}
+    </Select>
+  );
 };

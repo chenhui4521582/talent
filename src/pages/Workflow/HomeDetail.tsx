@@ -6,6 +6,14 @@ import {
   tsControlList,
   saveTaskForm,
 } from './services/home';
+import {
+  getAvailableTime,
+  archiveReplaceCardNumber,
+  vacationTime,
+  overTime,
+  getOutCheckTime,
+} from './services/detail';
+
 import { GlobalResParams } from '@/types/ITypes';
 import { Card, Descriptions, Button, Form, notification, Table } from 'antd';
 import moment from 'moment';
@@ -20,6 +28,7 @@ export default props => {
   const [title, setTitle] = useState<string | null>('');
   const [mount, setMount] = useState<Boolean>(false);
   const [idItemList, setIdItemList] = useState<any[]>([]);
+  const [userCode, setUserCode] = useState<string | undefined>(undefined);
 
   const [form] = Form.useForm();
   useEffect(() => {
@@ -28,6 +37,9 @@ export default props => {
   const getFrom = async () => {
     let idItem: any = [];
     let json: GlobalResParams<tsWfFormDetail> = await wfFormDetail(formId);
+    let applyUser: any = undefined;
+    let remainCardNumberId: any = undefined;
+    let time: any = undefined;
     if (json.status === 200) {
       setMount(true);
       let obj = json.obj || {};
@@ -78,8 +90,48 @@ export default props => {
         }
       }
       setIdItemList(idItem);
+      console.log(idItem);
       setTitle(obj.name);
       setFormList(data);
+      let vacationTimeId: any = undefined;
+      idItem.map(item => {
+        if (item.baseControlType === 'currUser') {
+          applyUser = item;
+        }
+        if (item.baseControlType === 'vacationTime') {
+          vacationTimeId = item.id;
+        }
+        if (item.baseControlType === 'remainCardNumber') {
+          remainCardNumberId = item.id;
+        }
+        if (item.baseControlType === 'currDate') {
+          time = item.defaultValue;
+        }
+      });
+
+      if (vacationTimeId) {
+        let json1: GlobalResParams<any> = await getAvailableTime({
+          userCode: applyUser?.defaultValue,
+        });
+        if (json1.status === 200) {
+          let obj = {};
+          obj[vacationTimeId] = json1.obj?.currentLeft;
+          console.log(obj);
+          form.setFieldsValue(obj);
+        }
+      }
+      if (remainCardNumberId) {
+        let json1: GlobalResParams<any> = await archiveReplaceCardNumber({
+          userCode: applyUser?.defaultValue,
+        });
+        if (json1.status === 200) {
+          let obj = {};
+          obj[remainCardNumberId] = json1.obj?.surplus;
+          console.log(obj);
+          form.setFieldsValue(obj);
+        }
+      }
+      setUserCode(applyUser?.defaultValue);
     }
   };
 
@@ -115,7 +167,10 @@ export default props => {
       baseControlType === 'job' ||
       baseControlType === 'positionLevel' ||
       baseControlType === 'positionMLevel' ||
-      baseControlType === 'user'
+      baseControlType === 'user' ||
+      baseControlType === 'wkTask' ||
+      baseControlType === 'vacationType' ||
+      baseControlType === 'addSignType'
     ) {
       return value
         ? value + '-$-' + showValue
@@ -475,7 +530,8 @@ export default props => {
             key.split('-')[0] === 'cost' ||
             key.split('-')[0] === 'positionLevel' ||
             key.split('-')[0] === 'positionMLevel' ||
-            key.split('-')[0] === 'wkTask'
+            key.split('-')[0] === 'wkTask' ||
+            key.split('-')[0] === 'vacationType'
           ) {
             subList.push({
               id: parseInt(key.split('-')[1]),
@@ -532,9 +588,130 @@ export default props => {
     });
   };
 
+  const onValuesChange = (changedValues, allValues) => {
+    let apiType: any = undefined; //1 请假销假
+    let beginTime: any = undefined;
+    let endTime: any = undefined;
+    let type: any = undefined; //  请假 销假
+    let typeId = undefined; //
+    let setFormId: any = undefined;
+    let api: any = undefined;
+    // let userCode userCode
+    console.log(changedValues);
+    console.log(allValues);
+    idItemList?.map((item, index) => {
+      if (
+        item.baseControlType === 'totalVacationTime' ||
+        item.baseControlType === 'totalReVacationTime'
+      ) {
+        setFormId = item.id;
+        // 请假销假 验证
+        apiType = 1;
+        if (item.baseControlType === 'totalVacationTime') {
+          type = 1;
+        } else {
+          type = 2;
+        }
+      }
+
+      if (item.baseControlType === 'overTimeTotal') {
+        // 加班
+        setFormId = item.id;
+        apiType = 2;
+      }
+
+      if (item.baseControlType === 'outCheckTime') {
+        // 出差外出
+        setFormId = item.id;
+        apiType = 3;
+      }
+
+      if (
+        item.baseControlType === 'vacationStartTime' ||
+        item.baseControlType === 'overTimeStart' ||
+        item.baseControlType === 'outCheckStartTime'
+      ) {
+        beginTime = allValues[item.id]
+          ? allValues[item.id]?.format('YYYY-MM-DD HH:mm:ss')
+          : undefined;
+      }
+
+      if (
+        item.baseControlType === 'vacationEndTime' ||
+        item.baseControlType === 'overTimeEnd' ||
+        item.baseControlType === 'outCheckEndTime'
+      ) {
+        endTime = allValues[item.id]
+          ? allValues[item.id]?.format('YYYY-MM-DD HH:mm:ss')
+          : undefined;
+      }
+
+      if (item.baseControlType === 'vacationType') {
+        typeId = allValues[item.id];
+      }
+    });
+
+    let objParam: any = undefined;
+    if (apiType === 1) {
+      api = vacationTime;
+      objParam = {
+        endTime: endTime,
+        startTime: beginTime,
+        type: type,
+        typeId: typeId,
+        userCode: userCode,
+      };
+
+      if (endTime && beginTime && type && typeId && userCode) {
+        getFormTotle(1);
+      }
+    } else if (apiType === 2) {
+      api = overTime;
+      objParam = {
+        overTimeEnd: endTime,
+        overTimeStart: beginTime,
+      };
+      if (endTime && beginTime) {
+        getFormTotle(2);
+      }
+    } else if (apiType === 3) {
+      api = getOutCheckTime;
+      objParam = {
+        outcheckTimeEnd: endTime,
+        outcheckTimeStart: beginTime,
+      };
+      if (endTime && beginTime) {
+        getFormTotle(3);
+      }
+    }
+    async function getFormTotle(paramsType) {
+      let json: GlobalResParams<any> = await api(objParam);
+      if (json.status === 200) {
+        if (paramsType === 1) {
+          let obj0 = {};
+          obj0[setFormId] = allValues;
+          console.log(obj0);
+          form.setFieldsValue(obj0);
+        }
+        if (paramsType === 2 && setFormId) {
+          let obj = {};
+          obj[setFormId] = json.obj?.hour;
+          console.log(obj);
+          form.setFieldsValue(obj);
+        }
+        if (paramsType === 3 && setFormId) {
+          let obj1: any = {};
+          obj1[setFormId] = json.obj?.hour;
+          console.log(obj1);
+          form.setFieldsValue(obj1);
+        }
+      }
+    }
+  };
+
   return (
     <Card title={`发起流程  /  ${title}-创建`} className="home-detail">
-      <Form form={form}>
+      <Form form={form} onValuesChange={onValuesChange}>
         {fromContent}
         {mount ? (
           <div style={{ textAlign: 'center' }}>

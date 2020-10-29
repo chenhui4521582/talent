@@ -125,12 +125,18 @@ export default props => {
           endTime: moment(item.clockPeriods[1]).format('HH:mm'),
         };
         clockTimeListObj.breakTimeCalculation = item.rest.breakTimeCalculation;
-        clockTimeListObj.breakTimeStart = moment(
-          item.rest['breakTimeStart-breakTimeEnd'][0],
-        ).format('HH:mm');
-        clockTimeListObj.breakTimeEnd = moment(
-          item.rest['breakTimeStart-breakTimeEnd'][1],
-        ).format('HH:mm');
+        if (item.rest.breakTimeCalculation === 1) {
+          clockTimeListObj.breakTimeStart = '';
+          clockTimeListObj.breakTimeEnd = '';
+        } else {
+          clockTimeListObj.breakTimeStart = moment(
+            item.rest['breakTimeStart-breakTimeEnd'][0],
+          ).format('HH:mm');
+          clockTimeListObj.breakTimeEnd = moment(
+            item.rest['breakTimeStart-breakTimeEnd'][1],
+          ).format('HH:mm');
+        }
+
         clockTimeListObj.flexible = item.flex.flexible;
         clockTimeListObj.leaveEarly = item.flex.leaveEarly;
         clockTimeListObj.leaveLater = item.flex.leaveLater;
@@ -149,12 +155,18 @@ export default props => {
             endTime: moment(item.clockPeriods[1]).format('HH:mm'),
           });
         scheduleListObj.breakTimeCalculation = item.rest.breakTimeCalculation;
-        scheduleListObj.breakTimeStart = moment(
-          item.rest['breakTimeStart-breakTimeEnd'][0],
-        ).format('HH:mm');
-        scheduleListObj.breakTimeEnd = moment(
-          item.rest['breakTimeStart-breakTimeEnd'][1],
-        ).format('HH:mm');
+        if (item.rest.breakTimeCalculation === 1) {
+          scheduleListObj.breakTimeStart = '';
+          scheduleListObj.breakTimeEnd = '';
+        } else {
+          scheduleListObj.breakTimeStart = moment(
+            item.rest['breakTimeStart-breakTimeEnd'][0],
+          ).format('HH:mm');
+          scheduleListObj.breakTimeEnd = moment(
+            item.rest['breakTimeStart-breakTimeEnd'][1],
+          ).format('HH:mm');
+        }
+
         scheduleListObj.flexible = item.flex.flexible;
         scheduleListObj.leaveEarly = item.flex.leaveEarly;
         scheduleListObj.leaveLater = item.flex.leaveLater;
