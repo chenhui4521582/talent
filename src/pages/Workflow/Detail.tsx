@@ -187,7 +187,7 @@ export default props => {
 
       if (vacationTimeId) {
         let json1: GlobalResParams<any> = await getAvailableTime({
-          userCode: applyUser?.defaultValue,
+          userCode: applyUser?.value,
         });
         if (json1.status === 200) {
           let obj = {};
@@ -198,7 +198,7 @@ export default props => {
       }
       if (remainCardNumberId) {
         let json1: GlobalResParams<any> = await archiveReplaceCardNumber({
-          userCode: applyUser?.defaultValue,
+          userCode: applyUser?.value,
         });
         if (json1.status === 200) {
           let obj = {};
@@ -207,7 +207,7 @@ export default props => {
           form.setFieldsValue(obj);
         }
       }
-      setUserCode(applyUser?.defaultValue);
+      setUserCode(applyUser?.value);
     }
 
     if (LogJson.status === 200) {
@@ -262,12 +262,12 @@ export default props => {
         : undefined;
     } else if (
       baseControlType === 'datetime' ||
-      baseControlType === 'VacationStartTime' ||
-      baseControlType === 'VacationEndTime' ||
-      baseControlType === 'OverTimeStart' ||
-      baseControlType === 'OverTimeEnd' ||
-      baseControlType === 'OutCheckStartTime' ||
-      baseControlType === 'OutCheckEndTime'
+      baseControlType === 'vacationStartTime' ||
+      baseControlType === 'vacationEndTime' ||
+      baseControlType === 'overTimeStart' ||
+      baseControlType === 'overTimeEnd' ||
+      baseControlType === 'outCheckStartTime' ||
+      baseControlType === 'outCheckEndTime'
     ) {
       return showValue
         ? moment(showValue, 'YYYY-MM-DD HH:mm')
@@ -488,10 +488,10 @@ export default props => {
             item.baseControlType === 'datetime' ||
             item.baseControlType === 'VacationStartTime' ||
             item.baseControlType === 'VacationEndTime' ||
-            item.baseControlType === 'OverTimeStart' ||
-            item.baseControlType === 'OverTimeEnd' ||
-            item.baseControlType === 'OutCheckStartTime' ||
-            item.baseControlType === 'OutCheckEndTime'
+            item.baseControlType === 'overTimeStart' ||
+            item.baseControlType === 'overTimeEnd' ||
+            item.baseControlType === 'outCheckStartTime' ||
+            item.baseControlType === 'outCheckEndTime'
           ) {
             subList.push({
               resFormControlId: item.resFormControlId,
@@ -580,10 +580,10 @@ export default props => {
             key.split('-')[0] === 'datetime' ||
             key.split('-')[0] === 'VacationStartTime' ||
             key.split('-')[0] === 'VacationEndTime' ||
-            key.split('-')[0] === 'OverTimeStart' ||
-            key.split('-')[0] === 'OverTimeEnd' ||
-            key.split('-')[0] === 'OutCheckStartTime' ||
-            key.split('-')[0] === 'OutCheckEndTime'
+            key.split('-')[0] === 'overTimeStart' ||
+            key.split('-')[0] === 'overTimeEnd' ||
+            key.split('-')[0] === 'outCheckStartTime' ||
+            key.split('-')[0] === 'outCheckEndTime'
           ) {
             subList.push({
               resFormControlId: parseInt(key.split('-')[1]),
@@ -784,7 +784,7 @@ export default props => {
     let beginTime: any = undefined;
     let endTime: any = undefined;
     let type: any = undefined; //  请假 销假
-    let typeId = undefined; //
+    let typeId: any = undefined; //
     let setFormId: any = undefined;
     let api: any = undefined;
     // let userCode userCode
@@ -849,7 +849,7 @@ export default props => {
         endTime: endTime,
         startTime: beginTime,
         type: type,
-        typeId: typeId,
+        typeId: typeId?.split('-$-')[0],
         userCode: userCode,
       };
 

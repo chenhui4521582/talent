@@ -172,6 +172,7 @@ export default props => {
 
   useEffect(() => {
     let propsList = ruleList?.steps || [];
+    propsList = propsList.sort(compare('stepNumber'));
     let propsRuleSets = ruleList?.ruleSets || [];
     if (propsRuleSets.length === 0) {
       if (propsList?.length) {
@@ -400,9 +401,12 @@ export default props => {
               listItem.map((item, index) => {
                 item.poi = poi + '-' + index;
                 if (item.poi === ruleItem.poi) {
-                  // obj.poi=item.poi
-                  // item=obj
-                  item?.ruleList[ruleItem.index]?.list?.push(obj);
+                  if (item.ruleList[ruleItem.index].list) {
+                    item?.ruleList[ruleItem.index]?.list?.push(obj);
+                  } else {
+                    item.ruleList[ruleItem.index].list = [];
+                    item?.ruleList[ruleItem.index]?.list?.push(obj);
+                  }
                 }
                 item.ruleList?.map((ruleItem, ruleItemIndex) => {
                   handleData(ruleItem?.list, item.poi + '-' + ruleItemIndex);
@@ -437,10 +441,15 @@ export default props => {
         const droopData1 = data => {
           let newData = data;
           function handleData(listItem, poi) {
-            listItem.map((item, index) => {
+            listItem?.map((item, index) => {
               item.poi = poi + '-' + index;
               if (item.poi === ruleItem.poi) {
-                item?.ruleList[ruleItem.index]?.list?.push(obj);
+                if (item.ruleList[ruleItem.index]?.list) {
+                  item?.ruleList[ruleItem.index]?.list?.push(obj);
+                } else {
+                  item.ruleList[ruleItem.index].list = [];
+                  item?.ruleList[ruleItem.index]?.list?.push(obj);
+                }
               }
               item.ruleList?.map((ruleItem, ruleItemIndex) => {
                 handleData(ruleItem?.list, item.poi + '-' + ruleItemIndex);
@@ -621,19 +630,21 @@ export default props => {
       icon: <ExclamationCircleOutlined />,
       okType: 'danger' as any,
       cancelText: '取消',
-      onOk: async () => {
+      onOk: () => {
         let newList = JSON.parse(JSON.stringify(list));
         const droopData1 = data => {
           let newData = data;
           function handleData(listItem, poi) {
-            listItem.map((item, index) => {
+            listItem?.map((item, index) => {
               item.poi = poi + '-' + index;
               if (item.poi === items.poi) {
                 listItem.splice(index, 1);
+                return;
+              } else {
+                item.ruleList?.map((ruleItem, ruleItemIndex) => {
+                  handleData(ruleItem?.list, item.poi + '-' + ruleItemIndex);
+                });
               }
-              item.ruleList?.map((ruleItem, ruleItemIndex) => {
-                handleData(ruleItem?.list, item.poi + '-' + ruleItemIndex);
-              });
             });
           }
           return handleData(newData, 0);
@@ -688,7 +699,7 @@ export default props => {
       const droopData1 = data => {
         let newData = data;
         function handleData(listItem, poi) {
-          listItem.map((item, index) => {
+          listItem?.map((item, index) => {
             item.poi = poi + '-' + index;
             if (item.poi === selectObj?.poi) {
               item.stepName = fromSubData.name;
@@ -742,10 +753,16 @@ export default props => {
           return 1;
         case 'number':
           return 2;
+        case 'money':
+          return 2;
+        case 'positionMLevel':
+          return 4;
         case 'select':
-          return 3;
+          return 4;
         case 'multiple':
           return 4;
+        case 'text':
+          return 5;
         case 'text':
           return 5;
         case 'areatext':
@@ -772,6 +789,13 @@ export default props => {
               memberTagIds: value[key]?.value?.memberTagIds,
               userCodes: value[key]?.value?.userCodes,
             };
+          }
+          if (
+            value[key].type.indexOf('select') > -1 ||
+            value[key].type.indexOf('positionMLevel') > -1 ||
+            value[key].type.indexOf('multiple') > -1
+          ) {
+            resRuleCurdParams.value = value[key]?.value.join('|');
           }
           resRuleCurdParamsArr.push(resRuleCurdParams);
         }
@@ -845,7 +869,7 @@ export default props => {
           const droopData1 = data => {
             let newData = data;
             function handleData(listItem, poi) {
-              listItem.map((item, index) => {
+              listItem?.map((item, index) => {
                 item.poi = poi + '-' + index;
                 {
                   item.ruleList?.map((ruleItem, ruleItemIndex) => {
@@ -863,7 +887,7 @@ export default props => {
           const droopData1 = data => {
             let newData = data;
             function handleData(listItem, poi) {
-              listItem.map((item, index) => {
+              listItem?.map((item, index) => {
                 item.poi = poi + '-' + index;
                 if (item.poi === ruleItem.poi) {
                   newItem.list = [];
@@ -885,7 +909,7 @@ export default props => {
         const droopData2 = data => {
           let newData = data;
           function handleData(listItem, poi) {
-            listItem.map((item, index) => {
+            listItem?.map((item, index) => {
               item.poi = poi + '-' + index;
               if (item.poi === selectRule?.selectItem.poi) {
                 newItem.list = item.ruleList[selectRule?.index].list;
@@ -920,27 +944,32 @@ export default props => {
         const droopData1 = data => {
           let newData = data;
           function handleData(listItem, poi, pItem, pItemRuleIndex) {
-            listItem.map((item, index) => {
-              item.poi = poi + '-' + index;
-              if (item.poi === items.poi) {
-                item.ruleList.splice(indexs, 1);
-                if (item.ruleList?.length === 1) {
-                  let arr = pItem.ruleList[pItemRuleIndex].list.concat(
-                    item.ruleList[0].list,
-                  );
-                  pItem.ruleList[pItemRuleIndex].list = arr;
-                  item.ruleList = [];
-                  return;
+            listItem?.map((item, index) => {
+              if (!item || item == 'undefined') {
+                listItem.splice(index, 1);
+                return;
+              } else {
+                item.poi = poi + '-' + index;
+                if (item.poi === items.poi) {
+                  item.ruleList.splice(indexs, 1);
+                  if (item.ruleList?.length === 1) {
+                    // let arr = pItem.ruleList[pItemRuleIndex].list.concat(
+                    //   item.ruleList[0].list,
+                    // );
+                    // pItem.ruleList[pItemRuleIndex].list = pItem.ruleList[pItemRuleIndex].list;
+                    item.ruleList = [];
+                    return;
+                  }
                 }
+                item.ruleList?.map((ruleItem, ruleItemIndex) => {
+                  handleData(
+                    ruleItem?.list,
+                    item.poi + '-' + ruleItemIndex,
+                    item,
+                    ruleItemIndex,
+                  );
+                });
               }
-              item.ruleList?.map((ruleItem, ruleItemIndex) => {
-                handleData(
-                  ruleItem?.list,
-                  item.poi + '-' + ruleItemIndex,
-                  item,
-                  ruleItemIndex,
-                );
-              });
             });
           }
           return handleData(newData, 0, {}, 0);
@@ -1105,6 +1134,10 @@ export default props => {
     function handleData(listItem, poi) {
       let show = true;
       return listItem?.map((item, index) => {
+        if (!item || item == 'undefined') {
+          listItem.splice(index, 1);
+          return;
+        }
         item.poi = poi + '-' + index;
         item?.ruleList &&
           item?.ruleList[0]?.list?.map(oneItem => {
@@ -1240,7 +1273,7 @@ export default props => {
                               borderRadius: '5px 5px',
                             }}
                             onClick={() => {
-                              ruleItem.isDefault === 0
+                              ruleItem.isDefault != 1
                                 ? handleEditBranch(item, ruleItemIndex)
                                 : null;
                             }}
@@ -1249,7 +1282,7 @@ export default props => {
                               <span style={{ float: 'left' }}>
                                 {ruleItem.name}
                               </span>
-                              {ruleItem.isDefault === 0 ? (
+                              {ruleItem.isDefault != 1 ? (
                                 <span style={{ float: 'right' }}>
                                   优先级{ruleItem.priority}
                                 </span>
@@ -1277,7 +1310,7 @@ export default props => {
                                 请设置条件
                               </div>
                             ) : null}
-                            {ruleItem.isDefault === 0 ? (
+                            {ruleItem.isDefault != 1 ? (
                               <span
                                 style={{
                                   position: 'absolute',

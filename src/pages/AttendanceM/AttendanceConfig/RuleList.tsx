@@ -6,6 +6,7 @@ import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { GlobalResParams } from '@/types/ITypes';
 import { ruleList, deleteRule } from './services/rule';
 import { Card, notification, Button, Divider, Modal } from 'antd';
+import { ItemTypes } from '@/pages/WFmanage/services/form';
 
 export default () => {
   const columns: ColumnProps<any>[] = [
@@ -34,24 +35,31 @@ export default () => {
       key: 'clockTimeList',
       align: 'center',
       render: (_, record) => {
-        let html: any = [];
+        console.log(record);
+
         if (record.ruleType === 0) {
           return record?.clockTimeList?.map((item, index) => {
             let str: any[] = [];
             let timeStr: any[] = [];
-            if (item.monday) {
+            if (item.monday === 1) {
               str.push('星期一');
-            } else if (item.tuesday) {
+            }
+            if (item.tuesday === 1) {
               str.push('星期二');
-            } else if (item.wednesday) {
+            }
+            if (item.wednesday === 1) {
               str.push('星期三');
-            } else if (item.thursday) {
+            }
+            if (item.thursday === 1) {
               str.push('星期四');
-            } else if (item.friday) {
+            }
+            if (item.friday === 1) {
               str.push('星期五');
-            } else if (item.saturday) {
+            }
+            if (item.saturday === 1) {
               str.push('星期六');
-            } else if (item.sunday) {
+            }
+            if (item.sunday === 1) {
               str.push('星期日');
             }
             timeStr.push(
@@ -63,46 +71,28 @@ export default () => {
             );
             return (
               <div key={index}>
-                {str.join(',')}
+                {str.join('，')}
                 <br />
                 {timeStr.join(',')}
               </div>
             );
           });
         } else {
-          return record?.clockTimeList?.map((item, index) => {
-            let str: any[] = [];
-            let timeStr: any[] = [];
-            if (item.monday) {
-              str.push('星期一');
-            } else if (item.tuesday) {
-              str.push('星期二');
-            } else if (item.wednesday) {
-              str.push('星期三');
-            } else if (item.thursday) {
-              str.push('星期四');
-            } else if (item.friday) {
-              str.push('星期五');
-            } else if (item.saturday) {
-              str.push('星期六');
-            } else if (item.sunday) {
-              str.push('星期日');
-            }
-            timeStr.push(
-              '上班' +
-                item.clockPeriods.startTime +
-                '-' +
-                '下班' +
-                item.clockPeriods.endTime,
+          let html: any = [];
+          for (let key in record?.scheduleDetail) {
+            html.push(
+              <div>
+                <span style={{ marginRight: 20, display: 'inline-block' }}>
+                  {key}
+                </span>
+                <span>
+                  {record?.scheduleDetail[key].startTime} —{' '}
+                  {record?.scheduleDetail[key].endTime}
+                </span>
+              </div>,
             );
-            return (
-              <div key={index}>
-                {str.join(',')}
-                <br />
-                {timeStr.join(',')}
-              </div>
-            );
-          });
+          }
+          return html;
         }
       },
     },

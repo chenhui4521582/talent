@@ -39,7 +39,8 @@ export default props => {
         value.overtimeWay = obj.overtimeWay;
         if (obj.workingdayOvertime) {
           arr.push('workingdayOvertime');
-        } else if (obj.offdayOvertime) {
+        }
+        if (obj.offdayOvertime) {
           arr.push('offdayOvertime');
         }
         value['workingdayOvertime-offdayOvertime'] = arr;

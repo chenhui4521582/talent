@@ -16,6 +16,7 @@ import {
   Checkbox,
 } from 'antd';
 import { GlobalResParams } from '@/types/ITypes';
+import { useRankM } from '@/models/global';
 import { getFormSimple } from '../services/rule';
 import LabelOrUser from './LabelOrUser';
 
@@ -48,9 +49,16 @@ export default forwardRef((props: any, formRef) => {
           if (
             item.baseControlType === 'number' ||
             item.baseControlType === 'areatext' ||
+            item.baseControlType === 'text' ||
             item.baseControlType === 'select' ||
             item.baseControlType === 'multiple' ||
-            item.baseControlType === 'text'
+            item.baseControlType === 'text' ||
+            item.baseControlType === 'positionMLevel' ||
+            item.baseControlType === 'money' ||
+            item.baseControlType === 'totalVacationTime' ||
+            item.baseControlType === 'totalReVacationTime' ||
+            item.baseControlType === 'overTimeTotal' ||
+            item.baseControlType === 'vacationTime'
           ) {
             newList.push(item);
           }
@@ -130,9 +138,9 @@ export default forwardRef((props: any, formRef) => {
               initialValue={selectRule ? selectRule.priority : undefined}
             >
               <Select placeholder="请选择优先级" allowClear>
-                {selectRule?.rule ? (
-                  <Option value={selectRule.index}>
-                    优先级{selectRule.index}
+                {selectRule.priority || selectRule.index ? (
+                  <Option value={selectRule.priority || selectRule.index}>
+                    优先级{selectRule.priority || selectRule.index}
                   </Option>
                 ) : (
                   <Option value={1}>优先级1</Option>
@@ -155,6 +163,7 @@ const FormItem = props => {
   const { list, Index, handleDelete, form, selectRule, numberList } = props;
   const [type, setType] = useState<number>();
   const [itemList, setItemList] = useState<string>();
+  const { rankList } = useRankM();
 
   useEffect(() => {
     if (type === 2 || type === 5) {
@@ -166,40 +175,50 @@ const FormItem = props => {
     }
   }, [type]);
 
-  const handleType1 = str => {
-    switch (str) {
-      case 1:
-        return 'applicant';
-      case 2:
-        return 'number';
-      case 3:
-        return 'select';
-      case 4:
-        return 'multiple';
-      case 5:
-        return 'areatext';
-    }
-  };
-
   useEffect(() => {
     let obj: any = {};
+    let refResFormControlType: string = 'applicant';
+    let itemLists: string = '';
+    let arr: any = [];
+    list?.map(item => {
+      if (item.id == selectRule.refResFormControl) {
+        refResFormControlType = item.baseControlType;
+        if (
+          refResFormControlType === 'multiple' ||
+          refResFormControlType === 'select'
+        ) {
+          itemLists = item.itemList;
+          setItemList(itemLists);
+        }
+        if (refResFormControlType === 'positionMLevel') {
+          rankList?.map(item => {
+            arr.push(item.rankName);
+          });
+          setItemList(arr.join('|'));
+        }
+      }
+    });
     if (selectRule.refResFormControl || selectRule.type || selectRule.value) {
       obj[Index] = {
-        value: selectRule.value,
+        value:
+          selectRule.type === 4
+            ? selectRule?.value
+                .toString()
+                ?.replace(/\"/g, '')
+                .split('|')
+            : selectRule?.value.toString()?.replace(/\"/g, ''),
         type: selectRule.refResFormControl
-          ? selectRule.refResFormControl + '&&' + handleType1(selectRule.type)
-          : '' + '&&' + handleType1(selectRule.type),
+          ? selectRule.refResFormControl + '&&' + refResFormControlType
+          : '' + '&&' + 'applicant',
         comparetor: parseInt(selectRule.comparetor),
         id: selectRule.id,
       };
-      onChange(
-        selectRule.refResFormControl + '&&' + handleType1(selectRule.type),
-      );
+      onChange(selectRule.refResFormControl + '&&' + refResFormControlType);
       setTimeout(() => {
         form.setFieldsValue(obj);
       }, 1000);
     }
-  }, [selectRule]);
+  }, [selectRule, rankList]);
 
   const renderForm = () => {
     switch (type) {
@@ -322,15 +341,15 @@ const FormItem = props => {
                 name={[Index, 'value']}
                 rules={[{ required: true, message: '请输入!' }]}
               >
-                <Checkbox.Group>
+                <Select mode="multiple">
                   {itemList?.split('|')?.map((item, index) => {
                     return (
-                      <Checkbox value={item} key={index}>
+                      <Option value={item} key={index}>
                         {item}
-                      </Checkbox>
+                      </Option>
                     );
                   })}
-                </Checkbox.Group>
+                </Select>
               </Form.Item>
             </Col>
             <Col span={10} offset={1} hidden>
@@ -379,26 +398,48 @@ const FormItem = props => {
     let type = values?.split('&&')[1];
     if (type === 'applicant') {
       setType(1);
-    } else if (type === 'number') {
+    } else if (
+      type === 'number' ||
+      type === 'money' ||
+      type === 'totalVacationTime' ||
+      type === 'totalReVacationTime' ||
+      type === 'overTimeTotal' ||
+      type === 'vacationTime'
+    ) {
       setType(2);
-    } else if (type === 'select') {
-      setType(3);
-      let itemLists: any = '';
-      list?.map(item => {
-        if (item.id == values?.split('&&')[0]) {
-          itemLists = item.itemList;
-        }
-      });
-      setItemList(itemLists);
-    } else if (type === 'multiple') {
+      // }
+      //  else if (type === 'select') {
+      //   setType(3);
+      //   let itemLists: any = '';
+      //   list?.map(item => {
+      //     if (item.id == values?.split('&&')[0]) {
+      //       itemLists = item.itemList;
+      //     }
+      //   });
+      //   setItemList(itemLists);
+    } else if (
+      type === 'multiple' ||
+      type === 'select' ||
+      type === 'positionMLevel'
+    ) {
       setType(4);
       let itemLists: any = '';
+      let arr: any = [];
+
       list?.map(item => {
         if (item.id == values?.split('&&')[0]) {
           itemLists = item.itemList;
         }
       });
-      setItemList(itemLists);
+
+      if (type === 'positionMLevel') {
+        rankList?.map(item => {
+          arr.push(item.rankName);
+        });
+        setItemList(arr.join('|'));
+      } else {
+        setItemList(itemLists);
+      }
     } else if (type === 'areatext' || type === 'text') {
       setType(5);
     }
@@ -409,11 +450,17 @@ const FormItem = props => {
       return '申请人';
     } else if (type === 'number') {
       return '数字';
+    } else if (type === 'money') {
+      return '金额';
     } else if (type === 'select') {
       return '单选框';
     } else if (type === 'multiple') {
       return '多选框';
+    } else if (type === 'positionMLevel') {
+      return '职级';
     } else if (type === 'areatext') {
+      return '多行文本';
+    } else if (type === 'text') {
       return '文本框';
     }
   };
@@ -445,8 +492,8 @@ const FormItem = props => {
                     key={item.id}
                     value={item.id + '&&' + item.baseControlType}
                   >
-                    {item.childName}({item.name}) (
-                    {handleType(item.baseControlType)})
+                    {item.childName}({item.name})
+                    {/* ({handleType(item.baseControlType)}) */}
                   </Option>
                 );
               })}

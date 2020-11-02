@@ -179,12 +179,12 @@ export default props => {
         : undefined;
     } else if (
       baseControlType === 'datetime' ||
-      baseControlType === 'VacationStartTime' ||
-      baseControlType === 'VacationEndTime' ||
-      baseControlType === 'OverTimeStart' ||
-      baseControlType === 'OverTimeEnd' ||
-      baseControlType === 'OutCheckStartTime' ||
-      baseControlType === 'OutCheckEndTime'
+      baseControlType === 'vacationStartTime' ||
+      baseControlType === 'vacationEndTime' ||
+      baseControlType === 'overTimeStart' ||
+      baseControlType === 'overTimeEnd' ||
+      baseControlType === 'outCheckStartTime' ||
+      baseControlType === 'outCheckEndTime'
     ) {
       return showValue
         ? moment(showValue, 'YYYY-MM-DD HH:mm')
@@ -593,7 +593,7 @@ export default props => {
     let beginTime: any = undefined;
     let endTime: any = undefined;
     let type: any = undefined; //  请假 销假
-    let typeId = undefined; //
+    let typeId: any = undefined; //
     let setFormId: any = undefined;
     let api: any = undefined;
     // let userCode userCode
@@ -658,7 +658,7 @@ export default props => {
         endTime: endTime,
         startTime: beginTime,
         type: type,
-        typeId: typeId,
+        typeId: typeId?.split('-$-')[0],
         userCode: userCode,
       };
 

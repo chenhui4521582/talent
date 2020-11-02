@@ -46,6 +46,7 @@ export default props => {
   const [visible, setVisible] = useState<boolean>(false);
   const [userShow, setUserShow] = useState<boolean>(false);
   const [selectUserKey, setSelectUserKey] = useState<string[]>([]);
+  const [user, setUser] = useState<any[]>();
   const [form] = Form.useForm();
   const ref = useRef<any>();
   let archiveControlParams: any = [];
@@ -71,6 +72,33 @@ export default props => {
             handleList({});
           } else {
             handleList(res.obj);
+            if (res.obj?.illegalProcessType === 2) {
+              setUserShow(true);
+              setSelectUserKey([res.obj?.illegalProcessorNumber]);
+              setUser([
+                {
+                  key: res.obj?.illegalProcessorNumber,
+                  title: res.obj?.illegalProcessorName,
+                },
+              ]);
+              setTimeout(() => {
+                form.setFieldsValue({
+                  illegalUser: [
+                    {
+                      key: res.obj?.illegalProcessorNumber,
+                      title: res.obj?.illegalProcessorName,
+                    },
+                  ],
+                });
+              }, 500);
+            } else {
+              setUserShow(false);
+            }
+
+            form.setFieldsValue({
+              autoType: res.obj.autoType,
+              illegalProcessType: res.obj.illegalProcessType,
+            });
             setAddOrChange('change');
           }
         }
@@ -95,8 +123,11 @@ export default props => {
             warnStr = '请编辑条件' + item.name + '后再提交';
           }
         }
+
         item?.resRuleCurdParams?.map(items => {
-          items.value = JSON.stringify(items.value);
+          if (item.type == 1) {
+            items.value = JSON.stringify(items.value);
+          }
         });
         // item = item;
         item.resApprovalId = formId;
@@ -156,7 +187,7 @@ export default props => {
       let newData = data;
       function handleData(listItem) {
         listItem?.map((item, index) => {
-          if (item.poi != '0-0') {
+          if (item?.poi != '0-0') {
             steps.push({
               ...item,
               nextNodeId: listItem[index + 1]
@@ -165,8 +196,8 @@ export default props => {
             });
           }
 
-          item.ruleList?.map((ruleItem, ruleItemIndex) => {
-            if (item.poi != '0-0') {
+          item?.ruleList?.map((ruleItem, ruleItemIndex) => {
+            if (item?.poi != '0-0') {
               ruleSets.push({
                 name: ruleItem.name,
                 priority: ruleItem.priority,
@@ -277,13 +308,12 @@ export default props => {
   const handleUserOk = () => {
     console.log(ref.current.getvalue());
     form.setFieldsValue({ illegalUser: ref.current.getvalue() });
+    setUser(ref.current.getvalue());
     setVisible(false);
   };
 
   const renderUser = useMemo(() => {
-    console.log(form.getFieldValue('illegalUser'));
-    let user = form.getFieldValue('illegalUser');
-    if (!user) {
+    if (!user?.length) {
       return (
         <a
           onClick={() => {
@@ -315,7 +345,7 @@ export default props => {
         </>
       );
     }
-  }, [form.getFieldValue('illegalUser'), selectUserKey]);
+  }, [user, selectUserKey]);
   return (
     <>
       <DndProvider backend={HTML5Backend}>

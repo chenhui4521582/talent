@@ -154,8 +154,31 @@ export default () => {
         cancelText="取消"
         okText="确定"
       >
-        <div> 面试官反馈: {curRecord?.interviewEvaluation}</div>
-        <div style={{ marginTop: 20 }}> HR反馈: {curRecord?.hrEvaluation}</div>
+        <div>
+          {' '}
+          面试官反馈:{' '}
+          <div
+            dangerouslySetInnerHTML={{
+              __html: curRecord?.interviewEvaluation?.replace(
+                /\n/g,
+                function() {
+                  return '<br/>';
+                },
+              ),
+            }}
+          />
+        </div>
+        <div style={{ marginTop: 20 }}>
+          {' '}
+          HR反馈:{' '}
+          <div
+            dangerouslySetInnerHTML={{
+              __html: curRecord?.hrEvaluation?.replace(/\n/g, function() {
+                return '<br/>';
+              }),
+            }}
+          />
+        </div>
       </Modal>
     </Card>
   );

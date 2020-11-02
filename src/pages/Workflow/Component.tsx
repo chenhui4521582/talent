@@ -208,7 +208,7 @@ export default props => {
     // 控件名称="overTimeTotal", 加班共计时长
     case 'overTimeTotal':
       return <OverTimeTotal {...props} />;
-    // 控件名称="remainCardNumber"
+    // 控件名称="remainCardNumber" 当月打卡次数
     case 'remainCardNumber':
       return <RemainCardNumber {...props} />;
     // 控件名称="outCheckStartTime", 出差/外出打卡开始时间
@@ -830,7 +830,7 @@ const VacationType = props => {
     >
       {list?.map((item, index) => {
         return (
-          <Select key={index} value={item.id + '-$-' + item.name}>
+          <Select key={index} value={item.typeId + '-$-' + item.name}>
             {item.name}
           </Select>
         );

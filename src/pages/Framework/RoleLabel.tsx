@@ -190,7 +190,7 @@ export default () => {
   };
 
   const renderRoleLable = useMemo(() => {
-    return loop(dataList).map(item => {
+    return loop(dataList).map((item, index) => {
       return (
         <div
           className={
@@ -198,7 +198,8 @@ export default () => {
           }
           key={item.id}
           onClick={() => {
-            setSelectItem(item);
+            console.log(item);
+            setSelectItem(dataList[index]);
             handleSelectRole(item.id);
           }}
         >

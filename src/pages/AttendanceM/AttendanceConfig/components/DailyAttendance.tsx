@@ -258,7 +258,7 @@ export default props => {
               <Form.Item
                 name={['rest', 'breakTimeCalculation']}
                 // noStyle
-                style={{ display: 'block' }}
+                style={{ display: 'block', marginTop: '-6px' }}
                 initialValue={0}
               >
                 <Radio.Group

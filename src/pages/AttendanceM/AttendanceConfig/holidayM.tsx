@@ -40,11 +40,12 @@ export default () => {
   );
 
   const [detail, setDetail] = useState<any>();
-  const [selectDay, setSelectDay] = useState<string>(str);
+  const [selectDay, setSelectDay] = useState<string | undefined>(str);
   const [type, setType] = useState<1 | 2 | 3>();
   const [selectId, setSelectId] = useState<string>();
   const [form1] = Form.useForm();
   const [form2] = Form.useForm();
+  console.log(param);
   useEffect(() => {
     getDetail(false);
   }, [param]);
@@ -107,6 +108,7 @@ export default () => {
 
   const onChange = value => {
     setParam(value.format('YYYY-MM'));
+    // setSelectDay(undefined);
   };
 
   const radioChange = e => {
@@ -372,7 +374,7 @@ export default () => {
         locale={locale}
         onSelect={onSelect}
         onChange={onChange}
-        value={moment(selectDay)}
+        defaultValue={moment(selectDay)}
       />
       <div className="holiday">
         {renderBottom}
