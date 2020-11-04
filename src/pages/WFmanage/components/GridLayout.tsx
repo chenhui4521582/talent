@@ -172,6 +172,11 @@ export default props => {
 
   useEffect(() => {
     let propsList = ruleList?.steps || [];
+    propsList.map(item => {
+      if (item.type === 6) {
+        item.stepNumber = 1000000;
+      }
+    });
     propsList = propsList.sort(compare('stepNumber'));
     let propsRuleSets = ruleList?.ruleSets || [];
     if (propsRuleSets.length === 0) {
@@ -192,9 +197,8 @@ export default props => {
               item.poi = poi + '-' + index;
               {
                 item.ruleList?.map((ruleItem, ruleItemIndex) => {
-                  {
-                    handleData(ruleItem?.list, item.poi + '-' + ruleItemIndex);
-                  }
+                  ruleItem.priority = ruleItemIndex + 1;
+                  handleData(ruleItem?.list, item.poi + '-' + ruleItemIndex);
                 });
               }
             });
@@ -230,9 +234,8 @@ export default props => {
             item.poi = poi + '-' + index;
             {
               item.ruleList?.map((ruleItem, ruleItemIndex) => {
-                {
-                  handleData(ruleItem?.list, item.poi + '-' + ruleItemIndex);
-                }
+                ruleItem.priority = ruleItemIndex + 1;
+                handleData(ruleItem?.list, item.poi + '-' + ruleItemIndex);
               });
             }
           });
@@ -1148,6 +1151,7 @@ export default props => {
               return;
             }
           });
+
         return (
           <div
             style={{

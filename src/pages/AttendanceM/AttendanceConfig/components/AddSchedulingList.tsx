@@ -72,12 +72,15 @@ export default props => {
   }, [scheduleList]);
 
   const handleDetailOk = () => {
-    let form = formRef.current.getvalue;
-    form.validateFields().then(value => {
-      setDetail(value);
-      setVisibleDate(false);
-      // formRef.current?.getvalue?.resetFields();
-    });
+    let value = formRef.current.value;
+    console.log(value);
+    setDetail(value);
+    setVisibleDate(false);
+    // form.validateFields().then(value => {
+    //   console.log(value)
+
+    //   // formRef.current?.getvalue?.resetFields();
+    // });
   };
 
   const handleOk = () => {
@@ -220,12 +223,13 @@ const SchedulingUser = forwardRef((props: any, formRef) => {
   const [dateList, setDateList] = useState<any[]>();
   const [page, setPage] = useState<number>(1);
   const [values, setValues] = useState<any>();
-  const [userDetail, setUserDetail] = useState<any>();
+  const [userDetail, setUserDetail] = useState<any>({});
   const [ownUserList, setOwnUserList] = useState<any[]>();
+  const [allValue, setAllValue] = useState<any>({});
 
   useImperativeHandle(formRef, () => {
     return {
-      getvalue: form,
+      value: allValue,
     };
   });
 
@@ -256,9 +260,6 @@ const SchedulingUser = forwardRef((props: any, formRef) => {
   }, [month, year]);
 
   useEffect(() => {
-    if (!userDetail) {
-      return;
-    }
     let newUserList: any = [];
     let obj: any = {};
     for (let key in userDetail) {
@@ -276,24 +277,37 @@ const SchedulingUser = forwardRef((props: any, formRef) => {
         });
       });
     }
-    console.log(obj);
+    let newVlaue = JSON.parse(JSON.stringify(allValue));
+    let newAllValue = Object.assign(newVlaue, obj);
+    setAllValue(newAllValue);
     form.setFieldsValue(obj);
     setValues(obj);
+    userList?.map(item => {
+      if (!item.key) {
+        item.key = item.code;
+      }
+      if (!item.name) {
+        item.name = item.title;
+      }
+      if (!item.title) {
+        item.title = item.name;
+      }
+      newUserList.push(item);
+    });
 
-    newUserList = newUserList.concat(userList || []);
     let result: any = [];
     let obj1: any = {};
     for (let i = 0; i < newUserList.length; i++) {
-      if (!obj1[newUserList[i].code]) {
+      if (!obj1[newUserList[i].key]) {
         result.push(newUserList[i]);
-        obj1[newUserList[i].code] = true;
+        obj1[newUserList[i].key] = true;
       }
     }
     console.log(result);
     newUserList = result;
 
     setOwnUserList([...new Set(newUserList)]);
-  }, [userDetail, list]);
+  }, [userDetail, list, userList]);
 
   const getWeek = date => {
     let week;
@@ -367,7 +381,7 @@ const SchedulingUser = forwardRef((props: any, formRef) => {
 
   const renderUserList = useMemo(() => {
     let arr: any = [];
-    let newUserList = JSON.parse(JSON.stringify(ownUserList || []));
+    let newUserList = ownUserList || [];
     console.log('newUserList');
     console.log(newUserList);
     newUserList?.map((items, indexs) => {
@@ -444,6 +458,11 @@ const SchedulingUser = forwardRef((props: any, formRef) => {
         form={form}
         onValuesChange={value => {
           console.log(form.getFieldsValue());
+          console.log(allValue);
+          let newVlaue = JSON.parse(JSON.stringify(allValue));
+          let newAllValue = Object.assign(newVlaue, form.getFieldsValue());
+          console.log(newAllValue);
+          setAllValue(newAllValue);
           setTimeout(() => {
             setValues(form.getFieldsValue());
           }, 400);

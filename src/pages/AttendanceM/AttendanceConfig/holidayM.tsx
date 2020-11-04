@@ -58,6 +58,10 @@ export default () => {
       res.obj?.map(item => {
         if (item.date === selectDay) {
           id = item.holidayId;
+          if (!item.welfare) {
+            item.earlyOffHour = 2;
+            item.welfareType = 1;
+          }
           form1.setFieldsValue(item);
           let newType: any = undefined;
           if (item.welfare === 1 && item.workStatus === 0) {
@@ -82,7 +86,7 @@ export default () => {
     setSelectDay(value.format('YYYY-MM-DD'));
     let id = undefined;
     let newType: any = undefined;
-    let formItem = undefined;
+    let formItem: any = undefined;
     detail?.map(item => {
       if (item.date === value.format('YYYY-MM-DD')) {
         id = item.holidayId;
@@ -97,6 +101,10 @@ export default () => {
       }
     });
     if (formItem) {
+      if (!formItem.welfare) {
+        formItem.earlyOffHour = 2;
+        formItem.welfareType = 1;
+      }
       form1.setFieldsValue(formItem);
     } else {
       form1.resetFields();
@@ -176,11 +184,15 @@ export default () => {
       if (type === 1) {
         obj.workStatus = 1;
         obj.earlyOffHour = 0;
+        obj.welfareType = 0;
+        obj.welfare = 0;
       }
 
       if (type === 2) {
         obj.workStatus = 0;
         obj.earlyOffHour = 0;
+        obj.welfareType = 0;
+        obj.welfare = 0;
       }
 
       if (type === 3) {
@@ -283,6 +295,7 @@ export default () => {
               name="welfareType"
               rules={[{ required: true, message: '请选择福利类型!' }]}
               style={{ width: '20vw' }}
+              initialValue={1}
             >
               <Select>
                 <Option value={1}>提前下班</Option>

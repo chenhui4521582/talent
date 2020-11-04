@@ -245,15 +245,23 @@ export default props => {
       if (item.type === 6) {
         if (index === steps?.length - 1) {
           item = {
+            type: item.type,
             nodeType: 4,
             archiveControlParams: item.archiveControlParams,
             archiveId: item.archiveId,
+            resApprovalId: formId,
+            stepType: 1,
+            stepNumber: index,
           };
         } else {
           steps[index - 1] = {
+            type: item.type,
             nodeType: 3,
             archiveControlParams: item.archiveControlParams,
             archiveId: item.archiveId,
+            resApprovalId: formId,
+            stepType: 1,
+            stepNumber: index,
           };
         }
       } else {

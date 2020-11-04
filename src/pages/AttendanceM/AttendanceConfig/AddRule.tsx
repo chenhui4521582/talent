@@ -92,6 +92,8 @@ export default props => {
   }, []);
 
   const handleChangeUserList = list => {
+    console.log(list);
+    console.log('list');
     setUserList(list);
   };
 

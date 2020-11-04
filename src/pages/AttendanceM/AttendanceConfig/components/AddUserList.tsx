@@ -41,18 +41,16 @@ export default props => {
         code: item.code,
         type: item.type,
       });
-      if (item.type) {
+      if (item.type === 1) {
         item.name = item.codeName;
         newList1 = newList1.concat(handleList(handleddata1(item)));
-        setUserList(newList1);
       } else {
         item.name = item.codeName;
         userObj[item.code] = [item];
         newList1.push(userObj);
-        setUserList(newList1);
       }
     });
-
+    setUserList(newList1);
     setList(newList);
   }, [ruleDetail, organizationJson]);
 
@@ -101,16 +99,23 @@ export default props => {
     ref.current.getvalue().map(item => {
       let userObj: any = {};
 
-      if (item.level) {
+      if (
+        item?.memberList ||
+        item?.children ||
+        item?.memberList?.length ||
+        item?.children?.length
+      ) {
+        if (!item?.children || !item?.children?.length) {
+          item.children = item.memberList;
+        }
         newArr = newArr.concat(handleList(item));
-        setUserList(newArr);
       } else {
-        userObj[item.code] = [item];
+        userObj[item.code || item.key] = [item];
         newUserList.push(userObj);
-        setUserList(newUserList);
       }
     });
-
+    newArr = newArr.concat(newUserList);
+    setUserList(newArr);
     setList(newList);
   };
 
@@ -118,7 +123,7 @@ export default props => {
     if (data?.children) {
       let userObj: any = {};
       let newArr: any = [];
-      let newUserList = JSON.parse(JSON.stringify(userList || []));
+      let newUserList = userList || [];
       const handleItem = list => {
         for (let i = 0; i < list?.length; i++) {
           if (!list[i].level) {
@@ -131,7 +136,7 @@ export default props => {
       };
 
       handleItem(data?.children);
-      userObj[data.code] = newArr;
+      userObj[data.code || data.key] = newArr;
       newUserList.push(userObj);
       return newUserList;
     } else {

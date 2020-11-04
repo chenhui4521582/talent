@@ -157,6 +157,7 @@ export default props => {
 
       let res: GlobalResParams<string> = await saveVacationRecord(obj);
       if (res.status === 200) {
+        form.resetFields();
         notification['success']({
           message: res.msg,
           description: '',
@@ -194,7 +195,6 @@ export default props => {
           type="primary"
           onClick={() => {
             setVisible(true);
-            form.resetFields();
           }}
         >
           发起扣假
@@ -209,7 +209,7 @@ export default props => {
         okText="确认"
         cancelText="取消"
         onOk={handleOk}
-        // maskClosable={false}
+        maskClosable={false}
         onCancel={() => {
           setVisible(false);
         }}
@@ -300,6 +300,7 @@ export default props => {
         }}
         onCancel={() => {
           setVisible1(false);
+          form.resetFields();
         }}
       >
         <UserListTable list={list} />

@@ -15,7 +15,15 @@ import {
 } from './services/detail';
 
 import { GlobalResParams } from '@/types/ITypes';
-import { Card, Descriptions, Button, Form, notification, Table } from 'antd';
+import {
+  Card,
+  Descriptions,
+  Button,
+  Form,
+  notification,
+  Table,
+  message,
+} from 'antd';
 import moment from 'moment';
 import Temp from './Component';
 import update from 'immutability-helper';
@@ -115,7 +123,7 @@ export default props => {
         });
         if (json1.status === 200) {
           let obj = {};
-          obj[vacationTimeId] = json1.obj?.currentLeft;
+          obj[vacationTimeId] = json1.obj?.currentLeft + '天';
           console.log(obj);
           form.setFieldsValue(obj);
         }
@@ -126,7 +134,7 @@ export default props => {
         });
         if (json1.status === 200) {
           let obj = {};
-          obj[remainCardNumberId] = json1.obj?.surplus;
+          obj[remainCardNumberId] = json1.obj?.surplus + '次';
           console.log(obj);
           form.setFieldsValue(obj);
         }
@@ -651,6 +659,15 @@ export default props => {
       }
     });
 
+    if (
+      new Date(beginTime).getTime() &&
+      new Date(endTime).getTime() &&
+      beginTime >= endTime
+    ) {
+      message.warning('开始时间需要小于结束时间');
+      return;
+    }
+
     let objParam: any = undefined;
     if (apiType === 1) {
       api = vacationTime;
@@ -658,7 +675,7 @@ export default props => {
         endTime: endTime,
         startTime: beginTime,
         type: type,
-        typeId: typeId?.split('-$-')[0],
+        typeId: parseInt(typeId?.split('-$-')[0]),
         userCode: userCode,
       };
 
@@ -689,19 +706,23 @@ export default props => {
       if (json.status === 200) {
         if (paramsType === 1) {
           let obj0 = {};
-          obj0[setFormId] = allValues;
-          console.log(obj0);
-          form.setFieldsValue(obj0);
+          if (json.obj.isTrue) {
+            obj0[setFormId] =
+              json.obj.time + json.obj.unit === 0 ? '小时' : '天';
+            form.setFieldsValue(obj0);
+          } else {
+            message.warning(json.obj.reason || '参数异常');
+          }
         }
         if (paramsType === 2 && setFormId) {
           let obj = {};
-          obj[setFormId] = json.obj?.hour;
+          obj[setFormId] = json.obj?.hour + '小时';
           console.log(obj);
           form.setFieldsValue(obj);
         }
         if (paramsType === 3 && setFormId) {
           let obj1: any = {};
-          obj1[setFormId] = json.obj?.hour;
+          obj1[setFormId] = json.obj?.hour + '小时';
           console.log(obj1);
           form.setFieldsValue(obj1);
         }
