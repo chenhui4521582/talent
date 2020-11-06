@@ -3,7 +3,7 @@ import {
   wfFormDetail,
   tsWfFormDetail,
   tsFormChildlist,
-  tsControlList,
+  getUnitType,
   saveTaskForm,
 } from './services/home';
 import {
@@ -29,6 +29,11 @@ import Temp from './Component';
 import update from 'immutability-helper';
 import './style/home.less';
 
+interface IUnitList {
+  id: number;
+  desc: string;
+}
+
 export default props => {
   const formId = props.match.params.id;
 
@@ -37,6 +42,7 @@ export default props => {
   const [mount, setMount] = useState<Boolean>(false);
   const [idItemList, setIdItemList] = useState<any[]>([]);
   const [userCode, setUserCode] = useState<string | undefined>(undefined);
+  const [unitList, steUnitList] = useState<IUnitList[]>();
 
   const [form] = Form.useForm();
   useEffect(() => {
@@ -44,10 +50,15 @@ export default props => {
   }, []);
   const getFrom = async () => {
     let idItem: any = [];
-    let json: GlobalResParams<tsWfFormDetail> = await wfFormDetail(formId);
     let applyUser: any = undefined;
     let remainCardNumberId: any = undefined;
     let time: any = undefined;
+    let json: GlobalResParams<tsWfFormDetail> = await wfFormDetail(formId);
+    let json1: GlobalResParams<IUnitList[]> = await getUnitType();
+    if (json1.status === 200) {
+      steUnitList(json1?.obj);
+    }
+
     if (json.status === 200) {
       setMount(true);
       let obj = json.obj || {};
@@ -392,12 +403,12 @@ export default props => {
         } else {
           if (
             item.baseControlType === 'datetime' ||
-            item.baseControlType === 'VacationStartTime' ||
-            item.baseControlType === 'VacationEndTime' ||
-            item.baseControlType === 'OverTimeStart' ||
-            item.baseControlType === 'OverTimeEnd' ||
-            item.baseControlType === 'OutCheckStartTime' ||
-            item.baseControlType === 'OutCheckEndTime'
+            item.baseControlType === 'vacationStartTime' ||
+            item.baseControlType === 'vacationEndTime' ||
+            item.baseControlType === 'overTimeStart' ||
+            item.baseControlType === 'overTimeEnd' ||
+            item.baseControlType === 'outCheckStartTime' ||
+            item.baseControlType === 'outCheckEndTime'
           ) {
             subList.push({
               id: item.id,
@@ -465,6 +476,7 @@ export default props => {
           }
         }
       });
+
       for (let key in fromSubData) {
         if (key.split('-')[1] && key.split('-')[0]) {
           if (key.split('-')[0] === 'date') {
@@ -475,12 +487,12 @@ export default props => {
             });
           } else if (
             key.split('-')[0] === 'datetime' ||
-            key.split('-')[0] === 'VacationStartTime' ||
-            key.split('-')[0] === 'VacationEndTime' ||
-            key.split('-')[0] === 'OverTimeStart' ||
-            key.split('-')[0] === 'OverTimeEnd' ||
-            key.split('-')[0] === 'OutCheckStartTime' ||
-            key.split('-')[0] === 'OutCheckEndTime'
+            key.split('-')[0] === 'vacationStartTime' ||
+            key.split('-')[0] === 'vacationEndTime' ||
+            key.split('-')[0] === 'overTimeStart' ||
+            key.split('-')[0] === 'overTimeEnd' ||
+            key.split('-')[0] === 'outCheckStartTime' ||
+            key.split('-')[0] === 'outCheckEndTime'
           ) {
             subList.push({
               id: parseInt(key.split('-')[1]),
@@ -549,6 +561,47 @@ export default props => {
                 : '',
               multipleNumber: parseInt(key.split('-')[2]),
             });
+          } else if (
+            key.split('-')[0] === 'totalVacationTime' ||
+            key.split('-')[0] === 'totalReVacationTime' ||
+            key.split('-')[0] === 'overTimeTotal' ||
+            key.split('-')[0] === 'outCheckTime'
+          ) {
+            // 设置单位
+            let unitType: any = null;
+            let unitValue = fromSubData[key]
+              ? fromSubData[key].split('-$-')[0]
+              : '';
+            let unitShowValue = fromSubData[key]
+              ? fromSubData[key].split('-$-')[1]
+              : '';
+            unitList?.map(unitItem => {
+              if (unitShowValue?.indexOf(unitItem.desc) > -1) {
+                unitType = unitItem.id;
+              }
+            });
+            subList.push({
+              id: parseInt(key.split('-')[1]),
+              value: unitValue?.replcae(/'小时'/g, '')?.replcae(/'天'/g, ''),
+              showValue: unitShowValue
+                ?.replcae(/'小时'/g, '')
+                ?.replcae(/'天'/g, ''),
+              multipleNumber: parseInt(key.split('-')[2]),
+              unitType: unitType,
+            });
+          } else if (key.split('-')[0] === 'vacationTime') {
+            let unitValue = fromSubData[key]
+              ? fromSubData[key].split('-$-')[0]
+              : '';
+            let unitShowValue = fromSubData[key]
+              ? fromSubData[key].split('-$-')[1]
+              : '';
+            subList.push({
+              id: parseInt(key.split('-')[1]),
+              value: unitValue?.replace(/'次'/g, ''),
+              showValue: unitShowValue?.replace(/'次'/g, ''),
+              multipleNumber: parseInt(key.split('-')[2]),
+            });
           } else if (key.split('-')[0] === 'files') {
             fromSubData[key]?.map(file => {
               wfTaskFormFilesCrudParamList.push({
@@ -604,9 +657,6 @@ export default props => {
     let typeId: any = undefined; //
     let setFormId: any = undefined;
     let api: any = undefined;
-    // let userCode userCode
-    console.log(changedValues);
-    console.log(allValues);
     idItemList?.map((item, index) => {
       if (
         item.baseControlType === 'totalVacationTime' ||
@@ -701,6 +751,11 @@ export default props => {
         getFormTotle(3);
       }
     }
+
+    if (!changedValues?.setFormId) {
+      return;
+    }
+
     async function getFormTotle(paramsType) {
       let json: GlobalResParams<any> = await api(objParam);
       if (json.status === 200) {
@@ -708,7 +763,7 @@ export default props => {
           let obj0 = {};
           if (json.obj.isTrue) {
             obj0[setFormId] =
-              json.obj.time + json.obj.unit === 0 ? '小时' : '天';
+              json.obj.time + (json.obj.unit === 0 ? '小时' : '天');
             form.setFieldsValue(obj0);
           } else {
             message.warning(json.obj.reason || '参数异常');
@@ -786,7 +841,7 @@ const AutoTable = props => {
         dataIndex: item.baseControlType + '-' + item.id,
         key: item.id,
         align: 'left',
-        width: (100 / (list.length + 1)) * item.colspan - 1.8 + '%',
+        width: item.colspan * 120,
         ...item,
       });
       dataItem[item.baseControlType + '-' + item.id] = { ...item };
@@ -841,7 +896,7 @@ const AutoTable = props => {
         dataIndex: item.baseControlType + '-' + item.id,
         key: item.id,
         align: 'left',
-        width: (100 / (list.length + 1)) * item.colspan - 1.8 + '%',
+        width: item.colspan * 120,
         ...item,
       });
       dataItem[item.baseControlType + '-' + item.id] = { ...item };
@@ -911,23 +966,32 @@ const AutoTable = props => {
   };
 
   return (
-    <Table
-      title={() => {
-        return (
-          <Button
-            onClick={() => {
-              let newData = JSON.parse(JSON.stringify(dataSource));
-              newData.push(template);
-              setDataSource(newData);
-            }}
-          >
-            新增
-          </Button>
-        );
+    <div
+      style={{
+        marginBottom: 40,
+        width: '90%',
+        marginLeft: '5%',
+        overflowX: 'auto',
       }}
-      columns={columns}
-      style={{ marginBottom: 40, width: '90%', marginLeft: '5%' }}
-      dataSource={handleDataSource(dataSource)}
-    />
+    >
+      <Table
+        title={() => {
+          return (
+            <Button
+              onClick={() => {
+                let newData = JSON.parse(JSON.stringify(dataSource));
+                newData.push(template);
+                setDataSource(newData);
+              }}
+            >
+              新增
+            </Button>
+          );
+        }}
+        columns={columns}
+        style={{ width: columns.length * 120 }}
+        dataSource={handleDataSource(dataSource)}
+      />
+    </div>
   );
 };

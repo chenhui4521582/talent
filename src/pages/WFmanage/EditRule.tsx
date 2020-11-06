@@ -214,6 +214,8 @@ export default props => {
       return handleData(newData);
     };
     droopData1(value);
+    let arr: any = [];
+    let arr1: any = [];
     steps?.map((item, index) => {
       item.stepType = 1;
       item.stepNumber = index;
@@ -224,7 +226,7 @@ export default props => {
         item.nodeId = item.poi;
         delete item.id;
       }
-      if (item.ruleList >= 2) {
+      if (item?.ruleList?.length >= 2) {
         item.condition = 1;
       } else {
         item.condition = 0;
@@ -243,27 +245,17 @@ export default props => {
       }
 
       if (item.type === 6) {
-        if (index === steps?.length - 1) {
-          item = {
-            type: item.type,
-            nodeType: 4,
-            archiveControlParams: item.archiveControlParams,
-            archiveId: item.archiveId,
-            resApprovalId: formId,
-            stepType: 1,
-            stepNumber: index,
-          };
-        } else {
-          steps[index - 1] = {
-            type: item.type,
-            nodeType: 3,
-            archiveControlParams: item.archiveControlParams,
-            archiveId: item.archiveId,
-            resApprovalId: formId,
-            stepType: 1,
-            stepNumber: index,
-          };
-        }
+        item = {
+          type: item.type,
+          nodeType: 4,
+          archiveControlParams: item.archiveControlParams,
+          archiveId: item.archiveId,
+          resApprovalId: formId,
+          stepType: 1,
+          stepNumber: index,
+          nodeId: item.nodeId,
+          stepName: item.stepName,
+        };
       } else {
         delete item.archiveId;
         delete item.archiveControlParams;
@@ -280,17 +272,27 @@ export default props => {
       }
       item.stepType = 1;
       item.stepNumber = index;
+      if (item.type === 6) {
+        arr.push(item);
+      } else {
+        arr1.push(item);
+      }
     });
+    if (arr1[0]) {
+      arr1[0].nodeType = 1;
+    }
+    if (arr1[arr1?.length - 1]) {
+      arr1[arr1?.length - 1].nodeType = 3;
+    }
 
     ruleSets?.map(item => {
       item.resApprovalId = formId;
     });
-
     console.log(ruleSets);
     console.log(steps);
     data1 = {
       ruleSets,
-      steps,
+      steps: arr1.concat(arr),
     };
   };
 

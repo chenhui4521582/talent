@@ -5,16 +5,8 @@ import React, {
   useImperativeHandle,
   forwardRef,
 } from 'react';
-import {
-  Input,
-  Radio,
-  Form,
-  Select,
-  Col,
-  Row,
-  InputNumber,
-  Checkbox,
-} from 'antd';
+import { Input, Radio, Form, Select, Col, Row, InputNumber } from 'antd';
+import { getUnitType } from '@/pages/Workflow/services/home';
 import { GlobalResParams } from '@/types/ITypes';
 import { useRankM } from '@/models/global';
 import { getFormSimple } from '../services/rule';
@@ -29,6 +21,11 @@ interface IListItem {
   itemList: string;
 }
 
+interface IUnitList {
+  id: number;
+  desc: string;
+}
+
 export default forwardRef((props: any, formRef) => {
   const { selectRule } = props;
   const [form] = Form.useForm();
@@ -36,6 +33,17 @@ export default forwardRef((props: any, formRef) => {
   const [controlList, setControlList] = useState<IListItem[]>();
   const [numberList, setNumberList] = useState<any[]>([1]);
   const [formList, setFormList] = useState<any>();
+  const [unitList, steUnitList] = useState<IUnitList[]>();
+
+  useEffect(() => {
+    async function getUnitList() {
+      let json1: GlobalResParams<IUnitList[]> = await getUnitType();
+      if (json1.status === 200) {
+        steUnitList(json1?.obj);
+      }
+    }
+    getUnitList();
+  }, []);
 
   useEffect(() => {
     async function getControlList() {
@@ -90,7 +98,7 @@ export default forwardRef((props: any, formRef) => {
 
   const handleAdd = () => {
     let newList = JSON.parse(JSON.stringify(numberList || []));
-    newList?.push(1);
+    newList?.push(newList?.length || 0);
     setNumberList(newList);
   };
 
@@ -113,10 +121,11 @@ export default forwardRef((props: any, formRef) => {
           form={form}
           selectRule={item}
           numberList={numberList}
+          unitList={unitList}
         />
       );
     });
-  }, [numberList, controlList, selectRule]);
+  }, [numberList, controlList, selectRule, unitList]);
 
   return (
     <>
@@ -160,10 +169,19 @@ export default forwardRef((props: any, formRef) => {
 });
 
 const FormItem = props => {
-  const { list, Index, handleDelete, form, selectRule, numberList } = props;
+  const {
+    list,
+    Index,
+    handleDelete,
+    form,
+    selectRule,
+    numberList,
+    unitList,
+  } = props;
   const [type, setType] = useState<number>();
   const [itemList, setItemList] = useState<string>();
   const { rankList } = useRankM();
+  const [showUnit, setShowUnit] = useState<boolean>(false);
 
   useEffect(() => {
     if (type === 2 || type === 5) {
@@ -213,6 +231,10 @@ const FormItem = props => {
         comparetor: parseInt(selectRule.comparetor),
         id: selectRule.id,
       };
+      if (selectRule.unitType) {
+        obj[Index].unitType = selectRule.unitType;
+      }
+
       onChange(selectRule.refResFormControl + '&&' + refResFormControlType);
       setTimeout(() => {
         form.setFieldsValue(obj);
@@ -341,7 +363,7 @@ const FormItem = props => {
                 name={[Index, 'value']}
                 rules={[{ required: true, message: '请输入!' }]}
               >
-                <Select mode="multiple">
+                <Select mode="multiple" placeholder="请选择">
                   {itemList?.split('|')?.map((item, index) => {
                     return (
                       <Option value={item} key={index}>
@@ -396,6 +418,18 @@ const FormItem = props => {
 
   const onChange = values => {
     let type = values?.split('&&')[1];
+    let id = values?.split('&&')[0];
+    let unitItem: any = {};
+    list.map(item => {
+      if (item.id == id) {
+        unitItem = item;
+      }
+    });
+    if (unitItem?.unitType) {
+      setShowUnit(true);
+    } else {
+      setShowUnit(false);
+    }
     if (type === 'applicant') {
       setType(1);
     } else if (
@@ -407,16 +441,6 @@ const FormItem = props => {
       type === 'vacationTime'
     ) {
       setType(2);
-      // }
-      //  else if (type === 'select') {
-      //   setType(3);
-      //   let itemLists: any = '';
-      //   list?.map(item => {
-      //     if (item.id == values?.split('&&')[0]) {
-      //       itemLists = item.itemList;
-      //     }
-      //   });
-      //   setItemList(itemLists);
     } else if (
       type === 'multiple' ||
       type === 'select' ||
@@ -442,26 +466,6 @@ const FormItem = props => {
       }
     } else if (type === 'areatext' || type === 'text') {
       setType(5);
-    }
-  };
-
-  const handleType = type => {
-    if (type === 'applicant') {
-      return '申请人';
-    } else if (type === 'number') {
-      return '数字';
-    } else if (type === 'money') {
-      return '金额';
-    } else if (type === 'select') {
-      return '单选框';
-    } else if (type === 'multiple') {
-      return '多选框';
-    } else if (type === 'positionMLevel') {
-      return '职级';
-    } else if (type === 'areatext') {
-      return '多行文本';
-    } else if (type === 'text') {
-      return '文本框';
     }
   };
 
@@ -493,7 +497,6 @@ const FormItem = props => {
                     value={item.id + '&&' + item.baseControlType}
                   >
                     {item.childName}({item.name})
-                    {/* ({handleType(item.baseControlType)}) */}
                   </Option>
                 );
               })}
@@ -501,6 +504,24 @@ const FormItem = props => {
           </Form.Item>
         </Col>
         {renderForm()}
+        {showUnit ? (
+          <Col span={8} offset={1}>
+            <Form.Item
+              name={[Index, 'unitType']}
+              rules={[{ required: true, message: '请选择!' }]}
+            >
+              <Select placeholder="请选择" allowClear>
+                {unitList?.map(item => {
+                  return (
+                    <Option key={item.id} value={item.id}>
+                      {item.desc}
+                    </Option>
+                  );
+                })}
+              </Select>
+            </Form.Item>
+          </Col>
+        ) : null}
       </Row>
     </>
   ) : null;

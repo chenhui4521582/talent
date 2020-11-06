@@ -211,6 +211,7 @@ export default props => {
         onOk={handleOk}
         maskClosable={false}
         onCancel={() => {
+          form.resetFields();
           setVisible(false);
         }}
       >
@@ -300,7 +301,6 @@ export default props => {
         }}
         onCancel={() => {
           setVisible1(false);
-          form.resetFields();
         }}
       >
         <UserListTable list={list} />

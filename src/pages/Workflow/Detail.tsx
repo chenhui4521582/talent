@@ -25,7 +25,7 @@ import {
   overTime,
   getOutCheckTime,
 } from './services/detail';
-import { tsFormChildlist } from './services/home';
+import { tsFormChildlist, getUnitType } from './services/home';
 import { GlobalResParams } from '@/types/ITypes';
 import { ColumnProps } from 'antd/es/table';
 import moment from 'moment';
@@ -37,6 +37,10 @@ interface tsBtn {
   applicant: boolean;
   approver: boolean;
   submit: boolean;
+}
+interface IUnitList {
+  id: number;
+  desc: string;
 }
 
 const status = {
@@ -105,6 +109,7 @@ export default props => {
   const [btnObj, setBtnObj] = useState<tsBtn>();
   const [form] = Form.useForm();
   const [userCode, setUserCode] = useState<string | undefined>(undefined);
+  const [unitList, steUnitList] = useState<IUnitList[]>();
 
   useEffect(() => {
     getData();
@@ -118,6 +123,12 @@ export default props => {
     let json: GlobalResParams<tsDetail> = await getDetail(formId);
     let btnJson: GlobalResParams<tsBtn> = await getButtonStatus(formId);
     let LogJson: GlobalResParams<tsLog[]> = await gefLogList(formId);
+
+    let json1: GlobalResParams<IUnitList[]> = await getUnitType();
+    if (json1.status === 200) {
+      steUnitList(json1?.obj);
+    }
+
     if (json.status === 200) {
       setMount(true);
       let obj = json.obj || {};
@@ -331,6 +342,15 @@ export default props => {
                       style={{ maxWidth: '300px' }}
                     >
                       {groupItem.list.map(listItem => {
+                        unitList?.map(unitItem => {
+                          if (
+                            unitItem.id == listItem?.unitType &&
+                            listItem?.unitType != 0
+                          ) {
+                            listItem.showValue =
+                              listItem.showValue + unitItem.desc;
+                          }
+                        });
                         return (
                           <div
                             key={listItem.id}
@@ -376,6 +396,14 @@ export default props => {
                     </Descriptions.Item>
                   );
                 } else {
+                  unitList?.map(unitItem => {
+                    if (
+                      unitItem.id == groupItem?.unitType &&
+                      groupItem?.unitType != 0
+                    ) {
+                      groupItem.showValue = groupItem.showValue + unitItem.desc;
+                    }
+                  });
                   return (
                     <Descriptions.Item
                       key={groupItem.id}
@@ -487,8 +515,8 @@ export default props => {
         } else {
           if (
             item.baseControlType === 'datetime' ||
-            item.baseControlType === 'VacationStartTime' ||
-            item.baseControlType === 'VacationEndTime' ||
+            item.baseControlType === 'vacationStartTime' ||
+            item.baseControlType === 'vacationEndTime' ||
             item.baseControlType === 'overTimeStart' ||
             item.baseControlType === 'overTimeEnd' ||
             item.baseControlType === 'outCheckStartTime' ||
@@ -579,8 +607,8 @@ export default props => {
             });
           } else if (
             key.split('-')[0] === 'datetime' ||
-            key.split('-')[0] === 'VacationStartTime' ||
-            key.split('-')[0] === 'VacationEndTime' ||
+            key.split('-')[0] === 'vacationStartTime' ||
+            key.split('-')[0] === 'vacationEndTime' ||
             key.split('-')[0] === 'overTimeStart' ||
             key.split('-')[0] === 'overTimeEnd' ||
             key.split('-')[0] === 'outCheckStartTime' ||
@@ -598,6 +626,47 @@ export default props => {
               showValue: fromSubData[key]
                 ? fromSubData[key].split('-$-')[1]
                 : '',
+              multipleNumber: parseInt(key.split('-')[2]),
+            });
+          } else if (
+            key.split('-')[0] === 'totalVacationTime' ||
+            key.split('-')[0] === 'totalReVacationTime' ||
+            key.split('-')[0] === 'overTimeTotal' ||
+            key.split('-')[0] === 'outCheckTime'
+          ) {
+            // 设置单位
+            let unitType: any = null;
+            let unitValue = fromSubData[key]
+              ? fromSubData[key].split('-$-')[0]
+              : '';
+            let unitShowValue = fromSubData[key]
+              ? fromSubData[key].split('-$-')[1]
+              : '';
+            unitList?.map(unitItem => {
+              if (unitShowValue?.indexOf(unitItem.desc) > -1) {
+                unitType = unitItem.id;
+              }
+            });
+            subList.push({
+              id: parseInt(key.split('-')[1]),
+              value: unitValue?.replcae(/'小时'/g, '')?.replcae(/'天'/g, ''),
+              showValue: unitShowValue
+                ?.replcae(/'小时'/g, '')
+                ?.replcae(/'天'/g, ''),
+              multipleNumber: parseInt(key.split('-')[2]),
+              unitType: unitType,
+            });
+          } else if (key.split('-')[0] === 'vacationTime') {
+            let unitValue = fromSubData[key]
+              ? fromSubData[key].split('-$-')[0]
+              : '';
+            let unitShowValue = fromSubData[key]
+              ? fromSubData[key].split('-$-')[1]
+              : '';
+            subList.push({
+              id: parseInt(key.split('-')[1]),
+              value: unitValue?.replace(/'次'/g, ''),
+              showValue: unitShowValue?.replace(/'次'/g, ''),
               multipleNumber: parseInt(key.split('-')[2]),
             });
           } else if (
@@ -788,9 +857,6 @@ export default props => {
     let typeId: any = undefined; //
     let setFormId: any = undefined;
     let api: any = undefined;
-    // let userCode userCode
-    console.log(changedValues);
-    console.log(allValues);
     idItemList?.map((item, index) => {
       if (
         item.baseControlType === 'totalVacationTime' ||
@@ -886,6 +952,10 @@ export default props => {
       }
     }
 
+    if (!changedValues?.setFormId) {
+      return;
+    }
+
     async function getFormTotle(paramsType) {
       let json: GlobalResParams<any> = await api(objParam);
       if (json.status === 200) {
@@ -893,7 +963,7 @@ export default props => {
           let obj0 = {};
           if (json.obj.isTrue) {
             obj0[setFormId] =
-              json.obj.time + json.obj.unit === 0 ? '小时' : '天';
+              json.obj.time + (json.obj.unit === 0 ? '小时' : '天');
             form.setFieldsValue(obj0);
           } else {
             message.warning(json.obj.reason || '参数异常');
@@ -1132,35 +1202,44 @@ const AutoTable = props => {
     return objArr;
   };
   return (
-    <Table
-      title={() => {
-        if (isRemove) {
-          return (
-            <Button
-              onClick={() => {
-                let newData = JSON.parse(JSON.stringify(dataSource));
-                let newTemplate = JSON.parse(JSON.stringify(template));
-                newTemplate.map(item => {
-                  item.multipleNumber = parseInt(newData.length) + 1;
-                  item.value = null;
-                  item.showValue = null;
-                  item.fileList = [];
-                });
-                newTemplate.isRemove = true;
-                newData.push(newTemplate);
-                setDataSource(newData);
-              }}
-            >
-              新增
-            </Button>
-          );
-        } else {
-          return null;
-        }
+    <div
+      style={{
+        marginBottom: 40,
+        width: '90%',
+        marginLeft: '5%',
+        overflowX: 'auto',
       }}
-      columns={columns}
-      style={{ marginBottom: 40, width: '90%', marginLeft: '5%' }}
-      dataSource={handleDataSource(dataSource)}
-    />
+    >
+      <Table
+        title={() => {
+          if (isRemove) {
+            return (
+              <Button
+                onClick={() => {
+                  let newData = JSON.parse(JSON.stringify(dataSource));
+                  let newTemplate = JSON.parse(JSON.stringify(template));
+                  newTemplate.map(item => {
+                    item.multipleNumber = parseInt(newData.length) + 1;
+                    item.value = null;
+                    item.showValue = null;
+                    item.fileList = [];
+                  });
+                  newTemplate.isRemove = true;
+                  newData.push(newTemplate);
+                  setDataSource(newData);
+                }}
+              >
+                新增
+              </Button>
+            );
+          } else {
+            return null;
+          }
+        }}
+        columns={columns}
+        style={{ width: columns.length * 120 }}
+        dataSource={handleDataSource(dataSource)}
+      />
+    </div>
   );
 };

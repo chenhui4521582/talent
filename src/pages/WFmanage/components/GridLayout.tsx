@@ -1137,6 +1137,9 @@ export default props => {
     function handleData(listItem, poi) {
       let show = true;
       return listItem?.map((item, index) => {
+        if (item.type === 6 && !item.stepName) {
+          item.stepName = '归档';
+        }
         if (!item || item == 'undefined') {
           listItem.splice(index, 1);
           return;
@@ -1161,7 +1164,7 @@ export default props => {
               height: 'auto',
             }}
           >
-            {item.stepName ? (
+            {item.stepName || item.type === 6 ? (
               <div
                 style={{
                   display: 'flex',

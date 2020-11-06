@@ -249,7 +249,12 @@ export default props => {
               <Circle
                 radius={radius}
                 center={[center.location.lng, center.location.lat]}
-                style={{ opacity: '0.1' }}
+                style={{
+                  opacity: '0.1',
+                  fillColor: '#409fff',
+                  strokeWeight: '1',
+                  strokeColor: '#409afc',
+                }}
                 bubble={true}
               />
             ) : null}

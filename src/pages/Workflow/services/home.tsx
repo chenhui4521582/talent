@@ -175,3 +175,10 @@ export async function myListPageWt(params: PaginationTableParams) {
     data: params,
   });
 }
+
+//获取单位列表
+export async function getUnitType() {
+  return request(`/api/talent/attendenceControl/getUnitType`, {
+    method: 'POST',
+  });
+}

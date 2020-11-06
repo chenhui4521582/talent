@@ -85,7 +85,7 @@ export default (props: Iprops) => {
       dataIndex: 'action',
       key: 'action',
       align: 'center',
-      // width: '6em',
+      width: '6em',
       render: (_, record, index) => <span>{index + 1}</span>,
     });
     fromItem?.list.map((item, i) => {
@@ -297,25 +297,34 @@ export default (props: Iprops) => {
           }}
         />
       </div>
-      <Table
-        style={{ marginBottom: 40, marginLeft: '5%', width: '80%' }}
-        title={() => {
-          return (
-            <Button
-              style={{ marginLeft: 8, float: 'right' }}
-              onClick={e => {
-                e.preventDefault();
-                handleShowModal('add');
-              }}
-            >
-              添列
-            </Button>
-          );
+      <div
+        style={{
+          marginBottom: 40,
+          marginLeft: '5%',
+          overflowX: 'auto',
+          width: '80%',
         }}
-        columns={columns}
-        dataSource={handleDataSource(dataSource)}
-        pagination={false}
-      />
+      >
+        <Table
+          style={{ width: columns.length * 120 }}
+          title={() => {
+            return (
+              <Button
+                style={{ marginLeft: 8, float: 'right' }}
+                onClick={e => {
+                  e.preventDefault();
+                  handleShowModal('add');
+                }}
+              >
+                添列
+              </Button>
+            );
+          }}
+          columns={columns}
+          dataSource={handleDataSource(dataSource)}
+          pagination={false}
+        />
+      </div>
       <Modal
         visible={!!visible}
         title={visible === 'add' ? '新增' : '修改'}
@@ -418,6 +427,7 @@ const DorpItemTitle = (props: Ipropss) => {
       style={{
         padding: '5px 16px',
         opacity: isDragging ? 0.2 : 1,
+        minWidth: '60px',
       }}
     >
       <span className={colItem.isRequired ? 'label-required' : ''}>
