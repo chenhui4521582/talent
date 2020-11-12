@@ -38,10 +38,8 @@ let data2 = [];
 let flag = true;
 export default props => {
   const [listOne, setListOne] = useState<tsStep[]>([]);
-  const [listTwo, setListTwo] = useState<tsStep[]>([]);
   const [fromName, setFromName] = useState<string>('审批流程');
   const [addOrChange, setAddOrChange] = useState<'add' | 'change'>('change');
-  const [controlModels, setControlModels] = useState<any[]>();
   const [formId, setFormId] = useState<string>();
   const [visible, setVisible] = useState<boolean>(false);
   const [userShow, setUserShow] = useState<boolean>(false);
@@ -49,7 +47,6 @@ export default props => {
   const [user, setUser] = useState<any[]>();
   const [form] = Form.useForm();
   const ref = useRef<any>();
-  let archiveControlParams: any = [];
 
   useEffect(() => {
     getDetail();
@@ -125,7 +122,7 @@ export default props => {
         }
 
         item?.resRuleCurdParams?.map(items => {
-          if (item.type == 1) {
+          if (items.type == 1) {
             items.value = JSON.stringify(items.value);
           }
         });
@@ -188,8 +185,23 @@ export default props => {
       function handleData(listItem) {
         listItem?.map((item, index) => {
           if (item?.poi != '0-0') {
+            let nodeType = 2;
+            if (index < listItem?.length - 1) {
+              nodeType = 2;
+            } else {
+              nodeType = 3;
+            }
+
+            if (item.type === 6) {
+              nodeType = 4;
+              if (listItem?.length >= 2) {
+                steps[steps.length - 1].nodeType = 3;
+              }
+            }
             steps.push({
               ...item,
+              archiveControlParams: item.archiveControlParams,
+              nodeType: nodeType,
               nextNodeId: listItem[index + 1]
                 ? listItem[index + 1].poi
                 : undefined,
@@ -214,11 +226,15 @@ export default props => {
       return handleData(newData);
     };
     droopData1(value);
+    console.log(steps);
     let arr: any = [];
     let arr1: any = [];
     steps?.map((item, index) => {
+      if (index === 0) {
+        item.nodeType = 1;
+      }
       item.stepType = 1;
-      item.stepNumber = index;
+      item.stepNumber = index + 1;
       if (item.nextNodeId === 'undefined' || !item.nextNodeId) {
         delete item.nextNodeId;
       }
@@ -235,16 +251,8 @@ export default props => {
       delete item.ruleList;
       delete item.poi;
       item.resApprovalId = formId;
-      item.nodeType = 2;
-      if (index === 0) {
-        item.nodeType = 1;
-      }
 
-      if (index === steps?.length - 1) {
-        item.nodeType = 3;
-      }
-
-      if (item.type === 6) {
+      if (item.type == 6) {
         item = {
           type: item.type,
           nodeType: 4,
@@ -259,16 +267,6 @@ export default props => {
       } else {
         delete item.archiveId;
         delete item.archiveControlParams;
-      }
-      if (steps.length === 1) {
-        item.nodeType = 1;
-      }
-      if (steps.length === 2) {
-        steps[0].nodeType = 1;
-        steps[1].nodeType = 2;
-      }
-      if (item.type === 6) {
-        item.nodeType = 4;
       }
       item.stepType = 1;
       item.stepNumber = index;
@@ -289,30 +287,11 @@ export default props => {
       item.resApprovalId = formId;
     });
     console.log(ruleSets);
-    console.log(steps);
+
     data1 = {
       ruleSets,
       steps: arr1.concat(arr),
     };
-  };
-
-  const getArchiveControlParams = value => {
-    archiveControlParams = [];
-    for (let key in value) {
-      if (value.id) {
-        archiveControlParams.push({
-          resApprArchiveDemandId: key,
-          resFormControlId: value[key],
-          id: value.id,
-        });
-      } else {
-        archiveControlParams.push({
-          resApprArchiveDemandId: key,
-          resFormControlId: value[key],
-        });
-      }
-    }
-    setControlModels(archiveControlParams);
   };
 
   const handleUserOk = () => {
@@ -372,8 +351,8 @@ export default props => {
                 {...props}
                 ruleList={listOne}
                 change={getdata1}
-                controlModels={controlModels}
-                getArchiveControlParams={getArchiveControlParams}
+                // controlModels={controlModels}
+                // getArchiveControlParams={getArchiveControlParams}
               />
             </Col>
           </Row>

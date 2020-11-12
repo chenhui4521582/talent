@@ -220,7 +220,7 @@ export default props => {
       code: '奖多多集团',
       name: '奖多多集团',
       children: list,
-      memberNumber: defaulGroupList.length + deleteGroupList.length + totalNum,
+      memberNumber: defaulGroupList.length + totalNum,
     };
     handleList([newObj]);
   }
@@ -540,6 +540,7 @@ export default props => {
         }
       }
     };
+    console.log(loopdata);
     handleItem(loopdata);
     return loopdata;
   };

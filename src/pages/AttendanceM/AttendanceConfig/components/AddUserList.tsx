@@ -56,7 +56,8 @@ export default props => {
 
   useEffect(() => {
     handleChangeUserList(userList);
-    list && list.length && props.onChange(list);
+    console.log(list);
+    list && props.onChange(list);
   }, [list]);
 
   const handleList1 = data => {

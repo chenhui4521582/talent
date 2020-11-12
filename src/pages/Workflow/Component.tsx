@@ -618,7 +618,9 @@ const Uploads = props => {
         <>
           <UploadOutlined /> 上传附件(单个文件不大于20M)
         </>
-      ) : null}
+      ) : (
+        '附件上传'
+      )}
     </Upload>
   );
 };
@@ -868,13 +870,13 @@ const VacationEndTime = props => {
 // 请假共计时长 totalVacationTime
 const TotalVacationTime = props => {
   // 需要调接口
-  return <Input {...props} placeholder="请假共计时长" />;
+  return <Input {...props} placeholder="请假共计时长" disabled={true} />;
 };
 
 //销假共计时长 totalReVacationTime
 const TotalReVacationTime = props => {
   // 需要调接口
-  return <Input {...props} placeholder="销假共计时长" />;
+  return <Input {...props} placeholder="销假共计时长" disabled={true} />;
 };
 
 // 控件名称="overTimeStart", 加班开始时间
@@ -905,12 +907,12 @@ const OverTimeEnd = props => {
 
 // 控件名称="overTimeTotal", 加班共计时长
 const OverTimeTotal = props => {
-  return <Input {...props} placeholder="销假共计时长" />;
+  return <Input {...props} placeholder="销假共计时长" disabled={true} />;
 };
 
 // 控件名称="remainCardNumber" 当月剩余补卡次数
 const RemainCardNumber = props => {
-  return <Input {...props} placeholder="当月剩余补卡次数" />;
+  return <Input {...props} placeholder="当月剩余补卡次数" disabled={true} />;
 };
 
 // 控件名称="outCheckStartTime", 出差/外出打卡开始时间
@@ -941,7 +943,7 @@ const OutCheckEndTime = props => {
 
 // 控件名称="outcheckTime", 出差/外出共计时长
 const OutcheckTime = props => {
-  return <Input {...props} placeholder="共计时长" />;
+  return <Input {...props} placeholder="共计时长" disabled={true} />;
 };
 
 //控件名称="vacationTime", 可休年假时长

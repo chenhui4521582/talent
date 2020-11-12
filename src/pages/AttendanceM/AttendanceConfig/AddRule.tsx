@@ -343,7 +343,7 @@ export default props => {
         <Form.Item
           label="打卡人员"
           name="memberList"
-          rules={[{ required: true, message: '请输入用户名称!' }]}
+          // rules={[{ required: true, message: '请输入用户名称!' }]}
           style={{
             width: '82vw',
             marginBottom: 20,

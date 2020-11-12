@@ -30,7 +30,7 @@ export default forwardRef((props: any, formRef) => {
   const { selectRule } = props;
   const [form] = Form.useForm();
   const [formItemList, setFormItemList] = useState<any[]>();
-  const [controlList, setControlList] = useState<IListItem[]>();
+  const [controlList, setControlList] = useState<IListItem[] | any>();
   const [numberList, setNumberList] = useState<any[]>([1]);
   const [formList, setFormList] = useState<any>();
   const [unitList, steUnitList] = useState<IUnitList[]>();
@@ -50,9 +50,9 @@ export default forwardRef((props: any, formRef) => {
       let res: GlobalResParams<IListItem[]> = await getFormSimple(
         props?.match.params.id,
       );
-      if (res.status === 200) {
+      if (res?.status === 200) {
         let list = res.obj;
-        let newList: IListItem[] = [];
+        let newList: IListItem[] | any = [];
         list?.map(item => {
           if (
             item.baseControlType === 'number' ||
@@ -71,6 +71,7 @@ export default forwardRef((props: any, formRef) => {
             newList.push(item);
           }
         });
+
         newList.push({
           baseControlType: 'applicant',
           name: '申请人',
@@ -236,9 +237,9 @@ const FormItem = props => {
       }
 
       onChange(selectRule.refResFormControl + '&&' + refResFormControlType);
-      setTimeout(() => {
-        form.setFieldsValue(obj);
-      }, 1000);
+      // setTimeout(() => {
+      form?.setFieldsValue && form.setFieldsValue(obj);
+      // }, 1000);
     }
   }, [selectRule, rankList]);
 
@@ -265,7 +266,7 @@ const FormItem = props => {
                 name={[Index, 'value']}
                 rules={[{ required: true, message: '请选择!' }]}
               >
-                <LabelOrUser {...props} value={selectRule.value} />
+                <LabelOrUser {...props} selectRule={selectRule} />
               </Form.Item>
             </Col>
             <Col span={10} offset={1} hidden>
@@ -279,7 +280,7 @@ const FormItem = props => {
       case 2:
         return (
           <>
-            <Col offset={1} span={3}>
+            <Col offset={1} span={6}>
               <Form.Item
                 name={[Index, 'comparetor']}
                 rules={[{ required: true, message: '请选择!' }]}
@@ -290,19 +291,19 @@ const FormItem = props => {
                   <Option value={3}>大于等于</Option>
                   <Option value={4}>小于</Option>
                   <Option value={5}>小于等于</Option>
-                  <Option value={6}>介于</Option>
+                  {/* <Option value={6}>介于</Option> */}
                 </Select>
               </Form.Item>
             </Col>
-            <Col span={8} offset={1}>
+            <Col span={6} offset={1}>
               <Form.Item
                 name={[Index, 'value']}
                 rules={[{ required: true, message: '请输入!' }]}
               >
-                <InputNumber />
+                <InputNumber style={{ width: '100%' }} />
               </Form.Item>
             </Col>
-            <Col span={10} offset={1} hidden>
+            <Col span={6} offset={1} hidden>
               <Form.Item name={[Index, 'id']}>
                 <Input />
               </Form.Item>
@@ -322,7 +323,7 @@ const FormItem = props => {
                 <Input />
               </Form.Item>
             </Col>
-            <Col span={10} offset={1}>
+            <Col span={6} offset={1}>
               <Form.Item
                 name={[Index, 'value']}
                 rules={[{ required: true, message: '请输入!' }]}
@@ -358,7 +359,7 @@ const FormItem = props => {
                 <Input />
               </Form.Item>
             </Col>
-            <Col span={10} offset={1}>
+            <Col span={6} offset={1}>
               <Form.Item
                 name={[Index, 'value']}
                 rules={[{ required: true, message: '请输入!' }]}
@@ -385,12 +386,12 @@ const FormItem = props => {
       case 5:
         return (
           <>
-            <Col offset={1}>
+            <Col offset={1} span={6}>
               <Form.Item
                 name={[Index, 'comparetor']}
                 rules={[{ required: true, message: '请选择!' }]}
               >
-                <Select placeholder="" allowClear style={{ width: '100px' }}>
+                <Select placeholder="" allowClear>
                   <Option value={7}>精准字符串匹配</Option>
                   <Option value={8}>模糊匹配</Option>
                 </Select>
@@ -417,21 +418,16 @@ const FormItem = props => {
   };
 
   const onChange = values => {
+    let obj = {};
+    obj[Index] = {
+      value: undefined,
+    };
+    form.setFieldsValue(obj);
     let type = values?.split('&&')[1];
     let id = values?.split('&&')[0];
-    let unitItem: any = {};
-    list.map(item => {
-      if (item.id == id) {
-        unitItem = item;
-      }
-    });
-    if (unitItem?.unitType) {
-      setShowUnit(true);
-    } else {
-      setShowUnit(false);
-    }
     if (type === 'applicant') {
       setType(1);
+      setShowUnit(false);
     } else if (
       type === 'number' ||
       type === 'money' ||
@@ -440,12 +436,14 @@ const FormItem = props => {
       type === 'overTimeTotal' ||
       type === 'vacationTime'
     ) {
+      setShowUnit(true);
       setType(2);
     } else if (
       type === 'multiple' ||
       type === 'select' ||
       type === 'positionMLevel'
     ) {
+      setShowUnit(false);
       setType(4);
       let itemLists: any = '';
       let arr: any = [];
@@ -465,6 +463,7 @@ const FormItem = props => {
         setItemList(itemLists);
       }
     } else if (type === 'areatext' || type === 'text') {
+      setShowUnit(false);
       setType(5);
     }
   };
@@ -484,7 +483,7 @@ const FormItem = props => {
             </a>
           </Col>
         ) : null}
-        <Col span={8} offset={1}>
+        <Col span={5} offset={1}>
           <Form.Item
             name={[Index, 'type']}
             rules={[{ required: true, message: '请选择!' }]}
@@ -505,15 +504,16 @@ const FormItem = props => {
         </Col>
         {renderForm()}
         {showUnit ? (
-          <Col span={8} offset={1}>
+          <Col span={2} offset={1}>
             <Form.Item
               name={[Index, 'unitType']}
               rules={[{ required: true, message: '请选择!' }]}
+              initialValue={0}
             >
-              <Select placeholder="请选择" allowClear>
+              <Select placeholder="请选择单位" allowClear>
                 {unitList?.map(item => {
                   return (
-                    <Option key={item.id} value={item.id}>
+                    <Option key={item.code} value={item.code}>
                       {item.desc}
                     </Option>
                   );

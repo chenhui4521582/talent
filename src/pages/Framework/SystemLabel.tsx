@@ -286,7 +286,9 @@ export default () => {
               +
             </span>
           </div>
-          {renderRoleLable}
+          <div style={{ height: '60vh', overflowY: 'auto' }}>
+            {renderRoleLable}
+          </div>
         </div>
         {renderRight}
       </div>

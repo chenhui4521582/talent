@@ -109,13 +109,7 @@ let systemObj;
 // specifiedLevel
 
 export default props => {
-  const {
-    ruleList,
-    controlModels,
-    change,
-    getArchiveControlParams,
-    propsRuleSets,
-  } = props;
+  const { ruleList, change, propsRuleSets } = props;
   const [list, setList] = useState<tsStep[] | any>();
   const [, drop] = useDrop({
     accept: ItemTypes.Card,
@@ -313,6 +307,7 @@ export default props => {
     });
     return list1;
   };
+
   const compare = (name: string) => {
     return (a, b) => {
       let v1 = a[name];
@@ -370,7 +365,6 @@ export default props => {
       obj.id = listObj.length + 'add';
       if (type === 6) {
         paramForm.validateFields().then(value1 => {
-          getArchiveControlParams(value1);
           form.setFieldsValue({
             type: undefined,
             specifiedLevel: undefined,
@@ -401,10 +395,10 @@ export default props => {
           const droopData1 = data => {
             let newData = data;
             function handleData(listItem, poi) {
-              listItem.map((item, index) => {
+              listItem?.map((item, index) => {
                 item.poi = poi + '-' + index;
                 if (item.poi === ruleItem.poi) {
-                  if (item.ruleList[ruleItem.index].list) {
+                  if (item?.ruleList[ruleItem.index].list) {
                     item?.ruleList[ruleItem.index]?.list?.push(obj);
                   } else {
                     item.ruleList[ruleItem.index].list = [];
@@ -476,32 +470,47 @@ export default props => {
     });
   };
 
-  const handleObjList = value => {
+  const handleObjList = value1 => {
     let newList = JSON.parse(JSON.stringify(list));
-    const droopData1 = data => {
-      let newData = data;
-      function handleData(listItem, poi) {
-        listItem.map((item, index) => {
-          item.poi = poi + '-' + index;
-          if (item.poi === selectObj?.poi) {
-            Object.assign(item, value);
-          }
-          item.ruleList?.map((ruleItem, ruleItemIndex) => {
-            handleData(ruleItem?.list, item.poi + '-' + ruleItemIndex);
-          });
-        });
-      }
-      return handleData(newData, 0);
-    };
-    droopData1(newList);
-    setList(newList);
-
     if (type === 6) {
       paramForm.validateFields().then(value => {
-        getArchiveControlParams(value);
         handleHiddleModal();
         setType(1);
         setVisible(false);
+        let archiveControlParams: any = [];
+        for (let key in value) {
+          if (value.id) {
+            archiveControlParams.push({
+              resApprArchiveDemandId: key,
+              resFormControlId: value[key],
+              id: value.id,
+            });
+          } else {
+            archiveControlParams.push({
+              resApprArchiveDemandId: key,
+              resFormControlId: value[key],
+            });
+          }
+        }
+        value1.archiveControlParams = archiveControlParams;
+        const droopData1 = data => {
+          let newData = data;
+          function handleData(listItem, poi) {
+            listItem.map((item, index) => {
+              item.poi = poi + '-' + index;
+              if (item.poi === selectObj?.poi) {
+                item = Object.assign(item, value1);
+              }
+              item.ruleList?.map((ruleItem, ruleItemIndex) => {
+                handleData(ruleItem?.list, item.poi + '-' + ruleItemIndex);
+              });
+            });
+          }
+          return handleData(newData, 0);
+        };
+        droopData1(newList);
+        setList(newList);
+
         form.setFieldsValue({
           type: undefined,
           specifiedLevel: undefined,
@@ -513,6 +522,23 @@ export default props => {
       handleHiddleModal();
       setType(1);
       setVisible(false);
+      const droopData1 = data => {
+        let newData = data;
+        function handleData(listItem, poi) {
+          listItem.map((item, index) => {
+            item.poi = poi + '-' + index;
+            if (item.poi === selectObj?.poi) {
+              Object.assign(item, value1);
+            }
+            item.ruleList?.map((ruleItem, ruleItemIndex) => {
+              handleData(ruleItem?.list, item.poi + '-' + ruleItemIndex);
+            });
+          });
+        }
+        return handleData(newData, 0);
+      };
+      droopData1(newList);
+      setList(newList);
       form.setFieldsValue({
         type: undefined,
         specifiedLevel: undefined,
@@ -615,7 +641,7 @@ export default props => {
 
     if (selectItem.type === 6) {
       getP();
-      controlModels?.map(item => {
+      selectItem.archiveControlParams?.map(item => {
         let obj: any = {};
         obj[item.resApprArchiveDemandId] = item.resFormControlId;
         paramForm.setFieldsValue(obj);
@@ -787,6 +813,10 @@ export default props => {
             value: value[key].value,
             id: value.id,
           };
+          if (value[key].unitType === 0 || value[key].unitType) {
+            resRuleCurdParams.unitType = value[key].unitType;
+          }
+
           if (value[key].type.indexOf('applicant') > -1) {
             resRuleCurdParams.value = {
               memberTagIds: value[key]?.value?.memberTagIds,
@@ -1002,9 +1032,9 @@ export default props => {
               ]}
             >
               <Radio.Group>
-                <Radio value={0}>会签（ 须所有上级同意 ）</Radio>
-                <br />
                 <Radio value={1}>或签（ 一名上级同意即可 ）</Radio>
+                <br />
+                <Radio value={0}>会签（ 须所有上级同意 ）</Radio>
               </Radio.Group>
             </Form.Item>
           </>
@@ -1498,7 +1528,7 @@ export default props => {
           setConditionVisable(undefined);
         }}
         onOk={handleCondition}
-        width="40vw"
+        width="60vw"
       >
         <Condition
           key={!conditionVisable}

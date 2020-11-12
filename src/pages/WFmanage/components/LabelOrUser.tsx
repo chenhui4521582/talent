@@ -25,7 +25,7 @@ import Organization from '@/pages/Framework/components/Organization';
 import { useOrganization, usetDefaultOrganization } from '@/models/global';
 const { TabPane } = Tabs;
 export default props => {
-  const { value } = props;
+  const { selectRule } = props;
   const ref = useRef<any>();
   const ref1 = useRef<any>();
   const [userList, setUserList] = useState<any>();
@@ -36,11 +36,17 @@ export default props => {
 
   useEffect(() => {
     let value1: any;
-    if (value) {
-      if (Object.prototype.toString.call(value) === '[object Object]') {
-        value1 = value;
+    if (selectRule.value) {
+      if (
+        Object.prototype.toString.call(selectRule.value) === '[object Object]'
+      ) {
+        value1 = selectRule.value;
       } else {
-        value1 = eval('(' + value + ')');
+        // let value2 = JSON.parse(JSON.stringify(value.value));
+        value1 = "'" + selectRule.value + "'";
+        value1 = eval('(' + value1 + ')');
+        value1 = JSON.parse(value1);
+        console.log(value1);
       }
     }
     if (value1?.memberTagIds || value1?.userCodes) {
@@ -102,7 +108,7 @@ export default props => {
       };
       getApilableList();
     }
-  }, [value, organizationJson]);
+  }, [selectRule?.value, organizationJson]);
 
   const handelOk = () => {
     let uList: any = [];
@@ -115,11 +121,15 @@ export default props => {
       ref1.current.getvalue()?.map(item => {
         lList.push(item.id + '');
       });
+
+    setUserList(ref.current?.getvalue());
+    setLaberList(ref1.current?.getvalue());
     props.onChange &&
       props.onChange({
         userCodes: uList.join(','),
         memberTagIds: lList.join(','),
       });
+
     setVisible(false);
   };
 

@@ -124,6 +124,7 @@ function Organization(props: tsProps, formRef) {
           parentCode: list[i].parentCode,
           memberList: list[i].memberList,
           children: list[i].children,
+          level: list[i].level,
         });
         if (list[i].memberList) {
           departListkey.push(list[i].code);

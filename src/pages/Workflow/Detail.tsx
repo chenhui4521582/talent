@@ -39,7 +39,7 @@ interface tsBtn {
   submit: boolean;
 }
 interface IUnitList {
-  id: number;
+  code: number;
   desc: string;
 }
 
@@ -342,15 +342,15 @@ export default props => {
                       style={{ maxWidth: '300px' }}
                     >
                       {groupItem.list.map(listItem => {
-                        unitList?.map(unitItem => {
-                          if (
-                            unitItem.id == listItem?.unitType &&
-                            listItem?.unitType != 0
-                          ) {
-                            listItem.showValue =
-                              listItem.showValue + unitItem.desc;
-                          }
-                        });
+                        // unitList?.map(unitItem => {
+                        //   if (
+                        //     unitItem.code == listItem?.unitType &&
+                        //     listItem?.unitType != 0
+                        //   ) {
+                        //     listItem.showValue =
+                        //       listItem.showValue + unitItem.desc;
+                        //   }
+                        // });
                         return (
                           <div
                             key={listItem.id}
@@ -396,14 +396,14 @@ export default props => {
                     </Descriptions.Item>
                   );
                 } else {
-                  unitList?.map(unitItem => {
-                    if (
-                      unitItem.id == groupItem?.unitType &&
-                      groupItem?.unitType != 0
-                    ) {
-                      groupItem.showValue = groupItem.showValue + unitItem.desc;
-                    }
-                  });
+                  // unitList?.map(unitItem => {
+                  //   if (
+                  //     unitItem.code == groupItem?.unitType &&
+                  //     groupItem?.unitType != 0
+                  //   ) {
+                  //     groupItem.showValue = groupItem.showValue + unitItem.desc;
+                  //   }
+                  // });
                   return (
                     <Descriptions.Item
                       key={groupItem.id}
@@ -504,6 +504,30 @@ export default props => {
                   resFormControlId: item.resFormControlId,
                 });
               });
+          } else if (
+            item.baseControlType === 'totalVacationTime' ||
+            item.baseControlType === 'totalReVacationTime' ||
+            item.baseControlType === 'overTimeTotal' ||
+            item.baseControlType === 'outCheckTime' ||
+            item.baseControlType === 'vacationTime'
+          ) {
+            // 设置单位
+            let unitType: any = null;
+            let unitValue = fromSubData[item.id] || '';
+            let unitShowValue = fromSubData[item.id] || '';
+            unitList?.map(unitItem => {
+              if (unitShowValue?.indexOf(unitItem.desc) > -1) {
+                unitType = unitItem.code;
+              }
+            });
+            unitValue = unitValue?.replace('小时', '')?.replace('天', '');
+            subList.push({
+              resFormControlId: item.id,
+              value: unitValue,
+              showValue: unitShowValue,
+              multipleNumber: 1,
+              unitType: unitType,
+            });
           } else {
             subList.push({
               resFormControlId: item.resFormControlId,
@@ -644,18 +668,19 @@ export default props => {
               : '';
             unitList?.map(unitItem => {
               if (unitShowValue?.indexOf(unitItem.desc) > -1) {
-                unitType = unitItem.id;
+                unitType = unitItem.code;
               }
             });
-            subList.push({
-              id: parseInt(key.split('-')[1]),
-              value: unitValue?.replcae(/'小时'/g, '')?.replcae(/'天'/g, ''),
-              showValue: unitShowValue
-                ?.replcae(/'小时'/g, '')
-                ?.replcae(/'天'/g, ''),
-              multipleNumber: parseInt(key.split('-')[2]),
-              unitType: unitType,
-            });
+            (unitValue = unitValue
+              ?.replace(/'小时'/g, '')
+              ?.replace(/'天'/g, '')),
+              subList.push({
+                resFormControlId: parseInt(key.split('-')[1]),
+                value: unitValue,
+                showValue: unitShowValue,
+                multipleNumber: parseInt(key.split('-')[2]),
+                unitType: unitType,
+              });
           } else if (key.split('-')[0] === 'vacationTime') {
             let unitValue = fromSubData[key]
               ? fromSubData[key].split('-$-')[0]
@@ -664,7 +689,7 @@ export default props => {
               ? fromSubData[key].split('-$-')[1]
               : '';
             subList.push({
-              id: parseInt(key.split('-')[1]),
+              resFormControlId: parseInt(key.split('-')[1]),
               value: unitValue?.replace(/'次'/g, ''),
               showValue: unitShowValue?.replace(/'次'/g, ''),
               multipleNumber: parseInt(key.split('-')[2]),
@@ -1237,7 +1262,7 @@ const AutoTable = props => {
           }
         }}
         columns={columns}
-        style={{ width: columns.length * 120 }}
+        style={{ width: columns.length < 8 ? '100%' : columns.length * 120 }}
         dataSource={handleDataSource(dataSource)}
       />
     </div>
