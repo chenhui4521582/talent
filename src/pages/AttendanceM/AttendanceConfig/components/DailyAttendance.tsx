@@ -125,7 +125,7 @@ export default props => {
       });
       return (
         <div className="scheduling-box-one-item" key={index}>
-          <span>{str}</span>
+          <span>{str.join('，')}</span>
           <span>
             {moment(item.clockPeriods[0]).format('HH:mm') +
               '——' +

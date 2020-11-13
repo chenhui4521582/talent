@@ -14,11 +14,18 @@ export default props => {
   const [optList, setOptList] = useState<any[]>([]);
   const [center, setCenter] = useState<any>();
   const [list, setList] = useState<any>([]);
-  const [radius, setRadius] = useState<number>(500);
+  const [radius, setRadius] = useState<number>(300);
+  const [show, setShow] = useState<any>(false);
 
   useEffect(() => {
     list && list.length && props.onChange(list);
   }, [list]);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setShow(true);
+    }, 300);
+  }, []);
 
   useEffect(() => {
     let newList = JSON.parse(JSON.stringify(list || []));
@@ -233,32 +240,36 @@ export default props => {
               );
             })}
           </Select>
-          <Map
-            amapkey="85c4671059c4372b39b0f42cb5edab97"
-            zoom={15}
-            events={mapEvents}
-            center={
-              center ? [center?.location.lng, center?.location.lat] : undefined
-            }
-            plugins={['ToolBar', 'Scale']}
-          >
-            {center ? (
-              <Marker position={[center.location.lng, center.location.lat]} />
-            ) : null}
-            {center ? (
-              <Circle
-                radius={radius}
-                center={[center.location.lng, center.location.lat]}
-                style={{
-                  opacity: '0.1',
-                  fillColor: '#409fff',
-                  strokeWeight: '1',
-                  strokeColor: '#409afc',
-                }}
-                bubble={true}
-              />
-            ) : null}
-          </Map>
+          {show ? (
+            <Map
+              amapkey="85c4671059c4372b39b0f42cb5edab97"
+              zoom={15}
+              events={mapEvents}
+              center={
+                center
+                  ? [center?.location.lng, center?.location.lat]
+                  : undefined
+              }
+              plugins={['ToolBar', 'Scale']}
+            >
+              {center ? (
+                <Marker position={[center.location.lng, center.location.lat]} />
+              ) : null}
+              {center ? (
+                <Circle
+                  radius={radius}
+                  center={[center.location.lng, center.location.lat]}
+                  style={{
+                    opacity: '0.5',
+                    fillColor: '#409fff',
+                    strokeWeight: '1',
+                    strokeColor: '#409afc',
+                  }}
+                  bubble={true}
+                />
+              ) : null}
+            </Map>
+          ) : null}
         </div>
         <Form form={form} style={{ marginTop: '10vh' }}>
           <Form.Item name="areaId" label="areaId" style={{ display: 'none' }}>
@@ -282,7 +293,7 @@ export default props => {
             name="range"
             rules={[{ required: true, message: '请输入打卡名称!' }]}
             label="打卡范围"
-            initialValue={500}
+            initialValue={300}
             style={{ paddingLeft: 20 }}
           >
             <Select
@@ -291,8 +302,11 @@ export default props => {
               }}
               disabled={editType === 'edit' ? true : false}
             >
+              <Option value={300}>300米</Option>
               <Option value={500}>500米</Option>
               <Option value={1000}>1000米</Option>
+              <Option value={2000}>2000米</Option>
+              <Option value={3000}>3000米</Option>
             </Select>
           </Form.Item>
           <Form.Item name="lng" label="经度" style={{ display: 'none' }}>

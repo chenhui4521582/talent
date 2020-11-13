@@ -11,36 +11,50 @@ export default props => {
   const ref = useRef<any>();
 
   useEffect(() => {
-    let newList = JSON.parse(JSON.stringify(list || []));
+    let newList1 = JSON.parse(JSON.stringify(list || []));
     whitelist?.map(item => {
-      newList.push({
+      newList1.push({
         userCode: item.userCode,
         userName: item.userName,
         businessName: item.businessName,
         businessCode: item.businessCode,
       });
     });
-    setList(newList);
+    setList(newList1);
   }, [whitelist]);
 
   useEffect(() => {
-    list && list.length && props.onChange(list);
-  }, [list]);
-
-  const handleOk = () => {
-    let newList = JSON.parse(JSON.stringify([]));
-    console.log(newList);
-    ref.current.getvalue()?.map(item => {
-      newList.push({
-        userCode: item.key,
-        userName: item.name,
-        businessName: item.businessName,
-        businessCode: item.businessCode,
+    let newList3 = JSON.parse(JSON.stringify(list || []));
+    let arr: any = [];
+    newList3?.map(item => {
+      arr.push({
+        userCode: item?.userCode,
+        userName: item?.userName,
+        businessName: item?.businessName,
+        businessCode: item?.businessCode,
       });
     });
 
+    list && props.onChange(arr);
+  }, [list]);
+  // console.log('list')
+  // console.log(list)
+
+  const handleOk = () => {
+    let newList2 = JSON.parse(JSON.stringify([]));
+    console.log(newList2);
+    ref.current.getvalue()?.map(item => {
+      let obj: any = {};
+      obj.userCode = item.userCode;
+      obj.userName = item.userName;
+      obj.businessName = item.businessName;
+      obj.businessCode = item.businessCode;
+      newList2.push(obj);
+    });
+    console.log('list');
+    console.log(newList2);
     setVisible(false);
-    setList(newList);
+    setList(JSON.parse(JSON.stringify(newList2)));
   };
 
   const handleRemove = code => {
@@ -49,11 +63,10 @@ export default props => {
       selectItemArr.findIndex(item => item.code === code),
       1,
     );
-    setList([...new Set(selectItemArr)]);
+    setList(selectItemArr);
   };
 
   const renderList = useMemo(() => {
-    console.log(list);
     return list?.map((item, index) => {
       return (
         <div className="scheduling-box-one-item" key={index}>
@@ -106,7 +119,7 @@ export default props => {
           renderUser={true}
           ref={ref}
           onlySelectUser={true}
-          defKey={whitelist}
+          defKey={list}
         />
       </Modal>
     </>

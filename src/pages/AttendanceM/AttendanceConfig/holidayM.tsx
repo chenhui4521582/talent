@@ -333,48 +333,6 @@ export default () => {
             </Form.Item>
           ) : null}
         </Form>
-        {/* <Form
-          form={form2}
-          style={{ marginLeft: '3vw', float: 'left', width: '25vw' }}
-        >
-          <Form.Item label="性别" name="gender" style={{ width: '20vw' }}>
-            <Select>
-              <Option value={0}>不限</Option>
-              <Option value={1}>男</Option>
-              <Option value={2}>女</Option>
-            </Select>
-          </Form.Item>
-          <Form.Item label="年龄范围" name="age" style={{ width: '20vw' }}>
-            <Input.Group compact>
-              <Form.Item name={['age']} noStyle>
-                <Form.Item
-                  name={['age', 'smallestAge']}
-                  style={{ paddingRight: 30 }}
-                >
-                  <InputNumber />
-                </Form.Item>
-                <span style={{ paddingTop: 8, marginRight: 30 }}>至</span>
-                <Form.Item
-                  name={['age', 'biggestAge']}
-                  style={{ paddingRight: 30 }}
-                >
-                  <InputNumber />
-                </Form.Item>
-              </Form.Item>
-            </Input.Group>
-          </Form.Item>
-          <Form.Item
-            name="childAgeLimit"
-            style={{ width: '20vw', marginTop: '-24px' }}
-          >
-            <span style={{ marginRight: 8 }}>有子女，且</span>
-            <Form.Item label="性别" name="childAgeLimit" noStyle>
-              <InputNumber />
-            </Form.Item>
-            <span style={{ marginLeft: 8 }}>周岁及以下</span>
-          </Form.Item>
-        </Form>
-   */}
       </div>
     );
   }, [type, selectDay, detail]);

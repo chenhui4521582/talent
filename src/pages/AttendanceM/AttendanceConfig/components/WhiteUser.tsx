@@ -57,41 +57,24 @@ function Organization(props: tsProps, formRef) {
   const [selectItem, setSelectItem] = useState<any[]>([]);
   useEffect(() => {
     getJson();
-  }, [organizationJson]);
+  }, [organizationJson, defKey]);
 
   useEffect(() => {
     if (defKey) {
       let list: any = [...selectItem];
-      let newDefKey = [...defKey];
+      let newDefKey = [...new Set(defKey)];
       let arr: any = [];
+      console.log(arr);
       newDefKey.map(item => {
         arr.push(item.userCode);
         item.title = item.userName;
         item.key = item.userCode;
+        list.push(item);
       });
-      Object.assign(list, newDefKey);
-      console.log(arr);
       setCheckedKeys(arr);
+      setSelectItem(selectItem);
     }
   }, [defKey]);
-
-  // useEffect(()=>{
-  //   let json = JSON.parse(JSON.stringify(dataList))
-  //   let arr:any = []
-  //   const handleItem = list => {
-  //     for (let i = 0; i < list.length; i++) {
-  //       if(checkedKeys?.indexOf(list[i].key)>-1){
-  //         arr.push(list[i])
-  //       }
-  //       if (list[i].children) {
-  //         handleItem(list[i].children);
-  //       }
-  //     }
-  //   };
-
-  //   handleItem(json)
-  //   // setSelectItem(arr);
-  // },[checkedKeys, organizationJson, dataList])
 
   async function getJson() {
     let list = organizationJson;
@@ -173,8 +156,28 @@ function Organization(props: tsProps, formRef) {
         }
       }
     };
-
     handleItem(data);
+
+    if (defKey?.length && defKey) {
+      let defKeyArr: string[] = [];
+      defKey.map(item => {
+        defKeyArr.push(item.userCode);
+      });
+      let selectArr: any = [];
+      let expandedKey = keyTitle
+        .map(item => {
+          if (defKeyArr.indexOf(item.key) > -1) {
+            selectArr.push(item);
+            return getParentKey(item.key, data);
+          }
+          return null;
+        })
+        .filter((item, i, self) => item && self.indexOf(item) === i);
+      setCheckedKeys(defKeyArr);
+      setExpandedKeys(expandedKey);
+      setAutoExpandParent(true);
+    }
+
     setdepartList(departListkey);
     setUserKeyList(userKeyArr);
     setDataList(data);
@@ -183,15 +186,9 @@ function Organization(props: tsProps, formRef) {
   };
 
   useImperativeHandle(formRef, () => {
-    let newSelectItem = [...selectItem];
-    newSelectItem?.map(item => {
-      item.businessName = item.nameStr.split('-')[3];
-      item.businessCode = item.codeStr.split('-')[3];
-    });
-
     return {
       getvalue: () => {
-        return newSelectItem;
+        return selectItem;
       },
     };
   });
@@ -247,6 +244,10 @@ function Organization(props: tsProps, formRef) {
         selectItemArr = e.checkedNodes;
         selectItemArr.map(item => {
           list.push(item.key);
+          item.businessName = item.nameStr.split('-')[3];
+          item.businessCode = item.codeStr.split('-')[3];
+          item.userName = item.name;
+          item.userCode = item.key;
         });
         setSelectItem([...new Set(selectItemArr)]);
         setCheckedKeys([...new Set(list)]);

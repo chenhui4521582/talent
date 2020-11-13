@@ -1262,7 +1262,7 @@ const AutoTable = props => {
           }
         }}
         columns={columns}
-        style={{ width: columns.length < 8 ? '100%' : columns.length * 120 }}
+        style={{ width: columns.length < 12 ? '100%' : columns.length * 120 }}
         dataSource={handleDataSource(dataSource)}
       />
     </div>
