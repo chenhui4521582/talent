@@ -306,7 +306,7 @@ export default (props: Iprops) => {
         }}
       >
         <Table
-          style={{ width: columns.length * 120 }}
+          style={{ width: columns.length < 12 ? '100%' : columns.length * 120 }}
           title={() => {
             return (
               <Button
