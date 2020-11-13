@@ -73,14 +73,8 @@ export default props => {
 
   const handleDetailOk = () => {
     let value = formRef.current.value;
-    console.log(value);
     setDetail(value);
     setVisibleDate(false);
-    // form.validateFields().then(value => {
-    //   console.log(value)
-
-    //   // formRef.current?.getvalue?.resetFields();
-    // });
   };
 
   const handleOk = () => {
@@ -104,8 +98,6 @@ export default props => {
 
   const renderList = useMemo(() => {
     return list.map((item, indexs) => {
-      console.log(list);
-      console.log('list');
       return (
         <div className="scheduling-box-one-item" key={indexs}>
           <span>{item.name}</span>
@@ -242,7 +234,6 @@ const SchedulingUser = forwardRef((props: any, formRef) => {
         let obj: any = {};
         obj.date = i + 1;
         obj.day = getWeek(new Date(year, month - 1, i + 1));
-        console.log();
         arrDate.push(obj);
       }
       setDateList(arrDate);
@@ -303,7 +294,6 @@ const SchedulingUser = forwardRef((props: any, formRef) => {
         obj1[newUserList[i].key] = true;
       }
     }
-    console.log(result);
     newUserList = result;
 
     setOwnUserList([...new Set(newUserList)]);
@@ -382,8 +372,6 @@ const SchedulingUser = forwardRef((props: any, formRef) => {
   const renderUserList = useMemo(() => {
     let arr: any = [];
     let newUserList = ownUserList || [];
-    console.log('newUserList');
-    console.log(newUserList);
     newUserList?.map((items, indexs) => {
       if (indexs < page * 6 && indexs >= (page - 1) * 6) {
         arr.push(
@@ -457,11 +445,8 @@ const SchedulingUser = forwardRef((props: any, formRef) => {
       <Form
         form={form}
         onValuesChange={value => {
-          console.log(form.getFieldsValue());
-          console.log(allValue);
           let newVlaue = JSON.parse(JSON.stringify(allValue));
           let newAllValue = Object.assign(newVlaue, form.getFieldsValue());
-          console.log(newAllValue);
           setAllValue(newAllValue);
           setTimeout(() => {
             setValues(form.getFieldsValue());
@@ -481,7 +466,6 @@ const SchedulingUser = forwardRef((props: any, formRef) => {
             style={{ position: 'absolute', right: 0, bottom: 0 }}
             onChange={(page, pageSize) => {
               setPage(page);
-              console.log(page, pageSize);
             }}
           />
         </div>

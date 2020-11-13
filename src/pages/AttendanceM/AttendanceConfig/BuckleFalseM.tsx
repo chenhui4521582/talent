@@ -182,7 +182,6 @@ export default props => {
           arr = arr.concat(item[key]);
         }
       });
-      console.log(arr);
       setUserList(arr);
     }
   };

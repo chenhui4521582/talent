@@ -64,7 +64,6 @@ function Organization(props: tsProps, formRef) {
       let list: any = [...selectItem];
       let newDefKey = [...new Set(defKey)];
       let arr: any = [];
-      console.log(arr);
       newDefKey.map(item => {
         arr.push(item.userCode);
         item.title = item.userName;
@@ -236,7 +235,6 @@ function Organization(props: tsProps, formRef) {
       checked,
       node: { key, children, level },
     } = e;
-    console.log(e);
     let list: any = [];
     let selectItemArr: any = [];
     if (onlySelectUser) {

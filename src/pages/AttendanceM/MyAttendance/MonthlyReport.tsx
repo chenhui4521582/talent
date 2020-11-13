@@ -84,12 +84,10 @@ export default () => {
   };
 
   const handleYearChange = value => {
-    console.log(value);
     setSelectYear(value);
   };
 
   const handleMonthChange = value => {
-    console.log(value);
     setSelectMonth(value);
   };
 

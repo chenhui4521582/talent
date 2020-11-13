@@ -45,7 +45,6 @@ export default () => {
   const [selectId, setSelectId] = useState<string>();
   const [form1] = Form.useForm();
   const [form2] = Form.useForm();
-  console.log(param);
   useEffect(() => {
     getDetail(false);
   }, [param]);

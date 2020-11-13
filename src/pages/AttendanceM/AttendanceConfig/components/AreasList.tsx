@@ -48,9 +48,7 @@ export default props => {
       return;
     }
     form.validateFields().then(value => {
-      console.log(value);
       let newList = JSON.parse(JSON.stringify(list));
-      console.log(value);
       newList.push(value);
       setList(newList);
       setEditType(undefined);
@@ -71,7 +69,6 @@ export default props => {
       });
       placeSearch.search(val, (status, result) => {
         const { info, poiList } = result;
-        console.log(result);
         if (result.length) {
           return;
         }
@@ -79,7 +76,6 @@ export default props => {
           return;
         }
         if (poiList.pois && Array.isArray(poiList.pois)) {
-          console.log(poiList);
           setOptList(poiList.pois);
         }
       });
@@ -88,7 +84,6 @@ export default props => {
 
   const handleSelectChange = id => {
     const signAddrList = optList.find(item => item.id === id) || null;
-    console.log(signAddrList);
     if (signAddrList) {
       setCenter(signAddrList);
       setInputValue(id);
@@ -126,7 +121,6 @@ export default props => {
         });
         placeSearch.searchNearBy('', e.lnglat, 0, (status, result) => {
           const { info, poiList } = result;
-          console.log(result);
           if (result.length) {
             return;
           }
@@ -134,7 +128,6 @@ export default props => {
             return;
           }
           if (poiList.pois && Array.isArray(poiList.pois)) {
-            console.log(poiList);
             setOptList(poiList.pois);
             setInputValue(poiList.pois[0].id);
             setCenter(poiList.pois[0]);
@@ -151,7 +144,6 @@ export default props => {
   };
 
   const renderList = useMemo(() => {
-    console.log(list);
     return list.map((item, index) => {
       return (
         <div className="scheduling-box-one-item" key={index}>

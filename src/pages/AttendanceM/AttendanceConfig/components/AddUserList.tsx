@@ -56,7 +56,6 @@ export default props => {
 
   useEffect(() => {
     handleChangeUserList(userList);
-    console.log(list);
     list && props.onChange(list);
   }, [list]);
 
@@ -170,8 +169,6 @@ export default props => {
     return arr;
   };
   const renderList = useMemo(() => {
-    console.log(list);
-    console.log('list');
     return list?.map(item => {
       return (
         <div

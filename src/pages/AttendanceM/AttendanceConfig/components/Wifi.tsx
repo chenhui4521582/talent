@@ -39,9 +39,7 @@ export default props => {
       return;
     }
     form.validateFields().then(value => {
-      console.log(value);
       let newList = JSON.parse(JSON.stringify(list));
-      console.log(value);
       newList.push(value);
       setList(newList);
       setEditType(undefined);

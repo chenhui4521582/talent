@@ -11,6 +11,7 @@ import {
   notification,
   Divider,
 } from 'antd';
+import { Map, Marker, Circle } from 'react-amap';
 import moment from 'moment';
 import AddUserList from './components/AddUserList';
 
@@ -67,7 +68,6 @@ export default props => {
   useEffect(() => {
     async function getDetail() {
       let res: GlobalResParams<any> = await getRuleDetail(ruleId);
-      console.log(res);
       if (res.status === 200) {
         setRuleDetail(res.obj);
         setRuleType(res.obj.ruleType);
@@ -92,13 +92,10 @@ export default props => {
   }, []);
 
   const handleChangeUserList = list => {
-    console.log(list);
-    console.log('list');
     setUserList(list);
   };
 
   const submit = () => {
-    console.log(form.getFieldsValue());
     form.validateFields().then(async data => {
       let ruleName = data.ruleName;
       let ruleType = data.ruleType;

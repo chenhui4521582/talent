@@ -134,7 +134,6 @@ export default props => {
           <span>
             <a
               onClick={() => {
-                console.log(item);
                 setEditType('edit');
                 setIndex(indexs);
                 setRestType(item?.rest?.breakTimeCalculation);

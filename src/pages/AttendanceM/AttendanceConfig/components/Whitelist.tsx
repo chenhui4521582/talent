@@ -37,12 +37,9 @@ export default props => {
 
     list && props.onChange(arr);
   }, [list]);
-  // console.log('list')
-  // console.log(list)
 
   const handleOk = () => {
     let newList2 = JSON.parse(JSON.stringify([]));
-    console.log(newList2);
     ref.current.getvalue()?.map(item => {
       let obj: any = {};
       obj.userCode = item.userCode;
@@ -51,8 +48,6 @@ export default props => {
       obj.businessCode = item.businessCode;
       newList2.push(obj);
     });
-    console.log('list');
-    console.log(newList2);
     setVisible(false);
     setList(JSON.parse(JSON.stringify(newList2)));
   };

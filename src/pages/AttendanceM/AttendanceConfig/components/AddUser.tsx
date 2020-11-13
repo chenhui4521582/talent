@@ -57,8 +57,6 @@ function Organization(props: tsProps, formRef) {
   const [selectItem, setSelectItem] = useState<any[]>([]);
 
   useEffect(() => {
-    console.log(selectKeys);
-    console.log('selectKeys');
     selectKeys && setCheckedKeys(selectKeys);
   }, [selectKeys]);
 
@@ -230,7 +228,6 @@ function Organization(props: tsProps, formRef) {
       checked,
       node: { key, children, level },
     } = e;
-    console.log(e);
     let list = JSON.parse(JSON.stringify(checkedKeys));
     let selectItemArr = selectItem;
     if (checked) {
@@ -270,8 +267,6 @@ function Organization(props: tsProps, formRef) {
         );
       }
     }
-    console.log(list);
-    console.log(selectItemArr);
     setSelectItem([...new Set(selectItemArr)]);
     setCheckedKeys([...new Set(list)]);
   };

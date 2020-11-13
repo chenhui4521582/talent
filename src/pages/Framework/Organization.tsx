@@ -540,7 +540,6 @@ export default props => {
         }
       }
     };
-    console.log(loopdata);
     handleItem(loopdata);
     return loopdata;
   };

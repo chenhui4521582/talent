@@ -24,7 +24,6 @@ export default props => {
   useEffect(() => {
     async function getDetail() {
       let res: GlobalResParams<string> = await getGlobalConfig();
-      console.log(res);
       if (res.status === 200) {
         let obj: any = res.obj || {};
         let value: any = {};
@@ -53,7 +52,6 @@ export default props => {
   }, []);
 
   const handleSub = async () => {
-    console.log(form.getFieldsValue());
     form.validateFields().then(async data => {
       let value: any = {};
       data.id ? (value.id = data.id) : null;

@@ -198,7 +198,6 @@ export default () => {
           }
           key={item.id}
           onClick={() => {
-            console.log(item);
             setSelectItem(dataList[index]);
             handleSelectRole(item.id);
           }}

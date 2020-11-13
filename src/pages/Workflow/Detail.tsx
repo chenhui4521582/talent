@@ -204,7 +204,6 @@ export default props => {
         if (json1.status === 200) {
           let obj = {};
           obj[vacationTimeId] = json1.obj?.currentLeft + '天';
-          console.log(obj);
           form.setFieldsValue(obj);
         }
       }
@@ -215,7 +214,6 @@ export default props => {
         if (json1.status === 200) {
           let obj = {};
           obj[remainCardNumberId] = json1.obj?.surplus + '次';
-          console.log(obj);
           form.setFieldsValue(obj);
         }
       }
@@ -997,13 +995,11 @@ export default props => {
         if (paramsType === 2 && setFormId) {
           let obj = {};
           obj[setFormId] = json.obj?.hour + '小时';
-          console.log(obj);
           form.setFieldsValue(obj);
         }
         if (paramsType === 3 && setFormId) {
           let obj1: any = {};
           obj1[setFormId] = json.obj?.hour + '小时';
-          console.log(obj1);
           form.setFieldsValue(obj1);
         }
       }

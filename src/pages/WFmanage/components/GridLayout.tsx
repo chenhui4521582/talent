@@ -237,7 +237,6 @@ export default props => {
         return handleData(newData, 0);
       };
       droopData(arr);
-      console.log(arr);
       setList(arr);
     }
   }, [ruleList]);
@@ -250,8 +249,6 @@ export default props => {
       }
     });
   }, [list]);
-  console.log('list');
-  console.log(list);
 
   const handleProps = (propsList, propsRuleSets) => {
     propsList = propsList.sort(compare('stepNumber'));

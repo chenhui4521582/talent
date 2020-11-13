@@ -35,8 +35,6 @@ export default () => {
       key: 'clockTimeList',
       align: 'center',
       render: (_, record) => {
-        console.log(record);
-
         if (record.ruleType === 0) {
           return record?.clockTimeList?.map((item, index) => {
             let str: any[] = [];

@@ -146,8 +146,6 @@ export default props => {
         data1.illegalProcessorNumber = illegalProcessorNumber.join(',');
       }
       data1.noticeStatus = 1;
-      // let api = saveWithConditon;
-      console.log(data1);
       let api = updateWithCondition;
       if (addOrChange === 'add') {
         api = saveWithConditon;
@@ -175,8 +173,6 @@ export default props => {
   };
 
   const getdata1 = value => {
-    console.log(value);
-    // data1 = value;
     let ruleSets: any = [];
     let steps: any = [];
 
@@ -226,7 +222,6 @@ export default props => {
       return handleData(newData);
     };
     droopData1(value);
-    console.log(steps);
     let arr: any = [];
     let arr1: any = [];
     steps?.map((item, index) => {
@@ -286,8 +281,6 @@ export default props => {
     ruleSets?.map(item => {
       item.resApprovalId = formId;
     });
-    console.log(ruleSets);
-
     data1 = {
       ruleSets,
       steps: arr1.concat(arr),
@@ -295,7 +288,6 @@ export default props => {
   };
 
   const handleUserOk = () => {
-    console.log(ref.current.getvalue());
     form.setFieldsValue({ illegalUser: ref.current.getvalue() });
     setUser(ref.current.getvalue());
     setVisible(false);
@@ -392,7 +384,6 @@ export default props => {
                 >
                   <Radio.Group
                     onChange={e => {
-                      console.log(e.target.value);
                       if (e.target.value === 1) {
                         setUserShow(false);
                       } else {

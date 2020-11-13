@@ -46,7 +46,6 @@ export default props => {
         value1 = "'" + selectRule.value + "'";
         value1 = eval('(' + value1 + ')');
         value1 = JSON.parse(value1);
-        console.log(value1);
       }
     }
     if (value1?.memberTagIds || value1?.userCodes) {
@@ -184,7 +183,6 @@ export default props => {
   }, [userList, val]);
 
   const renderLabel = useMemo(() => {
-    console.log(userList);
     return laberList?.map(item => {
       return (
         <div
