@@ -10,6 +10,7 @@ import {
   Checkbox,
   notification,
   Divider,
+  Spin,
 } from 'antd';
 import { Map, Marker, Circle } from 'react-amap';
 import moment from 'moment';
@@ -61,7 +62,7 @@ export default props => {
   const [ruleDetail, setRuleDetail] = useState<any>();
   const [userList, setUserList] = useState<any>([]);
   const [timeList, setTimeList] = useState<any>([]);
-  const [userSchedulList, setUserSchedulList] = useState<any>([]);
+  const [loading, setLoading] = useState<boolean>(false);
   const [ruleType, setRuleType] = useState<0 | 1>(0);
   const [phoneClock, setPhoneClock] = useState<0 | 1>(0);
 
@@ -97,6 +98,7 @@ export default props => {
 
   const submit = () => {
     form.validateFields().then(async data => {
+      setLoading(true);
       let ruleName = data.ruleName;
       let ruleType = data.ruleType;
 
@@ -290,12 +292,14 @@ export default props => {
 
       let json: GlobalResParams<string> = await api(subdata);
       if (json.status === 200) {
+        setLoading(false);
         notification['success']({
           message: json.msg,
           description: '',
         });
         history.go(-1);
       } else {
+        setLoading(false);
         notification['error']({
           message: json.msg,
           description: '',
@@ -305,221 +309,252 @@ export default props => {
   };
 
   return (
-    <Card title={ruleId ? '编辑规则' : '新增规则'}>
-      <Form form={form}>
-        <Form.Item
-          label="规则名称"
-          name="ruleName"
-          rules={[{ required: true, message: '请输入规则名称!' }]}
-          style={{ width: 400, marginBottom: 40 }}
-        >
-          <Input placeholder="规则名称" />
-        </Form.Item>
-
-        <Form.Item
-          label="规则类型"
-          name="ruleType"
-          rules={[{ required: true, message: '请选择规则类型!' }]}
-          style={{ width: 400, marginBottom: 20 }}
-          initialValue={0}
-        >
-          <Radio.Group
-            onChange={e => {
-              setRuleType(e.target.value);
-            }}
-          >
-            <Radio value={0} style={{ display: 'block', marginBottom: 6 }}>
-              固定时间上下班
-            </Radio>
-            <Radio value={1} style={{ display: 'block', marginBottom: 6 }}>
-              按排班上下班
-            </Radio>
-          </Radio.Group>
-        </Form.Item>
-        <Divider style={{ margin: '30px 0' }} />
-        <Form.Item
-          label="打卡人员"
-          name="memberList"
-          // rules={[{ required: true, message: '请输入用户名称!' }]}
-          style={{
-            width: '82vw',
-            marginBottom: 20,
-            minHeight: '40px',
-            overflowY: 'auto',
-          }}
-        >
-          <AddUserList
-            {...props}
-            ruleDetail={ruleDetail}
-            handleChangeUserList={handleChangeUserList}
-          />
-        </Form.Item>
-        <Divider style={{ margin: '30px 0' }} />
-        {ruleType === 1 ? (
+    <div>
+      <Card title={ruleId ? '编辑规则' : '新增规则'}>
+        <div style={{ display: 'none' }}>
+          <Map amapkey="85c4671059c4372b39b0f42cb5edab97" zoom={15} />
+        </div>
+        <Form form={form}>
           <Form.Item
-            label="排班设置"
-            name="scheduleList"
-            rules={[{ required: true, message: '请填写排班设置!' }]}
-            style={{ width: '82vw', marginBottom: 20, minHeight: '40px' }}
+            label="规则名称"
+            name="ruleName"
+            rules={[{ required: true, message: '请输入规则名称!' }]}
+            style={{ width: 400, marginBottom: 40 }}
           >
-            <AddSchedulingList
-              {...props}
-              scheduleList={ruleDetail?.scheduleList}
-              ruleId={ruleId}
-              userList={() => {
-                let newUserList: any = [];
-                userList?.map(item => {
-                  for (let key in item) {
-                    newUserList = newUserList.concat(item[key]);
-                  }
-                });
-                return newUserList;
+            <Input placeholder="规则名称" />
+          </Form.Item>
+
+          <Form.Item
+            label="规则类型"
+            name="ruleType"
+            rules={[{ required: true, message: '请选择规则类型!' }]}
+            style={{ width: 400, marginBottom: 20 }}
+            initialValue={0}
+          >
+            <Radio.Group
+              onChange={e => {
+                setRuleType(e.target.value);
               }}
-            />
-          </Form.Item>
-        ) : null}
-        {ruleType === 0 ? (
-          <Form.Item
-            label="打卡时间"
-            name="clockTimeList"
-            rules={[{ required: true, message: '请添加打卡时间!' }]}
-            style={{ width: '82vw', marginBottom: 20 }}
-          >
-            <DailyAttendance
-              {...props}
-              clockTimeList={ruleDetail?.clockTimeList}
-            />
-          </Form.Item>
-        ) : null}
-        <Divider style={{ margin: '30px 0' }} />
-        <Form.Item
-          label="手机打卡"
-          name="enablePhoneClock"
-          style={{ marginBottom: 20 }}
-        >
-          <Checkbox.Group
-            onChange={e => {
-              setPhoneClock(e.length === 0 ? 0 : 1);
-            }}
-          >
-            <Checkbox value={1}>
-              开启 开启手机端打卡，考勤状态将和门禁系统打卡结合统计
-            </Checkbox>
-          </Checkbox.Group>
-        </Form.Item>
-
-        {phoneClock ? (
-          <Form.Item label="打卡地点" name="">
-            <div>位置和WIFI满足任意一项即可打卡</div>
-          </Form.Item>
-        ) : null}
-        {phoneClock ? (
-          <Form.Item
-            label="位置"
-            name="areas"
-            style={{ marginLeft: 30 }}
-            rules={[{ required: true, message: '请编辑位置!' }]}
-          >
-            <AreasList {...props} areas={ruleDetail?.rulePhone?.areas} />
-          </Form.Item>
-        ) : null}
-        {phoneClock ? (
-          <Form.Item label="wifi" name="wifis" style={{ marginLeft: 30 }}>
-            <Wifi {...props} wifis={ruleDetail?.rulePhone?.wifis} />
-          </Form.Item>
-        ) : null}
-        {phoneClock ? <Divider style={{ margin: '30px 0' }} /> : null}
-        {phoneClock ? (
-          <Form.Item
-            label="手机提醒"
-            name="phoneTips"
-            rules={[{ required: true, message: '请选择范围外打卡!' }]}
-          >
-            <Input.Group compact style={{ marginTop: 6 }}>
-              <Form.Item
-                name={['phoneTips', 'goWorkRemind']}
-                label="上班提醒"
-                initialValue={0}
-                style={{ paddingRight: 30 }}
-              >
-                <Select placeholder="请选择" style={{ minWidth: 200 }}>
-                  <Option value={0}>准点</Option>
-                  <Option value={5}>前15分钟</Option>
-                  <Option value={10}>前10分钟</Option>
-                  <Option value={15}>前15分钟</Option>
-                  <Option value={20}>前20分钟</Option>
-                </Select>
-              </Form.Item>
-              <Form.Item
-                name={['phoneTips', 'offWorkRemind']}
-                label="下班提醒"
-                initialValue={0}
-                style={{ paddingRight: 30 }}
-              >
-                <Select placeholder="请选择" style={{ minWidth: 200 }}>
-                  <Option value={0}>准点</Option>
-                  <Option value={5}>后15分钟</Option>
-                  <Option value={10}>后10分钟</Option>
-                  <Option value={15}>后15分钟</Option>
-                  <Option value={20}>后20分钟</Option>
-                </Select>
-              </Form.Item>
-            </Input.Group>
-          </Form.Item>
-        ) : null}
-        {phoneClock ? <Divider style={{ margin: '30px 0' }} /> : null}
-        {phoneClock ? (
-          <Form.Item
-            label="范围外打卡"
-            name="clockOutOfRange"
-            rules={[{ required: true, message: '请选择范围外打卡!' }]}
-            initialValue={1}
-          >
-            <Radio.Group>
-              <Radio style={{ display: 'block' }} value={1}>
-                不允许范围外打卡
+            >
+              <Radio value={0} style={{ display: 'block', marginBottom: 6 }}>
+                固定时间上下班
               </Radio>
-              <Radio style={{ display: 'block' }} value={0}>
-                允许范围外打卡，记录为打卡异常
+              <Radio value={1} style={{ display: 'block', marginBottom: 6 }}>
+                按排班上下班
               </Radio>
             </Radio.Group>
           </Form.Item>
-        ) : null}
-        <Divider style={{ margin: '30px 0' }} />
-        <Form.Item
-          label="规则生效"
-          name="effectiveTime"
-          rules={[{ required: true, message: '请选择范围外打卡!' }]}
-          initialValue={0}
-        >
-          <Radio.Group>
-            <Radio style={{ display: 'block' }} value={0}>
-              明日生效
-            </Radio>
-            <Radio style={{ display: 'block' }} value={1}>
-              立即生效
-            </Radio>
-          </Radio.Group>
-        </Form.Item>
-      </Form>
-      <div style={{ textAlign: 'center' }}>
-        <Button
-          type="primary"
-          style={{ marginRight: 20 }}
-          onClick={() => {
-            submit();
+          <Divider style={{ margin: '30px 0' }} />
+          <Form.Item
+            label="打卡人员"
+            name="memberList"
+            // rules={[{ required: true, message: '请输入用户名称!' }]}
+            style={{
+              width: '82vw',
+              marginBottom: 20,
+              minHeight: '40px',
+              overflowY: 'auto',
+            }}
+          >
+            <AddUserList
+              {...props}
+              ruleDetail={ruleDetail}
+              handleChangeUserList={handleChangeUserList}
+            />
+          </Form.Item>
+          <Divider style={{ margin: '30px 0' }} />
+          {ruleType === 1 ? (
+            <Form.Item
+              label="排班设置"
+              name="scheduleList"
+              rules={[{ required: true, message: '请填写排班设置!' }]}
+              style={{ width: '82vw', marginBottom: 20, minHeight: '40px' }}
+            >
+              <AddSchedulingList
+                {...props}
+                scheduleList={ruleDetail?.scheduleList}
+                ruleId={ruleId}
+                userList={() => {
+                  let newUserList: any = [];
+                  userList?.map(item => {
+                    for (let key in item) {
+                      newUserList = newUserList.concat(item[key]);
+                    }
+                  });
+                  return newUserList;
+                }}
+              />
+            </Form.Item>
+          ) : null}
+          {ruleType === 0 ? (
+            <Form.Item
+              label="打卡时间"
+              name="clockTimeList"
+              rules={[{ required: true, message: '请添加打卡时间!' }]}
+              style={{ width: '82vw', marginBottom: 20 }}
+            >
+              <DailyAttendance
+                {...props}
+                clockTimeList={ruleDetail?.clockTimeList}
+              />
+            </Form.Item>
+          ) : null}
+          <Divider style={{ margin: '30px 0' }} />
+          <Form.Item
+            label="手机打卡"
+            name="enablePhoneClock"
+            style={{ marginBottom: 20 }}
+          >
+            <Checkbox.Group
+              onChange={e => {
+                setPhoneClock(e.length === 0 ? 0 : 1);
+              }}
+            >
+              <Checkbox value={1}>
+                开启 开启手机端打卡，考勤状态将和门禁系统打卡结合统计
+              </Checkbox>
+            </Checkbox.Group>
+          </Form.Item>
+
+          {phoneClock ? (
+            <Form.Item label="打卡地点" name="">
+              <div>位置和WIFI满足任意一项即可打卡</div>
+            </Form.Item>
+          ) : null}
+          {phoneClock ? (
+            <Form.Item
+              label="位置"
+              name="areas"
+              style={{ marginLeft: 30 }}
+              rules={[{ required: true, message: '请编辑位置!' }]}
+            >
+              <AreasList {...props} areas={ruleDetail?.rulePhone?.areas} />
+            </Form.Item>
+          ) : null}
+          {phoneClock ? (
+            <Form.Item label="wifi" name="wifis" style={{ marginLeft: 30 }}>
+              <Wifi {...props} wifis={ruleDetail?.rulePhone?.wifis} />
+            </Form.Item>
+          ) : null}
+          {phoneClock ? <Divider style={{ margin: '30px 0' }} /> : null}
+          {phoneClock ? (
+            <Form.Item
+              label="手机提醒"
+              name="phoneTips"
+              rules={[{ required: true, message: '请选择范围外打卡!' }]}
+            >
+              <Input.Group compact style={{ marginTop: 6 }}>
+                <Form.Item
+                  name={['phoneTips', 'goWorkRemind']}
+                  label="上班提醒"
+                  initialValue={0}
+                  style={{ paddingRight: 30 }}
+                >
+                  <Select placeholder="请选择" style={{ minWidth: 200 }}>
+                    <Option value={0}>准点</Option>
+                    <Option value={5}>前15分钟</Option>
+                    <Option value={10}>前10分钟</Option>
+                    <Option value={15}>前15分钟</Option>
+                    <Option value={20}>前20分钟</Option>
+                  </Select>
+                </Form.Item>
+                <Form.Item
+                  name={['phoneTips', 'offWorkRemind']}
+                  label="下班提醒"
+                  initialValue={0}
+                  style={{ paddingRight: 30 }}
+                >
+                  <Select placeholder="请选择" style={{ minWidth: 200 }}>
+                    <Option value={0}>准点</Option>
+                    <Option value={5}>后15分钟</Option>
+                    <Option value={10}>后10分钟</Option>
+                    <Option value={15}>后15分钟</Option>
+                    <Option value={20}>后20分钟</Option>
+                  </Select>
+                </Form.Item>
+              </Input.Group>
+            </Form.Item>
+          ) : null}
+          {phoneClock ? <Divider style={{ margin: '30px 0' }} /> : null}
+          {phoneClock ? (
+            <Form.Item
+              label="范围外打卡"
+              name="clockOutOfRange"
+              rules={[{ required: true, message: '请选择范围外打卡!' }]}
+              initialValue={1}
+            >
+              <Radio.Group>
+                <Radio style={{ display: 'block' }} value={0}>
+                  不允许范围外打卡
+                </Radio>
+                <Radio style={{ display: 'block' }} value={1}>
+                  允许范围外打卡，记录为打卡异常
+                </Radio>
+              </Radio.Group>
+            </Form.Item>
+          ) : null}
+          <Divider style={{ margin: '30px 0' }} />
+          <Form.Item
+            label="规则生效"
+            name="effectiveTime"
+            rules={[{ required: true, message: '请选择范围外打卡!' }]}
+            initialValue={0}
+          >
+            <Radio.Group>
+              <Radio style={{ display: 'block' }} value={0}>
+                明日生效
+              </Radio>
+              <Radio style={{ display: 'block' }} value={1}>
+                立即生效
+              </Radio>
+            </Radio.Group>
+          </Form.Item>
+        </Form>
+        <div style={{ textAlign: 'center' }}>
+          <Button
+            type="primary"
+            style={{ marginRight: 20 }}
+            onClick={() => {
+              submit();
+            }}
+          >
+            提交
+          </Button>
+          <Button
+            onClick={() => {
+              history.go(-1);
+            }}
+          >
+            返回
+          </Button>
+        </div>
+      </Card>
+      {loading ? (
+        <div
+          style={{
+            position: 'absolute',
+            top: -30,
+            left: -50,
+            height: 'calc(100% + 60px)',
+            width: 'calc(100% + 100px)',
+            textAlign: 'center',
+            background: 'rgba(0, 0, 0, 0.05)',
+            borderRadius: '4px',
+            marginBottom: '20px',
+            padding: '30px 50px',
+            margin: ' 20px 0',
           }}
         >
-          提交
-        </Button>
-        <Button
-          onClick={() => {
-            history.go(-1);
-          }}
-        >
-          返回
-        </Button>
-      </div>
-    </Card>
+          <Spin
+            style={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              margin: '-10px',
+            }}
+          />
+        </div>
+      ) : null}
+    </div>
   );
 };
