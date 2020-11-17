@@ -73,6 +73,7 @@ export default props => {
 
   const handleDetailOk = () => {
     let value = formRef.current.value;
+    console.log(value);
     setDetail(value);
     setVisibleDate(false);
   };
@@ -103,7 +104,7 @@ export default props => {
           <span>{item.name}</span>
           <span>
             {moment(item.clockPeriods[0]).format('HH:mm') +
-              '——' +
+              ' —— ' +
               moment(item.clockPeriods[1]).format('HH:mm')}
           </span>
           <span>
@@ -291,9 +292,10 @@ const SchedulingUser = forwardRef((props: any, formRef) => {
     for (let i = 0; i < newUserList.length; i++) {
       if (!obj1[newUserList[i].key]) {
         result.push(newUserList[i]);
-        obj1[newUserList[i].key] = true;
+        obj1[newUserList[i].code] = true;
       }
     }
+    console.log(result);
     newUserList = result;
 
     setOwnUserList([...new Set(newUserList)]);

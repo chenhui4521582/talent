@@ -128,7 +128,7 @@ export default props => {
           <span>{str.join('，')}</span>
           <span>
             {moment(item.clockPeriods[0]).format('HH:mm') +
-              '——' +
+              ' —— ' +
               moment(item.clockPeriods[1]).format('HH:mm')}
           </span>
           <span>

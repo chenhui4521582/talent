@@ -10,6 +10,7 @@ import {
   Form,
   Modal,
   message,
+  Spin,
 } from 'antd';
 import {
   updateRolu,
@@ -45,6 +46,7 @@ export default props => {
   const [userShow, setUserShow] = useState<boolean>(false);
   const [selectUserKey, setSelectUserKey] = useState<string[]>([]);
   const [user, setUser] = useState<any[]>();
+  const [loading, setLoading] = useState<boolean>(false);
   const [form] = Form.useForm();
   const ref = useRef<any>();
 
@@ -150,24 +152,24 @@ export default props => {
       if (addOrChange === 'add') {
         api = saveWithConditon;
       }
-      if (flag) {
-        flag = false;
-        setTimeout(() => {
-          flag = true;
-        }, 1000);
-        let res: GlobalResParams<string> = await api(data1);
-        if (res.status === 200) {
-          getDetail();
-          notification['success']({
-            message: res.msg,
-            description: '',
-          });
-        } else {
-          notification['error']({
-            message: res.msg,
-            description: '',
-          });
-        }
+      if (loading) {
+        return;
+      }
+      setLoading(true);
+      let res: GlobalResParams<string> = await api(data1);
+      if (res.status === 200) {
+        getDetail();
+        setLoading(false);
+        notification['success']({
+          message: res.msg,
+          description: '',
+        });
+      } else {
+        setLoading(false);
+        notification['error']({
+          message: res.msg,
+          description: '',
+        });
       }
     });
   };
@@ -425,6 +427,16 @@ export default props => {
               返回{' '}
             </Button>
           </div>
+          {loading ? (
+            <Spin
+              style={{
+                position: 'fixed',
+                top: '50vh',
+                left: '55vw',
+                margin: '-10px',
+              }}
+            />
+          ) : null}
         </Card>
       </DndProvider>
       <Modal

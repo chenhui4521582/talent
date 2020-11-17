@@ -23,6 +23,7 @@ import {
   notification,
   Table,
   message,
+  Spin,
 } from 'antd';
 import moment from 'moment';
 import Temp from './Component';
@@ -43,6 +44,7 @@ export default props => {
   const [idItemList, setIdItemList] = useState<any[]>([]);
   const [userCode, setUserCode] = useState<string | undefined>(undefined);
   const [unitList, steUnitList] = useState<IUnitList[]>();
+  const [loading, setLoading] = useState<boolean>(false);
 
   const [form] = Form.useForm();
   useEffect(() => {
@@ -650,18 +652,24 @@ export default props => {
           }
         }
       }
+      if (loading) {
+        return;
+      }
+      setLoading(true);
       let json: GlobalResParams<string> = await saveTaskForm({
         resFormId: formId,
         wfResFormSaveItemCrudParamList: subList,
         wfTaskFormFilesCrudParamList: wfTaskFormFilesCrudParamList,
       });
       if (json.status === 200) {
+        setLoading(false);
         notification['success']({
           message: json.msg,
           description: '',
         });
         window.location.href = '/talent/workflow/mylist';
       } else {
+        setLoading(false);
         notification['error']({
           message: json.msg,
           description: '',
@@ -678,6 +686,7 @@ export default props => {
     let typeId: any = undefined; //
     let setFormId: any = undefined;
     let api: any = undefined;
+    let changid: string[] = [];
     idItemList?.map((item, index) => {
       if (
         item.baseControlType === 'totalVacationTime' ||
@@ -710,6 +719,7 @@ export default props => {
         item.baseControlType === 'overTimeStart' ||
         item.baseControlType === 'outCheckStartTime'
       ) {
+        changid.push(item.id + '');
         beginTime = allValues[item.id]
           ? allValues[item.id]?.format('YYYY-MM-DD HH:mm:ss')
           : undefined;
@@ -720,12 +730,14 @@ export default props => {
         item.baseControlType === 'overTimeEnd' ||
         item.baseControlType === 'outCheckEndTime'
       ) {
+        changid.push(item.id + '');
         endTime = allValues[item.id]
           ? allValues[item.id]?.format('YYYY-MM-DD HH:mm:ss')
           : undefined;
       }
 
       if (item.baseControlType === 'vacationType') {
+        changid.push(item.id + '');
         typeId = allValues[item.id];
       }
     });
@@ -739,6 +751,9 @@ export default props => {
       return;
     }
 
+    if (changid.indexOf(Object.keys(changedValues)[0] + '') === -1) {
+      return;
+    }
     let objParam: any = undefined;
     if (apiType === 1) {
       api = vacationTime;
@@ -771,10 +786,6 @@ export default props => {
       if (endTime && beginTime) {
         getFormTotle(3);
       }
-    }
-
-    if (!changedValues?.setFormId) {
-      return;
     }
 
     async function getFormTotle(paramsType) {
@@ -829,6 +840,16 @@ export default props => {
           </div>
         ) : null}
       </Form>
+      {loading ? (
+        <Spin
+          style={{
+            position: 'fixed',
+            top: '50vh',
+            left: '55vw',
+            margin: '-10px',
+          }}
+        />
+      ) : null}
     </Card>
   );
 };

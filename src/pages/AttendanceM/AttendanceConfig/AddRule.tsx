@@ -336,10 +336,10 @@ export default props => {
                 setRuleType(e.target.value);
               }}
             >
-              <Radio value={0} style={{ display: 'block', marginBottom: 6 }}>
+              <Radio value={0} style={{ marginBottom: 6 }}>
                 固定时间上下班
               </Radio>
-              <Radio value={1} style={{ display: 'block', marginBottom: 6 }}>
+              <Radio value={1} style={{ marginBottom: 6 }}>
                 按排班上下班
               </Radio>
             </Radio.Group>
@@ -484,10 +484,10 @@ export default props => {
               initialValue={1}
             >
               <Radio.Group>
-                <Radio style={{ display: 'block' }} value={0}>
+                <Radio style={{}} value={0}>
                   不允许范围外打卡
                 </Radio>
-                <Radio style={{ display: 'block' }} value={1}>
+                <Radio style={{}} value={1}>
                   允许范围外打卡，记录为打卡异常
                 </Radio>
               </Radio.Group>
@@ -498,15 +498,11 @@ export default props => {
             label="规则生效"
             name="effectiveTime"
             rules={[{ required: true, message: '请选择范围外打卡!' }]}
-            initialValue={0}
+            initialValue={1}
           >
             <Radio.Group>
-              <Radio style={{ display: 'block' }} value={0}>
-                明日生效
-              </Radio>
-              <Radio style={{ display: 'block' }} value={1}>
-                立即生效
-              </Radio>
+              <Radio value={1}>立即生效</Radio>
+              <Radio value={0}>明日生效</Radio>
             </Radio.Group>
           </Form.Item>
         </Form>

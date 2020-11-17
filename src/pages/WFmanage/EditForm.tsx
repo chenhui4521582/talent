@@ -1,5 +1,14 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Card, Modal, Button, Input, Form, Select, notification } from 'antd';
+import {
+  Card,
+  Modal,
+  Button,
+  Input,
+  Form,
+  Select,
+  notification,
+  Spin,
+} from 'antd';
 import { useDrop, DndProvider } from 'react-dnd';
 import update from 'immutability-helper';
 import { HTML5Backend } from 'react-dnd-html5-backend';
@@ -31,6 +40,7 @@ const EditForm = props => {
   const [name, setName] = useState<string>('');
   const [selectFormIndex, setSelectFormIndex] = useState<number>();
   const [hiddenFormTyoe, setHiddenFormType] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false);
   const [form] = Form.useForm();
   useEffect(() => {
     getForm();
@@ -293,17 +303,23 @@ const EditForm = props => {
         }
       });
     });
+    if (loading) {
+      return;
+    }
+    setLoading(true);
     let json = await updateForm({
       resFormId: props.match.params.id,
       resFormControlCrudParamList: [...new Set(cList)],
     });
     if (json.status === 200) {
       getForm();
+      setLoading(false);
       notification['success']({
         message: json.msg,
         description: '',
       });
     } else {
+      setLoading(false);
       notification['error']({
         message: json.msg,
         description: '',
@@ -447,6 +463,16 @@ const EditForm = props => {
           返回{' '}
         </Button>
       </div>
+      {loading ? (
+        <Spin
+          style={{
+            position: 'fixed',
+            top: '50vh',
+            left: '55vw',
+            margin: '-10px',
+          }}
+        />
+      ) : null}
     </Card>
   );
 };
