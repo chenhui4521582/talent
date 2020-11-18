@@ -366,7 +366,7 @@ export default defineConfig({
   ],
   proxy: {
     '/api': {
-      target: 'http://172.16.248.175:8087/',
+      target: 'http://talent.jdd-hub.com/',
       changeOrigin: true,
       pathRewrite: { '^/api': 'api' },
     },

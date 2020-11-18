@@ -270,7 +270,7 @@ const SchedulingUser = forwardRef((props: any, formRef) => {
       });
     }
     let newVlaue = JSON.parse(JSON.stringify(allValue));
-    let newAllValue = Object.assign(newVlaue, obj);
+    let newAllValue = Object.assign(obj, newVlaue);
     setAllValue(newAllValue);
     form.setFieldsValue(obj);
     setValues(obj);
@@ -288,17 +288,20 @@ const SchedulingUser = forwardRef((props: any, formRef) => {
     });
 
     let result: any = [];
-    let obj1: any = {};
+    let obj1: any = [];
     for (let i = 0; i < newUserList.length; i++) {
-      if (!obj1[newUserList[i].key]) {
+      if (!newUserList[i].code) {
+        newUserList[i].code = newUserList[i].key;
+      }
+      if (obj1.indexOf(newUserList[i].code) === -1) {
+        obj1.push(newUserList[i].code);
         result.push(newUserList[i]);
-        obj1[newUserList[i].code] = true;
       }
     }
+    // newUserList = result;
+    console.log('newUserList');
     console.log(result);
-    newUserList = result;
-
-    setOwnUserList([...new Set(newUserList)]);
+    setOwnUserList([...new Set(result)]);
   }, [userDetail, list, userList]);
 
   const getWeek = date => {

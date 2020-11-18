@@ -201,6 +201,38 @@ export default props => {
         }
         scheduleDetailList = scheduleDetailObj;
       }
+      let scheduleMonth: any[] = [];
+      let month: string[] = [];
+      for (let key in scheduleDetailList) {
+        let list = scheduleDetailList[key];
+        list.map(item => {
+          month.push(item.time.substr(0, 7));
+        });
+      }
+      month = [...new Set(month)];
+      month?.map(item => {
+        let scheduleMonthObj: any = {};
+        scheduleMonthObj.month = item;
+        scheduleMonthObj.scheduleDetailList = {};
+        let arr: any = [];
+        for (let key in scheduleDetailList) {
+          scheduleDetailList[key].map(itemData => {
+            if (itemData.time.indexOf(item) > -1) {
+              arr.push(itemData);
+            }
+          });
+          let result: any = [];
+          let obj1: any = {};
+          for (let i = 0; i < arr.length; i++) {
+            if (!obj1[arr[i].time]) {
+              result.push(arr[i]);
+              obj1[arr[i].time] = true;
+            }
+          }
+          scheduleMonthObj.scheduleDetailList[key] = [...new Set(result)];
+        }
+        scheduleMonth.push(scheduleMonthObj);
+      });
 
       //位置
       let areas: any = [];
@@ -235,7 +267,7 @@ export default props => {
             enablePhoneClock: enablePhoneClock,
             effectiveTime,
             scheduleList,
-            scheduleDetailList,
+            scheduleMonth,
             rulePhone: {
               areas,
               wifis,
@@ -252,7 +284,7 @@ export default props => {
             enablePhoneClock: enablePhoneClock,
             effectiveTime,
             scheduleList,
-            scheduleDetailList,
+            scheduleMonth,
             memberList,
           };
         }
