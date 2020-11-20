@@ -243,7 +243,13 @@ export default props => {
       return formList.map(fromItem => {
         let list: any[] = fromItem.list;
         if (fromItem.type === 1) {
-          return <AutoTable list={list} handleValue={handleValue} />;
+          return (
+            <AutoTable
+              list={list}
+              handleValue={handleValue}
+              titleName={fromItem.name}
+            />
+          );
         } else {
           return (
             <Descriptions
@@ -855,7 +861,7 @@ export default props => {
 };
 
 const AutoTable = props => {
-  const { list, handleValue } = props;
+  const { list, handleValue, titleName } = props;
   const [columns, setColumns] = useState<any>([]);
   const [dataSource, setDataSource] = useState<any>([]);
   const [template, setTemplate] = useState<any>();
@@ -1014,6 +1020,17 @@ const AutoTable = props => {
         overflowX: 'auto',
       }}
     >
+      <h3
+        style={{
+          color: 'rgba(0, 0, 0, 0.85)',
+          fontWeight: 'bold',
+          fontSize: '16px',
+          lineHeight: '1.5715',
+          textAlign: 'center',
+        }}
+      >
+        {titleName}
+      </h3>
       <Table
         title={() => {
           return (

@@ -119,8 +119,8 @@ export default () => {
         });
         return (
           <div>
-            <div>{areasArr.join(',')}</div>
-            <div>{wifiArr.join(',')}</div>
+            <div>{areasArr.join('，')}</div>
+            <div>{wifiArr.join('，')}</div>
           </div>
         );
       },

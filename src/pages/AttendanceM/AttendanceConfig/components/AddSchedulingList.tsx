@@ -73,7 +73,6 @@ export default props => {
 
   const handleDetailOk = () => {
     let value = formRef.current.value;
-    console.log(value);
     setDetail(value);
     setVisibleDate(false);
   };
@@ -191,7 +190,6 @@ export default props => {
         visible={visibleDate}
         onOk={handleDetailOk}
         onCancel={() => {
-          // formRef.current?.getvalue?.resetFields();
           setVisibleDate(false);
         }}
       >
@@ -201,6 +199,8 @@ export default props => {
           userList={userList()}
           list={list}
           ref={formRef}
+          visibleDate={visibleDate}
+          detail={detail}
         />
       </Modal>
     </>
@@ -209,7 +209,7 @@ export default props => {
 
 let date = new Date();
 const SchedulingUser = forwardRef((props: any, formRef) => {
-  const { ruleId, userList, list } = props;
+  const { ruleId, userList, list, visibleDate, detail } = props;
   const [form] = Form.useForm();
   const [month, setMonth] = useState<number>(date.getMonth() + 1);
   const [year, setYear] = useState<number>(date.getFullYear());
@@ -252,57 +252,56 @@ const SchedulingUser = forwardRef((props: any, formRef) => {
   }, [month, year]);
 
   useEffect(() => {
-    let newUserList: any = [];
-    let obj: any = {};
-    for (let key in userDetail) {
-      newUserList.push({
-        code: key.split(',')[0],
-        name: key.split(',')[1],
-      });
-
-      userDetail[key].map(item => {
-        list.map(listItem => {
-          if (listItem.scheduleId === item.valueId) {
-            obj[item.data + '|' + item.time + '|' + key.split(',')[0]] =
-              listItem.name;
-          }
+    if (visibleDate) {
+      let newUserList: any = [];
+      let obj: any = {};
+      for (let key in userDetail) {
+        newUserList.push({
+          code: key.split(',')[0],
+          name: key.split(',')[1],
         });
-      });
-    }
-    let newVlaue = JSON.parse(JSON.stringify(allValue));
-    let newAllValue = Object.assign(obj, newVlaue);
-    setAllValue(newAllValue);
-    form.setFieldsValue(obj);
-    setValues(obj);
-    userList?.map(item => {
-      if (!item.key) {
-        item.key = item.code;
-      }
-      if (!item.name) {
-        item.name = item.title;
-      }
-      if (!item.title) {
-        item.title = item.name;
-      }
-      newUserList.push(item);
-    });
 
-    let result: any = [];
-    let obj1: any = [];
-    for (let i = 0; i < newUserList.length; i++) {
-      if (!newUserList[i].code) {
-        newUserList[i].code = newUserList[i].key;
+        userDetail[key].map(item => {
+          list.map(listItem => {
+            if (listItem.scheduleId === item.valueId) {
+              obj[item.data + '|' + item.time + '|' + key.split(',')[0]] =
+                listItem.name;
+            }
+          });
+        });
       }
-      if (obj1.indexOf(newUserList[i].code) === -1) {
-        obj1.push(newUserList[i].code);
-        result.push(newUserList[i]);
+      let newVlaue = JSON.parse(JSON.stringify(allValue));
+      let newAllValue = Object.assign(obj, newVlaue);
+      userList?.map(item => {
+        if (!item.key) {
+          item.key = item.code;
+        }
+        if (!item.name) {
+          item.name = item.title;
+        }
+        if (!item.title) {
+          item.title = item.name;
+        }
+        newUserList.push(item);
+      });
+
+      let result: any = [];
+      let obj1: any = [];
+      for (let i = 0; i < newUserList.length; i++) {
+        if (!newUserList[i].code) {
+          newUserList[i].code = newUserList[i].key;
+        }
+        if (obj1.indexOf(newUserList[i].code) === -1) {
+          obj1.push(newUserList[i].code);
+          result.push(newUserList[i]);
+        }
       }
+      setOwnUserList([...new Set(result)]);
+      setAllValue(newAllValue);
+      setValues(Object.assign(obj, detail));
+      form.setFieldsValue(Object.assign(obj, detail));
     }
-    // newUserList = result;
-    console.log('newUserList');
-    console.log(result);
-    setOwnUserList([...new Set(result)]);
-  }, [userDetail, list, userList]);
+  }, [userDetail, list, userList, visibleDate, detail]);
 
   const getWeek = date => {
     let week;
@@ -449,11 +448,11 @@ const SchedulingUser = forwardRef((props: any, formRef) => {
       {renderTableHead}
       <Form
         form={form}
-        onValuesChange={value => {
+        onValuesChange={(value, allValues) => {
           let newVlaue = JSON.parse(JSON.stringify(allValue));
-          let newAllValue = Object.assign(newVlaue, form.getFieldsValue());
-          setAllValue(newAllValue);
+          let newAllValue = Object.assign(newVlaue, allValues);
           setTimeout(() => {
+            setAllValue(newAllValue);
             setValues(form.getFieldsValue());
           }, 400);
         }}

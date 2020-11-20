@@ -1,10 +1,11 @@
 // 我的打卡
 import React, { useState, useEffect, useMemo } from 'react';
-import { Card, Calendar, Badge } from 'antd';
+import { Card, Calendar, Badge, Tooltip } from 'antd';
 import locale from 'antd/lib/calendar/locale/zh_CN.js';
 import { listMyRecord } from './services/list';
 import { GlobalResParams } from '@/types/ITypes';
 import calendar from 'solarday2lunarday';
+import moment from 'moment';
 import './styles/myclockin.less';
 
 // 上班打卡方式
@@ -71,7 +72,12 @@ export default () => {
     if (record?.currentMonthRecord && record?.currentMonthRecord?.length) {
       record?.currentMonthRecord?.map((item, index) => {
         if (value.format('YYYY-MM-DD') === handlenumTostring(item.date)) {
-          if (startStatus[item.startStatus] && item.startStatus === 1) {
+          if (
+            startStatus[item.startStatus] &&
+            item.startStatus === 1 &&
+            startStatus[item.endStatus] &&
+            item.endStatus === 1
+          ) {
             html = (
               <span key={index}>
                 <Badge color="#87d068" />
@@ -86,6 +92,19 @@ export default () => {
               </span>
             );
           } else if (!startStatus[item.startStatus]) {
+            html = (
+              <span>
+                <Badge color="#b8b8b8" />
+              </span>
+            );
+          } else if (startStatus[item.endStatus] && item.endStatus != 1) {
+            html = (
+              <span key={index}>
+                <Badge color="red" />
+                {startStatus[item.endStatus]}
+              </span>
+            );
+          } else if (!startStatus[item.endStatus]) {
             html = (
               <span>
                 <Badge color="#b8b8b8" />
@@ -141,9 +160,10 @@ export default () => {
       </div>
     );
     if (record?.currentMonthRecord && record?.currentMonthRecord?.length) {
-      record?.currentMonthRecord.map((item, index) => {
+      record?.currentMonthRecord.map((item: any, index) => {
         if (selectItem === handlenumTostring(item.date)) {
           let day: any = calendar.solar2lunar(handlenumTostring(item.date));
+          let length = item?.outCLockRecords?.length;
           HTML = (
             <div className="myclock-bottom" key={index}>
               <div>
@@ -159,6 +179,62 @@ export default () => {
               </div>
               <div>
                 <h3>{`下班打卡时间（ ${item?.endDate || '未打卡'}）`}</h3>
+              </div>
+              <div style={{}}>
+                <h3>外出打卡</h3>
+                {length > 3 ? (
+                  <Tooltip
+                    placement="left"
+                    title={item?.outCLockRecords?.map(
+                      (outCLockRecordsItem, outCLockRecordsIndex) => {
+                        return (
+                          <p>
+                            <span>{outCLockRecordsItem.area}</span>
+                            <span style={{ marginLeft: 5 }}>
+                              {moment(outCLockRecordsItem.clockTime).format(
+                                'HH:MM',
+                              )}
+                            </span>
+                          </p>
+                        );
+                      },
+                    )}
+                  >
+                    {item?.outCLockRecords?.map(
+                      (outCLockRecordsItem, outCLockRecordsIndex) => {
+                        if (outCLockRecordsIndex < 3) {
+                          return (
+                            <p>
+                              <span>{outCLockRecordsItem.area}</span>
+                              <span style={{ marginLeft: 5 }}>
+                                {moment(outCLockRecordsItem.clockTime).format(
+                                  'HH:MM',
+                                )}
+                              </span>
+                            </p>
+                          );
+                        }
+                      },
+                    )}
+                  </Tooltip>
+                ) : (
+                  <div>
+                    {item?.outCLockRecords?.map(
+                      (outCLockRecordsItem, outCLockRecordsIndex) => {
+                        return (
+                          <p>
+                            <span>{outCLockRecordsItem.area}</span>
+                            <span style={{ marginLeft: 5 }}>
+                              {moment(outCLockRecordsItem.clockTime).format(
+                                'HH:MM',
+                              )}
+                            </span>
+                          </p>
+                        );
+                      },
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           );

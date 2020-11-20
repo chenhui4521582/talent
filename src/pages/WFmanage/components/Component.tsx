@@ -493,7 +493,7 @@ const LaborTemplate = props => {
       filterOption={(input, option) =>
         option?.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
       }
-      placeholder="请选择劳动关系"
+      placeholder="请选择"
     >
       {laborList?.map(item => {
         return (

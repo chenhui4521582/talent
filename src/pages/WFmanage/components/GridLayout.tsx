@@ -1065,7 +1065,12 @@ export default props => {
                 { required: type === 2 ? true : false, message: '请选择标签!' },
               ]}
             >
-              <Select placeholder="请选择标签" allowClear>
+              <Select
+                placeholder="请选择标签"
+                allowClear
+                showSearch
+                optionFilterProp="children"
+              >
                 {labelList?.map(item => {
                   return (
                     <Option key={item.id} value={item.id}>

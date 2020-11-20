@@ -214,19 +214,19 @@ export default props => {
         let scheduleMonthObj: any = {};
         scheduleMonthObj.month = item;
         scheduleMonthObj.scheduleDetailList = {};
-        let arr: any = [];
         for (let key in scheduleDetailList) {
+          let arr: any = [];
           scheduleDetailList[key].map(itemData => {
             if (itemData.time.indexOf(item) > -1) {
               arr.push(itemData);
             }
           });
           let result: any = [];
-          let obj1: any = {};
+          let obj1: any = [];
           for (let i = 0; i < arr.length; i++) {
-            if (!obj1[arr[i].time]) {
+            if (obj1.indexOf(arr[i].time) === -1) {
               result.push(arr[i]);
-              obj1[arr[i].time] = true;
+              obj1.push(arr[i].time);
             }
           }
           scheduleMonthObj.scheduleDetailList[key] = [...new Set(result)];

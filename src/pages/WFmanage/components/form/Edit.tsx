@@ -169,7 +169,13 @@ const Edit = (props: Iprops) => {
           return false;
         }}
       >
-        <Select placeholder="请选择控件类型">{renderControl}</Select>
+        <Select
+          placeholder="请选择控件类型"
+          showSearch
+          optionFilterProp="children"
+        >
+          {renderControl}
+        </Select>
       </Form.Item>
 
       {showInput ? (
