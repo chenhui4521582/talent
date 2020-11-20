@@ -250,6 +250,12 @@ export default props => {
     });
   }, [list]);
 
+  useEffect(() => {
+    userkeyList = selectObj?.userCodeList
+      ? selectObj?.userCodeList.split(',')
+      : [];
+  }, [selectObj]);
+
   const handleProps = (propsList, propsRuleSets) => {
     propsList = propsList.sort(compare('stepNumber'));
     let newList = JSON.parse(JSON.stringify(propsList || []));

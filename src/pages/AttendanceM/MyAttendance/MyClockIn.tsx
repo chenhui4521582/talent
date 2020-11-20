@@ -16,6 +16,7 @@ const startMethod = {
 
 //上班状态
 const startStatus = {
+  '-1': '未打卡',
   0: '无效打卡',
   1: '正常',
   2: '早退',
@@ -25,6 +26,7 @@ const startStatus = {
   6: '设备异常',
   7: '加班打卡',
   8: '旷工',
+  9: '补卡',
 };
 
 let now = new Date();
@@ -73,10 +75,10 @@ export default () => {
       record?.currentMonthRecord?.map((item, index) => {
         if (value.format('YYYY-MM-DD') === handlenumTostring(item.date)) {
           if (
-            startStatus[item.startStatus] &&
-            item.startStatus === 1 &&
-            startStatus[item.endStatus] &&
-            item.endStatus === 1
+            (item.startStatus == 1 ||
+              item.startStatus == 7 ||
+              item.startStatus == 9) &&
+            (item.endStatus == 1 || item.endStatus == 7 || item.endStatus == 9)
           ) {
             html = (
               <span key={index}>
@@ -84,37 +86,25 @@ export default () => {
                 打卡正常
               </span>
             );
-          } else if (startStatus[item.startStatus] && item.startStatus != 1) {
+          } else if (item.endStatus == '-1' || item.startStatus == '-1') {
             html = (
               <span key={index}>
                 <Badge color="red" />
-                {startStatus[item.startStatus]}
+                未打卡
               </span>
             );
-          } else if (!startStatus[item.startStatus]) {
-            html = (
-              <span>
-                <Badge color="#b8b8b8" />
-              </span>
-            );
-          } else if (startStatus[item.endStatus] && item.endStatus != 1) {
-            html = (
-              <span key={index}>
-                <Badge color="red" />
-                {startStatus[item.endStatus]}
-              </span>
-            );
-          } else if (!startStatus[item.endStatus]) {
-            html = (
-              <span>
-                <Badge color="#b8b8b8" />
-              </span>
-            );
-          } else {
+          } else if (!item.startStatus && !item.endStatus) {
             html = (
               <span>
                 <Badge color="#b8b8b8" />
                 暂无当天打卡信息
+              </span>
+            );
+          } else {
+            html = (
+              <span key={index}>
+                <Badge color="red" />
+                {startStatus[item.startStatus]}/{startStatus[item.endStatus]}
               </span>
             );
           }
@@ -176,9 +166,11 @@ export default () => {
               </div>
               <div>
                 <h3>{`上班打卡时间（${item?.startDate || '未打卡'}）`}</h3>
+                <p>{startStatus[item.startStatus]}</p>
               </div>
               <div>
                 <h3>{`下班打卡时间（ ${item?.endDate || '未打卡'}）`}</h3>
+                <p>{startStatus[item.endStatus]}</p>
               </div>
               <div style={{}}>
                 <h3>外出打卡</h3>
