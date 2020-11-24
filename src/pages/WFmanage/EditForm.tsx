@@ -21,6 +21,7 @@ import {
   getFormDetail,
   IForm,
   ItemTypes,
+  updateSort,
 } from './services/form';
 import { GlobalResParams } from '@/types/ITypes';
 import DropForm from './components/form/DropForm';
@@ -124,15 +125,25 @@ const EditForm = props => {
 
   const handleMoveIndex = (dragIndex: number, hoverIndex: number) => {
     let fromList = JSON.parse(JSON.stringify(formDetail));
-    const dragCard = fromList[dragIndex];
-    setFormDetail(
-      update(fromList, {
-        $splice: [
-          [dragIndex, 1],
-          [hoverIndex, 0, dragCard],
-        ],
-      }),
-    );
+    async function upSort() {
+      let json: GlobalResParams<string> = await updateSort(
+        fromList[dragIndex].id,
+        fromList[hoverIndex].id,
+      );
+      if (json.status === 200) {
+        const dragCard = fromList[dragIndex];
+        setFormDetail(
+          update(fromList, {
+            $splice: [
+              [dragIndex, 1],
+              [hoverIndex, 0, dragCard],
+            ],
+          }),
+        );
+      }
+    }
+
+    upSort();
   };
 
   const handleRemove = (index: number) => {

@@ -145,3 +145,13 @@ export async function updateCForm(resFormId, id, name, columnNum, type) {
     },
   });
 }
+// 更换子表单位置
+export async function updateSort(id1, id2) {
+  return request(`/api/talent/wfresformchild/updateSort`, {
+    method: 'POST',
+    data: {
+      id1,
+      id2,
+    },
+  });
+}

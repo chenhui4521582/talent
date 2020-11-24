@@ -658,6 +658,13 @@ const WkTask = props => {
       width: '15vw',
     },
     {
+      title: '申请单号',
+      dataIndex: 'formNumber',
+      key: 'formNumber',
+      align: 'center',
+      width: '15vw',
+    },
+    {
       title: '创建日期',
       dataIndex: 'createTime',
       key: 'createTime',
@@ -678,6 +685,7 @@ const WkTask = props => {
     cacheKey: 'wftaskform/listMyFormPageWkTask',
     showCheck: true,
     noClearKey: true,
+    selectedType: 'radio',
   });
 
   const handleOk = () => {
@@ -748,7 +756,7 @@ const WkTask = props => {
         cancelText="取消"
         onOk={handleOk}
         onCancel={handleOk}
-        width="50vw"
+        width="67vw"
       >
         <TableContent>
           <Row>

@@ -14,8 +14,9 @@ interface useTablesParams {
   cacheKey: string;
   showCheck?: boolean | undefined;
   noClearKey?: boolean | undefined;
+  selectedType?: 'checkbox' | 'radio' | undefined;
 }
-const selectedType = 'checkbox';
+
 export const useTable = ({
   queryMethod,
   columns,
@@ -25,6 +26,7 @@ export const useTable = ({
   cacheKey,
   showCheck,
   noClearKey,
+  selectedType,
 }: useTablesParams) => {
   const [searchForm] = Form.useForm();
   const { tableProps, refresh, search } = useFormTable(
@@ -63,9 +65,8 @@ export const useTable = ({
     }
     return [...new Set(arr)];
   };
-
   const rowSelection = {
-    selectedType,
+    type: selectedType,
     onChange: (selectedRowKeys, selectedRows) => {
       let page = tableProps.pagination.current || 'none';
       let obj: any = JSON.parse(JSON.stringify(selectPageObj));

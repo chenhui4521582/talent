@@ -187,7 +187,11 @@ export default props => {
             if (index < listItem?.length - 1) {
               nodeType = 2;
             } else {
-              nodeType = 3;
+              if (item?.ruleList?.length >= 2) {
+                nodeType = 2;
+              } else {
+                nodeType = 3;
+              }
             }
 
             if (item.type === 6) {
