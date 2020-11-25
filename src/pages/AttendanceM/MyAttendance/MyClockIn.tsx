@@ -66,11 +66,7 @@ export default () => {
   };
 
   const dateCellRender = value => {
-    let html: any = (
-      <span>
-        <Badge color="#b8b8b8" />
-      </span>
-    );
+    let html: any = <span>{/* <Badge color="#b8b8b8" /> */}</span>;
     if (record?.currentMonthRecord && record?.currentMonthRecord?.length) {
       record?.currentMonthRecord?.map((item, index) => {
         if (value.format('YYYY-MM-DD') === handlenumTostring(item.date)) {
@@ -117,7 +113,13 @@ export default () => {
         </span>
       );
     }
-    return html;
+
+    return (
+      <div className="date-item">
+        <p style={{ marginBottom: 4 }}>{value.format('DD')}</p>
+        <p>{html}</p>
+      </div>
+    );
   };
 
   const onChange = value => {
@@ -240,7 +242,7 @@ export default () => {
     <Card title="我的打卡">
       <Calendar
         locale={locale}
-        dateCellRender={dateCellRender}
+        dateFullCellRender={dateCellRender}
         onChange={onChange}
         onSelect={onSelect}
       />
